@@ -41,7 +41,7 @@ DEFAULTS = dict(
     trunk_height_target=0.040,
     trunk_support=0.70,
     low_trunk=0.10,
-    front_load=0.55,
+    front_load=0.90,
     front_load_force_scale=0.0564,
     belly_rate=0.05,
     hind_participation=0.0,
@@ -68,6 +68,7 @@ class WalkReward:
         self._height_history = deque(maxlen=window)
         self._hind_push_history = deque(maxlen=window)
         self._prev_hind_body_x = None
+        self._fls_ema = 0.0
 
     def _reset_v4_history(self):
         self._contact_history.clear()
@@ -75,6 +76,7 @@ class WalkReward:
         self._height_history.clear()
         self._hind_push_history.clear()
         self._prev_hind_body_x = None
+        self._fls_ema = 0.0
 
     def _participation_fraction(self, arr, feet):
         if arr.size == 0:
@@ -192,6 +194,8 @@ class WalkReward:
             ) / np.sum(front_stance))
         else:
             front_load_score = 0.0
+        self._fls_ema = 0.95 * self._fls_ema + 0.05 * front_load_score
+        front_factor = 0.25 + 0.75 * self._fls_ema
         front_sync_excess = float(np.clip(
             (v4["front_pair_sync_rate"] - w["front_pair_sync_free"]) / (1.0 - w["front_pair_sync_free"]),
             0.0,
@@ -227,6 +231,9 @@ class WalkReward:
         r_smooth = -w["smooth"] * smooth
         r_reach = w["reach"] if metrics["reached"] else 0.0
         r_fall = -w["fall"] if metrics["fallen"] else 0.0
+        r_progress *= front_factor
+        r_forward *= front_factor
+        r_reach *= front_factor
         r_front_pair_sync = -w["front_pair_sync"] * speed_gate * (front_sync_excess ** 2)
         r_front_pair_hop = -w["front_pair_hop"] * speed_gate * (front_hop_excess ** 2)
         r_body_bounce = -w["body_bounce"] * speed_gate * bounce_excess
