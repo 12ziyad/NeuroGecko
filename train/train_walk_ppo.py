@@ -35,7 +35,8 @@ from envs.gecko_walk_env import GeckoWalkEnv
 
 
 def make_env(seed, control_mode="raw", residual_scale=0.25,
-             contact_thresh=1e-6, front_stance_press=0.35):
+             contact_thresh=1e-6, front_stance_press=0.40,
+             front_swing_lift=0.40):
     def _f():
         return GeckoWalkEnv(
             seed=seed,
@@ -43,6 +44,7 @@ def make_env(seed, control_mode="raw", residual_scale=0.25,
             residual_scale=residual_scale,
             contact_thresh=contact_thresh,
             front_stance_press=front_stance_press,
+            front_swing_lift=front_swing_lift,
         )
     return _f
 
@@ -67,7 +69,8 @@ def main():
                    help="reset SB3 timestep counter when resuming")
     p.add_argument("--control-mode", choices=["raw", "cpg_residual"], default="raw")
     p.add_argument("--residual-scale", type=float, default=0.25)
-    p.add_argument("--front-stance-press", type=float, default=0.35)
+    p.add_argument("--front-stance-press", type=float, default=0.40)
+    p.add_argument("--front-swing-lift", type=float, default=0.40)
     p.add_argument("--contact-thresh", type=float, default=0.0564)
     args = p.parse_args()
 
@@ -81,7 +84,7 @@ def main():
 
     env_fns = [
         make_env(args.seed + i, args.control_mode, args.residual_scale,
-                 args.contact_thresh, args.front_stance_press)
+                 args.contact_thresh, args.front_stance_press, args.front_swing_lift)
         for i in range(args.envs)
     ]
     venv = VecCls(env_fns)
@@ -95,7 +98,7 @@ def main():
 
     eval_env = DummyVecEnv([
         make_env(10_000, args.control_mode, args.residual_scale,
-                 args.contact_thresh, args.front_stance_press)
+                 args.contact_thresh, args.front_stance_press, args.front_swing_lift)
     ])
     eval_env = VecMonitor(eval_env)
     eval_env = VecNormalize(eval_env, norm_obs=True, norm_reward=False, training=False, clip_obs=10.0)

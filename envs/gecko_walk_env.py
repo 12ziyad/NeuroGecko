@@ -68,7 +68,7 @@ class GeckoWalkEnv(gym.Env):
                  target_radius=0.25, reach_dist=0.04, action_scale=1.0,
                  action_ema=0.0, reset_noise=0.02, reward_cfg=None,
                  control_mode="raw", residual_scale=0.2, contact_thresh=1e-6,
-                 front_stance_press=0.35,
+                 front_stance_press=0.40, front_swing_lift=0.40,
                  render_mode=None, seed=None):
         super().__init__()
         self.model = mujoco.MjModel.from_xml_path(str(xml_path or DEFAULT_XML))
@@ -86,6 +86,7 @@ class GeckoWalkEnv(gym.Env):
         self.control_mode = control_mode
         self.residual_scale = float(residual_scale)
         self.front_stance_press = float(front_stance_press)
+        self.front_swing_lift = float(front_swing_lift)
         self.render_mode = render_mode
         self._rng = np.random.default_rng(seed)
         self.gait = LateralSequenceCPG()
@@ -113,6 +114,7 @@ class GeckoWalkEnv(gym.Env):
                 self.model,
                 residual_scale=self.residual_scale,
                 front_stance_press=self.front_stance_press,
+                front_swing_lift=self.front_swing_lift,
                 verbose=False,
             )
 

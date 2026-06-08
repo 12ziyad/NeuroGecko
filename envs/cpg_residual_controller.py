@@ -1,5 +1,5 @@
 """
-CPG-driven residual controller for GeckoBrain V4.2.1.
+CPG-driven residual controller for GeckoBrain V4.2.2.
 
 The action shape stays 25. A policy action is interpreted as a residual around
 an open-loop lateral-sequence CPG:
@@ -7,9 +7,9 @@ an open-loop lateral-sequence CPG:
     final_ctrl = clip(CPG_base(t) + action * residual_scale * ctrl_half_range)
 
 The front lift actuators, `elbow_L` and `elbow_R`, are locked to the CPG with
-zero residual scale so the policy cannot merge the front swing windows. V4.2.1
-also presses the front lifts downward during stance so the front feet carry
-load instead of floating through their stance windows.
+zero residual scale so the policy cannot merge the front swing windows. V4.2.2
+keeps front-foot load during stance while giving front swing lift its own
+explicit amplitude.
 """
 from __future__ import annotations
 
@@ -47,12 +47,12 @@ SIGN = {}
 
 
 def _limb_signals(phi, stance):
-    """Return fore-aft signal in [-1, 1] and swing lift in [0, 1]."""
+    """Return fore-aft signal, swing lift, and whether the limb is in stance."""
     if phi < stance:
         s = phi / stance
-        return (1.0 - 2.0 * s), 0.0
+        return (1.0 - 2.0 * s), 0.0, True
     s = (phi - stance) / (1.0 - stance)
-    return (-1.0 + 2.0 * s), math.sin(math.pi * s)
+    return (-1.0 + 2.0 * s), math.sin(math.pi * s), False
 
 
 class CPGResidualController:
@@ -70,7 +70,8 @@ class CPGResidualController:
         residual_scale=0.2,
         lock_front_lift=True,
         front_lift_residual_scale=0.0,
-        front_stance_press=0.35,
+        front_stance_press=0.40,
+        front_swing_lift=0.40,
         verbose=False,
     ):
         self.model = model
@@ -83,6 +84,7 @@ class CPGResidualController:
         self.lock_front_lift = bool(lock_front_lift)
         self.front_lift_residual_scale = float(front_lift_residual_scale)
         self.front_stance_press = float(front_stance_press)
+        self.front_swing_lift = float(front_swing_lift)
 
         nu = model.nu
         lo = model.actuator_ctrlrange[:, 0].copy()
@@ -126,12 +128,12 @@ class CPGResidualController:
             signals[limb] = _limb_signals(phi, self.stance)
 
         for aid, limb, role in self.entries:
-            fa, lift = signals[limb]
+            fa, lift, in_stance = signals[limb]
             if role == "fa":
                 signal = self.amp["fa"] * fa
             elif role == "lift":
                 if limb in ("FL", "FR"):
-                    signal = self.amp["lift"] * lift if lift > 0.0 else -self.front_stance_press
+                    signal = self.front_stance_press if in_stance else self.front_swing_lift * lift
                 else:
                     signal = self.amp["lift"] * lift
             else:
@@ -158,7 +160,7 @@ class CPGResidualController:
         name = lambda i: mujoco.mj_id2name(self.model, mujoco.mjtObj.mjOBJ_ACTUATOR, i) or f"act{i}"
         print("[cpg] CPG-residual controller")
         print(f"      freq={self.freq} Hz  stance={self.stance}  residual_scale={self.residual_scale}")
-        print(f"      front_stance_press={self.front_stance_press} (FL/FR press down during stance)")
+        print(f"      front_stance_press={self.front_stance_press}  front_swing_lift={self.front_swing_lift}")
         by_limb = {"HL": [], "FL": [], "HR": [], "FR": []}
         for aid, limb, role in self.entries:
             by_limb.setdefault(limb, []).append(f"{name(aid)}({role})")

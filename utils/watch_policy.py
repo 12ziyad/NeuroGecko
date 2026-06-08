@@ -5,7 +5,7 @@ watch_policy.py  --  roll out a trained policy and print metrics.
     python utils/watch_policy.py --run v3_cpg_sanity_200k --episodes 3 --render-video
 """
 from __future__ import annotations
-import argparse, sys, os, platform, contextlib
+import argparse, sys, os, platform, contextlib, math
 from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO))
@@ -16,6 +16,107 @@ import numpy as np
 from envs.gecko_walk_env import GeckoWalkEnv, _GAIT_FEET
 
 _FOOT_INDEX = {foot: i for i, foot in enumerate(_GAIT_FEET)}
+
+
+def _ensure_renderer(env):
+    import mujoco
+    if env._renderer is None:
+        env._renderer = mujoco.Renderer(env.model, 480, 640)
+    return env._renderer
+
+
+def _scene_obj(renderer):
+    return getattr(renderer, "scene", getattr(renderer, "_scene", None))
+
+
+def _target_marker_xyz(env):
+    target = getattr(env, "target", None)
+    if target is None:
+        return None
+    return np.array([float(target[0]), float(target[1]), 0.045], dtype=np.float64)
+
+
+def _add_scene_sphere(renderer, pos, radius=0.025, rgba=(1.0, 0.1, 0.05, 1.0)):
+    import mujoco
+    scene = _scene_obj(renderer)
+    if scene is None or scene.ngeom >= scene.maxgeom:
+        return
+    geom = scene.geoms[scene.ngeom]
+    mujoco.mjv_initGeom(
+        geom,
+        mujoco.mjtGeom.mjGEOM_SPHERE,
+        np.array([radius, radius, radius], dtype=np.float64),
+        np.asarray(pos, dtype=np.float64),
+        np.eye(3, dtype=np.float64).reshape(-1),
+        np.asarray(rgba, dtype=np.float32),
+    )
+    scene.ngeom += 1
+
+
+def _add_scene_capsule(renderer, start, end, radius=0.006, rgba=(1.0, 0.7, 0.05, 0.9)):
+    import mujoco
+    scene = _scene_obj(renderer)
+    if scene is None or scene.ngeom >= scene.maxgeom:
+        return
+    geom = scene.geoms[scene.ngeom]
+    try:
+        mujoco.mjv_connector(
+            geom,
+            mujoco.mjtGeom.mjGEOM_CAPSULE,
+            float(radius),
+            np.asarray(start, dtype=np.float64),
+            np.asarray(end, dtype=np.float64),
+        )
+        geom.rgba[:] = np.asarray(rgba, dtype=np.float32)
+        scene.ngeom += 1
+    except Exception:
+        return
+
+
+def _add_target_marker(env, renderer):
+    target_xyz = _target_marker_xyz(env)
+    if target_xyz is None:
+        return
+    trunk = env.data.xpos[env._trunk].copy()
+    trunk_ground = np.array([trunk[0], trunk[1], target_xyz[2]], dtype=np.float64)
+    _add_scene_capsule(renderer, trunk_ground, target_xyz)
+    _add_scene_sphere(renderer, target_xyz)
+
+
+def _wide_camera_lookat(env, lookahead):
+    trunk = env.data.xpos[env._trunk].copy()
+    lookat = trunk.copy()
+    target = getattr(env, "target", None)
+    if target is not None:
+        delta = np.array([target[0] - trunk[0], target[1] - trunk[1]], dtype=np.float64)
+        norm = float(np.linalg.norm(delta))
+        if norm > 1e-9:
+            lookat[:2] += delta / norm * float(lookahead)
+            return lookat
+    forward = env.data.xmat[env._trunk].reshape(3, 3)[:, 0]
+    lookat[:2] += forward[:2] * float(lookahead)
+    return lookat
+
+
+def _render_frame(env, camera_mode, args):
+    import mujoco
+    renderer = _ensure_renderer(env)
+    cam = mujoco.MjvCamera()
+    mujoco.mjv_defaultCamera(cam)
+    if camera_mode == "wide":
+        distance = max(float(args.camera_distance), 1e-6)
+        height = max(float(args.camera_height), 0.0)
+        cam.lookat[:] = _wide_camera_lookat(env, args.camera_lookahead)
+        cam.distance = distance
+        cam.azimuth = 130
+        cam.elevation = -math.degrees(math.asin(min(height / distance, 0.95)))
+    else:
+        cam.lookat[:] = env.data.xpos[env._trunk]
+        cam.distance, cam.azimuth, cam.elevation = 0.34, 130, -18
+    renderer.update_scene(env.data, camera=cam)
+    if args.show_target:
+        _add_target_marker(env, renderer)
+    return renderer.render()
 
 
 def _mean_or_nan(values):
@@ -39,11 +140,17 @@ def main():
     p.add_argument("--episodes", type=int, default=3)
     p.add_argument("--fps", type=int, default=50)
     p.add_argument("--render-video", action="store_true")
+    p.add_argument("--camera-mode", choices=["close", "wide", "both"], default="close")
+    p.add_argument("--camera-distance", type=float, default=3.0)
+    p.add_argument("--camera-height", type=float, default=0.9)
+    p.add_argument("--camera-lookahead", type=float, default=0.8)
+    p.add_argument("--show-target", action="store_true")
     p.add_argument("--participation-window", type=int, default=50,
                    help="steps used for hind/all-foot stance+swing participation metrics")
     p.add_argument("--control-mode", choices=["raw", "cpg_residual"], default="raw")
     p.add_argument("--residual-scale", type=float, default=0.25)
-    p.add_argument("--front-stance-press", type=float, default=0.35)
+    p.add_argument("--front-stance-press", type=float, default=0.40)
+    p.add_argument("--front-swing-lift", type=float, default=0.40)
     p.add_argument("--contact-thresh", type=float, default=0.0564)
     args = p.parse_args()
 
@@ -56,6 +163,7 @@ def main():
         control_mode=args.control_mode,
         residual_scale=args.residual_scale,
         front_stance_press=args.front_stance_press,
+        front_swing_lift=args.front_swing_lift,
         contact_thresh=args.contact_thresh,
     )
     venv = DummyVecEnv([lambda: base])
@@ -66,7 +174,11 @@ def main():
     model = PPO.load(str(ckpt) if (out / "best_model.zip").exists() else str(out / "final"),
                      device="cpu")
 
-    frames, reached, falls, rets = [], 0, 0, []
+    render_views = []
+    if args.render_video:
+        render_views = ["close", "wide"] if args.camera_mode == "both" else [args.camera_mode]
+    frames_by_view = {view: [] for view in render_views}
+    reached, falls, rets = 0, 0, []
     final_distances = []
     forward_speeds = []
     gait_matches = []
@@ -126,7 +238,8 @@ def main():
             trunk_heights.append(trunk_height)
             episode_trunk_heights.append(trunk_height)
             if args.render_video:
-                frames.append(base.render())
+                for view in render_views:
+                    frames_by_view[view].append(_render_frame(base, view, args))
         rets.append(ret)
         final_distances.append(float(info[0].get("distance", info[0].get("dist", np.nan))))
         falls += int(info[0].get("fallen", 0.0) > 0.5)
@@ -162,9 +275,27 @@ def main():
         try:
             import imageio.v2 as imageio
             outdir = REPO / "renders"; outdir.mkdir(exist_ok=True)
-            path = outdir / f"{args.run}.mp4"
-            imageio.mimwrite(path, frames, fps=args.fps, quality=8)
-            print("video ->", path)
+
+            def write_video(path, frames):
+                if not frames:
+                    return
+                imageio.mimwrite(path, frames, fps=args.fps, quality=8)
+                print("video ->", path)
+
+            if args.camera_mode == "both":
+                close_path = outdir / f"{args.run}_close.mp4"
+                wide_path = outdir / f"{args.run}_wide.mp4"
+                both_path = outdir / f"{args.run}_both_views.mp4"
+                write_video(close_path, frames_by_view.get("close", []))
+                write_video(wide_path, frames_by_view.get("wide", []))
+                write_video(
+                    both_path,
+                    frames_by_view.get("close", []) + frames_by_view.get("wide", []),
+                )
+            elif args.camera_mode == "wide":
+                write_video(outdir / f"{args.run}_wide.mp4", frames_by_view.get("wide", []))
+            else:
+                write_video(outdir / f"{args.run}.mp4", frames_by_view.get("close", []))
         except Exception as e:
             print("video write failed:", str(e)[:120])
 
