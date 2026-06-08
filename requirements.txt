@@ -1,0 +1,12 @@
+# GeckoBrain — Phase 1 (locomotion). CPU is enough for this phase.
+mujoco==3.9.0
+gymnasium>=0.29.1,<1.3.0
+stable-baselines3==2.8.0
+sb3-contrib==2.8.0        # RecurrentPPO (Phase 2+)
+numpy>=1.26
+imageio>=2.34
+imageio-ffmpeg>=0.5       # mp4 writing for watch_policy
+tensorboard>=2.16         # training curves
+# torch is pulled in by stable-baselines3 (CPU build by default).
+# GPU torch is only needed for the camera phases (Phase 2+):
+#   pip install torch --index-url https://download.pytorch.org/whl/cu124
