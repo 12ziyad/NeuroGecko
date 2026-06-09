@@ -41,7 +41,7 @@ DEFAULTS = dict(
     trunk_height_target=0.040,
     trunk_support=0.70,
     low_trunk=0.10,
-    front_load=0.90,
+    front_load=1.20,
     front_load_force_scale=0.0564,
     belly_rate=0.05,
     hind_participation=0.0,
@@ -50,7 +50,7 @@ DEFAULTS = dict(
     foot_participation=0.02,
     front_pair_sync=0.20,
     front_pair_sync_free=0.40,
-    front_pair_hop=0.10,
+    front_pair_hop=0.18,
     front_pair_hop_free=0.05,
     body_bounce=0.10,
     body_bounce_free=0.008,
@@ -195,7 +195,7 @@ class WalkReward:
         else:
             front_load_score = 0.0
         self._fls_ema = 0.95 * self._fls_ema + 0.05 * front_load_score
-        front_factor = 0.25 + 0.75 * self._fls_ema
+        front_factor = 0.10 + 0.90 * self._fls_ema
         front_sync_excess = float(np.clip(
             (v4["front_pair_sync_rate"] - w["front_pair_sync_free"]) / (1.0 - w["front_pair_sync_free"]),
             0.0,
@@ -306,3 +306,4 @@ class WalkReward:
             trunk_height=v4["trunk_height"],
             forward_speed=v4["forward_speed"],
         )
+

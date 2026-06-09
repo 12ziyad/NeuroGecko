@@ -55,7 +55,7 @@ SIGN = {}
 RESIDUAL_OVERRIDES = {
     "shoulder_sprawl_L": 0.05, "shoulder_sprawl_R": 0.05,
     "shoulder_proret_L": 0.08, "shoulder_proret_R": 0.08,
-    "knee_L": 0.08, "knee_R": 0.08,
+    "knee_L": 0.05, "knee_R": 0.05,
     "spine_pitch": 0.10,
     "spine_bend": 0.15, "tail_bend_L": 0.15, "tail_bend_R": 0.15,
 }
@@ -212,3 +212,4 @@ class CPGResidualController:
             both_off += int((phiL >= self.stance) and (phiR >= self.stance))
         frac = both_off / n
         return frac, (frac < 1e-9)
+
