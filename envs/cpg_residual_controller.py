@@ -77,6 +77,8 @@ class CPGResidualController:
                  front_lift_residual_scale=0.0,
                  front_stance_press=0.40, front_stance_press_fr=0.50,
                  front_swing_lift=0.40,
+                 front_stance_seek=0.22,
+                 front_seek_relax=0.5,
                  shoulder_sprawl_tuck=0.30,
                  spine_amp=0.30, spine_phase=0.0,
                  tail_amp=0.15, tail_phase_lag=0.15,
@@ -94,6 +96,8 @@ class CPGResidualController:
         self.front_stance_press = float(front_stance_press)
         self.front_stance_press_fr = float(front_stance_press_fr)
         self.front_swing_lift = float(front_swing_lift)
+        self.front_stance_seek = float(front_stance_seek)
+        self.front_seek_relax = float(front_seek_relax)
         self.shoulder_sprawl_tuck = float(shoulder_sprawl_tuck)
         self.spine_amp = float(spine_amp)
         self.spine_phase = float(spine_phase)
@@ -144,7 +148,13 @@ class CPGResidualController:
             self.report()
 
     # ------------------------------------------------------------------ API
-    def base_ctrl(self, t):
+    def base_ctrl(self, t, front_contact=None):
+        # front_contact: optional dict {"FL": bool, "FR": bool} of CURRENT
+        # load-bearing contact. When provided, the controller seeks the ground
+        # (slightly stronger press) if a commanded-stance front foot is airborne,
+        # and relaxes the press once contact exists (avoid dragging/slip). This
+        # is a small reflex assist, NOT a hard override. front_contact=None keeps
+        # the exact V4.2.7 open-loop behavior.
         ctrl = self.neutral.copy()
         sig = {}
         for limb, off in self.phase.items():
@@ -157,7 +167,17 @@ class CPGResidualController:
             elif role == "lift":
                 if limb in ("FL", "FR"):
                     press = self.front_stance_press if limb == "FL" else self.front_stance_press_fr
-                    s = (self.front_swing_lift * lift) if lift > 0.0 else +press
+                    if lift > 0.0:
+                        s = self.front_swing_lift * lift
+                    else:
+                        in_contact = (None if front_contact is None
+                                      else bool(front_contact.get(limb, False)))
+                        if in_contact is False:
+                            s = +(press + self.front_stance_seek)
+                        elif in_contact is True:
+                            s = +(press * self.front_seek_relax)
+                        else:
+                            s = +press
                 else:
                     s = self.amp["lift"] * lift
             else:
@@ -176,9 +196,9 @@ class CPGResidualController:
                 ctrl[self._tail_r] = -self.tail_amp * self.half[self._tail_r] * wt
         return ctrl
 
-    def compute(self, action, t):
+    def compute(self, action, t, front_contact=None):
         action = np.asarray(action, dtype=float).reshape(-1)
-        base = self.base_ctrl(t)
+        base = self.base_ctrl(t, front_contact=front_contact)
         residual = action * self.res_scale_vec * self.half
         ctrl = base + residual
         ctrl = np.where(self.lim, np.clip(ctrl, self.lo, self.hi), ctrl)

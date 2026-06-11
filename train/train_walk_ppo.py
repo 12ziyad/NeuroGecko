@@ -36,7 +36,7 @@ from envs.gecko_walk_env import GeckoWalkEnv
 
 def make_env(seed, control_mode="raw", residual_scale=0.25,
              contact_thresh=1e-6, front_stance_press=0.40,
-             front_swing_lift=0.40):
+             front_swing_lift=0.40, reward_cfg=None):
     def _f():
         return GeckoWalkEnv(
             seed=seed,
@@ -45,6 +45,7 @@ def make_env(seed, control_mode="raw", residual_scale=0.25,
             contact_thresh=contact_thresh,
             front_stance_press=front_stance_press,
             front_swing_lift=front_swing_lift,
+            reward_cfg=reward_cfg,
         )
     return _f
 
@@ -72,7 +73,30 @@ def main():
     p.add_argument("--front-stance-press", type=float, default=0.40)
     p.add_argument("--front-swing-lift", type=float, default=0.40)
     p.add_argument("--contact-thresh", type=float, default=0.0564)
+    p.add_argument("--phase", choices=["p1", "p2", "none"], default="none",
+                   help="V4.2.8 curriculum. p1=contact acquisition (low speed "
+                        "pressure, early gate), p2=speed restoration. "
+                        "none (default) leaves reward weights at code defaults so "
+                        "existing commands are unchanged.")
     args = p.parse_args()
+
+    # V4.2.8 curriculum reward configs. --phase none -> reward_cfg=None -> the
+    # WalkReward DEFAULTS are used unchanged (backward compatible).
+    reward_cfg = None
+    if args.phase == "p1":
+        reward_cfg = dict(
+            progress=7.0, forward=0.6,          # lower speed/progress pressure
+            v4_speed_threshold=0.008,           # open speed_gate earlier so gated terms can teach
+            front_track=1.30, front_miss=1.90,  # stronger contact acquisition
+            front_duty=0.80, front_load=1.20,
+        )
+    elif args.phase == "p2":
+        reward_cfg = dict(
+            progress=12.0, forward=1.5,         # restore speed/progress pressure
+            v4_speed_threshold=0.025,
+            front_track=1.10, front_miss=1.60,  # keep contact tracking active
+            front_duty=0.80, front_load=1.20,
+        )
 
     from stable_baselines3.common.vec_env import (SubprocVecEnv, DummyVecEnv,
                                                   VecNormalize, VecMonitor)
@@ -84,7 +108,8 @@ def main():
 
     env_fns = [
         make_env(args.seed + i, args.control_mode, args.residual_scale,
-                 args.contact_thresh, args.front_stance_press, args.front_swing_lift)
+                 args.contact_thresh, args.front_stance_press, args.front_swing_lift,
+                 reward_cfg=reward_cfg)
         for i in range(args.envs)
     ]
     venv = VecCls(env_fns)
@@ -98,7 +123,8 @@ def main():
 
     eval_env = DummyVecEnv([
         make_env(10_000, args.control_mode, args.residual_scale,
-                 args.contact_thresh, args.front_stance_press, args.front_swing_lift)
+                 args.contact_thresh, args.front_stance_press, args.front_swing_lift,
+                 reward_cfg=reward_cfg)
     ])
     eval_env = VecMonitor(eval_env)
     eval_env = VecNormalize(eval_env, norm_obs=True, norm_reward=False, training=False, clip_obs=10.0)

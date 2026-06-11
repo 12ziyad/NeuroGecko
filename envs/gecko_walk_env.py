@@ -260,7 +260,9 @@ class GeckoWalkEnv(gym.Env):
         if self.action_ema > 0:
             action = self.action_ema * self._prev_action + (1 - self.action_ema) * action
         if self.control_mode == "cpg_residual":
-            self._ctrl = self.cpg.compute(action, self._cpg_t)
+            fc = self._foot_contacts()  # [HL, FL, HR, FR] in _GAIT_FEET order
+            front_contact = {"FL": bool(fc[1] > 0.5), "FR": bool(fc[3] > 0.5)}
+            self._ctrl = self.cpg.compute(action, self._cpg_t, front_contact=front_contact)
             self._cpg_t += self.control_dt
         else:
             # affine map [-1,1] -> [low, high]

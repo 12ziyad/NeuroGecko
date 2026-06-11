@@ -62,6 +62,16 @@ DEFAULTS = dict(
     front_pair_hop_free=0.05,
     body_bounce=0.10,
     body_bounce_free=0.008,
+    # V4.2.8: ungated CPG front contact-reference tracking.
+    # These terms are deliberately NOT multiplied by speed_gate, so they supply
+    # a gradient even at low/zero speed. V4.2.7's front terms were all gated and
+    # self-throttled (FL moved only 0.327 -> 0.342). Design intent:
+    #   commanded front stance & contact   -> reward  (front_track)
+    #   commanded front stance & airborne   -> penalty (front_miss, asymmetric > hit)
+    #   commanded front swing  & contact     -> small penalty (front_swing_penalty)
+    front_track=1.10,
+    front_miss=1.60,
+    front_swing_penalty=0.25,
 )
 
 
@@ -248,6 +258,27 @@ class WalkReward:
         ))
         bounce_excess = max(0.0, v4["body_bounce"] - w["body_bounce_free"])
 
+        # ---- V4.2.8 ungated front contact-reference tracking ----------------
+        # CPG-commanded stance/swing for the FRONT pair this step, vs. actual
+        # load-bearing contact. NOT gated by speed_gate (that is the whole point:
+        # V4.2.7's gated front terms could not move the operating point).
+        fl_t = bool(targets[_FOOT_INDEX["FL"]])
+        fr_t = bool(targets[_FOOT_INDEX["FR"]])
+        fl_c = bool(contacts[_FOOT_INDEX["FL"]])
+        fr_c = bool(contacts[_FOOT_INDEX["FR"]])
+
+        front_stance_cmds = float(fl_t) + float(fr_t)
+        front_hits = float(fl_t and fl_c) + float(fr_t and fr_c)
+        front_miss_cnt = float(fl_t and not fl_c) + float(fr_t and not fr_c)
+        front_swing_touch = float((not fl_t) and fl_c) + float((not fr_t) and fr_c)
+
+        track_hit = (front_hits / front_stance_cmds) if front_stance_cmds > 0 else 0.0
+        track_miss = (front_miss_cnt / front_stance_cmds) if front_stance_cmds > 0 else 0.0
+        r_front_track = w["front_track"] * track_hit
+        r_front_miss = -w["front_miss"] * track_miss
+        r_front_swing_touch = -w["front_swing_penalty"] * 0.5 * front_swing_touch
+        # ---------------------------------------------------------------------
+
         r_alive = w["alive"]
         r_progress = w["progress"] * progress
         r_forward = w["forward"] * forward_speed
@@ -308,6 +339,9 @@ class WalkReward:
             + r_front_pair_sync
             + r_front_pair_hop
             + r_body_bounce
+            + r_front_track
+            + r_front_miss
+            + r_front_swing_touch
         )
 
         return total, dict(
@@ -355,5 +389,10 @@ class WalkReward:
             fr_duty=v4["fr_duty"],
             front_duty_score=v4["front_duty_score"],
             front_factor=front_factor,
+            r_front_track=r_front_track,
+            r_front_miss=r_front_miss,
+            r_front_swing_touch=r_front_swing_touch,
+            front_track_hit=track_hit,
+            front_track_miss=track_miss,
         )
 
