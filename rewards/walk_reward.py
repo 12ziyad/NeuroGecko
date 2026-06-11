@@ -72,6 +72,15 @@ DEFAULTS = dict(
     front_track=1.10,
     front_miss=1.60,
     front_swing_penalty=0.25,
+
+    # V4.3: target-speed objective. Current good gait is safe but stuck at ~0.09 m/s.
+    # This rewards moving into the 0.12 m/s band while preserving front-support gates.
+    target_speed=0.12,
+    speed_floor=0.09,
+    speed_track_sigma=0.035,
+    speed_track=0.0,
+    slow_speed=0.105,
+    slow_penalty=0.0,
 )
 
 
@@ -217,6 +226,25 @@ class WalkReward:
             0.0,
             1.0,
         ))
+
+        # V4.3: explicit target-speed shaping.
+        # At the old slow gait (~0.09), speed_ramp is near 0, so slow crawling no longer
+        # earns this bonus. It ramps up toward target_speed, but remains front-gated
+        # through front_factor below so front-support cannot collapse for speed.
+        v_fwd = max(0.0, float(v4["forward_speed"]))
+        speed_ramp = float(np.clip(
+            (v_fwd - w["speed_floor"]) / max(w["target_speed"] - w["speed_floor"], 1e-9),
+            0.0,
+            1.0,
+        ))
+        speed_band_score = float(np.exp(
+            -0.5 * ((v_fwd - w["target_speed"]) / max(w["speed_track_sigma"], 1e-9)) ** 2
+        ))
+        slow_excess = float(np.clip(
+            (w["slow_speed"] - v_fwd) / max(w["slow_speed"], 1e-9),
+            0.0,
+            1.0,
+        ))
         trunk_span = max(w["trunk_height_target"] - w["trunk_height_min"], 1e-9)
         trunk_support_score = float(np.clip(
             (v4["trunk_height"] - w["trunk_height_min"]) / trunk_span,
@@ -312,6 +340,8 @@ class WalkReward:
         r_front_pair_sync = -w["front_pair_sync"] * speed_gate * (front_sync_excess ** 2)
         r_front_pair_hop = -w["front_pair_hop"] * speed_gate * (front_hop_excess ** 2)
         r_body_bounce = -w["body_bounce"] * speed_gate * bounce_excess
+        r_speed_track = w["speed_track"] * front_factor * speed_ramp * speed_band_score
+        r_slow = -w["slow_penalty"] * slow_excess
 
         total = (
             r_alive
@@ -339,6 +369,8 @@ class WalkReward:
             + r_front_pair_sync
             + r_front_pair_hop
             + r_body_bounce
+            + r_speed_track
+            + r_slow
             + r_front_track
             + r_front_miss
             + r_front_swing_touch
@@ -370,6 +402,10 @@ class WalkReward:
             r_front_pair_sync=r_front_pair_sync,
             r_front_pair_hop=r_front_pair_hop,
             r_body_bounce=r_body_bounce,
+            r_speed_track=r_speed_track,
+            r_slow=r_slow,
+            speed_ramp=speed_ramp,
+            speed_band_score=speed_band_score,
             clean_gait_speed_gate=speed_gate,
             trunk_support_score=trunk_support_score,
             front_load=front_load_score,

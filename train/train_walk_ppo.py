@@ -73,7 +73,7 @@ def main():
     p.add_argument("--front-stance-press", type=float, default=0.40)
     p.add_argument("--front-swing-lift", type=float, default=0.40)
     p.add_argument("--contact-thresh", type=float, default=0.0564)
-    p.add_argument("--phase", choices=["p1", "p2", "none"], default="none",
+    p.add_argument("--phase", choices=["p1", "p2", "v43", "none"], default="none",
                    help="V4.2.8 curriculum. p1=contact acquisition (low speed "
                         "pressure, early gate), p2=speed restoration. "
                         "none (default) leaves reward weights at code defaults so "
@@ -96,6 +96,25 @@ def main():
             v4_speed_threshold=0.025,
             front_track=1.10, front_miss=1.60,  # keep contact tracking active
             front_duty=0.80, front_load=1.20,
+        )
+    elif args.phase == "v43":
+        reward_cfg = dict(
+            # V4.3B: start from FAST checkpoint, preserve speed while fixing front support.
+            progress=12.0,
+            forward=2.0,
+            v4_speed_threshold=0.025,
+
+            front_track=1.20,
+            front_miss=1.80,
+            front_duty=0.90,
+            front_load=1.20,
+
+            target_speed=0.13,
+            speed_floor=0.085,
+            speed_track_sigma=0.030,
+            speed_track=8.0,
+            slow_speed=0.115,
+            slow_penalty=4.0,
         )
 
     from stable_baselines3.common.vec_env import (SubprocVecEnv, DummyVecEnv,
