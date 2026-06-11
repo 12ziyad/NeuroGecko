@@ -16,13 +16,15 @@ import numpy as np
 
 TAU = 2.0 * math.pi
 LATERAL_SEQUENCE_ORDER = ("HL", "FL", "HR", "FR")
+# V4.4D: longer commanded front stance; must match controller.
+FRONT_STANCE = {"FL": 0.68, "FR": 0.70}
 
 
 @dataclass(frozen=True)
 class GaitPriorConfig:
     gait_type: str = "lateral_sequence"
     phase_order: tuple[str, ...] = LATERAL_SEQUENCE_ORDER
-    frequency_hz: float = 1.1
+    frequency_hz: float = 1.18
     frequency_range_hz: tuple[float, float] = (1.0, 1.2)
     stance_ratio: float = 0.62
     swing_ratio: float = 0.38
@@ -36,7 +38,7 @@ class LateralSequenceCPG:
 
     def __init__(
         self,
-        frequency_hz: float = 1.1,
+        frequency_hz: float = 1.18,
         stance_ratio: float = 0.62,
         swing_ratio: float = 0.38,
         phase_order: Iterable[str] = LATERAL_SEQUENCE_ORDER,
@@ -64,6 +66,7 @@ class LateralSequenceCPG:
         self.phase_offsets = {
             foot: i * step for i, foot in enumerate(self.config.phase_order)
         }
+        self.front_stance = dict(FRONT_STANCE)
 
     @property
     def foot_order(self) -> tuple[str, ...]:
@@ -96,9 +99,12 @@ class LateralSequenceCPG:
             raise KeyError(f"Unknown foot label {foot!r}; expected {self.foot_order}.")
         return float((self.cycle_fraction(time_s) - self.phase_offsets[foot]) % 1.0)
 
+    def _stance_for(self, foot: str) -> float:
+        return self.front_stance.get(foot, self.stance_ratio)
+
     def target_contacts(self, time_s: float) -> dict[str, float]:
         return {
-            foot: float(self.foot_phase_fraction(foot, time_s) < self.stance_ratio)
+            foot: float(self.foot_phase_fraction(foot, time_s) < self._stance_for(foot))
             for foot in self.foot_order
         }
 

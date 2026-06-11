@@ -99,22 +99,20 @@ def main():
         )
     elif args.phase == "v43":
         reward_cfg = dict(
-            # V4.3B: start from FAST checkpoint, preserve speed while fixing front support.
+            # V4.5 Claude final: matched front stance + 1.18Hz cadence.
             progress=12.0,
             forward=2.0,
             v4_speed_threshold=0.025,
-
             front_track=1.20,
             front_miss=1.80,
-            front_duty=0.90,
+            front_duty=1.00,
             front_load=1.20,
-
-            target_speed=0.13,
+            target_speed=0.125,
             speed_floor=0.085,
-            speed_track_sigma=0.030,
-            speed_track=8.0,
-            slow_speed=0.115,
-            slow_penalty=4.0,
+            speed_track_sigma=0.035,
+            speed_track=6.0,
+            slow_speed=0.112,
+            slow_penalty=3.0,
         )
 
     from stable_baselines3.common.vec_env import (SubprocVecEnv, DummyVecEnv,

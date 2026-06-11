@@ -33,10 +33,12 @@ import numpy as np
 import mujoco
 
 
-FREQ_HZ = 1.1
+FREQ_HZ = 1.18
 STANCE = 0.62
+# V4.4D: longer front stance for support.
+FRONT_STANCE = {"FL": 0.68, "FR": 0.70}
 PHASE = {"HL": 0.00, "FL": 0.25, "HR": 0.50, "FR": 0.75}
-AMP = {"fa": 0.6, "lift": 0.6, "other": 0.15}
+AMP = {"fa": 0.68, "lift": 0.6, "other": 0.15}
 
 DEFAULT_MAP = {
     "hip_sprawl_L": ("HL", "other"), "hip_proret_L": ("HL", "fa"),
@@ -159,7 +161,8 @@ class CPGResidualController:
         sig = {}
         for limb, off in self.phase.items():
             phi = (t * self.freq + off) % 1.0
-            sig[limb] = _limb_signals(phi, self.stance)
+            limb_stance = FRONT_STANCE.get(limb, self.stance)
+            sig[limb] = _limb_signals(phi, limb_stance)
         for aid, limb, role in self.entries:
             fa, lift = sig[limb]
             if role == "fa":
