@@ -33,7 +33,7 @@ import numpy as np
 import mujoco
 
 
-FREQ_HZ = 1.18
+FREQ_HZ = 1.188
 STANCE = 0.62
 # V4.4D: longer front stance for support.
 FRONT_STANCE = {"FL": 0.68, "FR": 0.70}
@@ -80,7 +80,7 @@ class CPGResidualController:
                  front_stance_press=0.40, front_stance_press_fr=0.50,
                  front_swing_lift=0.40,
                  front_stance_seek=0.12,
-                 front_seek_relax=0.35,
+                 front_seek_relax=0.25,
                  shoulder_sprawl_tuck=0.30,
                  spine_amp=0.30, spine_phase=0.0,
                  tail_amp=0.15, tail_phase_lag=0.15,
