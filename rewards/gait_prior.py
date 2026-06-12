@@ -24,7 +24,7 @@ FRONT_STANCE = {"FL": 0.68, "FR": 0.70}
 class GaitPriorConfig:
     gait_type: str = "lateral_sequence"
     phase_order: tuple[str, ...] = LATERAL_SEQUENCE_ORDER
-    frequency_hz: float = 1.188
+    frequency_hz: float = 1.1888
     frequency_range_hz: tuple[float, float] = (1.0, 1.2)
     stance_ratio: float = 0.62
     swing_ratio: float = 0.38
@@ -38,7 +38,7 @@ class LateralSequenceCPG:
 
     def __init__(
         self,
-        frequency_hz: float = 1.188,
+        frequency_hz: float = 1.1888,
         stance_ratio: float = 0.62,
         swing_ratio: float = 0.38,
         phase_order: Iterable[str] = LATERAL_SEQUENCE_ORDER,
