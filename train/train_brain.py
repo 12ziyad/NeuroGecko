@@ -14,7 +14,7 @@ if platform.system() == "Linux" and not os.environ.get("DISPLAY"):
     os.environ.setdefault("MUJOCO_GL", "egl")
 
 from stable_baselines3.common.monitor import Monitor
-from stable_baselines3.common.callbacks import BaseCallback
+from stable_baselines3.common.callbacks import BaseCallback, CallbackList
 from stable_baselines3.common.vec_env import DummyVecEnv
 
 from brain.agwm import BrainV1Config, make_brain_ppo, recurrent_ppo_available
@@ -37,6 +37,14 @@ def _taper_enabled(args) -> bool:
     )
 
 
+def _dropout_taper_enabled(args) -> bool:
+    return (
+        args.privileged_food_start_dropout is not None
+        or args.privileged_food_end_dropout is not None
+        or int(args.privileged_food_dropout_taper_steps) > 0
+    )
+
+
 def _validate_privileged_food_args(parser: argparse.ArgumentParser, args) -> bool:
     taper_enabled = _taper_enabled(args)
 
@@ -52,6 +60,23 @@ def _validate_privileged_food_args(parser: argparse.ArgumentParser, args) -> boo
             parser.error("--privileged-food-end-scale is required when using a taper.")
 
     return taper_enabled
+
+
+def _validate_privileged_food_dropout_args(parser: argparse.ArgumentParser, args) -> bool:
+    dropout_enabled = _dropout_taper_enabled(args)
+
+    if int(args.privileged_food_dropout_taper_steps) < 0:
+        parser.error("--privileged-food-dropout-taper-steps must be >= 0.")
+
+    if dropout_enabled:
+        if not args.use_privileged_food:
+            parser.error("Privileged food dropout taper requires --use-privileged-food.")
+        if args.privileged_food_start_dropout is None:
+            parser.error("--privileged-food-start-dropout is required when using dropout taper.")
+        if args.privileged_food_end_dropout is None:
+            parser.error("--privileged-food-end-dropout is required when using dropout taper.")
+
+    return dropout_enabled
 
 
 def _initial_privileged_food_scale(args, taper_enabled: bool) -> float:
@@ -125,8 +150,58 @@ class PrivilegedFoodTaperCallback(BaseCallback):
         return True
 
 
+class PrivilegedFoodDropoutCallback(BaseCallback):
+    def __init__(
+        self,
+        start_prob: float,
+        end_prob: float,
+        taper_steps: int,
+        verbose: int = 0,
+    ):
+        super().__init__(verbose=verbose)
+        self.start_prob = float(start_prob)
+        self.end_prob = float(end_prob)
+        self.taper_steps = int(taper_steps)
+        if self.taper_steps > 0:
+            self.log_interval = max(1, min(10_000, self.taper_steps // 10 or 1))
+        else:
+            self.log_interval = 1
+        self._last_logged_step: int | None = None
+
+    def _prob(self, step: int) -> float:
+        if self.taper_steps <= 0:
+            return float(self.start_prob if step <= 0 else self.end_prob)
+        alpha = min(max(float(step) / float(self.taper_steps), 0.0), 1.0)
+        return float(self.start_prob + alpha * (self.end_prob - self.start_prob))
+
+    def _set_prob(self, step: int, force_print: bool = False) -> None:
+        prob = self._prob(step)
+        self.training_env.env_method("set_privileged_food_dropout_prob", prob)
+        self.logger.record("curriculum/privileged_food_dropout", prob)
+
+        should_print = force_print
+        if self._last_logged_step is None:
+            should_print = True
+        elif step - self._last_logged_step >= self.log_interval:
+            should_print = True
+        elif self.taper_steps > 0 and step >= self.taper_steps > self._last_logged_step:
+            should_print = True
+
+        if should_print:
+            print(f"[curriculum] step={step} privileged_food_dropout={prob:.6f}")
+            self._last_logged_step = step
+
+    def _on_training_start(self) -> None:
+        self._set_prob(0, force_print=True)
+
+    def _on_step(self) -> bool:
+        self._set_prob(int(self.num_timesteps))
+        return True
+
+
 def _make_env_fn(args):
     privileged_target = float(args._initial_privileged_food_scale)
+    privileged_food_dropout_prob = float(args._initial_privileged_food_dropout_prob)
 
     def thunk():
         env = GeckoBrainEnv(
@@ -134,6 +209,7 @@ def _make_env_fn(args):
             max_steps=args.episode_steps,
             seed=args.seed,
             privileged_target=privileged_target,
+            privileged_food_dropout_prob=privileged_food_dropout_prob,
             render_mode=None,
         )
         return Monitor(env)
@@ -189,6 +265,24 @@ def main() -> None:
         help="Steps over which privileged food scale linearly decays to the end scale.",
     )
     parser.add_argument(
+        "--privileged-food-start-dropout",
+        type=float,
+        default=None,
+        help="Starting dropout probability for privileged food curriculum (0.0 = no dropout).",
+    )
+    parser.add_argument(
+        "--privileged-food-end-dropout",
+        type=float,
+        default=None,
+        help="Final dropout probability for privileged food curriculum (1.0 = always zero out).",
+    )
+    parser.add_argument(
+        "--privileged-food-dropout-taper-steps",
+        type=int,
+        default=0,
+        help="Steps over which privileged food dropout probability linearly ramps to end value.",
+    )
+    parser.add_argument(
         "--num-envs",
         type=int,
         default=1,
@@ -214,6 +308,10 @@ def main() -> None:
     args = parser.parse_args()
     taper_enabled = _validate_privileged_food_args(parser, args)
     args._initial_privileged_food_scale = _initial_privileged_food_scale(args, taper_enabled)
+    dropout_taper_enabled = _validate_privileged_food_dropout_args(parser, args)
+    args._initial_privileged_food_dropout_prob = (
+        float(args.privileged_food_start_dropout) if dropout_taper_enabled else 0.0
+    )
 
     rollout_size = args.n_steps * args.num_envs
     if args.batch_size > rollout_size:
@@ -251,6 +349,16 @@ def main() -> None:
         "privileged_food_taper_steps": (
             int(args.privileged_food_taper_steps) if taper_enabled else 0
         ),
+        "privileged_food_dropout_taper_enabled": bool(dropout_taper_enabled),
+        "privileged_food_start_dropout": (
+            float(args.privileged_food_start_dropout) if dropout_taper_enabled else None
+        ),
+        "privileged_food_end_dropout": (
+            float(args.privileged_food_end_dropout) if dropout_taper_enabled else None
+        ),
+        "privileged_food_dropout_taper_steps": (
+            int(args.privileged_food_dropout_taper_steps) if dropout_taper_enabled else 0
+        ),
         "observation_mode": obs_mode,
         "num_envs": int(args.num_envs),
         "n_steps": int(args.n_steps),
@@ -272,9 +380,15 @@ def main() -> None:
         print()
     if taper_enabled:
         print(
-            "[brain train] taper       = "
+            "[brain train] scale_taper = "
             f"{args.privileged_food_start_scale} -> {args.privileged_food_end_scale} "
             f"over {args.privileged_food_taper_steps} steps"
+        )
+    if dropout_taper_enabled:
+        print(
+            "[brain train] drop_taper  = "
+            f"{args.privileged_food_start_dropout} -> {args.privileged_food_end_dropout} "
+            f"over {args.privileged_food_dropout_taper_steps} steps"
         )
     print(f"[brain train] num_envs    = {args.num_envs}  vec={vec_type}")
     print(f"[brain train] n_steps     = {args.n_steps}  batch_size={args.batch_size}")
@@ -297,13 +411,20 @@ def main() -> None:
             gae_lambda=0.95,
             ent_coef=0.01,
         )
-        callback = None
+        callbacks = []
         if taper_enabled:
-            callback = PrivilegedFoodTaperCallback(
+            callbacks.append(PrivilegedFoodTaperCallback(
                 start_scale=float(args.privileged_food_start_scale),
                 end_scale=float(args.privileged_food_end_scale),
                 taper_steps=int(args.privileged_food_taper_steps),
-            )
+            ))
+        if dropout_taper_enabled:
+            callbacks.append(PrivilegedFoodDropoutCallback(
+                start_prob=float(args.privileged_food_start_dropout),
+                end_prob=float(args.privileged_food_end_dropout),
+                taper_steps=int(args.privileged_food_dropout_taper_steps),
+            ))
+        callback = CallbackList(callbacks) if callbacks else None
         model.learn(
             total_timesteps=int(args.total_steps),
             callback=callback,

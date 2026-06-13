@@ -103,6 +103,16 @@ def main() -> None:
         default=1.0,
         help="Scale for the privileged food vector. Only active with --use-privileged-food.",
     )
+    parser.add_argument(
+        "--privileged-food-dropout-prob",
+        type=float,
+        default=0.0,
+        help=(
+            "Probability of zeroing the privileged food vector each step. "
+            "1.0 = always zero (pure visual eval equivalent). "
+            "Default 0.0 = no dropout."
+        ),
+    )
     args = parser.parse_args()
 
     run_dir = REPO / "models" / "brain" / args.brain_run
@@ -122,11 +132,20 @@ def main() -> None:
     print(f"[watch] privileged   = {priv_label}")
     if train_config.get("privileged_food_taper_enabled", False):
         print(
-            "[watch] train_taper  = "
+            "[watch] train_scale_taper = "
             f"{train_config.get('privileged_food_start_scale')} -> "
             f"{train_config.get('privileged_food_end_scale')} "
             f"over {train_config.get('privileged_food_taper_steps')} steps"
         )
+    if train_config.get("privileged_food_dropout_taper_enabled", False):
+        print(
+            "[watch] train_drop_taper  = "
+            f"{train_config.get('privileged_food_start_dropout')} -> "
+            f"{train_config.get('privileged_food_end_dropout')} "
+            f"over {train_config.get('privileged_food_dropout_taper_steps')} steps"
+        )
+    dropout_label = f"{args.privileged_food_dropout_prob:.3f}" if args.privileged_food_dropout_prob > 0.0 else "off"
+    print(f"[watch] dropout_prob = {dropout_label}")
     print(f"[watch] view         = {args.view}  smoothing={args.camera_smoothing}")
     print("=" * 60)
 
@@ -139,6 +158,7 @@ def main() -> None:
         max_steps=args.steps,
         seed=args.seed,
         privileged_target=privileged_target,
+        privileged_food_dropout_prob=float(args.privileged_food_dropout_prob),
         render_mode="rgb_array" if args.render_video else None,
         view_mode=args.view,
         camera_smoothing=args.camera_smoothing,

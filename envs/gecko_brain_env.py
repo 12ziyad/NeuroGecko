@@ -78,6 +78,7 @@ class GeckoBrainEnv(gym.Env):
         render_mode: str | None = None,
         seed: int | None = None,
         privileged_target: float = 1.0,
+        privileged_food_dropout_prob: float = 0.0,
         control_mode: str = "cpg_residual",
         residual_scale: float = 0.25,
         front_stance_press: float = 0.40,
@@ -111,6 +112,7 @@ class GeckoBrainEnv(gym.Env):
         self.camera_height = int(camera_height)
         self.render_mode = render_mode
         self.privileged_target = float(privileged_target)
+        self.privileged_food_dropout_prob = float(np.clip(privileged_food_dropout_prob, 0.0, 1.0))
         self._rng = np.random.default_rng(seed)
 
         walker_max_steps = max(1, self.max_steps * self.brain_steps_per_action)
@@ -165,6 +167,9 @@ class GeckoBrainEnv(gym.Env):
 
     def set_privileged_food_scale(self, scale: float) -> None:
         self.privileged_target = float(scale)
+
+    def set_privileged_food_dropout_prob(self, prob: float) -> None:
+        self.privileged_food_dropout_prob = float(np.clip(prob, 0.0, 1.0))
 
     def _load_frozen_walker(self, walker_run: str):
         run_dir = REPO / "models" / walker_run
@@ -276,6 +281,13 @@ class GeckoBrainEnv(gym.Env):
             )
         try:
             self._head_renderer.update_scene(self.walk_env.data, camera="head_cam")
+            food_xyz = np.array(
+                [self.food_xy[0], self.food_xy[1], self.food_radius], dtype=np.float64
+            )
+            _add_scene_sphere(
+                self._head_renderer, food_xyz, radius=self.food_radius,
+                rgba=(0.1, 0.95, 0.25, 1.0),
+            )
             image = self._head_renderer.render()
         except Exception as exc:
             raise RuntimeError(
@@ -309,7 +321,10 @@ class GeckoBrainEnv(gym.Env):
             ],
             dtype=np.float32,
         )
-        return privileged * np.float32(self.privileged_target)
+        privileged = privileged * np.float32(self.privileged_target)
+        if self.privileged_food_dropout_prob > 0.0 and self._rng.random() < self.privileged_food_dropout_prob:
+            return np.zeros(5, dtype=np.float32)
+        return privileged
 
     def _obs(self):
         return {
