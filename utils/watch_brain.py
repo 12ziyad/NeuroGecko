@@ -42,6 +42,18 @@ def main() -> None:
     parser.add_argument("--fps", type=int, default=50)
     parser.add_argument("--show-debug-line", action="store_true")
     parser.add_argument("--no-downloads-copy", action="store_true")
+    parser.add_argument(
+        "--view",
+        choices=["fixed", "chase", "close"],
+        default="close",
+        help="Viewer camera mode: 'close' (default), 'chase', or 'fixed'.",
+    )
+    parser.add_argument(
+        "--camera-smoothing",
+        type=float,
+        default=0.85,
+        help="EMA smoothing for viewer camera (0=none, 0.85=default).",
+    )
     args = parser.parse_args()
 
     if args.walker_run != "v4_5b_speed_polish_1m":
@@ -56,6 +68,8 @@ def main() -> None:
         seed=args.seed,
         privileged_target=args.privileged_target,
         show_debug_markers=args.show_debug_line,
+        view_mode=args.view,
+        camera_smoothing=args.camera_smoothing,
     )
     frames = []
 

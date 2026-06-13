@@ -84,10 +84,19 @@ class GeckoBrainEnv(gym.Env):
         front_swing_lift: float = 0.40,
         contact_thresh: float = 0.0564,
         show_debug_markers: bool = False,
+        view_mode: str = "close",
+        camera_smoothing: float = 0.0,
     ):
         super().__init__()
         self.walker_run = str(walker_run)
         self.show_debug_markers = bool(show_debug_markers)
+        _valid_views = ("fixed", "chase", "close")
+        if str(view_mode).lower() not in _valid_views:
+            raise ValueError(f"view_mode must be one of {_valid_views}, got '{view_mode}'")
+        self._view_mode = str(view_mode).lower()
+        self._camera_smoothing = float(max(0.0, min(1.0, camera_smoothing)))
+        self._smooth_lookat: np.ndarray | None = None
+        self._smooth_azimuth: float | None = None
         self.max_steps = int(max_steps)
         self.brain_steps_per_action = int(brain_steps_per_action)
         if self.brain_steps_per_action < 1:
@@ -316,6 +325,8 @@ class GeckoBrainEnv(gym.Env):
         self.drives.reset()
         self._step = 0
         self._prev_action = np.zeros(4, dtype=np.float32)
+        self._smooth_lookat = None
+        self._smooth_azimuth = None
         self._spawn_food()
         self._brain_action_to_target(np.array([1.0, 0.0, -1.0, -1.0], dtype=np.float32))
         self._last_info = {
@@ -439,17 +450,61 @@ class GeckoBrainEnv(gym.Env):
         _add_scene_capsule(renderer, target_xyz, food_xyz, radius=0.003,
                            rgba=(0.1, 0.8, 1.0, 0.55))
 
+    def _render_camera_params(self):
+        """Return (lookat, azimuth, distance, elevation) for the current view mode."""
+        trunk = self.walk_env.data.xpos[self.walk_env._trunk].copy()
+        rot = self._trunk_rot()
+        forward = rot[:, 0]
+        heading_deg = math.degrees(math.atan2(forward[1], forward[0]))
+
+        if self._view_mode == "fixed":
+            distance = 2.0
+            height = 0.70
+            target_azimuth = 130.0
+            target_lookat = np.array([trunk[0], trunk[1], 0.05], dtype=np.float64)
+        elif self._view_mode == "chase":
+            distance = 2.2
+            height = 0.70
+            # camera sits directly behind: heading_deg + 180 in MuJoCo azimuth space
+            target_azimuth = heading_deg + 180.0
+            target_lookat = np.array([trunk[0], trunk[1], 0.05], dtype=np.float64)
+        else:  # "close" — closer 3/4-rear view
+            distance = 1.5
+            height = 0.50
+            target_azimuth = heading_deg + 180.0
+            # slight forward bias so the gecko stays in lower-half of frame
+            lookahead = forward[:2] * 0.15
+            target_lookat = np.array(
+                [trunk[0] + lookahead[0], trunk[1] + lookahead[1], 0.05],
+                dtype=np.float64,
+            )
+
+        alpha = self._camera_smoothing
+        if alpha > 0.0 and self._smooth_lookat is not None and self._smooth_azimuth is not None:
+            lookat = alpha * self._smooth_lookat + (1.0 - alpha) * target_lookat
+            # wrap azimuth delta to [-180, 180] to avoid spinning through 360
+            delta_az = (target_azimuth - self._smooth_azimuth + 180.0) % 360.0 - 180.0
+            azimuth = self._smooth_azimuth + (1.0 - alpha) * delta_az
+        else:
+            lookat = target_lookat.copy()
+            azimuth = target_azimuth
+
+        self._smooth_lookat = lookat.copy()
+        self._smooth_azimuth = float(azimuth)
+
+        elevation = -math.degrees(math.asin(min(height / distance, 0.9999)))
+        return lookat, float(azimuth), float(distance), float(elevation)
+
     def render(self):
         if self._render_renderer is None:
             self._render_renderer = mujoco.Renderer(self.walk_env.model, 480, 640)
+        lookat, azimuth, distance, elevation = self._render_camera_params()
         cam = mujoco.MjvCamera()
         mujoco.mjv_defaultCamera(cam)
-        distance = 3.0
-        height = 0.9
-        cam.lookat[:] = self._wide_camera_lookat(0.8)
+        cam.lookat[:] = lookat
         cam.distance = distance
-        cam.azimuth = 130
-        cam.elevation = -math.degrees(math.asin(min(height / distance, 0.95)))
+        cam.azimuth = azimuth
+        cam.elevation = elevation
         self._render_renderer.update_scene(self.walk_env.data, camera=cam)
         self._add_render_markers(self._render_renderer)
         return self._render_renderer.render()

@@ -33,8 +33,36 @@ def _load_train_config(run_dir: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def _check_obs_mode(train_config: dict, use_privileged_food: bool) -> None:
+    if not train_config:
+        return
+
+    trained_privileged = bool(train_config.get("use_privileged_food", False))
+
+    if trained_privileged and not use_privileged_food:
+        print(
+            "[watch] INFO: Model was trained WITH privileged food (curriculum mode). "
+            "Running pure eval — the privileged channel is zeroed out. "
+            "This is the correct real-world test. "
+            "Pass --use-privileged-food to reproduce training conditions."
+        )
+    elif not trained_privileged and use_privileged_food:
+        print(
+            "[watch] WARNING: Model was trained WITHOUT privileged food. "
+            "Its extractor ignores the privileged channel entirely. "
+            "--use-privileged-food has no effect on this model. "
+            "Run without --use-privileged-food to avoid confusion."
+        )
+    elif trained_privileged and use_privileged_food:
+        scale = train_config.get("privileged_food_scale", 1.0)
+        print(
+            f"[watch] INFO: Running with privileged food (scale={scale}). "
+            "This matches training conditions — NOT a pure evaluation."
+        )
+
+
 def main() -> None:
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description="Watch a trained Brain V1 model")
     parser.add_argument("--brain-run", type=str, required=True)
     parser.add_argument("--episodes", type=int, default=1)
     parser.add_argument("--steps", type=int, default=200)
@@ -42,6 +70,35 @@ def main() -> None:
     parser.add_argument("--walker-run", type=str, default=None)
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--fps", type=int, default=50)
+    parser.add_argument(
+        "--view",
+        choices=["fixed", "chase", "close"],
+        default="close",
+        help="Viewer camera mode. 'close' = stable close follow (default), "
+             "'chase' = wider follow, 'fixed' = static azimuth.",
+    )
+    parser.add_argument(
+        "--camera-smoothing",
+        type=float,
+        default=0.85,
+        help="EMA smoothing for the viewer camera (0=none, 0.85=default). "
+             "Reduces jitter in chase/close modes.",
+    )
+    parser.add_argument(
+        "--use-privileged-food",
+        action="store_true",
+        help=(
+            "Expose real egocentric food direction/distance to the policy. "
+            "Must match the observation mode the model was trained with. "
+            "Default (no flag) = pure visual eval."
+        ),
+    )
+    parser.add_argument(
+        "--privileged-food-scale",
+        type=float,
+        default=1.0,
+        help="Scale for the privileged food vector. Only active with --use-privileged-food.",
+    )
     args = parser.parse_args()
 
     run_dir = REPO / "models" / "brain" / args.brain_run
@@ -51,13 +108,29 @@ def main() -> None:
 
     train_config = _load_train_config(run_dir)
     walker_run = args.walker_run or train_config.get("walker_run", "v4_5b_speed_polish_1m")
+    obs_mode = train_config.get("observation_mode", "unknown")
+
+    print("=" * 60)
+    print(f"[watch] brain_run    = {args.brain_run}")
+    print(f"[watch] walker_run   = {walker_run}")
+    print(f"[watch] train_obs    = {obs_mode}")
+    priv_label = f"YES (scale={args.privileged_food_scale})" if args.use_privileged_food else "NO  (pure visual eval)"
+    print(f"[watch] privileged   = {priv_label}")
+    print(f"[watch] view         = {args.view}  smoothing={args.camera_smoothing}")
+    print("=" * 60)
+
+    _check_obs_mode(train_config, args.use_privileged_food)
+
+    privileged_target = float(args.privileged_food_scale) if args.use_privileged_food else 0.0
 
     env = GeckoBrainEnv(
         walker_run=walker_run,
         max_steps=args.steps,
         seed=args.seed,
-        privileged_target=0.0,
+        privileged_target=privileged_target,
         render_mode="rgb_array" if args.render_video else None,
+        view_mode=args.view,
+        camera_smoothing=args.camera_smoothing,
     )
     model = PPO.load(str(model_path), device="cpu")
     frames = []
