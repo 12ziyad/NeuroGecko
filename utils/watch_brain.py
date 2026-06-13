@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import shutil
 import sys
 from pathlib import Path
 
@@ -39,7 +40,13 @@ def main() -> None:
     parser.add_argument("--privileged-target", type=float, default=1.0)
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--fps", type=int, default=50)
+    parser.add_argument("--show-debug-line", action="store_true")
+    parser.add_argument("--no-downloads-copy", action="store_true")
     args = parser.parse_args()
+
+    if args.walker_run != "v4_5b_speed_polish_1m":
+        print(f"[warn] walker_run='{args.walker_run}': "
+              "This is wiring-only; not final brain behavior validation.")
 
     rng = np.random.default_rng(args.seed)
     env = GeckoBrainEnv(
@@ -48,6 +55,7 @@ def main() -> None:
         render_mode="rgb_array" if args.render_video else None,
         seed=args.seed,
         privileged_target=args.privileged_target,
+        show_debug_markers=args.show_debug_line,
     )
     frames = []
 
@@ -100,6 +108,10 @@ def main() -> None:
                 out_path = out_dir / f"brain_{args.mode}_{safe_run}.mp4"
                 imageio.mimwrite(out_path, frames, fps=args.fps, quality=8)
                 print("video ->", out_path)
+                if not args.no_downloads_copy:
+                    dl_path = Path.home() / "Downloads" / out_path.name
+                    shutil.copy2(out_path, dl_path)
+                    print("copied ->", dl_path)
             except Exception as exc:
                 print("video write failed:", str(exc)[:160])
     finally:

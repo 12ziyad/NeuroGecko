@@ -83,9 +83,11 @@ class GeckoBrainEnv(gym.Env):
         front_stance_press: float = 0.40,
         front_swing_lift: float = 0.40,
         contact_thresh: float = 0.0564,
+        show_debug_markers: bool = False,
     ):
         super().__init__()
         self.walker_run = str(walker_run)
+        self.show_debug_markers = bool(show_debug_markers)
         self.max_steps = int(max_steps)
         self.brain_steps_per_action = int(brain_steps_per_action)
         if self.brain_steps_per_action < 1:
@@ -417,17 +419,25 @@ class GeckoBrainEnv(gym.Env):
         return lookat
 
     def _add_render_markers(self, renderer) -> None:
+        food_xyz = np.array(
+            [self.food_xy[0], self.food_xy[1], self.food_radius], dtype=np.float64
+        )
+        _add_scene_sphere(renderer, food_xyz, radius=self.food_radius,
+                          rgba=(0.1, 0.95, 0.25, 1.0))
+        if not self.show_debug_markers:
+            return
+
         trunk = self.walk_env.data.xpos[self.walk_env._trunk].copy()
         trunk_ground = np.array([trunk[0], trunk[1], 0.045], dtype=np.float64)
-        food_xyz = np.array([self.food_xy[0], self.food_xy[1], self.food_radius], dtype=np.float64)
         target_xyz = np.array(
-            [self._brain_target_xy[0], self._brain_target_xy[1], 0.045],
-            dtype=np.float64,
+            [self._brain_target_xy[0], self._brain_target_xy[1], 0.045], dtype=np.float64
         )
-        _add_scene_sphere(renderer, food_xyz, radius=self.food_radius, rgba=(0.1, 0.95, 0.25, 1.0))
-        _add_scene_sphere(renderer, target_xyz, radius=0.022, rgba=(1.0, 0.15, 0.05, 0.9))
-        _add_scene_capsule(renderer, trunk_ground, target_xyz, rgba=(1.0, 0.65, 0.05, 0.9))
-        _add_scene_capsule(renderer, target_xyz, food_xyz, radius=0.003, rgba=(0.1, 0.8, 1.0, 0.55))
+        _add_scene_sphere(renderer, target_xyz, radius=0.022,
+                          rgba=(1.0, 0.15, 0.05, 0.9))
+        _add_scene_capsule(renderer, trunk_ground, target_xyz,
+                           rgba=(1.0, 0.65, 0.05, 0.9))
+        _add_scene_capsule(renderer, target_xyz, food_xyz, radius=0.003,
+                           rgba=(0.1, 0.8, 1.0, 0.55))
 
     def render(self):
         if self._render_renderer is None:
