@@ -14,6 +14,7 @@ if platform.system() == "Linux" and not os.environ.get("DISPLAY"):
     os.environ.setdefault("MUJOCO_GL", "egl")
 
 from stable_baselines3.common.monitor import Monitor
+from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.vec_env import DummyVecEnv
 
 from brain.agwm import BrainV1Config, make_brain_ppo, recurrent_ppo_available
@@ -28,8 +29,104 @@ def _cuda_available() -> bool:
         return False
 
 
+def _taper_enabled(args) -> bool:
+    return (
+        args.privileged_food_start_scale is not None
+        or args.privileged_food_end_scale is not None
+        or int(args.privileged_food_taper_steps) > 0
+    )
+
+
+def _validate_privileged_food_args(parser: argparse.ArgumentParser, args) -> bool:
+    taper_enabled = _taper_enabled(args)
+
+    if int(args.privileged_food_taper_steps) < 0:
+        parser.error("--privileged-food-taper-steps must be >= 0.")
+
+    if taper_enabled:
+        if not args.use_privileged_food:
+            parser.error("Privileged food taper requires --use-privileged-food.")
+        if args.privileged_food_start_scale is None:
+            parser.error("--privileged-food-start-scale is required when using a taper.")
+        if args.privileged_food_end_scale is None:
+            parser.error("--privileged-food-end-scale is required when using a taper.")
+
+    return taper_enabled
+
+
+def _initial_privileged_food_scale(args, taper_enabled: bool) -> float:
+    if not args.use_privileged_food:
+        return 0.0
+    if taper_enabled:
+        return float(args.privileged_food_start_scale)
+    return float(args.privileged_food_scale)
+
+
+def _privileged_food_scale_at_step(
+    step: int,
+    start_scale: float,
+    end_scale: float,
+    taper_steps: int,
+) -> float:
+    if taper_steps <= 0:
+        return float(start_scale if step <= 0 else end_scale)
+    alpha = min(max(float(step) / float(taper_steps), 0.0), 1.0)
+    return float(start_scale + alpha * (end_scale - start_scale))
+
+
+class PrivilegedFoodTaperCallback(BaseCallback):
+    def __init__(
+        self,
+        start_scale: float,
+        end_scale: float,
+        taper_steps: int,
+        verbose: int = 0,
+    ):
+        super().__init__(verbose=verbose)
+        self.start_scale = float(start_scale)
+        self.end_scale = float(end_scale)
+        self.taper_steps = int(taper_steps)
+        if self.taper_steps > 0:
+            self.log_interval = max(1, min(10_000, self.taper_steps // 10 or 1))
+        else:
+            self.log_interval = 1
+        self._last_logged_step: int | None = None
+
+    def _scale(self, step: int) -> float:
+        return _privileged_food_scale_at_step(
+            step,
+            self.start_scale,
+            self.end_scale,
+            self.taper_steps,
+        )
+
+    def _set_scale(self, step: int, force_print: bool = False) -> None:
+        scale = self._scale(step)
+        self.training_env.env_method("set_privileged_food_scale", scale)
+        self.logger.record("curriculum/privileged_food_scale", scale)
+
+        should_print = force_print
+        if self._last_logged_step is None:
+            should_print = True
+        elif step - self._last_logged_step >= self.log_interval:
+            should_print = True
+        elif self.taper_steps > 0 and step >= self.taper_steps > self._last_logged_step:
+            should_print = True
+
+        if should_print:
+            print(f"[curriculum] step={step} privileged_food_scale={scale:.6f}")
+            self._last_logged_step = step
+
+    def _on_training_start(self) -> None:
+        self._set_scale(0, force_print=True)
+
+    def _on_step(self) -> bool:
+        self._set_scale(int(self.num_timesteps))
+        return True
+
+
 def _make_env_fn(args):
-    privileged_target = float(args.privileged_food_scale) if args.use_privileged_food else 0.0
+    privileged_target = float(args._initial_privileged_food_scale)
 
     def thunk():
         env = GeckoBrainEnv(
@@ -74,6 +171,24 @@ def main() -> None:
         help="Scale applied to the privileged food vector (default 1.0). Only active with --use-privileged-food.",
     )
     parser.add_argument(
+        "--privileged-food-start-scale",
+        type=float,
+        default=None,
+        help="Starting scale for privileged food curriculum taper.",
+    )
+    parser.add_argument(
+        "--privileged-food-end-scale",
+        type=float,
+        default=None,
+        help="Final scale for privileged food curriculum taper.",
+    )
+    parser.add_argument(
+        "--privileged-food-taper-steps",
+        type=int,
+        default=0,
+        help="Steps over which privileged food scale linearly decays to the end scale.",
+    )
+    parser.add_argument(
         "--num-envs",
         type=int,
         default=1,
@@ -97,6 +212,8 @@ def main() -> None:
         help="Show tqdm progress bar during training (requires tqdm).",
     )
     args = parser.parse_args()
+    taper_enabled = _validate_privileged_food_args(parser, args)
+    args._initial_privileged_food_scale = _initial_privileged_food_scale(args, taper_enabled)
 
     rollout_size = args.n_steps * args.num_envs
     if args.batch_size > rollout_size:
@@ -123,7 +240,17 @@ def main() -> None:
         "recurrent_ppo_available": recurrent_ppo_available(),
         "architecture": config.to_json_dict(),
         "use_privileged_food": bool(args.use_privileged_food),
-        "privileged_food_scale": float(args.privileged_food_scale) if args.use_privileged_food else 0.0,
+        "privileged_food_scale": float(args._initial_privileged_food_scale),
+        "privileged_food_taper_enabled": bool(taper_enabled),
+        "privileged_food_start_scale": (
+            float(args.privileged_food_start_scale) if taper_enabled else None
+        ),
+        "privileged_food_end_scale": (
+            float(args.privileged_food_end_scale) if taper_enabled else None
+        ),
+        "privileged_food_taper_steps": (
+            int(args.privileged_food_taper_steps) if taper_enabled else 0
+        ),
         "observation_mode": obs_mode,
         "num_envs": int(args.num_envs),
         "n_steps": int(args.n_steps),
@@ -140,9 +267,15 @@ def main() -> None:
     print(f"[brain train] run         = {args.run_name}")
     print(f"[brain train] obs_mode    = {obs_mode}", end="")
     if args.use_privileged_food:
-        print(f"  (privileged_scale={args.privileged_food_scale})")
+        print(f"  (privileged_scale={args._initial_privileged_food_scale})")
     else:
         print()
+    if taper_enabled:
+        print(
+            "[brain train] taper       = "
+            f"{args.privileged_food_start_scale} -> {args.privileged_food_end_scale} "
+            f"over {args.privileged_food_taper_steps} steps"
+        )
     print(f"[brain train] num_envs    = {args.num_envs}  vec={vec_type}")
     print(f"[brain train] n_steps     = {args.n_steps}  batch_size={args.batch_size}")
     print(f"[brain train] total_steps = {args.total_steps}")
@@ -164,7 +297,18 @@ def main() -> None:
             gae_lambda=0.95,
             ent_coef=0.01,
         )
-        model.learn(total_timesteps=int(args.total_steps), progress_bar=args.progress_bar)
+        callback = None
+        if taper_enabled:
+            callback = PrivilegedFoodTaperCallback(
+                start_scale=float(args.privileged_food_start_scale),
+                end_scale=float(args.privileged_food_end_scale),
+                taper_steps=int(args.privileged_food_taper_steps),
+            )
+        model.learn(
+            total_timesteps=int(args.total_steps),
+            callback=callback,
+            progress_bar=args.progress_bar,
+        )
         final_path = out_dir / "final.zip"
         model.save(str(final_path))
         print(f"brain model  -> {final_path}")

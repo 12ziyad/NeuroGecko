@@ -33,7 +33,11 @@ def _load_train_config(run_dir: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def _check_obs_mode(train_config: dict, use_privileged_food: bool) -> None:
+def _check_obs_mode(
+    train_config: dict,
+    use_privileged_food: bool,
+    privileged_food_scale: float,
+) -> None:
     if not train_config:
         return
 
@@ -54,7 +58,7 @@ def _check_obs_mode(train_config: dict, use_privileged_food: bool) -> None:
             "Run without --use-privileged-food to avoid confusion."
         )
     elif trained_privileged and use_privileged_food:
-        scale = train_config.get("privileged_food_scale", 1.0)
+        scale = privileged_food_scale
         print(
             f"[watch] INFO: Running with privileged food (scale={scale}). "
             "This matches training conditions — NOT a pure evaluation."
@@ -116,10 +120,17 @@ def main() -> None:
     print(f"[watch] train_obs    = {obs_mode}")
     priv_label = f"YES (scale={args.privileged_food_scale})" if args.use_privileged_food else "NO  (pure visual eval)"
     print(f"[watch] privileged   = {priv_label}")
+    if train_config.get("privileged_food_taper_enabled", False):
+        print(
+            "[watch] train_taper  = "
+            f"{train_config.get('privileged_food_start_scale')} -> "
+            f"{train_config.get('privileged_food_end_scale')} "
+            f"over {train_config.get('privileged_food_taper_steps')} steps"
+        )
     print(f"[watch] view         = {args.view}  smoothing={args.camera_smoothing}")
     print("=" * 60)
 
-    _check_obs_mode(train_config, args.use_privileged_food)
+    _check_obs_mode(train_config, args.use_privileged_food, args.privileged_food_scale)
 
     privileged_target = float(args.privileged_food_scale) if args.use_privileged_food else 0.0
 

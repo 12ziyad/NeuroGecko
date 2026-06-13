@@ -163,6 +163,9 @@ class GeckoBrainEnv(gym.Env):
         self._render_renderer = None
         self._last_info = {}
 
+    def set_privileged_food_scale(self, scale: float) -> None:
+        self.privileged_target = float(scale)
+
     def _load_frozen_walker(self, walker_run: str):
         run_dir = REPO / "models" / walker_run
         model_path = run_dir / "final.zip"
