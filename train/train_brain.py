@@ -227,6 +227,7 @@ def _make_env_fn(args):
             privileged_target=privileged_target,
             privileged_food_dropout_prob=privileged_food_dropout_prob,
             food_spawn_angle_deg=float(args.food_spawn_angle_deg),
+            eat_radius=float(args.eat_radius),
             render_mode=None,
         )
         return Monitor(env)
@@ -265,6 +266,12 @@ def main() -> None:
         type=float,
         default=180.0,
         help="Food spawn half-angle in body frame. 180.0 keeps full-circle spawn.",
+    )
+    parser.add_argument(
+        "--eat-radius",
+        type=float,
+        default=0.10,
+        help="Mouth/nose distance threshold for eating in the Brain env.",
     )
     parser.add_argument(
         "--use-privileged-food",
@@ -403,6 +410,7 @@ def main() -> None:
         "resumed_from_run": args.resume_brain_run if resumed_from_path is not None else None,
         "resumed_from_path": str(resumed_from_path) if resumed_from_path is not None else None,
         "food_spawn_angle_deg": float(args.food_spawn_angle_deg),
+        "eat_radius": float(args.eat_radius),
         "notes": "Brain V1 trains only the high-level 4D target/engage channel.",
     }
     config_path = out_dir / "train_config.json"
@@ -447,6 +455,7 @@ def main() -> None:
     print(f"[brain train] num_envs    = {args.num_envs}  vec={vec_type}")
     print(f"[brain train] n_steps     = {args.n_steps}  batch_size={args.batch_size}")
     print(f"[brain train] food_spawn_angle_deg = {args.food_spawn_angle_deg}")
+    print(f"[brain train] eat_radius = {args.eat_radius}")
     print(f"[brain train] total_steps = {args.total_steps}")
     print(f"[brain train] device      = {device}")
     if callable(getattr(env, "save", None)):

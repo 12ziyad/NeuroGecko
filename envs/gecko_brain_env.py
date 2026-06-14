@@ -73,7 +73,7 @@ class GeckoBrainEnv(gym.Env):
         food_radius: float = 0.035,
         food_spawn_radius: tuple[float, float] = (0.25, 0.70),
         food_spawn_angle_deg: float = 180.0,
-        eat_radius: float = 0.06,
+        eat_radius: float = 0.10,
         camera_width: int = 64,
         camera_height: int = 64,
         render_mode: str | None = None,
@@ -421,10 +421,10 @@ class GeckoBrainEnv(gym.Env):
         self.drives.update(total_dt, ate=ate, danger=danger, moving=moving_drive)
 
         progress = mouth_dist_before - mouth_dist_after
-        reward = 8.0 * progress
-        reward += 2.0 if ate else 0.0
-        reward -= 0.01 * max(steps_run, 1)
-        reward -= 0.025 * moving_drive
+        reward = 40.0 * progress
+        reward += 3.0 if ate else 0.0
+        reward += 0.5 * max(0.0, 1.0 - mouth_dist_after / 0.20)
+        reward -= 0.005 * max(steps_run, 1)
         reward -= 0.35 * danger
         if fallen:
             reward -= 2.0

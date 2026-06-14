@@ -81,6 +81,12 @@ def main() -> None:
         help="Food spawn half-angle in body frame. 180.0 keeps full-circle spawn.",
     )
     parser.add_argument(
+        "--eat-radius",
+        type=float,
+        default=0.10,
+        help="Mouth/nose distance threshold for eating in the Brain env.",
+    )
+    parser.add_argument(
         "--view",
         choices=["fixed", "chase", "close"],
         default="close",
@@ -135,6 +141,7 @@ def main() -> None:
     print(f"[watch] walker_run   = {walker_run}")
     print(f"[watch] train_obs    = {obs_mode}")
     print(f"[watch] food_spawn_angle_deg = {args.food_spawn_angle_deg}")
+    print(f"[watch] eat_radius   = {args.eat_radius}")
     priv_label = f"YES (scale={args.privileged_food_scale})" if args.use_privileged_food else "NO  (pure visual eval)"
     print(f"[watch] privileged   = {priv_label}")
     if train_config.get("privileged_food_taper_enabled", False):
@@ -167,6 +174,7 @@ def main() -> None:
         privileged_target=privileged_target,
         privileged_food_dropout_prob=float(args.privileged_food_dropout_prob),
         food_spawn_angle_deg=float(args.food_spawn_angle_deg),
+        eat_radius=float(args.eat_radius),
         render_mode="rgb_array" if args.render_video else None,
         view_mode=args.view,
         camera_smoothing=args.camera_smoothing,
