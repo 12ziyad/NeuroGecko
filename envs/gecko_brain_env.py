@@ -72,6 +72,7 @@ class GeckoBrainEnv(gym.Env):
         brain_steps_per_action: int = 1,
         food_radius: float = 0.035,
         food_spawn_radius: tuple[float, float] = (0.25, 0.70),
+        food_spawn_angle_deg: float = 180.0,
         eat_radius: float = 0.06,
         camera_width: int = 64,
         camera_height: int = 64,
@@ -107,6 +108,7 @@ class GeckoBrainEnv(gym.Env):
             float(food_spawn_radius[0]),
             float(food_spawn_radius[1]),
         )
+        self.food_spawn_angle_deg = float(food_spawn_angle_deg)
         self.eat_radius = float(eat_radius)
         self.camera_width = int(camera_width)
         self.camera_height = int(camera_height)
@@ -127,6 +129,13 @@ class GeckoBrainEnv(gym.Env):
             render_mode=render_mode,
             seed=seed,
         )
+        self._nose_sid = mujoco.mj_name2id(
+            self.walk_env.model,
+            mujoco.mjtObj.mjOBJ_SITE,
+            "nose_tip",
+        )
+        if self._nose_sid < 0:
+            raise RuntimeError("XML site 'nose_tip' not found; required for mouth-based eating.")
 
         self.walk_model, self.walk_norm = self._load_frozen_walker(self.walker_run)
         self.walk_obs_dim = int(np.prod(self.walk_env.observation_space.shape))
@@ -202,7 +211,13 @@ class GeckoBrainEnv(gym.Env):
         lo, hi = self.food_spawn_radius
         if hi < lo:
             lo, hi = hi, lo
-        angle = self._rng.uniform(-np.pi, np.pi)
+        if self.food_spawn_angle_deg >= 180.0:
+            angle = self._rng.uniform(-np.pi, np.pi)
+        else:
+            a = math.radians(max(self.food_spawn_angle_deg, 0.0))
+            forward_world = self._trunk_rot() @ np.array([1.0, 0.0, 0.0], dtype=np.float64)
+            heading = math.atan2(forward_world[1], forward_world[0])
+            angle = heading + self._rng.uniform(-a, a)
         radius = self._rng.uniform(max(lo, 0.0), max(hi, 0.0))
         offset = radius * np.array([np.cos(angle), np.sin(angle)], dtype=np.float64)
         self.food_xy = self._trunk_xy() + offset
@@ -231,6 +246,10 @@ class GeckoBrainEnv(gym.Env):
 
     def _food_distance(self) -> float:
         return float(np.linalg.norm(self.food_xy - self._trunk_xy()))
+
+    def _mouth_food_distance(self) -> float:
+        nose_xy = self.walk_env.data.site_xpos[self._nose_sid][:2]
+        return float(np.linalg.norm(self.food_xy - nose_xy))
 
     def _set_walk_target(self, target: np.ndarray) -> None:
         self.walk_env.target = np.asarray(target, dtype=np.float64).copy()
@@ -349,6 +368,7 @@ class GeckoBrainEnv(gym.Env):
         self._brain_action_to_target(np.array([1.0, 0.0, -1.0, -1.0], dtype=np.float32))
         self._last_info = {
             "food_dist": self._food_distance(),
+            "mouth_food_dist": self._mouth_food_distance(),
             "ate": False,
             "hunger": self.drives.hunger,
             "energy": self.drives.energy,
@@ -366,6 +386,7 @@ class GeckoBrainEnv(gym.Env):
     def step(self, action):
         action = np.clip(np.asarray(action, dtype=np.float32), -1.0, 1.0)
         food_dist_before = self._food_distance()
+        mouth_dist_before = self._mouth_food_distance()
         trunk_before = self._trunk_xy()
         _, engage = self._brain_action_to_target(action)
 
@@ -388,7 +409,8 @@ class GeckoBrainEnv(gym.Env):
 
         self._set_walk_target(self._brain_target_xy)
         food_dist_after = self._food_distance()
-        ate = bool(food_dist_after <= self.eat_radius)
+        mouth_dist_after = self._mouth_food_distance()
+        ate = bool(mouth_dist_after <= self.eat_radius)
         fallen = bool(walker_terminated or last_walker_info.get("fallen", 0.0) > 0.5)
         belly_contact = float(last_walker_info.get("belly_contact", 0.0))
         danger = float(np.clip(0.65 * belly_contact + (1.0 if fallen else 0.0), 0.0, 1.0))
@@ -398,7 +420,7 @@ class GeckoBrainEnv(gym.Env):
 
         self.drives.update(total_dt, ate=ate, danger=danger, moving=moving_drive)
 
-        progress = food_dist_before - food_dist_after
+        progress = mouth_dist_before - mouth_dist_after
         reward = 8.0 * progress
         reward += 2.0 if ate else 0.0
         reward -= 0.01 * max(steps_run, 1)
@@ -410,6 +432,7 @@ class GeckoBrainEnv(gym.Env):
         if ate:
             self._spawn_food()
             food_dist_after = self._food_distance()
+            mouth_dist_after = self._mouth_food_distance()
 
         self._step += 1
         self._prev_action = action.copy()
@@ -418,6 +441,7 @@ class GeckoBrainEnv(gym.Env):
 
         info = {
             "food_dist": float(food_dist_after),
+            "mouth_food_dist": float(mouth_dist_after),
             "ate": ate,
             "hunger": float(self.drives.hunger),
             "energy": float(self.drives.energy),

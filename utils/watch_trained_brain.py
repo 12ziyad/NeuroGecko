@@ -75,6 +75,12 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--fps", type=int, default=50)
     parser.add_argument(
+        "--food-spawn-angle-deg",
+        type=float,
+        default=180.0,
+        help="Food spawn half-angle in body frame. 180.0 keeps full-circle spawn.",
+    )
+    parser.add_argument(
         "--view",
         choices=["fixed", "chase", "close"],
         default="close",
@@ -128,6 +134,7 @@ def main() -> None:
     print(f"[watch] brain_run    = {args.brain_run}")
     print(f"[watch] walker_run   = {walker_run}")
     print(f"[watch] train_obs    = {obs_mode}")
+    print(f"[watch] food_spawn_angle_deg = {args.food_spawn_angle_deg}")
     priv_label = f"YES (scale={args.privileged_food_scale})" if args.use_privileged_food else "NO  (pure visual eval)"
     print(f"[watch] privileged   = {priv_label}")
     if train_config.get("privileged_food_taper_enabled", False):
@@ -159,6 +166,7 @@ def main() -> None:
         seed=args.seed,
         privileged_target=privileged_target,
         privileged_food_dropout_prob=float(args.privileged_food_dropout_prob),
+        food_spawn_angle_deg=float(args.food_spawn_angle_deg),
         render_mode="rgb_array" if args.render_video else None,
         view_mode=args.view,
         camera_smoothing=args.camera_smoothing,
@@ -172,6 +180,9 @@ def main() -> None:
             eat_count = 0
             falls = 0
             food_distances = [float(info.get("food_dist", np.nan))]
+            mouth_food_distances = []
+            if "mouth_food_dist" in info:
+                mouth_food_distances.append(float(info["mouth_food_dist"]))
             belly_contacts = []
             hungers = []
 
@@ -181,6 +192,8 @@ def main() -> None:
                 eat_count += int(bool(info.get("ate", False)))
                 falls += int(bool(info.get("fallen", False)))
                 food_distances.append(float(info.get("food_dist", np.nan)))
+                if "mouth_food_dist" in info:
+                    mouth_food_distances.append(float(info["mouth_food_dist"]))
                 belly_contacts.append(float(info.get("belly_contact", 0.0)))
                 hungers.append(float(info.get("hunger", 0.0)))
 
@@ -189,15 +202,23 @@ def main() -> None:
                 if terminated or truncated:
                     break
 
-            print(
-                f"episode={ep + 1} "
-                f"eat_count={eat_count} "
-                f"final_food_dist={food_distances[-1]:.4f} "
-                f"mean_food_dist={_mean_or_nan(food_distances):.4f} "
-                f"falls={falls} "
-                f"belly_contact_rate={_mean_or_nan(belly_contacts):.3f} "
-                f"mean_hunger={_mean_or_nan(hungers):.3f}"
-            )
+            episode_parts = [
+                f"episode={ep + 1}",
+                f"eat_count={eat_count}",
+                f"final_food_dist={food_distances[-1]:.4f}",
+                f"mean_food_dist={_mean_or_nan(food_distances):.4f}",
+            ]
+            if mouth_food_distances:
+                episode_parts.extend([
+                    f"final_mouth_food_dist={mouth_food_distances[-1]:.4f}",
+                    f"mean_mouth_food_dist={_mean_or_nan(mouth_food_distances):.4f}",
+                ])
+            episode_parts.extend([
+                f"falls={falls}",
+                f"belly_contact_rate={_mean_or_nan(belly_contacts):.3f}",
+                f"mean_hunger={_mean_or_nan(hungers):.3f}",
+            ])
+            print(" ".join(episode_parts))
 
         if args.render_video:
             import imageio.v2 as imageio
