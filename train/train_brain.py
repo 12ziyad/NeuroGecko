@@ -15,7 +15,7 @@ if platform.system() == "Linux" and not os.environ.get("DISPLAY"):
 
 from stable_baselines3 import PPO
 from stable_baselines3.common.monitor import Monitor
-from stable_baselines3.common.callbacks import BaseCallback, CallbackList
+from stable_baselines3.common.callbacks import BaseCallback, CallbackList, CheckpointCallback
 from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize
 
 from brain.agwm import BrainV1Config, make_brain_ppo, recurrent_ppo_available
@@ -343,6 +343,12 @@ def main() -> None:
         action="store_true",
         help="Show tqdm progress bar during training (requires tqdm).",
     )
+    parser.add_argument(
+        "--checkpoint-freq",
+        type=int,
+        default=25000,
+        help="Save an intermediate checkpoint every N timesteps. 0 to disable.",
+    )
     args = parser.parse_args()
     taper_enabled = _validate_privileged_food_args(parser, args)
     args._initial_privileged_food_scale = _initial_privileged_food_scale(args, taper_enabled)
@@ -411,6 +417,7 @@ def main() -> None:
         "resumed_from_path": str(resumed_from_path) if resumed_from_path is not None else None,
         "food_spawn_angle_deg": float(args.food_spawn_angle_deg),
         "eat_radius": float(args.eat_radius),
+        "checkpoint_freq": int(args.checkpoint_freq),
         "notes": "Brain V1 trains only the high-level 4D target/engage channel.",
     }
     config_path = out_dir / "train_config.json"
@@ -494,6 +501,15 @@ def main() -> None:
                 start_prob=float(args.privileged_food_start_dropout),
                 end_prob=float(args.privileged_food_end_dropout),
                 taper_steps=int(args.privileged_food_dropout_taper_steps),
+            ))
+        if int(args.checkpoint_freq) > 0:
+            ckpt_dir = out_dir / "checkpoints"
+            ckpt_dir.mkdir(parents=True, exist_ok=True)
+            callbacks.append(CheckpointCallback(
+                save_freq=int(args.checkpoint_freq),
+                save_path=str(ckpt_dir),
+                name_prefix="step",
+                verbose=1,
             ))
         callback = CallbackList(callbacks) if callbacks else None
         model.learn(

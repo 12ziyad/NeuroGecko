@@ -61,6 +61,15 @@ def _add_scene_capsule(
         return
 
 
+def _food_visible_frac(image: np.ndarray) -> float:
+    """Fraction of pixels matching the green food marker in a uint8 HxWx3 image."""
+    r = image[:, :, 0].astype(np.int32)
+    g = image[:, :, 1].astype(np.int32)
+    b = image[:, :, 2].astype(np.int32)
+    mask = (g > 120) & (g > r + 30) & (g > b + 30)
+    return float(mask.sum()) / float(mask.size)
+
+
 class GeckoBrainEnv(gym.Env):
     metadata = {"render_modes": ["rgb_array"], "render_fps": 50}
 
@@ -426,7 +435,6 @@ class GeckoBrainEnv(gym.Env):
         r_close = 0.5 * max(0.0, 1.0 - mouth_dist_after / 0.20) if ate else 0.0
         r_time = -0.01 * max(steps_run, 1)
         r_danger = -0.35 * danger + (-2.0 if fallen else 0.0)
-        reward = r_progress + r_eat + r_close + r_time + r_danger
 
         if ate:
             self._spawn_food()
@@ -437,6 +445,11 @@ class GeckoBrainEnv(gym.Env):
         self._prev_action = action.copy()
         terminated = bool(fallen)
         truncated = bool((self._step >= self.max_steps or walker_truncated) and not terminated)
+
+        obs = self._obs()
+        food_visible_frac = _food_visible_frac(obs["image"])
+        r_visible = 0.25 if food_visible_frac > 0.002 else 0.0
+        reward = r_progress + r_eat + r_close + r_visible + r_time + r_danger
 
         info = {
             "food_dist": float(food_dist_after),
@@ -454,14 +467,16 @@ class GeckoBrainEnv(gym.Env):
             "food_xy": self.food_xy.copy(),
             "progress": float(progress),
             "moving_speed": float(moving_speed),
+            "food_visible_frac": float(food_visible_frac),
             "reward_progress": float(r_progress),
             "reward_eat_bonus": float(r_eat),
             "reward_close_bonus": float(r_close),
+            "reward_visible_bonus": float(r_visible),
             "reward_time_penalty": float(r_time),
             "reward_danger_penalty": float(r_danger),
         }
         self._last_info = dict(info)
-        return self._obs(), float(reward), terminated, truncated, info
+        return obs, float(reward), terminated, truncated, info
 
     def _wide_camera_lookat(self, lookahead: float = 0.8) -> np.ndarray:
         trunk = self.walk_env.data.xpos[self.walk_env._trunk].copy()

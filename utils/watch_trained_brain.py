@@ -227,24 +227,27 @@ def main() -> None:
                 except Exception:
                     pass
 
-                # food visible fraction via green pixel heuristic
-                try:
-                    img = obs["image"]
-                    img_np = np.asarray(img)
-                    if img_np.ndim == 4:
-                        img_np = img_np[0]
-                    if img_np.ndim == 3 and img_np.shape[0] == 3:
-                        img_np = img_np.transpose(1, 2, 0)
-                    if img_np.dtype != np.uint8:
-                        if img_np.max() <= 1.0:
-                            img_np = (img_np * 255.0).astype(np.uint8)
-                        else:
-                            img_np = img_np.astype(np.uint8)
-                    r, g, b = img_np[..., 0], img_np[..., 1], img_np[..., 2]
-                    green_mask = (g > 120) & (g > r.astype(np.int32) + 30) & (g > b.astype(np.int32) + 30)
-                    food_visible_fracs.append(float(green_mask.mean()))
-                except Exception:
-                    food_visible_fracs.append(float("nan"))
+                # food visible fraction: prefer env info field, fallback to green-pixel heuristic
+                if "food_visible_frac" in info:
+                    food_visible_fracs.append(float(info["food_visible_frac"]))
+                else:
+                    try:
+                        img = obs["image"]
+                        img_np = np.asarray(img)
+                        if img_np.ndim == 4:
+                            img_np = img_np[0]
+                        if img_np.ndim == 3 and img_np.shape[0] == 3:
+                            img_np = img_np.transpose(1, 2, 0)
+                        if img_np.dtype != np.uint8:
+                            if img_np.max() <= 1.0:
+                                img_np = (img_np * 255.0).astype(np.uint8)
+                            else:
+                                img_np = img_np.astype(np.uint8)
+                        r, g, b = img_np[..., 0], img_np[..., 1], img_np[..., 2]
+                        green_mask = (g > 120) & (g > r.astype(np.int32) + 30) & (g > b.astype(np.int32) + 30)
+                        food_visible_fracs.append(float(green_mask.mean()))
+                    except Exception:
+                        food_visible_fracs.append(float("nan"))
 
                 if args.render_video:
                     frames.append(env.render())
