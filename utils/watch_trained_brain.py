@@ -130,10 +130,19 @@ def main() -> None:
         action="store_true",
         help="Use stochastic (non-deterministic) action sampling. Default is deterministic.",
     )
+    parser.add_argument(
+        "--ckpt",
+        type=str,
+        default=None,
+        help="Path to a specific checkpoint .zip to evaluate. Overrides the default final.zip.",
+    )
     args = parser.parse_args()
 
     run_dir = REPO / "models" / "brain" / args.brain_run
-    model_path = run_dir / "final.zip"
+    if args.ckpt:
+        model_path = Path(args.ckpt)
+    else:
+        model_path = run_dir / "final.zip"
     if not model_path.exists():
         raise FileNotFoundError(f"Missing trained brain model: {model_path}")
 
@@ -143,6 +152,7 @@ def main() -> None:
 
     print("=" * 60)
     print(f"[watch] brain_run    = {args.brain_run}")
+    print(f"[watch] model_path   = {model_path}")
     print(f"[watch] walker_run   = {walker_run}")
     print(f"[watch] train_obs    = {obs_mode}")
     print(f"[watch] food_spawn_angle_deg = {args.food_spawn_angle_deg}")

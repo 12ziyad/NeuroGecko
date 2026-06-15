@@ -356,6 +356,10 @@ def main() -> None:
     args._initial_privileged_food_dropout_prob = (
         float(args.privileged_food_start_dropout) if dropout_taper_enabled else 0.0
     )
+    args._effective_checkpoint_freq = (
+        max(int(args.checkpoint_freq) // max(int(args.num_envs), 1), 1)
+        if int(args.checkpoint_freq) > 0 else 0
+    )
     resumed_from_path = (
         _resolve_brain_run_path(args.resume_brain_run)
         if args.resume_brain_run is not None
@@ -418,6 +422,7 @@ def main() -> None:
         "food_spawn_angle_deg": float(args.food_spawn_angle_deg),
         "eat_radius": float(args.eat_radius),
         "checkpoint_freq": int(args.checkpoint_freq),
+        "checkpoint_freq_env_calls": int(args._effective_checkpoint_freq),
         "notes": "Brain V1 trains only the high-level 4D target/engage channel.",
     }
     config_path = out_dir / "train_config.json"
@@ -464,6 +469,11 @@ def main() -> None:
     print(f"[brain train] food_spawn_angle_deg = {args.food_spawn_angle_deg}")
     print(f"[brain train] eat_radius = {args.eat_radius}")
     print(f"[brain train] total_steps = {args.total_steps}")
+    if args._effective_checkpoint_freq > 0:
+        print(
+            f"[brain train] checkpoint  = every {args.checkpoint_freq} total steps "
+            f"({args._effective_checkpoint_freq} env calls x {args.num_envs} envs)"
+        )
     print(f"[brain train] device      = {device}")
     if callable(getattr(env, "save", None)):
         print("[brain train] vecnormalize = active; will save brain vecnormalize.pkl")
@@ -502,13 +512,13 @@ def main() -> None:
                 end_prob=float(args.privileged_food_end_dropout),
                 taper_steps=int(args.privileged_food_dropout_taper_steps),
             ))
-        if int(args.checkpoint_freq) > 0:
+        if args._effective_checkpoint_freq > 0:
             ckpt_dir = out_dir / "checkpoints"
             ckpt_dir.mkdir(parents=True, exist_ok=True)
             callbacks.append(CheckpointCallback(
-                save_freq=int(args.checkpoint_freq),
+                save_freq=args._effective_checkpoint_freq,
                 save_path=str(ckpt_dir),
-                name_prefix="step",
+                name_prefix="ckpt",
                 verbose=1,
             ))
         callback = CallbackList(callbacks) if callbacks else None
