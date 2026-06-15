@@ -125,6 +125,11 @@ def main() -> None:
             "Default 0.0 = no dropout."
         ),
     )
+    parser.add_argument(
+        "--stochastic",
+        action="store_true",
+        help="Use stochastic (non-deterministic) action sampling. Default is deterministic.",
+    )
     args = parser.parse_args()
 
     run_dir = REPO / "models" / "brain" / args.brain_run
@@ -160,6 +165,8 @@ def main() -> None:
         )
     dropout_label = f"{args.privileged_food_dropout_prob:.3f}" if args.privileged_food_dropout_prob > 0.0 else "off"
     print(f"[watch] dropout_prob = {dropout_label}")
+    action_mode = "stochastic" if args.stochastic else "deterministic"
+    print(f"[watch] action_mode  = {action_mode}")
     print(f"[watch] view         = {args.view}  smoothing={args.camera_smoothing}")
     print("=" * 60)
 
@@ -193,22 +200,67 @@ def main() -> None:
                 mouth_food_distances.append(float(info["mouth_food_dist"]))
             belly_contacts = []
             hungers = []
+            min_mouth_food_dist = float("inf")
+            engage_vals = []
+            food_visible_fracs = []
 
             for _ in range(args.steps):
-                action, _ = model.predict(obs, deterministic=True)
+                action, _ = model.predict(obs, deterministic=not args.stochastic)
                 obs, _, terminated, truncated, info = env.step(action)
                 eat_count += int(bool(info.get("ate", False)))
                 falls += int(bool(info.get("fallen", False)))
                 food_distances.append(float(info.get("food_dist", np.nan)))
-                if "mouth_food_dist" in info:
-                    mouth_food_distances.append(float(info["mouth_food_dist"]))
+                mfd = info.get("mouth_food_dist", None)
+                if mfd is not None:
+                    mfd_f = float(mfd)
+                    mouth_food_distances.append(mfd_f)
+                    if mfd_f < min_mouth_food_dist:
+                        min_mouth_food_dist = mfd_f
                 belly_contacts.append(float(info.get("belly_contact", 0.0)))
                 hungers.append(float(info.get("hunger", 0.0)))
+
+                # engage: action[3] in [-1,1] -> [0,1]
+                try:
+                    raw_engage = float(np.asarray(action).flat[3])
+                    engage_val = max(0.0, min(1.0, (raw_engage + 1.0) * 0.5))
+                    engage_vals.append(engage_val)
+                except Exception:
+                    pass
+
+                # food visible fraction via green pixel heuristic
+                try:
+                    img = obs["image"]
+                    img_np = np.asarray(img)
+                    if img_np.ndim == 4:
+                        img_np = img_np[0]
+                    if img_np.ndim == 3 and img_np.shape[0] == 3:
+                        img_np = img_np.transpose(1, 2, 0)
+                    if img_np.dtype != np.uint8:
+                        if img_np.max() <= 1.0:
+                            img_np = (img_np * 255.0).astype(np.uint8)
+                        else:
+                            img_np = img_np.astype(np.uint8)
+                    r, g, b = img_np[..., 0], img_np[..., 1], img_np[..., 2]
+                    green_mask = (g > 120) & (g > r.astype(np.int32) + 30) & (g > b.astype(np.int32) + 30)
+                    food_visible_fracs.append(float(green_mask.mean()))
+                except Exception:
+                    food_visible_fracs.append(float("nan"))
 
                 if args.render_video:
                     frames.append(env.render())
                 if terminated or truncated:
                     break
+
+            if min_mouth_food_dist == float("inf"):
+                min_mouth_food_dist = float("nan")
+
+            mean_engage = _mean_or_nan(engage_vals)
+            engage_gt06_frac = (
+                float(np.mean([v > 0.6 for v in engage_vals])) if engage_vals else float("nan")
+            )
+            food_visible_frac = _mean_or_nan(
+                [v for v in food_visible_fracs if not np.isnan(v)]
+            )
 
             episode_parts = [
                 f"episode={ep + 1}",
@@ -225,6 +277,10 @@ def main() -> None:
                 f"falls={falls}",
                 f"belly_contact_rate={_mean_or_nan(belly_contacts):.3f}",
                 f"mean_hunger={_mean_or_nan(hungers):.3f}",
+                f"min_mouth_food_dist={min_mouth_food_dist:.4f}",
+                f"mean_engage={mean_engage:.4f}",
+                f"engage_gt0.6_frac={engage_gt06_frac:.4f}",
+                f"food_visible_frac={food_visible_frac:.6f}",
             ])
             print(" ".join(episode_parts))
 
