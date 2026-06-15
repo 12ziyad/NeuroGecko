@@ -421,13 +421,12 @@ class GeckoBrainEnv(gym.Env):
         self.drives.update(total_dt, ate=ate, danger=danger, moving=moving_drive)
 
         progress = mouth_dist_before - mouth_dist_after
-        reward = 40.0 * progress
-        reward += 3.0 if ate else 0.0
-        reward += 0.5 * max(0.0, 1.0 - mouth_dist_after / 0.20)
-        reward -= 0.005 * max(steps_run, 1)
-        reward -= 0.35 * danger
-        if fallen:
-            reward -= 2.0
+        r_progress = 12.0 * progress
+        r_eat = 10.0 if ate else 0.0
+        r_close = 0.5 * max(0.0, 1.0 - mouth_dist_after / 0.20) if ate else 0.0
+        r_time = -0.01 * max(steps_run, 1)
+        r_danger = -0.35 * danger + (-2.0 if fallen else 0.0)
+        reward = r_progress + r_eat + r_close + r_time + r_danger
 
         if ate:
             self._spawn_food()
@@ -455,6 +454,11 @@ class GeckoBrainEnv(gym.Env):
             "food_xy": self.food_xy.copy(),
             "progress": float(progress),
             "moving_speed": float(moving_speed),
+            "reward_progress": float(r_progress),
+            "reward_eat_bonus": float(r_eat),
+            "reward_close_bonus": float(r_close),
+            "reward_time_penalty": float(r_time),
+            "reward_danger_penalty": float(r_danger),
         }
         self._last_info = dict(info)
         return self._obs(), float(reward), terminated, truncated, info
