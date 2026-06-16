@@ -61,6 +61,14 @@ def _dropout_taper_enabled(args) -> bool:
     )
 
 
+def _food_cue_taper_enabled(args) -> bool:
+    return (
+        args.food_radius_start is not None
+        or args.food_radius_end is not None
+        or int(args.food_radius_taper_steps) > 0
+    )
+
+
 def _validate_privileged_food_args(parser: argparse.ArgumentParser, args) -> bool:
     taper_enabled = _taper_enabled(args)
 
@@ -166,6 +174,31 @@ class PrivilegedFoodTaperCallback(BaseCallback):
         return True
 
 
+class FoodCueCurriculumCallback(BaseCallback):
+    def __init__(self, start_r: float, end_r: float, taper_steps: int, verbose: int = 0):
+        super().__init__(verbose=verbose)
+        self.start_r = float(start_r)
+        self.end_r = float(end_r)
+        self.taper_steps = int(taper_steps)
+        self._start_step: int = 0
+
+    def _radius(self, elapsed: int) -> float:
+        if self.taper_steps <= 0:
+            return self.end_r
+        a = min(max(float(elapsed) / float(self.taper_steps), 0.0), 1.0)
+        return self.start_r + a * (self.end_r - self.start_r)
+
+    def _on_training_start(self) -> None:
+        self._start_step = int(self.num_timesteps)
+        self.training_env.env_method("set_food_radius", self.start_r)
+        print(f"[curriculum] run_step=0 (global={self._start_step}) food_radius={self.start_r:.4f}")
+
+    def _on_step(self) -> bool:
+        elapsed = max(int(self.num_timesteps) - self._start_step, 0)
+        self.training_env.env_method("set_food_radius", self._radius(elapsed))
+        return True
+
+
 class PrivilegedFoodDropoutCallback(BaseCallback):
     def __init__(
         self,
@@ -218,6 +251,7 @@ class PrivilegedFoodDropoutCallback(BaseCallback):
 def _make_env_fn(args):
     privileged_target = float(args._initial_privileged_food_scale)
     privileged_food_dropout_prob = float(args._initial_privileged_food_dropout_prob)
+    food_radius = float(args._initial_food_radius)
 
     def thunk():
         env = GeckoBrainEnv(
@@ -228,6 +262,7 @@ def _make_env_fn(args):
             privileged_food_dropout_prob=privileged_food_dropout_prob,
             food_spawn_angle_deg=float(args.food_spawn_angle_deg),
             eat_radius=float(args.eat_radius),
+            food_radius=food_radius,
             render_mode=None,
         )
         return Monitor(env)
@@ -349,12 +384,41 @@ def main() -> None:
         default=25000,
         help="Save an intermediate checkpoint every N timesteps. 0 to disable.",
     )
+    parser.add_argument(
+        "--food-radius",
+        type=float,
+        default=0.035,
+        help="Radius of the brain-camera food cue sphere. Does NOT affect eat_radius.",
+    )
+    parser.add_argument(
+        "--food-radius-start",
+        type=float,
+        default=None,
+        help="Starting food cue radius for curriculum taper (e.g. 0.09).",
+    )
+    parser.add_argument(
+        "--food-radius-end",
+        type=float,
+        default=None,
+        help="Final food cue radius for curriculum taper (e.g. 0.035).",
+    )
+    parser.add_argument(
+        "--food-radius-taper-steps",
+        type=int,
+        default=0,
+        help="Steps over which food cue radius linearly changes from start to end.",
+    )
     args = parser.parse_args()
     taper_enabled = _validate_privileged_food_args(parser, args)
     args._initial_privileged_food_scale = _initial_privileged_food_scale(args, taper_enabled)
     dropout_taper_enabled = _validate_privileged_food_dropout_args(parser, args)
     args._initial_privileged_food_dropout_prob = (
         float(args.privileged_food_start_dropout) if dropout_taper_enabled else 0.0
+    )
+    food_cue_taper = _food_cue_taper_enabled(args)
+    args._initial_food_radius = (
+        float(args.food_radius_start) if food_cue_taper and args.food_radius_start is not None
+        else float(args.food_radius)
     )
     args._effective_checkpoint_freq = (
         max(int(args.checkpoint_freq) // max(int(args.num_envs), 1), 1)
@@ -421,6 +485,10 @@ def main() -> None:
         "resumed_from_path": str(resumed_from_path) if resumed_from_path is not None else None,
         "food_spawn_angle_deg": float(args.food_spawn_angle_deg),
         "eat_radius": float(args.eat_radius),
+        "food_radius": float(args._initial_food_radius),
+        "food_radius_start": float(args.food_radius_start) if food_cue_taper and args.food_radius_start is not None else None,
+        "food_radius_end": float(args.food_radius_end) if food_cue_taper and args.food_radius_end is not None else None,
+        "food_radius_taper_steps": int(args.food_radius_taper_steps) if food_cue_taper else 0,
         "checkpoint_freq": int(args.checkpoint_freq),
         "checkpoint_freq_env_calls": int(args._effective_checkpoint_freq),
         "notes": "Brain V1 trains only the high-level 4D target/engage channel.",
@@ -467,7 +535,15 @@ def main() -> None:
     print(f"[brain train] num_envs    = {args.num_envs}  vec={vec_type}")
     print(f"[brain train] n_steps     = {args.n_steps}  batch_size={args.batch_size}")
     print(f"[brain train] food_spawn_angle_deg = {args.food_spawn_angle_deg}")
-    print(f"[brain train] eat_radius = {args.eat_radius}")
+    print(f"[brain train] eat_radius  = {args.eat_radius}")
+    if food_cue_taper:
+        print(
+            f"[brain train] food_radius = {args._initial_food_radius:.4f} (taper "
+            f"{args.food_radius_start} -> {args.food_radius_end} "
+            f"over {args.food_radius_taper_steps} steps)"
+        )
+    else:
+        print(f"[brain train] food_radius = {args._initial_food_radius:.4f}")
     print(f"[brain train] total_steps = {args.total_steps}")
     if args._effective_checkpoint_freq > 0:
         print(
@@ -500,6 +576,12 @@ def main() -> None:
                 ent_coef=0.01,
             )
         callbacks = []
+        if food_cue_taper:
+            callbacks.append(FoodCueCurriculumCallback(
+                start_r=float(args.food_radius_start) if args.food_radius_start is not None else args._initial_food_radius,
+                end_r=float(args.food_radius_end) if args.food_radius_end is not None else args._initial_food_radius,
+                taper_steps=int(args.food_radius_taper_steps),
+            ))
         if taper_enabled:
             callbacks.append(PrivilegedFoodTaperCallback(
                 start_scale=float(args.privileged_food_start_scale),

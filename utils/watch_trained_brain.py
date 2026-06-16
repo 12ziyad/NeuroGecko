@@ -136,6 +136,12 @@ def main() -> None:
         default=None,
         help="Path to a specific checkpoint .zip to evaluate. Overrides the default final.zip.",
     )
+    parser.add_argument(
+        "--food-radius",
+        type=float,
+        default=0.035,
+        help="Radius of the brain-camera food cue sphere. Does NOT affect eat_radius.",
+    )
     args = parser.parse_args()
 
     run_dir = REPO / "models" / "brain" / args.brain_run
@@ -157,6 +163,7 @@ def main() -> None:
     print(f"[watch] train_obs    = {obs_mode}")
     print(f"[watch] food_spawn_angle_deg = {args.food_spawn_angle_deg}")
     print(f"[watch] eat_radius   = {args.eat_radius}")
+    print(f"[watch] food_radius  = {args.food_radius}")
     priv_label = f"YES (scale={args.privileged_food_scale})" if args.use_privileged_food else "NO  (pure visual eval)"
     print(f"[watch] privileged   = {priv_label}")
     if train_config.get("privileged_food_taper_enabled", False):
@@ -192,6 +199,7 @@ def main() -> None:
         privileged_food_dropout_prob=float(args.privileged_food_dropout_prob),
         food_spawn_angle_deg=float(args.food_spawn_angle_deg),
         eat_radius=float(args.eat_radius),
+        food_radius=float(args.food_radius),
         render_mode="rgb_array" if args.render_video else None,
         view_mode=args.view,
         camera_smoothing=args.camera_smoothing,

@@ -182,13 +182,15 @@ class GeckoBrainEnv(gym.Env):
         self._head_renderer = None
         self._render_renderer = None
         self._last_info = {}
-        self._prev_food_visible_signal = 0.0
 
     def set_privileged_food_scale(self, scale: float) -> None:
         self.privileged_target = float(scale)
 
     def set_privileged_food_dropout_prob(self, prob: float) -> None:
         self.privileged_food_dropout_prob = float(np.clip(prob, 0.0, 1.0))
+
+    def set_food_radius(self, radius: float) -> None:
+        self.food_radius = float(max(radius, 1e-3))
 
     def _load_frozen_walker(self, walker_run: str):
         run_dir = REPO / "models" / walker_run
@@ -391,9 +393,7 @@ class GeckoBrainEnv(gym.Env):
             "brain_target_xy": self._brain_target_xy.copy(),
             "food_xy": self.food_xy.copy(),
         }
-        obs = self._obs()
-        self._prev_food_visible_signal = min(_food_visible_frac(obs["image"]) / 0.012, 1.0)
-        return obs, dict(self._last_info)
+        return self._obs(), dict(self._last_info)
 
     def step(self, action):
         action = np.clip(np.asarray(action, dtype=np.float32), -1.0, 1.0)
@@ -452,9 +452,7 @@ class GeckoBrainEnv(gym.Env):
         obs = self._obs()
         food_visible_frac = _food_visible_frac(obs["image"])
         food_visible_signal = min(food_visible_frac / 0.012, 1.0)
-        r_visual_delta = 0.5 * (food_visible_signal - self._prev_food_visible_signal)
-        self._prev_food_visible_signal = food_visible_signal
-        reward = r_progress + r_eat + r_close + r_visual_delta + r_time + r_danger
+        reward = r_progress + r_eat + r_close + r_time + r_danger
 
         info = {
             "food_dist": float(food_dist_after),
@@ -474,10 +472,10 @@ class GeckoBrainEnv(gym.Env):
             "moving_speed": float(moving_speed),
             "food_visible_frac": float(food_visible_frac),
             "food_visible_signal": float(food_visible_signal),
+            "food_radius": float(self.food_radius),
             "reward_progress": float(r_progress),
             "reward_eat_bonus": float(r_eat),
             "reward_close_bonus": float(r_close),
-            "reward_visual_delta": float(r_visual_delta),
             "reward_time_penalty": float(r_time),
             "reward_danger_penalty": float(r_danger),
         }
