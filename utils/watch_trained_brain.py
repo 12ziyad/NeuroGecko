@@ -9,6 +9,7 @@ import sys
 from pathlib import Path
 
 import numpy as np
+import torch
 
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO))
@@ -147,21 +148,29 @@ def main() -> None:
         action="store_true",
         help="Use env.oracle_action() instead of model.predict(). Diagnostic: tests walker+brain interface.",
     )
+    parser.add_argument(
+        "--bc-diagnostics",
+        action="store_true",
+        help="At each step compare model action to env.oracle_action(). Reports dir_cos, dist_err, engage_err.",
+    )
     args = parser.parse_args()
 
     run_dir = REPO / "models" / "brain" / args.brain_run
-    if args.ckpt:
-        model_path = Path(args.ckpt)
-    else:
-        model_path = run_dir / "final.zip"
-    if not model_path.exists():
-        raise FileNotFoundError(f"Missing trained brain model: {model_path}")
-
     train_config = _load_train_config(run_dir)
     walker_run = args.walker_run or train_config.get("walker_run", "v4_5b_speed_polish_1m")
     obs_mode = train_config.get("observation_mode", "unknown")
     algo = train_config.get("algo", "ppo").lower()
     is_recurrent = (algo == "recurrent_ppo")
+    is_bc = (algo == "behavior_cloning")
+
+    if args.ckpt:
+        model_path = Path(args.ckpt)
+    elif is_bc:
+        model_path = run_dir / "final.pt"
+    else:
+        model_path = run_dir / "final.zip"
+    if not model_path.exists():
+        raise FileNotFoundError(f"Missing trained brain model: {model_path}")
 
     print("=" * 60)
     print(f"[watch] brain_run    = {args.brain_run}")
@@ -214,7 +223,23 @@ def main() -> None:
         view_mode=args.view,
         camera_smoothing=args.camera_smoothing,
     )
-    if is_recurrent:
+    if is_bc:
+        from brain.bc_actor import BrainBCActor, build_obs_space
+        _proprio_dim = int(train_config.get("proprio_dim", 0))
+        if _proprio_dim <= 0:
+            raise ValueError("train_config missing 'proprio_dim' for behavior_cloning model")
+        _bc_obs_space = build_obs_space(_proprio_dim)
+        model = BrainBCActor(
+            _bc_obs_space,
+            image_features_dim=int(train_config.get("image_features_dim", 128)),
+            body_features_dim=int(train_config.get("body_features_dim", 96)),
+            fused_features_dim=int(train_config.get("fused_features_dim", 256)),
+            use_privileged=bool(train_config.get("use_privileged_food", True)),
+            action_dim=int(train_config.get("action_dim", 4)),
+        )
+        model.load_state_dict(torch.load(str(model_path), map_location="cpu"))
+        model.eval()
+    elif is_recurrent:
         try:
             from sb3_contrib import RecurrentPPO as _RecurrentPPO
         except Exception:
@@ -243,10 +268,15 @@ def main() -> None:
             min_mouth_food_dist = float("inf")
             engage_vals = []
             food_visible_fracs = []
+            bc_dir_cosines: list[float] = []
+            bc_dist_errors: list[float] = []
+            bc_engage_errors: list[float] = []
 
             for _ in range(args.steps):
                 if args.oracle:
                     action = env.oracle_action()
+                elif is_bc:
+                    action = model.predict(obs)
                 elif is_recurrent:
                     action, lstm_states = model.predict(
                         obs,
@@ -259,6 +289,14 @@ def main() -> None:
                 obs, _, terminated, truncated, info = env.step(action)
                 if is_recurrent:
                     episode_starts = np.array([terminated or truncated], dtype=bool)
+                if args.bc_diagnostics:
+                    _oracle = env.oracle_action()
+                    _act = np.asarray(action, dtype=np.float32)
+                    _na = float(np.linalg.norm(_act[:2])) + 1e-8
+                    _no = float(np.linalg.norm(_oracle[:2])) + 1e-8
+                    bc_dir_cosines.append(float(np.dot(_act[:2], _oracle[:2]) / (_na * _no)))
+                    bc_dist_errors.append(float(abs(_act[2] - _oracle[2])))
+                    bc_engage_errors.append(float(abs(_act[3] - _oracle[3])))
                 eat_count += int(bool(info.get("ate", False)))
                 falls += int(bool(info.get("fallen", False)))
                 food_distances.append(float(info.get("food_dist", np.nan)))
@@ -337,6 +375,12 @@ def main() -> None:
                 f"engage_gt0.6_frac={engage_gt06_frac:.4f}",
                 f"food_visible_frac={food_visible_frac:.6f}",
             ])
+            if args.bc_diagnostics and bc_dir_cosines:
+                episode_parts.extend([
+                    f"bc_dir_cos={_mean_or_nan(bc_dir_cosines):.4f}",
+                    f"bc_dist_err={_mean_or_nan(bc_dist_errors):.4f}",
+                    f"bc_engage_err={_mean_or_nan(bc_engage_errors):.4f}",
+                ])
             print(" ".join(episode_parts))
 
         if args.render_video:
