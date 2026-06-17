@@ -10,7 +10,7 @@ from pathlib import Path
 import numpy as np
 import torch
 import torch.nn.functional as F
-from torch.utils.data import DataLoader, Dataset, random_split
+from torch.utils.data import ConcatDataset, DataLoader, Dataset, random_split
 
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO))
@@ -43,6 +43,44 @@ class OracleBCDataset(Dataset):
             "privileged": self.privileged[idx],
         }
         return obs, self.actions[idx]
+
+
+def _parse_extra_dataset_names(values: list[str] | None) -> list[str]:
+    names: list[str] = []
+    for value in values or []:
+        for part in str(value).split(","):
+            name = part.strip()
+            if name:
+                names.append(name)
+    return names
+
+
+def _load_dataset_meta(data_dir: Path, dataset_name: str) -> tuple[Path, dict]:
+    npz_path = data_dir / f"{dataset_name}.npz"
+    meta_path = data_dir / f"{dataset_name}_meta.json"
+    if not npz_path.exists():
+        raise FileNotFoundError(f"Dataset not found: {npz_path}")
+    if not meta_path.exists():
+        raise FileNotFoundError(f"Metadata not found: {meta_path}")
+    return npz_path, json.loads(meta_path.read_text(encoding="utf-8"))
+
+
+def _validate_extra_meta(main_name: str, main_meta: dict, extra_name: str, extra_meta: dict) -> None:
+    main_proprio = int(main_meta["proprio_dim"])
+    extra_proprio = int(extra_meta["proprio_dim"])
+    if extra_proprio != main_proprio:
+        raise ValueError(
+            "Cannot concatenate BC datasets with different proprio_dim: "
+            f"{main_name}={main_proprio}, {extra_name}={extra_proprio}"
+        )
+
+    main_action_dim = int(main_meta.get("action_dim", 4))
+    extra_action_dim = int(extra_meta.get("action_dim", 4))
+    if extra_action_dim != main_action_dim:
+        raise ValueError(
+            "Cannot concatenate BC datasets with different action_dim: "
+            f"{main_name}={main_action_dim}, {extra_name}={extra_action_dim}"
+        )
 
 
 def _losses(pred: torch.Tensor, label: torch.Tensor):
@@ -86,6 +124,16 @@ def _run_epoch(model, loader, optimizer, device):
 def main() -> None:
     parser = argparse.ArgumentParser(description="Train feedforward BC brain actor")
     parser.add_argument("--dataset-name", type=str, required=True)
+    parser.add_argument(
+        "--extra-dataset-name",
+        type=str,
+        action="append",
+        default=[],
+        help=(
+            "Additional oracle_bc dataset name(s) to concatenate. May be passed "
+            "multiple times or as a comma-separated list."
+        ),
+    )
     parser.add_argument("--run-name", type=str, required=True)
     parser.add_argument("--epochs", type=int, default=10)
     parser.add_argument("--batch-size", type=int, default=256)
@@ -101,15 +149,17 @@ def main() -> None:
     np.random.seed(args.seed)
 
     data_dir = REPO / "data" / "oracle_bc"
-    npz_path = data_dir / f"{args.dataset_name}.npz"
-    meta_path = data_dir / f"{args.dataset_name}_meta.json"
+    extra_dataset_names = _parse_extra_dataset_names(args.extra_dataset_name)
+    dataset_names = [args.dataset_name] + extra_dataset_names
+    npz_path, meta = _load_dataset_meta(data_dir, args.dataset_name)
+    dataset_paths = [npz_path]
+    dataset_metas = {args.dataset_name: meta}
+    for extra_name in extra_dataset_names:
+        extra_npz_path, extra_meta = _load_dataset_meta(data_dir, extra_name)
+        _validate_extra_meta(args.dataset_name, meta, extra_name, extra_meta)
+        dataset_paths.append(extra_npz_path)
+        dataset_metas[extra_name] = extra_meta
 
-    if not npz_path.exists():
-        raise FileNotFoundError(f"Dataset not found: {npz_path}")
-    if not meta_path.exists():
-        raise FileNotFoundError(f"Metadata not found: {meta_path}")
-
-    meta = json.loads(meta_path.read_text(encoding="utf-8"))
     proprio_dim = int(meta["proprio_dim"])
     walker_run = meta.get("walker_run", "v4_5b_speed_polish_1m")
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -120,6 +170,8 @@ def main() -> None:
     print("=" * 60)
     print(f"[bc train] run_name     = {args.run_name}")
     print(f"[bc train] dataset      = {args.dataset_name}")
+    if extra_dataset_names:
+        print(f"[bc train] extra_data   = {', '.join(extra_dataset_names)}")
     print(f"[bc train] proprio_dim  = {proprio_dim}")
     print(f"[bc train] epochs       = {args.epochs}")
     print(f"[bc train] batch_size   = {args.batch_size}")
@@ -137,12 +189,18 @@ def main() -> None:
         action_dim=4,
     ).to(device)
 
-    dataset = OracleBCDataset(npz_path)
+    datasets = [OracleBCDataset(path) for path in dataset_paths]
+    dataset_lengths = [len(ds) for ds in datasets]
+    dataset = datasets[0] if len(datasets) == 1 else ConcatDataset(datasets)
     n_val = max(1, int(len(dataset) * args.val_frac))
     n_train = len(dataset) - n_val
     train_set, val_set = random_split(
         dataset, [n_train, n_val],
         generator=torch.Generator().manual_seed(args.seed),
+    )
+    print(
+        f"[bc train] rows={len(dataset)} "
+        f"by_dataset={dict(zip(dataset_names, dataset_lengths))}"
     )
     print(f"[bc train] train={n_train}  val={n_val}")
 
@@ -187,6 +245,12 @@ def main() -> None:
         "val_frac": float(args.val_frac),
         "seed": int(args.seed),
         "dataset_name": args.dataset_name,
+        "extra_dataset_names": extra_dataset_names,
+        "dataset_names": dataset_names,
+        "dataset_num_transitions": {
+            name: int(dataset_metas[name].get("num_transitions", length))
+            for name, length in zip(dataset_names, dataset_lengths)
+        },
         "best_val_loss": float(best_val_loss),
     }
     config_path = out_dir / "train_config.json"
