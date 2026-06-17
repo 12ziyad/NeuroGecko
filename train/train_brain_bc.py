@@ -169,6 +169,7 @@ def main() -> None:
     train_config = {
         "run_name": args.run_name,
         "algo": "behavior_cloning",
+        "observation_mode": "privileged",
         "use_privileged_food": True,
         "action_dim": 4,
         "brain_action": ["target_dir_x", "target_dir_y", "target_distance", "engage"],

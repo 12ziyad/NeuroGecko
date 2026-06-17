@@ -273,8 +273,9 @@ def main() -> None:
             bc_engage_errors: list[float] = []
 
             for _ in range(args.steps):
+                oracle_before = env.oracle_action() if (args.bc_diagnostics or args.oracle) else None
                 if args.oracle:
-                    action = env.oracle_action()
+                    action = oracle_before
                 elif is_bc:
                     action = model.predict(obs)
                 elif is_recurrent:
@@ -290,7 +291,7 @@ def main() -> None:
                 if is_recurrent:
                     episode_starts = np.array([terminated or truncated], dtype=bool)
                 if args.bc_diagnostics:
-                    _oracle = env.oracle_action()
+                    _oracle = oracle_before
                     _act = np.asarray(action, dtype=np.float32)
                     _na = float(np.linalg.norm(_act[:2])) + 1e-8
                     _no = float(np.linalg.norm(_oracle[:2])) + 1e-8
