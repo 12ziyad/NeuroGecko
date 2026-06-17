@@ -142,6 +142,11 @@ def main() -> None:
         default=0.035,
         help="Radius of the brain-camera food cue sphere. Does NOT affect eat_radius.",
     )
+    parser.add_argument(
+        "--oracle",
+        action="store_true",
+        help="Use env.oracle_action() instead of model.predict(). Diagnostic: tests walker+brain interface.",
+    )
     args = parser.parse_args()
 
     run_dir = REPO / "models" / "brain" / args.brain_run
@@ -184,6 +189,7 @@ def main() -> None:
     print(f"[watch] dropout_prob = {dropout_label}")
     action_mode = "stochastic" if args.stochastic else "deterministic"
     print(f"[watch] action_mode  = {action_mode}")
+    print(f"[watch] oracle_action = {'YES' if args.oracle else 'NO'}")
     print(f"[watch] view         = {args.view}  smoothing={args.camera_smoothing}")
     print("=" * 60)
 
@@ -223,7 +229,10 @@ def main() -> None:
             food_visible_fracs = []
 
             for _ in range(args.steps):
-                action, _ = model.predict(obs, deterministic=not args.stochastic)
+                if args.oracle:
+                    action = env.oracle_action()
+                else:
+                    action, _ = model.predict(obs, deterministic=not args.stochastic)
                 obs, _, terminated, truncated, info = env.step(action)
                 eat_count += int(bool(info.get("ate", False)))
                 falls += int(bool(info.get("fallen", False)))
