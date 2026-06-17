@@ -160,10 +160,14 @@ def main() -> None:
     train_config = _load_train_config(run_dir)
     walker_run = args.walker_run or train_config.get("walker_run", "v4_5b_speed_polish_1m")
     obs_mode = train_config.get("observation_mode", "unknown")
+    algo = train_config.get("algo", "ppo").lower()
+    is_recurrent = (algo == "recurrent_ppo")
 
     print("=" * 60)
     print(f"[watch] brain_run    = {args.brain_run}")
     print(f"[watch] model_path   = {model_path}")
+    print(f"[watch] algo         = {algo}")
+    print(f"[watch] recurrent_state = {'YES' if is_recurrent else 'NO'}")
     print(f"[watch] walker_run   = {walker_run}")
     print(f"[watch] train_obs    = {obs_mode}")
     print(f"[watch] food_spawn_angle_deg = {args.food_spawn_angle_deg}")
@@ -210,12 +214,24 @@ def main() -> None:
         view_mode=args.view,
         camera_smoothing=args.camera_smoothing,
     )
-    model = PPO.load(str(model_path), device="cpu")
+    if is_recurrent:
+        try:
+            from sb3_contrib import RecurrentPPO as _RecurrentPPO
+        except Exception:
+            raise ImportError(
+                "Model was trained with RecurrentPPO but sb3_contrib is not installed. "
+                "Install with: pip install sb3-contrib"
+            )
+        model = _RecurrentPPO.load(str(model_path), device="cpu")
+    else:
+        model = PPO.load(str(model_path), device="cpu")
     frames = []
 
     try:
         for ep in range(args.episodes):
             obs, info = env.reset(seed=args.seed + ep)
+            lstm_states = None
+            episode_starts = np.ones((1,), dtype=bool)
             eat_count = 0
             falls = 0
             food_distances = [float(info.get("food_dist", np.nan))]
@@ -231,9 +247,18 @@ def main() -> None:
             for _ in range(args.steps):
                 if args.oracle:
                     action = env.oracle_action()
+                elif is_recurrent:
+                    action, lstm_states = model.predict(
+                        obs,
+                        state=lstm_states,
+                        episode_start=episode_starts,
+                        deterministic=not args.stochastic,
+                    )
                 else:
                     action, _ = model.predict(obs, deterministic=not args.stochastic)
                 obs, _, terminated, truncated, info = env.step(action)
+                if is_recurrent:
+                    episode_starts = np.array([terminated or truncated], dtype=bool)
                 eat_count += int(bool(info.get("ate", False)))
                 falls += int(bool(info.get("fallen", False)))
                 food_distances.append(float(info.get("food_dist", np.nan)))

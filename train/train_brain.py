@@ -15,10 +15,17 @@ if platform.system() == "Linux" and not os.environ.get("DISPLAY"):
 
 from stable_baselines3 import PPO
 from stable_baselines3.common.monitor import Monitor
+
+try:
+    from sb3_contrib import RecurrentPPO
+    RECURRENT_PPO_AVAILABLE = True
+except Exception:
+    RecurrentPPO = None
+    RECURRENT_PPO_AVAILABLE = False
 from stable_baselines3.common.callbacks import BaseCallback, CallbackList, CheckpointCallback
 from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize
 
-from brain.agwm import BrainV1Config, make_brain_ppo, recurrent_ppo_available
+from brain.agwm import BrainV1Config, make_brain_ppo, make_policy_kwargs, recurrent_ppo_available
 from envs.gecko_brain_env import GeckoBrainEnv
 
 
@@ -270,6 +277,28 @@ def _make_env_fn(args):
     return thunk
 
 
+def _warm_start_extractor(new_model, warm_start_run: str) -> None:
+    warm_path = REPO / "models" / "brain" / warm_start_run / "final.zip"
+    if not warm_path.exists():
+        raise FileNotFoundError(f"Warm-start checkpoint not found: {warm_path}")
+    old_model = PPO.load(str(warm_path), device="cpu")
+    old_state = old_model.policy.state_dict()
+    new_state = new_model.policy.state_dict()
+    copied, skipped = 0, 0
+    for key in old_state:
+        if (
+            key.startswith("features_extractor.")
+            and key in new_state
+            and old_state[key].shape == new_state[key].shape
+        ):
+            new_state[key] = old_state[key].clone()
+            copied += 1
+        else:
+            skipped += 1
+    new_model.policy.load_state_dict(new_state)
+    print(f"[warm-start] {warm_start_run}: copied_extractor_keys={copied} skipped={skipped}")
+
+
 def _make_vec_env(args):
     thunks = [_make_env_fn(args) for _ in range(args.num_envs)]
     if platform.system() == "Linux" and args.num_envs > 1:
@@ -408,6 +437,18 @@ def main() -> None:
         default=0,
         help="Steps over which food cue radius linearly changes from start to end.",
     )
+    parser.add_argument(
+        "--algo",
+        choices=["ppo", "recurrent_ppo"],
+        default="ppo",
+        help="RL algorithm. 'ppo' = standard feedforward PPO (default). 'recurrent_ppo' = LSTM-based RecurrentPPO.",
+    )
+    parser.add_argument(
+        "--warm-start-extractor-run",
+        type=str,
+        default=None,
+        help="Brain run name to copy compatible feature extractor weights from (PPO -> RecurrentPPO). Optional.",
+    )
     args = parser.parse_args()
     taper_enabled = _validate_privileged_food_args(parser, args)
     args._initial_privileged_food_scale = _initial_privileged_food_scale(args, taper_enabled)
@@ -430,6 +471,20 @@ def main() -> None:
         else None
     )
 
+    if args.algo == "recurrent_ppo" and not RECURRENT_PPO_AVAILABLE:
+        parser.error("--algo recurrent_ppo requires sb3_contrib. Install with: pip install sb3-contrib")
+
+    if args.algo == "recurrent_ppo" and args.resume_brain_run is not None:
+        _resume_cfg_path = REPO / "models" / "brain" / args.resume_brain_run / "train_config.json"
+        if _resume_cfg_path.exists():
+            _resume_cfg = json.loads(_resume_cfg_path.read_text(encoding="utf-8"))
+            _resume_algo = _resume_cfg.get("algo", "ppo").lower()
+            if _resume_algo != "recurrent_ppo":
+                parser.error(
+                    f"Cannot resume PPO checkpoint into RecurrentPPO. "
+                    f"Run '{args.resume_brain_run}' was trained with algo='{_resume_algo}'."
+                )
+
     rollout_size = args.n_steps * args.num_envs
     if args.batch_size > rollout_size:
         parser.error(
@@ -451,8 +506,10 @@ def main() -> None:
         "episode_steps": int(args.episode_steps),
         "brain_action": ["target_dir_x", "target_dir_y", "target_distance", "engage"],
         "brain_action_dim": 4,
-        "algo": "PPO",
-        "recurrent_ppo_available": recurrent_ppo_available(),
+        "algo": args.algo,
+        "recurrent_ppo_available": RECURRENT_PPO_AVAILABLE,
+        "policy_class_used": "MultiInputLstmPolicy" if args.algo == "recurrent_ppo" else "BrainActorCriticPolicy",
+        "warm_start_extractor_run": args.warm_start_extractor_run,
         "architecture": config.to_json_dict(),
         "use_privileged_food": bool(args.use_privileged_food),
         "privileged_food_scale": float(args._initial_privileged_food_scale),
@@ -550,6 +607,12 @@ def main() -> None:
             f"[brain train] checkpoint  = every {args.checkpoint_freq} total steps "
             f"({args._effective_checkpoint_freq} env calls x {args.num_envs} envs)"
         )
+    print(f"[brain train] algo        = {args.algo}")
+    _policy_cls_label = "MultiInputLstmPolicy" if args.algo == "recurrent_ppo" else "BrainActorCriticPolicy"
+    print(f"[brain train] policy_class = {_policy_cls_label}")
+    print(f"[brain train] recurrent_ppo_available = {RECURRENT_PPO_AVAILABLE}")
+    if args.warm_start_extractor_run:
+        print(f"[brain train] warm_start   = {args.warm_start_extractor_run}")
     print(f"[brain train] device      = {device}")
     if callable(getattr(env, "save", None)):
         print("[brain train] vecnormalize = active; will save brain vecnormalize.pkl")
@@ -558,23 +621,45 @@ def main() -> None:
     print("=" * 60)
 
     try:
-        if resumed_from_path is not None:
-            model = PPO.load(str(resumed_from_path / "final.zip"), env=env, device=device)
+        if args.algo == "recurrent_ppo":
+            if resumed_from_path is not None:
+                model = RecurrentPPO.load(str(resumed_from_path / "final.zip"), env=env, device=device)
+            else:
+                model = RecurrentPPO(
+                    "MultiInputLstmPolicy",
+                    env,
+                    policy_kwargs=make_policy_kwargs(config),
+                    verbose=1,
+                    seed=args.seed,
+                    device=device,
+                    n_steps=args.n_steps,
+                    batch_size=args.batch_size,
+                    n_epochs=4,
+                    learning_rate=3e-4,
+                    gamma=0.99,
+                    gae_lambda=0.95,
+                    ent_coef=0.01,
+                )
+            if args.warm_start_extractor_run:
+                _warm_start_extractor(model, args.warm_start_extractor_run)
         else:
-            model = make_brain_ppo(
-                env,
-                config,
-                verbose=1,
-                seed=args.seed,
-                device=device,
-                n_steps=args.n_steps,
-                batch_size=args.batch_size,
-                n_epochs=4,
-                learning_rate=3e-4,
-                gamma=0.99,
-                gae_lambda=0.95,
-                ent_coef=0.01,
-            )
+            if resumed_from_path is not None:
+                model = PPO.load(str(resumed_from_path / "final.zip"), env=env, device=device)
+            else:
+                model = make_brain_ppo(
+                    env,
+                    config,
+                    verbose=1,
+                    seed=args.seed,
+                    device=device,
+                    n_steps=args.n_steps,
+                    batch_size=args.batch_size,
+                    n_epochs=4,
+                    learning_rate=3e-4,
+                    gamma=0.99,
+                    gae_lambda=0.95,
+                    ent_coef=0.01,
+                )
         callbacks = []
         if food_cue_taper:
             callbacks.append(FoodCueCurriculumCallback(
