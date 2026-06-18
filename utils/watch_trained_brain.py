@@ -66,6 +66,41 @@ def _check_obs_mode(
         )
 
 
+def _is_visual_distillation(train_config: dict) -> bool:
+    return str(train_config.get("algo", "")).lower() == "visual_distillation"
+
+
+def _assert_visual_mode_allowed(train_config: dict, use_privileged_food: bool) -> None:
+    if not _is_visual_distillation(train_config):
+        return
+    if use_privileged_food:
+        raise ValueError(
+            "Patch38A violation: visual_distillation models must be evaluated "
+            "WITHOUT --use-privileged-food."
+        )
+    if train_config.get("observation_mode") != "visual":
+        raise ValueError(
+            "Patch38A violation: visual_distillation train_config must declare "
+            "observation_mode='visual'."
+        )
+    if bool(train_config.get("use_privileged_food", True)):
+        raise ValueError(
+            "Patch38A violation: visual_distillation train_config must set "
+            "use_privileged_food=false."
+        )
+    if int(train_config.get("action_dim", 0)) != 4:
+        raise ValueError("Patch38A violation: visual_distillation action_dim must be 4.")
+
+
+def _assert_obs_privileged_zero(obs: dict, context: str) -> None:
+    arr = np.asarray(obs.get("privileged", np.zeros(1, dtype=np.float32)), dtype=np.float32)
+    if arr.size and not np.allclose(arr, 0.0):
+        raise RuntimeError(
+            "Patch38A violation: watcher visual mode received nonzero privileged "
+            f"observation at {context}; max_abs={float(np.max(np.abs(arr))):.8f}"
+        )
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Watch a trained Brain V1 model")
     parser.add_argument("--brain-run", type=str, required=True)
@@ -162,10 +197,18 @@ def main() -> None:
     algo = train_config.get("algo", "ppo").lower()
     is_recurrent = (algo == "recurrent_ppo")
     is_bc = (algo == "behavior_cloning")
+    is_visual_distill = (algo == "visual_distillation")
+    is_pt_actor = is_bc or is_visual_distill
+    _assert_visual_mode_allowed(train_config, args.use_privileged_food)
+    if is_visual_distill and (args.oracle or args.bc_diagnostics):
+        raise ValueError(
+            "Patch38A violation: final visual student evaluation must not use "
+            "--oracle or --bc-diagnostics, because they consult privileged food."
+        )
 
     if args.ckpt:
         model_path = Path(args.ckpt)
-    elif is_bc:
+    elif is_pt_actor:
         model_path = run_dir / "final.pt"
     else:
         model_path = run_dir / "final.zip"
@@ -184,6 +227,8 @@ def main() -> None:
     print(f"[watch] food_radius  = {args.food_radius}")
     priv_label = f"YES (scale={args.privileged_food_scale})" if args.use_privileged_food else "NO  (pure visual eval)"
     print(f"[watch] privileged   = {priv_label}")
+    if is_visual_distill:
+        print("FINAL/VISUAL MODE: privileged food OFF")
     if train_config.get("privileged_food_taper_enabled", False):
         print(
             "[watch] train_scale_taper = "
@@ -223,19 +268,28 @@ def main() -> None:
         view_mode=args.view,
         camera_smoothing=args.camera_smoothing,
     )
-    if is_bc:
+    if tuple(env.action_space.shape) != (4,):
+        raise RuntimeError(
+            "Patch38A requires 4D brain action space "
+            "[target_dir_x, target_dir_y, target_distance, engage]; "
+            f"got {env.action_space.shape}"
+        )
+    if is_pt_actor:
         from brain.bc_actor import BrainBCActor, build_obs_space
         _proprio_dim = int(train_config.get("proprio_dim", 0))
         if _proprio_dim <= 0:
-            raise ValueError("train_config missing 'proprio_dim' for behavior_cloning model")
+            raise ValueError("train_config missing 'proprio_dim' for .pt brain actor")
+        _action_dim = int(train_config.get("action_dim", 4))
+        if _action_dim != 4:
+            raise ValueError(f"Patch38A requires action_dim=4, got {_action_dim}")
         _bc_obs_space = build_obs_space(_proprio_dim)
         model = BrainBCActor(
             _bc_obs_space,
             image_features_dim=int(train_config.get("image_features_dim", 128)),
             body_features_dim=int(train_config.get("body_features_dim", 96)),
             fused_features_dim=int(train_config.get("fused_features_dim", 256)),
-            use_privileged=bool(train_config.get("use_privileged_food", True)),
-            action_dim=int(train_config.get("action_dim", 4)),
+            use_privileged=False if is_visual_distill else bool(train_config.get("use_privileged_food", True)),
+            action_dim=_action_dim,
         )
         model.load_state_dict(torch.load(str(model_path), map_location="cpu"))
         model.eval()
@@ -255,6 +309,8 @@ def main() -> None:
     try:
         for ep in range(args.episodes):
             obs, info = env.reset(seed=args.seed + ep)
+            if is_visual_distill:
+                _assert_obs_privileged_zero(obs, f"episode {ep + 1} reset")
             lstm_states = None
             episode_starts = np.ones((1,), dtype=bool)
             eat_count = 0
@@ -276,7 +332,7 @@ def main() -> None:
                 oracle_before = env.oracle_action() if (args.bc_diagnostics or args.oracle) else None
                 if args.oracle:
                     action = oracle_before
-                elif is_bc:
+                elif is_pt_actor:
                     action = model.predict(obs)
                 elif is_recurrent:
                     action, lstm_states = model.predict(
@@ -287,7 +343,13 @@ def main() -> None:
                     )
                 else:
                     action, _ = model.predict(obs, deterministic=not args.stochastic)
+                action_arr = np.asarray(action, dtype=np.float32).reshape(-1)
+                if action_arr.shape != (4,):
+                    raise RuntimeError(f"Patch38A violation: policy emitted action shape {action_arr.shape}")
+                action = action_arr
                 obs, _, terminated, truncated, info = env.step(action)
+                if is_visual_distill:
+                    _assert_obs_privileged_zero(obs, f"episode {ep + 1} step")
                 if is_recurrent:
                     episode_starts = np.array([terminated or truncated], dtype=bool)
                 if args.bc_diagnostics:
