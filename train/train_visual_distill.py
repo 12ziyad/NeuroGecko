@@ -10,7 +10,7 @@ from pathlib import Path
 import numpy as np
 import torch
 import torch.nn.functional as F
-from torch.utils.data import DataLoader, Dataset, Subset, random_split
+from torch.utils.data import ConcatDataset, DataLoader, Dataset, Subset, random_split
 
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO))
@@ -95,6 +95,47 @@ def _load_dataset_meta(data_dir: Path, dataset_name: str) -> tuple[Path, dict]:
     return npz_path, json.loads(meta_path.read_text(encoding="utf-8"))
 
 
+def _parse_dataset_names(value: str | None) -> list[str]:
+    names: list[str] = []
+    for part in str(value or "").split(","):
+        name = part.strip()
+        if name:
+            names.append(name)
+    return names
+
+
+def _validate_visual_meta(dataset_name: str, meta: dict) -> None:
+    if meta.get("observation_mode") != "visual":
+        raise ValueError(
+            f"Dataset {dataset_name!r} must have observation_mode='visual', "
+            f"got {meta.get('observation_mode')!r}"
+        )
+    if bool(meta.get("use_privileged_food_student", meta.get("use_privileged_food", True))):
+        raise ValueError(
+            f"Patch38C violation: dataset {dataset_name!r} enables privileged student food"
+        )
+    if int(meta.get("action_dim", 4)) != 4:
+        raise ValueError(
+            f"Patch38C violation: dataset {dataset_name!r} action_dim is "
+            f"{meta.get('action_dim')!r}, expected 4"
+        )
+
+
+def _validate_compatible_meta(
+    main_name: str,
+    main_meta: dict,
+    extra_name: str,
+    extra_meta: dict,
+) -> None:
+    main_proprio = int(main_meta["proprio_dim"])
+    extra_proprio = int(extra_meta["proprio_dim"])
+    if extra_proprio != main_proprio:
+        raise ValueError(
+            "Cannot concatenate visual datasets with different proprio_dim: "
+            f"{main_name}={main_proprio}, {extra_name}={extra_proprio}"
+        )
+
+
 def _losses(pred: torch.Tensor, label: torch.Tensor):
     cos_sim = F.cosine_similarity(pred[:, :2], label[:, :2], dim=1, eps=1e-8)
     dir_loss = (1.0 - cos_sim).mean()
@@ -156,6 +197,12 @@ def _split_dataset(dataset: Dataset, val_frac: float, seed: int):
 def main() -> None:
     parser = argparse.ArgumentParser(description="Train a visual-only distillation brain actor")
     parser.add_argument("--dataset-name", type=str, required=True)
+    parser.add_argument(
+        "--extra-dataset-names",
+        type=str,
+        default="",
+        help="Comma-separated additional visual_distill dataset names to concatenate.",
+    )
     parser.add_argument("--run-name", type=str, required=True)
     parser.add_argument("--teacher-brain-run", type=str, default=DEFAULT_TEACHER)
     parser.add_argument("--epochs", type=int, default=3)
@@ -179,20 +226,31 @@ def main() -> None:
 
     data_dir = REPO / "data" / "visual_distill"
     npz_path, meta = _load_dataset_meta(data_dir, args.dataset_name)
-    if meta.get("observation_mode") != "visual":
-        raise ValueError(
-            "Expected visual distillation metadata observation_mode='visual', "
-            f"got {meta.get('observation_mode')!r}"
-        )
-    if bool(meta.get("use_privileged_food_student", meta.get("use_privileged_food", True))):
-        raise ValueError("Patch38A violation: dataset metadata enables privileged student food")
+    _validate_visual_meta(args.dataset_name, meta)
 
-    dataset = VisualDistillDataset(npz_path, max_rows=args.max_rows)
-    proprio_dim = int(meta.get("proprio_dim", dataset.proprio.shape[1]))
-    if int(dataset.proprio.shape[1]) != proprio_dim:
+    extra_dataset_names = _parse_dataset_names(args.extra_dataset_names)
+    dataset_names = [args.dataset_name] + extra_dataset_names
+    dataset_paths = [npz_path]
+    for extra_name in extra_dataset_names:
+        extra_npz_path, extra_meta = _load_dataset_meta(data_dir, extra_name)
+        _validate_visual_meta(extra_name, extra_meta)
+        _validate_compatible_meta(args.dataset_name, meta, extra_name, extra_meta)
+        dataset_paths.append(extra_npz_path)
+
+    datasets = [VisualDistillDataset(path) for path in dataset_paths]
+    dataset_lengths = [len(ds) for ds in datasets]
+    dataset_full = datasets[0] if len(datasets) == 1 else ConcatDataset(datasets)
+    if args.max_rows is not None:
+        max_rows = max(1, int(args.max_rows))
+        dataset = Subset(dataset_full, range(min(max_rows, len(dataset_full))))
+    else:
+        dataset = dataset_full
+
+    proprio_dim = int(meta.get("proprio_dim", datasets[0].proprio.shape[1]))
+    if int(datasets[0].proprio.shape[1]) != proprio_dim:
         raise ValueError(
             "Dataset/meta proprio_dim mismatch: "
-            f"dataset={dataset.proprio.shape[1]} meta={proprio_dim}"
+            f"dataset={datasets[0].proprio.shape[1]} meta={proprio_dim}"
         )
 
     train_set, val_set = _split_dataset(dataset, float(args.val_frac), int(args.seed))
@@ -219,8 +277,11 @@ def main() -> None:
 
     print("=" * 72)
     print(f"[visual train] run_name={args.run_name}")
-    print(f"[visual train] dataset_name={args.dataset_name}")
-    print(f"[visual train] rows={len(dataset)} train={len(train_set)}")
+    print(f"[visual train] dataset_names={dataset_names}")
+    print(
+        f"[visual train] rows={len(dataset)} train={len(train_set)} "
+        f"by_dataset={dict(zip(dataset_names, dataset_lengths))}"
+    )
     if val_set is not None:
         print(f"[visual train] val={len(val_set)}")
     print(f"[visual train] device={device}")
@@ -250,6 +311,7 @@ def main() -> None:
         "run_name": args.run_name,
         "algo": "visual_distillation",
         "observation_mode": "visual",
+        "train_obs": "visual",
         "use_privileged_food": False,
         "use_privileged_food_student": False,
         "action_dim": 4,
@@ -269,7 +331,13 @@ def main() -> None:
         "val_frac": float(args.val_frac),
         "seed": int(args.seed),
         "dataset_name": args.dataset_name,
+        "extra_dataset_names": extra_dataset_names,
+        "dataset_names": dataset_names,
         "dataset_num_transitions": int(len(dataset)),
+        "dataset_total_rows_before_max_rows": int(len(dataset_full)),
+        "dataset_row_counts": {
+            name: int(length) for name, length in zip(dataset_names, dataset_lengths)
+        },
         "best_epoch": int(best_epoch),
         "best_val_loss": float(best_metric),
     }
