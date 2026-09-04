@@ -10,7 +10,11 @@ env/
 .env.*
 
 # Training outputs / large files
-models/
+models/*
+!models/INVENTORY.md
+models_recovered/
+models_backups/
+build_sessions/
 renders/
 aws_results/
 runs/
