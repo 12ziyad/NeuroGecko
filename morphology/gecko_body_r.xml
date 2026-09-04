@@ -47,11 +47,16 @@
     <body name="trunk_middle" pos="0 0 0.028">  <!-- ROOT, ~CoM R-redist (root, ~CoM) -->
       <freejoint name="root"/>
       <site name="imu" pos="0 0 0" size="0.002"/>
+      <!-- Measurement-only landmarks: sites add no mass, joints, or sensors.
+           group 4 keeps these out of the default policy/render site groups.
+           mid_back follows the existing dorsal visual surface (not skin data). -->
+      <site name="mid_back" pos="0 0 0.01196" size="0.0005" group="4"/>
       <camera name="tracking" mode="trackcom" pos="0 -0.18 0.10" xyaxes="1 0 0 0 0.5 0.87"/>
       <geom class="collision" type="capsule" fromto="-0.0095 0 0 0.0095 0 0" size="0.013" mass="0.008"/>  <!-- trunk_mid R-redist (root, ~CoM) -->
       <geom class="visual" type="ellipsoid" pos="0 0 0" size="0.0147 0.01365 0.01196" material="skin"/>
       <site name="belly_mid" type="box" pos="0.0 0 -0.0104" size="0.0114 0.0078 0.003" rgba="0.9 0.2 0.2 0.25"/>
       <body name="trunk_anterior" pos="0.0095 0 0">
+        <site name="pectoral_center" pos="0.0125 0 -0.002" size="0.0005" group="4"/>
         <joint name="spine_lat_1" axis="0 0 1" range="-25 25" stiffness="0.02" damping="0.006"/>  <!-- lateral bend 1 [R] -->
         <joint name="spine_pitch" axis="0 1 0" range="-10 10" stiffness="0.03" damping="0.006"/>  <!-- weakly actuated pitch [R] -->
         <geom class="collision" type="capsule" fromto="0 0 0 0.018 0 0" size="0.012" mass="0.008"/>  <!-- R-redist -->
@@ -75,6 +80,7 @@
           </body>  <!-- head -->
         </body>  <!-- neck -->
         <body name="humerus_L" pos="0.0125 0.011 -0.002">
+          <site name="shoulder_L" pos="0 0 0" size="0.0005" group="4"/>
           <joint name="shoulder_sprawl_L" axis="1 0 0" range="-35 35"/>
           <joint name="shoulder_proret_L" axis="0 0 1" range="-40 40"/>
           <geom class="collision" type="capsule" fromto="0 0 0 -0.00474636 0.013448 -0.00465005" size="0.0025" mass="0.0012"/>
@@ -87,7 +93,7 @@
               <joint name="wrist_L" axis="0 1 0" range="-35 35" stiffness="0.02" damping="0.003"/>  <!-- PASSIVE [R] -->
               <geom class="collision" type="box" pos="0.0038 0 -0.0026" size="0.0038 0.0028 0.0014" mass="0.0002"/>  <!-- forefoot pad (mass) -->
               <geom class="visual" type="box" pos="0.0038 0 -0.0026" size="0.0038 0.0028 0.0014" material="skin"/>
-              <site name="footzone_fore_L" type="box" pos="0.00725 0 -0.00248" size="0.00845 0.00628 0.00368" rgba="0.2 0.8 0.3 0.16"/>
+              <site name="footzone_fore_L" type="box" pos="0.00725 0 -0.00248" size="0.00845 0.00628 0.00368" rgba="0.2 0.8 0.3 0.16" group="4"/>
               <geom class="visual" type="capsule" fromto="0.00722 0 -0.0021 0.0106818 -0.00334303 -0.00312293" size="0.0008" rgba="0.62 0.55 0.42 1"/>  <!-- digit 1 (visual) -->
               <geom class="collision" type="capsule" fromto="0.0106818 -0.00334303 -0.00312293 0.011523 -0.00415532 -0.00364355" size="0.0004" mass="0" rgba="0.15 0.13 0.10 1"/>  <!-- claw 1 (contact, massless) -->
               <geom class="visual" type="capsule" fromto="0.00722 0 -0.0021 0.0122806 -0.00204463 -0.00326015" size="0.0008" rgba="0.62 0.55 0.42 1"/>  <!-- digit 2 (visual) -->
@@ -102,6 +108,7 @@
           </body>  <!-- forearm -->
         </body>  <!-- humerus -->
         <body name="humerus_R" pos="0.0125 -0.011 -0.002">
+          <site name="shoulder_R" pos="0 0 0" size="0.0005" group="4"/>
           <joint name="shoulder_sprawl_R" axis="1 0 0" range="-35 35"/>
           <joint name="shoulder_proret_R" axis="0 0 1" range="-40 40"/>
           <geom class="collision" type="capsule" fromto="0 0 0 -0.00474636 -0.013448 -0.00465005" size="0.0025" mass="0.0012"/>
@@ -114,7 +121,7 @@
               <joint name="wrist_R" axis="0 1 0" range="-35 35" stiffness="0.02" damping="0.003"/>  <!-- PASSIVE [R] -->
               <geom class="collision" type="box" pos="0.0038 0 -0.0026" size="0.0038 0.0028 0.0014" mass="0.0002"/>  <!-- forefoot pad (mass) -->
               <geom class="visual" type="box" pos="0.0038 0 -0.0026" size="0.0038 0.0028 0.0014" material="skin"/>
-              <site name="footzone_fore_R" type="box" pos="0.00725 0 -0.00248" size="0.00845 0.00628 0.00368" rgba="0.2 0.8 0.3 0.16"/>
+              <site name="footzone_fore_R" type="box" pos="0.00725 0 -0.00248" size="0.00845 0.00628 0.00368" rgba="0.2 0.8 0.3 0.16" group="4"/>
               <geom class="visual" type="capsule" fromto="0.00722 0 -0.0021 0.0106818 0.00334303 -0.00312293" size="0.0008" rgba="0.62 0.55 0.42 1"/>  <!-- digit 1 (visual) -->
               <geom class="collision" type="capsule" fromto="0.0106818 0.00334303 -0.00312293 0.011523 0.00415532 -0.00364355" size="0.0004" mass="0" rgba="0.15 0.13 0.10 1"/>  <!-- claw 1 (contact, massless) -->
               <geom class="visual" type="capsule" fromto="0.00722 0 -0.0021 0.0122806 0.00204463 -0.00326015" size="0.0008" rgba="0.62 0.55 0.42 1"/>  <!-- digit 2 (visual) -->
@@ -135,11 +142,13 @@
         <geom class="visual" type="ellipsoid" pos="-0.009 0 0" size="0.0129 0.01365 0.01235" material="skin"/>
         <site name="belly_post" type="box" pos="-0.009 0 -0.0104" size="0.0108 0.0078 0.003" rgba="0.9 0.2 0.2 0.25"/>
         <body name="pelvis" pos="-0.018 0 0">
+          <site name="pelvis_center" pos="-0.007 0 -0.002" size="0.0005" group="4"/>
           <joint name="spine_lat_3" axis="0 0 1" range="-25 25" stiffness="0.03" damping="0.007"/>  <!-- lateral bend 3 (lumbo-sacral) [R] -->
           <geom class="collision" type="capsule" fromto="0 0 0 -0.014 0 0" size="0.013" mass="0.005"/>  <!-- R -->
           <geom class="visual" type="ellipsoid" pos="-0.007 0 0" size="0.01155 0.01456 0.013" material="skin"/>
           <site name="vent" pos="-0.014 0 0" size="0.001" rgba="1 0 0 0.6"/>
           <body name="femur_L" pos="-0.007 0.012 -0.002">
+            <site name="hip_L" pos="0 0 0" size="0.0005" group="4"/>
             <joint name="hip_sprawl_L" axis="1 0 0" range="-35 35"/>
             <joint name="hip_proret_L" axis="0 0 1" range="-40 40"/>
             <joint name="hip_rot_L" axis="0 1 0" range="-35 35"/>  <!-- long-axis -->
@@ -153,7 +162,7 @@
                 <joint name="ankle_L" axis="0 1 0" range="-45 45"/>
                 <geom class="collision" type="box" pos="0.0045 0 -0.003" size="0.0045 0.0032 0.0016" mass="0.0004"/>  <!-- hindfoot pad (mass) -->
                 <geom class="visual" type="box" pos="0.0045 0 -0.003" size="0.0045 0.0032 0.0016" material="skin"/>
-                <site name="footzone_hind_L" type="box" pos="0.008745 0 -0.00289" size="0.009945 0.00765 0.00409" rgba="0.2 0.8 0.3 0.16"/>
+                <site name="footzone_hind_L" type="box" pos="0.008745 0 -0.00289" size="0.009945 0.00765 0.00409" rgba="0.2 0.8 0.3 0.16" group="4"/>
                 <geom class="visual" type="capsule" fromto="0.00855 0 -0.0025 0.0128773 -0.00417879 -0.00377866" size="0.0009" rgba="0.62 0.55 0.42 1"/>  <!-- digit 1 (visual) -->
                 <geom class="collision" type="capsule" fromto="0.0128773 -0.00417879 -0.00377866 0.0138236 -0.00509262 -0.00436436" size="0.00045" mass="0" rgba="0.15 0.13 0.10 1"/>  <!-- claw 1 (contact, massless) -->
                 <geom class="visual" type="capsule" fromto="0.00855 0 -0.0025 0.0148758 -0.00255578 -0.00395018" size="0.0009" rgba="0.62 0.55 0.42 1"/>  <!-- digit 2 (visual) -->
@@ -168,6 +177,7 @@
             </body>  <!-- tibia -->
           </body>  <!-- femur -->
           <body name="femur_R" pos="-0.007 -0.012 -0.002">
+            <site name="hip_R" pos="0 0 0" size="0.0005" group="4"/>
             <joint name="hip_sprawl_R" axis="1 0 0" range="-35 35"/>
             <joint name="hip_proret_R" axis="0 0 1" range="-40 40"/>
             <joint name="hip_rot_R" axis="0 1 0" range="-35 35"/>  <!-- long-axis -->
@@ -181,7 +191,7 @@
                 <joint name="ankle_R" axis="0 1 0" range="-45 45"/>
                 <geom class="collision" type="box" pos="0.0045 0 -0.003" size="0.0045 0.0032 0.0016" mass="0.0004"/>  <!-- hindfoot pad (mass) -->
                 <geom class="visual" type="box" pos="0.0045 0 -0.003" size="0.0045 0.0032 0.0016" material="skin"/>
-                <site name="footzone_hind_R" type="box" pos="0.008745 0 -0.00289" size="0.009945 0.00765 0.00409" rgba="0.2 0.8 0.3 0.16"/>
+                <site name="footzone_hind_R" type="box" pos="0.008745 0 -0.00289" size="0.009945 0.00765 0.00409" rgba="0.2 0.8 0.3 0.16" group="4"/>
                 <geom class="visual" type="capsule" fromto="0.00855 0 -0.0025 0.0128773 0.00417879 -0.00377866" size="0.0009" rgba="0.62 0.55 0.42 1"/>  <!-- digit 1 (visual) -->
                 <geom class="collision" type="capsule" fromto="0.0128773 0.00417879 -0.00377866 0.0138236 0.00509262 -0.00436436" size="0.00045" mass="0" rgba="0.15 0.13 0.10 1"/>  <!-- claw 1 (contact, massless) -->
                 <geom class="visual" type="capsule" fromto="0.00855 0 -0.0025 0.0148758 0.00255578 -0.00395018" size="0.0009" rgba="0.62 0.55 0.42 1"/>  <!-- digit 2 (visual) -->

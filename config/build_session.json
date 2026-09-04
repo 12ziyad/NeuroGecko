@@ -1,0 +1,14 @@
+{
+  "session": "build-20260904T233438Z",
+  "authorized_additional_aws_usd": 60,
+  "authorization_source": "Direct user reply: 60dollar",
+  "existing_instance_only": true,
+  "new_cloud_resources_permitted": false,
+  "published_reference_compute_usd_per_hour": 1.006,
+  "reference_rate_date": "2026-03",
+  "reference_source": "https://aws.amazon.com/jp/blogs/news/case-study-dentsusoken-unveil/",
+  "conservative_planning_usd_per_hour": 2.5,
+  "planning_rate_is_billing_reading": false,
+  "per_experiment_external_timeout_seconds": 900,
+  "notes": "Planning includes substantial headroom but is not a current bill. Each job also has an external timeout. No unattended long training is launched; the pre-existing instance's ongoing uptime is not stopped by a process timeout. Reserve most of the user's cap until morphology and gait gates are measured."
+}

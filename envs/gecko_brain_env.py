@@ -16,6 +16,29 @@ from envs.gecko_walk_env import GeckoWalkEnv
 REPO = Path(__file__).resolve().parent.parent
 
 
+def _camera_scene_options(policy_camera_mode: str):
+    """Keep camera contracts independent; sealing changes policy pixels.
+
+    ``legacy`` preserves pre-seal render options for checkpoint comparisons,
+    not the original MJCF itself. ``sealed`` masks group-1 body visuals, all
+    sites and skins. World/light/camera/physical-body changes can still change
+    observations; this is not a guarantee that arbitrary appearance edits are
+    distribution-neutral. New vision experiments should select sealed mode
+    explicitly, and checkpoint evaluations must record which mode was used.
+    """
+    if policy_camera_mode not in ("legacy", "sealed"):
+        raise ValueError("policy_camera_mode must be 'legacy' or 'sealed'")
+    policy = mujoco.MjvOption()
+    human = mujoco.MjvOption()
+    if policy_camera_mode == "sealed":
+        policy.geomgroup[1] = 0
+        policy.sitegroup[:] = 0
+        policy.skingroup[:] = 0
+    # Preserve ordinary human rendering, including body group 1 and shadows.
+    # Do not enable collision group 3 or diagnostic measurement/site group 4.
+    return policy, human
+
+
 def _scene_obj(renderer):
     return getattr(renderer, "scene", getattr(renderer, "_scene", None))
 
@@ -97,8 +120,14 @@ class GeckoBrainEnv(gym.Env):
         show_debug_markers: bool = False,
         view_mode: str = "close",
         camera_smoothing: float = 0.0,
+        policy_camera_mode: str = "legacy",
+        walker_xml_path: str | Path | None = None,
     ):
         super().__init__()
+        self.policy_camera_mode = str(policy_camera_mode)
+        self._policy_scene_option, self._render_scene_option = _camera_scene_options(
+            self.policy_camera_mode
+        )
         self.walker_run = str(walker_run)
         self.show_debug_markers = bool(show_debug_markers)
         _valid_views = ("fixed", "chase", "close")
@@ -128,6 +157,7 @@ class GeckoBrainEnv(gym.Env):
 
         walker_max_steps = max(1, self.max_steps * self.brain_steps_per_action)
         self.walk_env = GeckoWalkEnv(
+            xml_path=walker_xml_path,
             frame_skip=frame_skip,
             max_steps=walker_max_steps,
             control_mode=control_mode,
@@ -311,7 +341,18 @@ class GeckoBrainEnv(gym.Env):
                 self.camera_width,
             )
         try:
-            self._head_renderer.update_scene(self.walk_env.data, camera="head_cam")
+            self._head_renderer.update_scene(
+                self.walk_env.data, camera="head_cam",
+                scene_option=self._policy_scene_option,
+            )
+            # MuJoCo 3.9: shadows are MjvScene render flags, not MjvOption
+            # attributes. Never mutate the model's shared light_castshadow.
+            scene = _scene_obj(self._head_renderer)
+            if scene is None:
+                raise RuntimeError("Policy renderer does not expose its scene")
+            scene.flags[mujoco.mjtRndFlag.mjRND_SHADOW] = (
+                self.policy_camera_mode == "legacy"
+            )
             food_xyz = np.array(
                 [self.food_xy[0], self.food_xy[1], self.food_radius], dtype=np.float64
             )
@@ -570,7 +611,10 @@ class GeckoBrainEnv(gym.Env):
         cam.distance = distance
         cam.azimuth = azimuth
         cam.elevation = elevation
-        self._render_renderer.update_scene(self.walk_env.data, camera=cam)
+        self._render_renderer.update_scene(
+            self.walk_env.data, camera=cam, scene_option=self._render_scene_option
+        )
+        _scene_obj(self._render_renderer).flags[mujoco.mjtRndFlag.mjRND_SHADOW] = 1
         self._add_render_markers(self._render_renderer)
         return self._render_renderer.render()
 

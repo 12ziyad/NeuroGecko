@@ -28,6 +28,7 @@ from gymnasium import spaces
 
 from envs.cpg_residual_controller import CPGResidualController
 from rewards.gait_prior import LateralSequenceCPG
+from common.energetics import actuator_work
 
 REPO = Path(__file__).resolve().parent.parent
 DEFAULT_XML = REPO / "morphology" / "gecko_body_r.xml"
@@ -129,6 +130,10 @@ class GeckoWalkEnv(gym.Env):
         _, self._prev_dist, _ = self._target_egocentric()
         self._prev_foot_xy = self._foot_xy().copy()
         self._last_step_metrics = {}
+        self._step_work = np.zeros(3, dtype=np.float64)
+        self._episode_work = np.zeros(3, dtype=np.float64)
+        self._episode_path_m = 0.0
+        self._work_prev_xy = self.data.xpos[self._trunk, :2].copy()
         obs = self._obs()
         self.observation_space = spaces.Box(-np.inf, np.inf, obs.shape, np.float32)
         self.action_space = spaces.Box(-1.0, 1.0, (self.nu,), np.float32)
@@ -231,6 +236,13 @@ class GeckoWalkEnv(gym.Env):
             foot_contact_forces=foot_forces.copy(),
             foot_speed=foot_speed.astype(np.float32),
             gait_phase=self.gait.phase(time_s),
+            mechanical_work_positive_J=float(self._step_work[0]),
+            mechanical_work_negative_J=float(self._step_work[1]),
+            mechanical_work_abs_J=float(self._step_work[2]),
+            mechanical_work_episode_abs_J=float(self._episode_work[2]),
+            mechanical_path_length_m=float(self._episode_path_m),
+            mechanical_work_J_per_m=(float(self._episode_work[2] / self._episode_path_m)
+                                     if self._episode_path_m > 1e-9 else None),
         )
         return metrics, foot_xy
 
@@ -253,6 +265,10 @@ class GeckoWalkEnv(gym.Env):
         _, self._prev_dist, _ = self._target_egocentric()
         self._prev_foot_xy = self._foot_xy().copy()
         self._last_step_metrics = {}
+        self._step_work[:] = 0.0
+        self._episode_work[:] = 0.0
+        self._episode_path_m = 0.0
+        self._work_prev_xy = d.xpos[self._trunk, :2].copy()
         return self._obs(), {}
 
     def step(self, action):
@@ -268,8 +284,16 @@ class GeckoWalkEnv(gym.Env):
             # affine map [-1,1] -> [low, high]
             self._ctrl = self.act_low + (action + 1.0) * 0.5 * (self.act_high - self.act_low)
         self.data.ctrl[:] = self._ctrl
+        self._step_work[:] = 0.0
         for _ in range(self.frame_skip):
             mujoco.mj_step(self.model, self.data)
+            self._step_work += actuator_work(self.data.actuator_force,
+                                             self.data.actuator_velocity,
+                                             self.model.opt.timestep)
+        self._episode_work += self._step_work
+        work_xy = self.data.xpos[self._trunk, :2].copy()
+        self._episode_path_m += float(np.linalg.norm(work_xy - self._work_prev_xy))
+        self._work_prev_xy = work_xy
         self._step += 1
 
         ego, dist, head = self._target_egocentric()

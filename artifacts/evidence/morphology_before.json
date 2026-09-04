@@ -1,0 +1,395 @@
+{
+  "schema_version": 1,
+  "created_utc": "2026-09-04T23:46:29.075432+00:00",
+  "model_path": "C:\\Users\\ziyad\\GeckoBrain\\morphology\\gecko_body_r.xml",
+  "model_sha256": "c4293da9a0e86ed3e43d23c561b55fec32ccc9b32ec99699737c4294345c3c73",
+  "registry_path": "C:\\Users\\ziyad\\GeckoBrain\\config\\proxies.yaml",
+  "registry_sha256": "c02bd9df2e36aee0b13cd80e65834d8f78be9597889496fae5b7b7a152a9d625",
+  "protocol": {
+    "neutral_keyframe": "neutral",
+    "settle_seconds_requested": 2.0,
+    "settle_seconds_actual": 1.9999999999999103,
+    "settle_steps": 2500,
+    "actuator_targets": "all zero (position targets, not zero applied force)",
+    "ground": "model floor z=0; no environmental randomization",
+    "com": "neutral-pose body-mass weighted axial projection; tail exclusion is mathematical",
+    "bilateral_gates": "both sides and both joint/actuator ranges must pass",
+    "claim": "engineering morphology audit; not walking or kinematic validation"
+  },
+  "structural_counts": {
+    "nq": 39,
+    "nv": 38,
+    "nu": 25,
+    "hinge_joints": 32,
+    "sites": 18,
+    "sensors": 83
+  },
+  "metrics": {
+    "total_mass_kg": 0.0612,
+    "tail_mass_fraction": 0.24509803921568626,
+    "tail_length_svl": 1.0377358490566038,
+    "com_intact_svl": 0.8107237376680232,
+    "com_tail_excluded_svl": 0.6088840625255247,
+    "femur_tibia_ratio": {
+      "L": 1.357145334719101,
+      "R": 1.357145334719101
+    },
+    "hindlimb_length_svl": {
+      "L": 0.46611336590752356,
+      "R": 0.46611336590752356
+    },
+    "hip_proret_range_deg": {
+      "L_joint_deg": 80.0,
+      "L_actuator_deg": 80.00003428605437,
+      "R_joint_deg": 80.0,
+      "R_actuator_deg": 80.00003428605437
+    },
+    "hip_rot_range_deg": {
+      "L_joint_deg": 70.0,
+      "L_actuator_deg": 69.99997270451807,
+      "R_joint_deg": 70.0,
+      "R_actuator_deg": 69.99997270451807
+    },
+    "head_width_svl": 0.23867924528301887,
+    "interorbital_distance_m": 0.013640000000000001,
+    "hip_height_svl": {
+      "L": 0.19589962313446213,
+      "R": 0.19589962313446213
+    },
+    "shoulder_height_svl": {
+      "L": 0.19215080923935296,
+      "R": 0.19215080923935296
+    },
+    "shoulder_hip_ratio": {
+      "L": 0.9808635982288947,
+      "R": 0.9808635982288947
+    }
+  },
+  "diagnostics": {
+    "svl_m": 0.106,
+    "tail_chain_length_m": 0.11,
+    "neutral_com_m": [
+      -0.021436716192810453,
+      -8.304244580924514e-20,
+      0.026427314820261436
+    ],
+    "neutral_tail_excluded_com_m": [
+      -4.171062770562833e-05,
+      -1.1000427886419486e-19,
+      0.025916702748917747
+    ],
+    "hindlimb_segments": {
+      "L": {
+        "femur_m": 0.01900003422255865,
+        "tibia_m": 0.013999999658467852,
+        "ankle_to_fourth_digit_m": 0.00890800202065536,
+        "fourth_digit_m": 0.00749998088451564,
+        "total_m": 0.049408016786197495
+      },
+      "R": {
+        "femur_m": 0.01900003422255865,
+        "tibia_m": 0.013999999658467852,
+        "ankle_to_fourth_digit_m": 0.00890800202065536,
+        "fourth_digit_m": 0.00749998088451564,
+        "total_m": 0.049408016786197495
+      }
+    },
+    "head_collision_width_m": 0.022,
+    "head_visual_skin_width_m": 0.0253,
+    "eye_center_distance_m": 0.02024,
+    "settled_hip_z_m": {
+      "L": 0.020765360052252987,
+      "R": 0.020765360052252987
+    },
+    "settled_shoulder_z_m": {
+      "L": 0.020367985779371413,
+      "R": 0.020367985779371413
+    },
+    "settled_max_abs_qvel": 0.00021694393513224447,
+    "settled_touch_forces_N": {
+      "touch_fore_L": 0.028897112569673436,
+      "touch_fore_R": 0.028897112569675015,
+      "touch_hind_L": 0.27128897495232773,
+      "touch_hind_R": 0.271288974952326,
+      "touch_belly_mid": 0.0,
+      "touch_belly_post": 0.0
+    }
+  },
+  "corrections_and_limits": [
+    "The model has 32 hinge joints, not the 26 asserted in parts of the supplied documents.",
+    "Fuller Table1 femur/tibia is 1.54/1.51=1.0199, not 0.98. The requested 0.90\u20131.06 pass band is retained explicitly.",
+    "Fuller Table1 tibia SEM is 0.02 cm, not the 0.04 cm transcribed in the supplied scorecard.",
+    "Interorbital distance is approximated by the inner spherical-eye gap, not center-to-center separation.",
+    "The source limb total includes fourth toe. MJCF ankle-to-digit geometry is a proxy, not a measured metatarsal segment.",
+    "Static zero-control heights are engineering gates using walking reference values; they do not establish dynamic posture validity.",
+    "A root spawn-height edit alone cannot set the eventual mechanically settled hip height.",
+    "Gate tolerances are engineering choices. Passing them is not a statistical claim about individual animals.",
+    "Tail CoM exclusion holds all remaining segments in the same neutral pose and is not an autotomy behavior experiment."
+  ],
+  "gates": [
+    {
+      "id": "total_mass_kg",
+      "label": "Total mass",
+      "actual": 0.0612,
+      "target": 0.038,
+      "lower": 0.034,
+      "upper": 0.041999999999999996,
+      "units": "kg",
+      "passed": false,
+      "provenance_refs": [
+        "body_mass_kg",
+        "body_mass_tolerance_kg"
+      ],
+      "source": "Jagnandan, Russell & Higham (2014), J Exp Biol 217:3891\u20133897, doi:10.1242/jeb.110916; Jagnandan & Higham (2017), Sci Rep 7:10865, doi:10.1038/s41598-017-11484-7; CODEX_PROMPT.md (user build brief, 2026-09-05)",
+      "confidence": "likely",
+      "notes": "Engineering population choice near lab cohorts, not one published individual or a mean of pooled animals."
+    },
+    {
+      "id": "tail_mass_fraction",
+      "label": "Tail mass fraction",
+      "actual": 0.24509803921568626,
+      "target": 0.22,
+      "lower": 0.19,
+      "upper": 0.25,
+      "units": "fraction",
+      "passed": true,
+      "provenance_refs": [
+        "tail_mass_fraction",
+        "tail_mass_fraction_range"
+      ],
+      "source": "Jagnandan, Russell & Higham (2014), J Exp Biol 217:3891\u20133897, doi:10.1242/jeb.110916",
+      "confidence": "likely",
+      "notes": "Transcribed from supplied research; anatomical partition remains approximate."
+    },
+    {
+      "id": "tail_length_svl",
+      "label": "Tail chain / SVL",
+      "actual": 1.0377358490566038,
+      "target": 0.73,
+      "lower": 0.69,
+      "upper": 0.77,
+      "units": "SVL",
+      "passed": false,
+      "provenance_refs": [
+        "tail_length_svl",
+        "tail_length_svl_tolerance"
+      ],
+      "source": "Rawat et al. (2019), Reptiles & Amphibians 26(1):58\u201361, Table 1, doi:10.17161/randa.v26i1.14342",
+      "confidence": "verified",
+      "notes": "87 mm / 119 mm from the ONE intact-tail specimen; second specimen had a regenerated tail. Transferred to lab-cohort body size."
+    },
+    {
+      "id": "com_intact_svl",
+      "label": "Intact CoM behind nose / SVL",
+      "actual": 0.8107237376680232,
+      "target": 0.659,
+      "lower": 0.639,
+      "upper": 0.679,
+      "units": "SVL behind snout",
+      "passed": false,
+      "provenance_refs": [
+        "com_intact_svl",
+        "com_svl_tolerance"
+      ],
+      "source": "Jagnandan, Russell & Higham (2014), J Exp Biol 217:3891\u20133897, doi:10.1242/jeb.110916",
+      "confidence": "likely",
+      "notes": "Supplied-source target. Compare axial projection in neutral pose; this is not full walking CoM validation."
+    },
+    {
+      "id": "com_tail_excluded_svl",
+      "label": "Tail-excluded CoM / SVL",
+      "actual": 0.6088840625255247,
+      "target": 0.527,
+      "lower": 0.507,
+      "upper": 0.547,
+      "units": "SVL behind snout",
+      "passed": false,
+      "provenance_refs": [
+        "com_tail_excluded_svl",
+        "com_svl_tolerance"
+      ],
+      "source": "Jagnandan, Russell & Higham (2014), J Exp Biol 217:3891\u20133897, doi:10.1242/jeb.110916",
+      "confidence": "likely",
+      "notes": "Supplied-source target after complete tail loss. Audit excludes tail masses in the SAME pose; it does not simulate surgery or compensation."
+    },
+    {
+      "id": "hip_height_svl",
+      "label": "Settled hip height / SVL",
+      "actual": {
+        "L": 0.19589962313446213,
+        "R": 0.19589962313446213
+      },
+      "target": 0.15,
+      "lower": 0.13999999999999999,
+      "upper": 0.16,
+      "units": "SVL",
+      "passed": false,
+      "provenance_refs": [
+        "hip_height_svl",
+        "girdle_height_svl_tolerance"
+      ],
+      "source": "Jagnandan, Russell & Higham (2014), J Exp Biol 217:3891\u20133897, doi:10.1242/jeb.110916",
+      "confidence": "likely",
+      "notes": "Walking measurement used as a static neutral-control engineering gate. Settled stance is not the same experimental protocol."
+    },
+    {
+      "id": "shoulder_height_svl",
+      "label": "Settled shoulder height / SVL",
+      "actual": {
+        "L": 0.19215080923935296,
+        "R": 0.19215080923935296
+      },
+      "target": 0.113,
+      "lower": 0.10300000000000001,
+      "upper": 0.123,
+      "units": "SVL",
+      "passed": false,
+      "provenance_refs": [
+        "shoulder_height_svl",
+        "girdle_height_svl_tolerance"
+      ],
+      "source": "Jagnandan, Russell & Higham (2014), J Exp Biol 217:3891\u20133897, doi:10.1242/jeb.110916; CODEX_PROMPT.md (user build brief, 2026-09-05)",
+      "confidence": "likely",
+      "notes": "Build target; the supplied paper table rounds shoulder height to 0.11 SVL. Static neutral-control proxy for walking height."
+    },
+    {
+      "id": "shoulder_hip_ratio",
+      "label": "Shoulder / hip height",
+      "actual": {
+        "L": 0.9808635982288947,
+        "R": 0.9808635982288947
+      },
+      "target": 0.73,
+      "lower": 0.6799999999999999,
+      "upper": 0.78,
+      "units": "ratio",
+      "passed": false,
+      "provenance_refs": [
+        "shoulder_hip_ratio",
+        "shoulder_hip_ratio_tolerance"
+      ],
+      "source": "Jagnandan, Russell & Higham (2014), J Exp Biol 217:3891\u20133897, doi:10.1242/jeb.110916",
+      "confidence": "likely",
+      "notes": "0.11/0.15 rounded; compare bilateral ratios."
+    },
+    {
+      "id": "femur_tibia_ratio",
+      "label": "Femur / tibia length",
+      "actual": {
+        "L": 1.357145334719101,
+        "R": 1.357145334719101
+      },
+      "target": 1.0198675496688743,
+      "lower": 0.9,
+      "upper": 1.06,
+      "units": "ratio",
+      "passed": false,
+      "provenance_refs": [
+        "femur_tibia_ratio",
+        "femur_tibia_ratio_range"
+      ],
+      "source": "Fuller, Higham & Clark (2011), Zoology 114:104\u2013112, Table 1, doi:10.1016/j.zool.2010.11.003",
+      "confidence": "verified",
+      "notes": "Correct femur/tibia ratio is 1.0199, not 0.98. The latter reverses the ratio; requested pass band is retained separately."
+    },
+    {
+      "id": "hindlimb_length_svl",
+      "label": "Hindlimb chain / SVL",
+      "actual": {
+        "L": 0.46611336590752356,
+        "R": 0.46611336590752356
+      },
+      "target": 0.417,
+      "lower": 0.387,
+      "upper": 0.44699999999999995,
+      "units": "SVL",
+      "passed": false,
+      "provenance_refs": [
+        "hindlimb_length_svl",
+        "hindlimb_length_svl_tolerance"
+      ],
+      "source": "Jagnandan, Russell & Higham (2014), J Exp Biol 217:3891\u20133897, doi:10.1242/jeb.110916; Fuller, Higham & Clark (2011), Zoology 114:104\u2013112, Table 1, doi:10.1016/j.zool.2010.11.003",
+      "confidence": "likely",
+      "notes": "Cross-study ratio 0.15/0.36. Fuller absolute total/SVL is 4.41/10.65=0.414. Total limb includes fourth toe; current model digit is an engineering proxy."
+    },
+    {
+      "id": "hip_proret_range_deg",
+      "label": "Hip pro/retraction range",
+      "actual": {
+        "L_joint_deg": 80.0,
+        "L_actuator_deg": 80.00003428605437,
+        "R_joint_deg": 80.0,
+        "R_actuator_deg": 80.00003428605437
+      },
+      "target": 90.0,
+      "lower": 90.0,
+      "upper": null,
+      "units": "deg",
+      "passed": false,
+      "provenance_refs": [
+        "hip_proret_min_range_deg"
+      ],
+      "source": "Jagnandan & Higham (2017), Sci Rep 7:10865, doi:10.1038/s41598-017-11484-7; CODEX_PROMPT.md (user build brief, 2026-09-05)",
+      "confidence": "likely",
+      "notes": "Engineering range allowance for observed 82.57-degree excursion, NOT a cadaveric anatomical ROM. Both joint limits and position actuator ranges must permit it."
+    },
+    {
+      "id": "hip_rot_range_deg",
+      "label": "Hip rotation range",
+      "actual": {
+        "L_joint_deg": 70.0,
+        "L_actuator_deg": 69.99997270451807,
+        "R_joint_deg": 70.0,
+        "R_actuator_deg": 69.99997270451807
+      },
+      "target": 35.0,
+      "lower": null,
+      "upper": 35.0,
+      "units": "deg",
+      "passed": false,
+      "provenance_refs": [
+        "hip_rot_max_range_deg"
+      ],
+      "source": "Arnold et al. (2014), Iguana proxy as cited in docs/research/gecko_scorecard.md",
+      "confidence": "uncertain",
+      "notes": "Cross-species engineering ceiling from supplied research, not leopard-gecko ROM. Primary source not independently rechecked."
+    },
+    {
+      "id": "head_width_svl",
+      "label": "Skin head width / SVL",
+      "actual": 0.23867924528301887,
+      "target": 0.185,
+      "lower": 0.165,
+      "upper": 0.205,
+      "units": "SVL",
+      "passed": false,
+      "provenance_refs": [
+        "head_width_svl",
+        "head_width_svl_tolerance"
+      ],
+      "source": "Rawat et al. (2019), Reptiles & Amphibians 26(1):58\u201361, Table 1, doi:10.17161/randa.v26i1.14342",
+      "confidence": "verified",
+      "notes": "22/119=0.185 for specimen1; specimen2 21/109=0.193. Gate measures skin geometry excluding protruding eye spheres; collision width is reported separately."
+    },
+    {
+      "id": "interorbital_distance_m",
+      "label": "Inner-eye gap",
+      "actual": 0.013640000000000001,
+      "target": 0.01,
+      "lower": 0.009000000000000001,
+      "upper": 0.011,
+      "units": "m",
+      "passed": false,
+      "provenance_refs": [
+        "interorbital_distance_m",
+        "interorbital_distance_tolerance_m"
+      ],
+      "source": "Rawat et al. (2019), Reptiles & Amphibians 26(1):58\u201361, Table 1, doi:10.17161/randa.v26i1.14342",
+      "confidence": "verified",
+      "notes": "Both specimens measured 10 mm between eyes. Model uses shortest inner gap between visual spherical eyes, not center separation; that landmark mapping remains an engineering approximation."
+    }
+  ],
+  "passed_count": 1,
+  "gate_count": 14,
+  "all_passed": false
+}

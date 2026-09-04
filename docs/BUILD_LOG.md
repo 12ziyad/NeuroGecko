@@ -44,3 +44,29 @@ controller weights, and frozen walker checkpoints have not yet been changed.
 
 Research files under `docs/research/` remain unchanged. Corrections to the supplied
 brief and source interpretations are recorded in `docs/DECISIONS.md`.
+
+### Instrumentation verified
+
+- Added seven measurement sites and moved four footzone markers to diagnostic group 4.
+- MuJoCo shape remains nq=39, nv=38, nu=25; 83 sensors unchanged.
+- Original versus instrumented XML: 2,500 physics steps produced bit-identical
+  qpos, qvel and sensor traces under identical controls.
+- Added per-physics-step actuator mechanical work (positive, signed negative,
+  absolute). This is not metabolic or electrical energy.
+- Before/after work-logger 80-control-step qpos/qvel SHA256 matched exactly:
+  `a0edbbd87f82d8d4eb88a1f7e9000144c97cc09c778bfefbab83baefcb3daad1`.
+- Morphology baseline: **1/14 engineering gates passes** (tail mass fraction).
+  Full actuals and source conventions: `artifacts/evidence/morphology_before.json`.
+- Local suite: 68 tests passed/skipped accounting at the initial integration run
+  (67 passed, 1 skipped: optional SciPy high-rate filter success path). The
+  undersampled-input rejection test runs without SciPy. Subsequent additions are
+  reported at final verification.
+- Camera tests include actual rendered-pixel invariance for hidden self-appearance.
+- Checkpoint tests include a real tiny PPO save/load, identical deterministic
+  actions and normalization statistics, then resumed learning.
+- Local 1,000-iteration component profile is in
+  `artifacts/evidence/profile_local.json`; it is a microbenchmark, not training FPS.
+
+The body correction is being built as a separate opt-in `gecko_body_lab.xml` so
+the original walking system remains available for comparisons. No candidate is
+promoted merely because it looks better.

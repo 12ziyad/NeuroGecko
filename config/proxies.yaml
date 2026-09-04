@@ -1,0 +1,726 @@
+{
+  "schema_version": 1,
+  "format": "JSON subset of YAML 1.2 (stdlib loader; no PyYAML dependency)",
+  "scope": "Audited morphology and initial evaluator parameters only. Research documents are preserved read-only. Not every future controller number is registered yet.",
+  "confidence_policy": "verified means checked in the primary source or measured repository for the stated fact; it does not validate cross-species/landmark transfer. likely means supplied-source transcription not independently rechecked here. uncertain and INVENTED remain explicit.",
+  "entries": {
+    "body_mass_kg": {
+      "value": 0.038,
+      "units": "kg",
+      "species": "derived",
+      "sample_size": null,
+      "source": "Jagnandan, Russell & Higham (2014), J Exp Biol 217:3891–3897, doi:10.1242/jeb.110916; Jagnandan & Higham (2017), Sci Rep 7:10865, doi:10.1038/s41598-017-11484-7; CODEX_PROMPT.md (user build brief, 2026-09-05)",
+      "confidence": "likely",
+      "recording_temp_C": 30,
+      "notes": "Engineering population choice near lab cohorts, not one published individual or a mean of pooled animals."
+    },
+    "body_mass_tolerance_kg": {
+      "value": 0.004,
+      "units": "kg",
+      "species": "INVENTED",
+      "sample_size": null,
+      "source": "CODEX_PROMPT.md (user build brief, 2026-09-05)",
+      "confidence": "uncertain",
+      "recording_temp_C": null,
+      "notes": "Engineering acceptance half-width; not a biological confidence interval."
+    },
+    "tail_mass_fraction": {
+      "value": 0.22,
+      "units": "fraction",
+      "species": "E_macularius",
+      "sample_size": 7,
+      "source": "Jagnandan, Russell & Higham (2014), J Exp Biol 217:3891–3897, doi:10.1242/jeb.110916",
+      "confidence": "likely",
+      "recording_temp_C": 30,
+      "notes": "Transcribed from supplied research; anatomical partition remains approximate."
+    },
+    "tail_mass_fraction_range": {
+      "value": [
+        0.19,
+        0.25
+      ],
+      "units": "fraction",
+      "species": "INVENTED",
+      "sample_size": null,
+      "source": "CODEX_PROMPT.md (user build brief, 2026-09-05)",
+      "confidence": "uncertain",
+      "recording_temp_C": null,
+      "notes": "Engineering pass band spanning supplied studies, not a confidence interval."
+    },
+    "tail_length_svl": {
+      "value": 0.73,
+      "units": "SVL",
+      "species": "derived",
+      "sample_size": 1,
+      "source": "Rawat et al. (2019), Reptiles & Amphibians 26(1):58–61, Table 1, doi:10.17161/randa.v26i1.14342",
+      "confidence": "verified",
+      "recording_temp_C": null,
+      "notes": "87 mm / 119 mm from the ONE intact-tail specimen; second specimen had a regenerated tail. Transferred to lab-cohort body size.",
+      "url": "https://journals.ku.edu/reptilesandamphibians/article/download/14342/13190/29596"
+    },
+    "tail_length_svl_tolerance": {
+      "value": 0.04,
+      "units": "SVL",
+      "species": "INVENTED",
+      "sample_size": null,
+      "source": "CODEX_PROMPT.md (user build brief, 2026-09-05)",
+      "confidence": "uncertain",
+      "recording_temp_C": null,
+      "notes": "Engineering acceptance half-width."
+    },
+    "com_intact_svl": {
+      "value": 0.659,
+      "units": "SVL behind snout",
+      "species": "E_macularius",
+      "sample_size": 7,
+      "source": "Jagnandan, Russell & Higham (2014), J Exp Biol 217:3891–3897, doi:10.1242/jeb.110916",
+      "confidence": "likely",
+      "recording_temp_C": 30,
+      "notes": "Supplied-source target. Compare axial projection in neutral pose; this is not full walking CoM validation."
+    },
+    "com_tail_excluded_svl": {
+      "value": 0.527,
+      "units": "SVL behind snout",
+      "species": "E_macularius",
+      "sample_size": 7,
+      "source": "Jagnandan, Russell & Higham (2014), J Exp Biol 217:3891–3897, doi:10.1242/jeb.110916",
+      "confidence": "likely",
+      "recording_temp_C": 30,
+      "notes": "Supplied-source target after complete tail loss. Audit excludes tail masses in the SAME pose; it does not simulate surgery or compensation."
+    },
+    "com_svl_tolerance": {
+      "value": 0.02,
+      "units": "SVL",
+      "species": "INVENTED",
+      "sample_size": null,
+      "source": "CODEX_PROMPT.md (user build brief, 2026-09-05)",
+      "confidence": "uncertain",
+      "recording_temp_C": null,
+      "notes": "Engineering acceptance half-width; not the paper SEM."
+    },
+    "hip_height_svl": {
+      "value": 0.15,
+      "units": "SVL",
+      "species": "E_macularius",
+      "sample_size": 7,
+      "source": "Jagnandan, Russell & Higham (2014), J Exp Biol 217:3891–3897, doi:10.1242/jeb.110916",
+      "confidence": "likely",
+      "recording_temp_C": 30,
+      "notes": "Walking measurement used as a static neutral-control engineering gate. Settled stance is not the same experimental protocol."
+    },
+    "shoulder_height_svl": {
+      "value": 0.113,
+      "units": "SVL",
+      "species": "derived",
+      "sample_size": 7,
+      "source": "Jagnandan, Russell & Higham (2014), J Exp Biol 217:3891–3897, doi:10.1242/jeb.110916; CODEX_PROMPT.md (user build brief, 2026-09-05)",
+      "confidence": "likely",
+      "recording_temp_C": 30,
+      "notes": "Build target; the supplied paper table rounds shoulder height to 0.11 SVL. Static neutral-control proxy for walking height."
+    },
+    "girdle_height_svl_tolerance": {
+      "value": 0.01,
+      "units": "SVL",
+      "species": "INVENTED",
+      "sample_size": null,
+      "source": "CODEX_PROMPT.md (user build brief, 2026-09-05)",
+      "confidence": "uncertain",
+      "recording_temp_C": null,
+      "notes": "Engineering half-width; rounded paper SEM 0.00 does not mean zero uncertainty."
+    },
+    "shoulder_hip_ratio": {
+      "value": 0.73,
+      "units": "ratio",
+      "species": "derived",
+      "sample_size": 7,
+      "source": "Jagnandan, Russell & Higham (2014), J Exp Biol 217:3891–3897, doi:10.1242/jeb.110916",
+      "confidence": "likely",
+      "recording_temp_C": 30,
+      "notes": "0.11/0.15 rounded; compare bilateral ratios."
+    },
+    "shoulder_hip_ratio_tolerance": {
+      "value": 0.05,
+      "units": "ratio",
+      "species": "INVENTED",
+      "sample_size": null,
+      "source": "CODEX_PROMPT.md (user build brief, 2026-09-05)",
+      "confidence": "uncertain",
+      "recording_temp_C": null,
+      "notes": "Engineering acceptance half-width."
+    },
+    "femur_tibia_ratio": {
+      "value": 1.0198675496688743,
+      "units": "ratio",
+      "species": "derived",
+      "sample_size": 4,
+      "source": "Fuller, Higham & Clark (2011), Zoology 114:104–112, Table 1, doi:10.1016/j.zool.2010.11.003",
+      "confidence": "verified",
+      "recording_temp_C": 35,
+      "notes": "Correct femur/tibia ratio is 1.0199, not 0.98. The latter reverses the ratio; requested pass band is retained separately.",
+      "url": "https://biomechanics.ucr.edu/Fuller_etal_2011.pdf"
+    },
+    "femur_tibia_ratio_range": {
+      "value": [
+        0.9,
+        1.06
+      ],
+      "units": "ratio",
+      "species": "INVENTED",
+      "sample_size": null,
+      "source": "CODEX_PROMPT.md (user build brief, 2026-09-05)",
+      "confidence": "uncertain",
+      "recording_temp_C": null,
+      "notes": "Retains build brief's 0.98 +/- 0.08 gate without falsely attributing that center to Fuller. Both source segments are nearly equal."
+    },
+    "hindlimb_length_svl": {
+      "value": 0.417,
+      "units": "SVL",
+      "species": "derived",
+      "sample_size": 4,
+      "source": "Jagnandan, Russell & Higham (2014), J Exp Biol 217:3891–3897, doi:10.1242/jeb.110916; Fuller, Higham & Clark (2011), Zoology 114:104–112, Table 1, doi:10.1016/j.zool.2010.11.003",
+      "confidence": "likely",
+      "recording_temp_C": 35,
+      "notes": "Cross-study ratio 0.15/0.36. Fuller absolute total/SVL is 4.41/10.65=0.414. Total limb includes fourth toe; current model digit is an engineering proxy."
+    },
+    "hindlimb_length_svl_tolerance": {
+      "value": 0.03,
+      "units": "SVL",
+      "species": "INVENTED",
+      "sample_size": null,
+      "source": "CODEX_PROMPT.md (user build brief, 2026-09-05)",
+      "confidence": "uncertain",
+      "recording_temp_C": null,
+      "notes": "Engineering acceptance half-width."
+    },
+    "hip_proret_min_range_deg": {
+      "value": 90,
+      "units": "deg",
+      "species": "derived",
+      "sample_size": 10,
+      "source": "Jagnandan & Higham (2017), Sci Rep 7:10865, doi:10.1038/s41598-017-11484-7; CODEX_PROMPT.md (user build brief, 2026-09-05)",
+      "confidence": "likely",
+      "recording_temp_C": 30,
+      "notes": "Engineering range allowance for observed 82.57-degree excursion, NOT a cadaveric anatomical ROM. Both joint limits and position actuator ranges must permit it."
+    },
+    "hip_rot_max_range_deg": {
+      "value": 35,
+      "units": "deg",
+      "species": "derived",
+      "sample_size": null,
+      "source": "Arnold et al. (2014), Iguana proxy as cited in docs/research/gecko_scorecard.md",
+      "confidence": "uncertain",
+      "recording_temp_C": null,
+      "notes": "Cross-species engineering ceiling from supplied research, not leopard-gecko ROM. Primary source not independently rechecked.",
+      "source_species": "Iguana_iguana"
+    },
+    "head_width_svl": {
+      "value": 0.185,
+      "units": "SVL",
+      "species": "derived",
+      "sample_size": 2,
+      "source": "Rawat et al. (2019), Reptiles & Amphibians 26(1):58–61, Table 1, doi:10.17161/randa.v26i1.14342",
+      "confidence": "verified",
+      "recording_temp_C": null,
+      "notes": "22/119=0.185 for specimen1; specimen2 21/109=0.193. Gate measures skin geometry excluding protruding eye spheres; collision width is reported separately.",
+      "url": "https://journals.ku.edu/reptilesandamphibians/article/download/14342/13190/29596"
+    },
+    "head_width_svl_tolerance": {
+      "value": 0.02,
+      "units": "SVL",
+      "species": "INVENTED",
+      "sample_size": null,
+      "source": "CODEX_PROMPT.md (user build brief, 2026-09-05)",
+      "confidence": "uncertain",
+      "recording_temp_C": null,
+      "notes": "Engineering acceptance half-width."
+    },
+    "interorbital_distance_m": {
+      "value": 0.01,
+      "units": "m",
+      "species": "E_macularius",
+      "sample_size": 2,
+      "source": "Rawat et al. (2019), Reptiles & Amphibians 26(1):58–61, Table 1, doi:10.17161/randa.v26i1.14342",
+      "confidence": "verified",
+      "recording_temp_C": null,
+      "notes": "Both specimens measured 10 mm between eyes. Model uses shortest inner gap between visual spherical eyes, not center separation; that landmark mapping remains an engineering approximation.",
+      "url": "https://journals.ku.edu/reptilesandamphibians/article/download/14342/13190/29596"
+    },
+    "interorbital_distance_tolerance_m": {
+      "value": 0.001,
+      "units": "m",
+      "species": "INVENTED",
+      "sample_size": null,
+      "source": "CODEX_PROMPT.md (user build brief, 2026-09-05)",
+      "confidence": "uncertain",
+      "recording_temp_C": null,
+      "notes": "Engineering acceptance half-width."
+    },
+    "morphology_settle_s": {
+      "value": 2,
+      "units": "s",
+      "species": "INVENTED",
+      "sample_size": null,
+      "source": "CODEX_PROMPT.md (user build brief, 2026-09-05)",
+      "confidence": "uncertain",
+      "recording_temp_C": null,
+      "notes": "Fixed neutral-control settling protocol requested by brief; not a biological target."
+    },
+    "measurement_site_local_positions_m": {
+      "value": {
+        "hip_L": [
+          0,
+          0,
+          0
+        ],
+        "hip_R": [
+          0,
+          0,
+          0
+        ],
+        "shoulder_L": [
+          0,
+          0,
+          0
+        ],
+        "shoulder_R": [
+          0,
+          0,
+          0
+        ],
+        "pelvis_center": [
+          -0.007,
+          0,
+          -0.002
+        ],
+        "pectoral_center": [
+          0.0125,
+          0,
+          -0.002
+        ],
+        "mid_back": [
+          0,
+          0,
+          0.01196
+        ]
+      },
+      "units": "m",
+      "species": "derived",
+      "sample_size": null,
+      "source": "morphology/gecko_body_r.xml at ddbb105",
+      "confidence": "verified",
+      "recording_temp_C": null,
+      "notes": "Marker locations copied from existing body origins/girdle attachment offsets and dorsal visual surface; these are model-derived, NOT animal measurements."
+    },
+    "evaluation_duration_s": {
+      "value": 20,
+      "units": "s",
+      "species": "INVENTED",
+      "sample_size": null,
+      "source": "CODEX_PROMPT.md (user build brief, 2026-09-05)",
+      "confidence": "uncertain",
+      "recording_temp_C": null,
+      "notes": "Requested evaluator protocol duration."
+    },
+    "evaluation_settle_s": {
+      "value": 3,
+      "units": "s",
+      "species": "INVENTED",
+      "sample_size": null,
+      "source": "CODEX_PROMPT.md (user build brief, 2026-09-05)",
+      "confidence": "uncertain",
+      "recording_temp_C": null,
+      "notes": "Requested evaluator warm-up exclusion."
+    },
+    "contact_debounce_s": {
+      "value": 0.04,
+      "units": "s",
+      "species": "INVENTED",
+      "sample_size": null,
+      "source": "CODEX_PROMPT.md (user build brief, 2026-09-05)",
+      "confidence": "uncertain",
+      "recording_temp_C": null,
+      "notes": "Engineering debounce; 2 samples at 50 Hz."
+    },
+    "legacy_contact_threshold_N": {
+      "value": 0.0564,
+      "units": "N",
+      "species": "INVENTED",
+      "sample_size": null,
+      "source": "envs/gecko_walk_env.py legacy controller calibration",
+      "confidence": "uncertain",
+      "recording_temp_C": null,
+      "notes": "Force threshold preserved for before measurements. NOT a skin mechanoreceptor threshold."
+    },
+    "ethogram_trunk_activity_m_s": {
+      "value": 0.001,
+      "units": "m/s",
+      "species": "INVENTED",
+      "sample_size": null,
+      "source": "CODEX_PROMPT.md (user build brief, 2026-09-05)",
+      "confidence": "uncertain",
+      "recording_temp_C": null,
+      "notes": "Evaluator noise/activity threshold; configurable, not published animal cutoff."
+    },
+    "ethogram_joint_activity_rad_s": {
+      "value": 0.02,
+      "units": "rad/s",
+      "species": "INVENTED",
+      "sample_size": null,
+      "source": "CODEX_PROMPT.md (user build brief, 2026-09-05)",
+      "confidence": "uncertain",
+      "recording_temp_C": null,
+      "notes": "Evaluator joint-motion tolerance; configurable."
+    },
+    "ethogram_rest_s": {
+      "value": 3,
+      "units": "s",
+      "species": "E_macularius",
+      "sample_size": 18,
+      "source": "Krönke & Xu (2023), PMC10705344 ethogram definition",
+      "confidence": "likely",
+      "recording_temp_C": null,
+      "notes": "Primary Table 1 verified: inactive for at least 3 s. Activity detector itself is engineered."
+    },
+    "ethogram_walk_svl": {
+      "value": 1,
+      "units": "SVL",
+      "species": "derived",
+      "sample_size": 18,
+      "source": "Krönke & Xu (2023), PMC10705344; CODEX_PROMPT.md (user build brief, 2026-09-05)",
+      "confidence": "likely",
+      "recording_temp_C": null,
+      "notes": "Primary prose section 4.3 explicitly uses one snout-to-vent length for walking and orientation categories. Automated detector and bout segmentation remain engineering approximations."
+    },
+    "ethogram_pause_merge_s": {
+      "value": 0.1,
+      "units": "s",
+      "species": "INVENTED",
+      "sample_size": null,
+      "source": "CODEX_PROMPT.md (user build brief, 2026-09-05)",
+      "confidence": "uncertain",
+      "recording_temp_C": null,
+      "notes": "Active-bout pause merging tolerance, not published event segmentation."
+    },
+    "evaluation_goal_distance_m": {
+      "value": 10,
+      "units": "m",
+      "species": "INVENTED",
+      "sample_size": null,
+      "source": "CODEX_PROMPT.md (user build brief, 2026-09-05)",
+      "confidence": "uncertain",
+      "recording_temp_C": null,
+      "notes": "Fixed straight-ahead goal for calibration avoids target turnover; not a sensory measurement."
+    },
+    "calibration_temperature_C": {
+      "value": 30,
+      "units": "deg C",
+      "species": "derived",
+      "sample_size": null,
+      "source": "Jagnandan, Russell & Higham (2014), J Exp Biol 217:3891–3897, doi:10.1242/jeb.110916; Jagnandan & Higham (2017), Sci Rep 7:10865, doi:10.1038/s41598-017-11484-7",
+      "confidence": "likely",
+      "recording_temp_C": 30,
+      "notes": "Validity-envelope metadata only. Simulator currently has no temperature-dependent physiology."
+    },
+    "hind_duty_factor": {
+      "value": 0.765,
+      "units": "fraction",
+      "species": "derived",
+      "sample_size": null,
+      "source": "Jagnandan & Higham (2017), Sci Rep 7:10865, doi:10.1038/s41598-017-11484-7; McElroy, Hickey & Reilly (2008)",
+      "confidence": "likely",
+      "recording_temp_C": [
+        26,
+        30
+      ],
+      "notes": "Chosen aggregate target; source-study values differ. Not a pooled statistical estimate."
+    },
+    "hind_duty_factor_range": {
+      "value": [
+        0.7,
+        0.79
+      ],
+      "units": "fraction",
+      "species": "derived",
+      "sample_size": null,
+      "source": "Jagnandan & Higham (2017), Sci Rep 7:10865, doi:10.1038/s41598-017-11484-7; McElroy, Hickey & Reilly (2008)",
+      "confidence": "likely",
+      "recording_temp_C": [
+        26,
+        30
+      ],
+      "notes": "Between-study envelope per supplied documents."
+    },
+    "fore_duty_factor": {
+      "value": 0.7,
+      "units": "fraction",
+      "species": "E_macularius",
+      "sample_size": 10,
+      "source": "Jagnandan & Higham (2017), Sci Rep 7:10865, doi:10.1038/s41598-017-11484-7",
+      "confidence": "likely",
+      "recording_temp_C": 30,
+      "notes": "Supplied Table1 intact-tail value."
+    },
+    "fore_duty_factor_tolerance": {
+      "value": 0.01,
+      "units": "fraction",
+      "species": "E_macularius",
+      "sample_size": 10,
+      "source": "Jagnandan & Higham (2017), Sci Rep 7:10865, doi:10.1038/s41598-017-11484-7",
+      "confidence": "likely",
+      "recording_temp_C": 30,
+      "notes": "Reported SEM from supplied table, not prediction interval."
+    },
+    "limb_phase_range": {
+      "value": [
+        0.43,
+        0.44
+      ],
+      "units": "stride fraction",
+      "species": "E_macularius",
+      "sample_size": null,
+      "source": "McElroy, Hickey & Reilly (2008), J Exp Biol 211:1029",
+      "confidence": "likely",
+      "recording_temp_C": [
+        26,
+        30
+      ],
+      "notes": "Ipsilateral hind-to-fore phase, supplied-source walk/run summary."
+    },
+    "stride_length_svl_range": {
+      "value": [
+        0.62,
+        0.82
+      ],
+      "units": "SVL",
+      "species": "derived",
+      "sample_size": null,
+      "source": "Jagnandan & Higham (2017), Sci Rep 7:10865, doi:10.1038/s41598-017-11484-7; Jagnandan, Russell & Higham (2014), J Exp Biol 217:3891–3897, doi:10.1242/jeb.110916; Fuller, Higham & Clark (2011), Zoology 114:104–112, Table 1, doi:10.1016/j.zool.2010.11.003",
+      "confidence": "likely",
+      "recording_temp_C": null,
+      "notes": "Cross-study envelope. Fit stride length, not independently cadence and speed, since v=stride length*frequency."
+    },
+    "walking_speed_m_s_range": {
+      "value": [
+        0.028,
+        0.351
+      ],
+      "units": "m/s",
+      "species": "E_macularius",
+      "sample_size": 10,
+      "source": "Jagnandan & Higham (2017), Sci Rep 7:10865, doi:10.1038/s41598-017-11484-7",
+      "confidence": "likely",
+      "recording_temp_C": 30,
+      "notes": "Supplied voluntary-study envelope, not sprint speed."
+    },
+    "trunk_pitch_deg": {
+      "value": 3.72,
+      "units": "deg nose-up",
+      "species": "E_macularius",
+      "sample_size": 7,
+      "source": "Jagnandan, Russell & Higham (2014), J Exp Biol 217:3891–3897, doi:10.1242/jeb.110916",
+      "confidence": "likely",
+      "recording_temp_C": 30,
+      "notes": "Supplied intact-tail walking value; sign convention must be explicit."
+    },
+    "trunk_pitch_sem_deg": {
+      "value": 0.61,
+      "units": "deg",
+      "species": "E_macularius",
+      "sample_size": 7,
+      "source": "Jagnandan, Russell & Higham (2014), J Exp Biol 217:3891–3897, doi:10.1242/jeb.110916",
+      "confidence": "likely",
+      "recording_temp_C": 30,
+      "notes": "Supplied reported SEM, not an engineering tolerance."
+    },
+      "calibration_friction": {
+        "value": 0.9,
+        "units": "coefficient",
+        "species": "INVENTED",
+        "sample_size": null,
+        "source": "NeuroGecko lab candidate v1 engineering design, 2026-09-05",
+        "confidence": "uncertain",
+        "recording_temp_C": null,
+        "notes": "Engineering evaluation surface, not a measured gecko skin friction coefficient."
+      },
+      "gait_acquisition_hz": {
+        "value": 50,
+        "units": "Hz",
+        "species": "INVENTED",
+        "sample_size": null,
+        "source": "NeuroGecko lab candidate v1 engineering design, 2026-09-05",
+        "confidence": "uncertain",
+        "recording_temp_C": null,
+        "notes": "Existing control/logging rate."
+      },
+      "legacy_residual_scale": {
+        "value": 0.25,
+        "units": "action scale",
+        "species": "INVENTED",
+        "sample_size": null,
+        "source": "envs/cpg_residual_controller.py",
+        "confidence": "uncertain",
+        "recording_temp_C": null,
+        "notes": "Checkpoint-compatible legacy evaluation setting, not biological."
+      },
+      "legacy_front_stance_press": {
+        "value": 0.4,
+        "units": "action scale",
+        "species": "INVENTED",
+        "sample_size": null,
+        "source": "envs/cpg_residual_controller.py",
+        "confidence": "uncertain",
+        "recording_temp_C": null,
+        "notes": "Checkpoint-compatible legacy evaluation setting, not biological."
+      },
+      "legacy_front_swing_lift": {
+        "value": 0.4,
+        "units": "action scale",
+        "species": "INVENTED",
+        "sample_size": null,
+        "source": "envs/cpg_residual_controller.py",
+        "confidence": "uncertain",
+        "recording_temp_C": null,
+        "notes": "Checkpoint-compatible legacy evaluation setting, not biological."
+      },
+      "evaluation_reset_noise": {
+        "value": 0,
+        "units": "simulation noise scale",
+        "species": "INVENTED",
+        "sample_size": null,
+        "source": "NeuroGecko lab candidate v1 engineering design, 2026-09-05",
+        "confidence": "uncertain",
+        "recording_temp_C": null,
+        "notes": "Deterministic calibration protocol."
+      },
+      "lab_neutral_femur_drop_m": {
+        "value": 0.004,
+        "units": "m",
+        "species": "INVENTED",
+        "sample_size": null,
+        "source": "NeuroGecko lab candidate v1 engineering design, 2026-09-05",
+        "confidence": "uncertain",
+        "recording_temp_C": null,
+        "notes": "Engineered hip-to-knee downward component. Preserves source-scaled femur length by adjusting horizontal projection; not measured gecko neutral geometry."
+      },
+      "lab_neutral_tibia_drop_m": {
+        "value": 0.0076,
+        "units": "m",
+        "species": "INVENTED",
+        "sample_size": null,
+        "source": "NeuroGecko lab candidate v1 engineering design, 2026-09-05",
+        "confidence": "uncertain",
+        "recording_temp_C": null,
+        "notes": "Engineered knee-to-ankle downward component. Other components adjusted to preserve source-scaled tibia length."
+      },
+      "lab_forelimb_fraction_hind": {
+        "value": 0.85,
+        "units": "ratio",
+        "species": "INVENTED",
+        "sample_size": null,
+        "source": "NeuroGecko lab candidate v1 engineering design, 2026-09-05",
+        "confidence": "uncertain",
+        "recording_temp_C": null,
+        "notes": "Engineering choice because no species-specific complete forelimb segment pair is available. Not a comparative-lizard universal law."
+      },
+      "lab_neutral_humerus_drop_m": {
+        "value": 0.0027,
+        "units": "m",
+        "species": "INVENTED",
+        "sample_size": null,
+        "source": "NeuroGecko lab candidate v1 engineering design, 2026-09-05",
+        "confidence": "uncertain",
+        "recording_temp_C": null,
+        "notes": "Engineered shoulder-to-elbow downward component for a low neutral stance."
+      },
+      "lab_neutral_forearm_drop_m": {
+        "value": 0.0061,
+        "units": "m",
+        "species": "INVENTED",
+        "sample_size": null,
+        "source": "NeuroGecko lab candidate v1 engineering design, 2026-09-05",
+        "confidence": "uncertain",
+        "recording_temp_C": null,
+        "notes": "Engineered elbow-to-wrist downward component for a low neutral stance."
+      },
+      "lab_shoulder_attachment_z_m": {
+        "value": -0.0094,
+        "units": "m",
+        "species": "INVENTED",
+        "sample_size": null,
+        "source": "NeuroGecko lab candidate v1 engineering design, 2026-09-05",
+        "confidence": "uncertain",
+        "recording_temp_C": null,
+        "notes": "Engineered ventrolateral glenoid offset. Coupled with leg inclinations to approximate lower shoulders while allowing nose-up trunk pitch. Not measured anatomy."
+      },
+      "lab_snout_height_scale": {
+        "value": 0.55,
+        "units": "scale",
+        "species": "INVENTED",
+        "sample_size": null,
+        "source": "NeuroGecko lab candidate v1 engineering design, 2026-09-05",
+        "confidence": "uncertain",
+        "recording_temp_C": null,
+        "notes": "Engineering flattening of secondary snout ellipsoid, which has no separately measured depth."
+      },
+      "lab_head_height_svl": {
+        "value": 0.105,
+        "units": "SVL",
+        "species": "derived",
+        "sample_size": 2,
+        "source": "Rawat et al. (2019), Table 1 plus build geometry approximation",
+        "confidence": "likely",
+        "recording_temp_C": null,
+        "notes": "Geometry target close to Rawat two-specimen HH/SVL (~.101). Engineering rounding; not a pooled animal estimate."
+      },
+      "fuller_svl_m": {
+        "value": 0.1065,
+        "units": "m",
+        "species": "E_macularius",
+        "sample_size": 4,
+        "source": "Fuller et al. (2011), Table 1, https://biomechanics.ucr.edu/Fuller_etal_2011.pdf",
+        "confidence": "verified",
+        "recording_temp_C": null,
+        "notes": "Source cohort SVL used only to size-scale measured segment lengths."
+      },
+      "fuller_femur_m": {
+        "value": 0.0154,
+        "units": "m",
+        "species": "E_macularius",
+        "sample_size": 4,
+        "source": "Fuller et al. (2011), Table 1, https://biomechanics.ucr.edu/Fuller_etal_2011.pdf",
+        "confidence": "verified",
+        "recording_temp_C": null,
+        "notes": "Mean external femur length; source population was heavier than selected lab cohort."
+      },
+      "fuller_tibia_m": {
+        "value": 0.0151,
+        "units": "m",
+        "species": "E_macularius",
+        "sample_size": 4,
+        "source": "Fuller et al. (2011), Table 1, https://biomechanics.ucr.edu/Fuller_etal_2011.pdf",
+        "confidence": "verified",
+        "recording_temp_C": null,
+        "notes": "Mean external tibia length; source SEM is .0002 m, not .0004 m."
+      },
+      "lab_mass_partition_method": {
+        "value": "preserve_legacy_within_tail_and_body",
+        "units": "method",
+        "species": "INVENTED",
+        "sample_size": null,
+        "source": "NeuroGecko lab candidate v1 engineering design, 2026-09-05",
+        "confidence": "uncertain",
+        "recording_temp_C": null,
+        "notes": "Scale the existing unknown segment fractions separately within tail and non-tail groups. Does not claim validated CoM and intentionally does not fit arbitrary segment densities to CoM gates."
+      },
+      "lab_actuator_scaling_method": {
+        "value": "kp, kv, forcerange multiplied by new_mass/legacy_mass",
+        "units": "method",
+        "species": "INVENTED",
+        "sample_size": null,
+        "source": "NeuroGecko lab candidate v1 engineering design, 2026-09-05",
+        "confidence": "uncertain",
+        "recording_temp_C": null,
+        "notes": "Engineering mass scaling, not biological muscle calibration. Joint damping, stiffness, and armature remain legacy estimates; fresh training/tuning still needed."
+      }
+  }
+}

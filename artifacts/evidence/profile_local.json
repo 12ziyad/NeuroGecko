@@ -1,0 +1,29 @@
+{
+  "caveat": "Static-pose component timing; not end-to-end training throughput",
+  "control_dt_s": 0.02,
+  "device": "cpu",
+  "gpu": null,
+  "mujoco": "3.9.0",
+  "physics_25_substeps_equivalent_ms": 0.946375000057742,
+  "physics_dt_s": 0.0008,
+  "physics_step": {
+    "iterations": 1000,
+    "mean_ms": 0.03785500000230968,
+    "total_seconds": 0.03785500000230968
+  },
+  "platform": "Windows-11-10.0.26200-SP0",
+  "policy_render_64x64": {
+    "iterations": 1000,
+    "mean_ms": 4.351576900000509,
+    "total_seconds": 4.351576900000509
+  },
+  "python": "3.12.10",
+  "renderer": "glfw",
+  "torch": "2.12.0+cpu",
+  "torch_threads": 1,
+  "visual_actor_predict": {
+    "iterations": 1000,
+    "mean_ms": 0.5936784999939846,
+    "total_seconds": 0.5936784999939846
+  }
+}
