@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import os
 from pathlib import Path, PurePosixPath
 import re
@@ -62,9 +63,9 @@ class Puller:
             raise ValueError('Remote path must be absolute, without traversal or shell characters')
         self.host = host
         self.remote_root = PurePosixPath(remote_root)
-        self.local_root = local_root.resolve()
-        if self.local_root.is_symlink():
+        if local_root.is_symlink():
             raise ValueError('Local destination must not be a symlink')
+        self.local_root = local_root.resolve()
         self.local_root.mkdir(parents=True, exist_ok=True)
         self.options = ['-i', str(identity.resolve(strict=True)), '-o', 'BatchMode=yes',
                         '-o', 'StrictHostKeyChecking=yes', '-o', 'ConnectTimeout=15']
@@ -79,11 +80,14 @@ class Puller:
 
     def manifests(self) -> list[PurePosixPath]:
         quoted = shlex.quote(str(self.remote_root))
-        command = f'if test -d {quoted}; then find {quoted} -mindepth 2 -maxdepth 2 -type f -name manifest.json; fi'
+        pattern = shlex.quote(str(self.remote_root / 'step-*' / 'manifest.json'))
+        command = f'if test -d {quoted}; then find {quoted} -mindepth 2 -maxdepth 2 -type f -path {pattern}; fi'
         paths = []
         for line in self.ssh(command).splitlines():
             path = PurePosixPath(line)
             rel = path.relative_to(self.remote_root)
+            if len(rel.parts) == 2 and rel.parts[0].startswith('.step-') and '.incomplete-' in rel.parts[0]:
+                continue
             if len(rel.parts) != 2 or not re.fullmatch(r'step-[0-9]+(?:-final)?', rel.parts[0]) or rel.parts[1] != 'manifest.json':
                 raise ValueError('Unexpected checkpoint discovery path')
             paths.append(path)
@@ -134,7 +138,8 @@ def main():
     p.add_argument('--watch-seconds', type=float, default=0, help='0: one pass; otherwise finite polling period')
     p.add_argument('--poll-seconds', type=float, default=10)
     args = p.parse_args()
-    if args.watch_seconds < 0 or args.poll_seconds <= 0:
+    if (not math.isfinite(args.watch_seconds) or not math.isfinite(args.poll_seconds)
+            or args.watch_seconds < 0 or args.poll_seconds <= 0):
         p.error('Watch duration must be nonnegative; polling interval positive')
     puller = Puller(args.host, args.identity, args.remote_root, args.local_root)
     deadline = time.monotonic() + args.watch_seconds

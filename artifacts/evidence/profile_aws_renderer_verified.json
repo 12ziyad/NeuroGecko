@@ -1,0 +1,34 @@
+{
+  "caveat": "Separate component timing, not training throughput: physics evolves at neutral control; rendering uses a reset pose; actor prediction includes data transfer and output synchronization. Torch CUDA availability does not establish GPU-accelerated rendering; inspect GL_RENDERER.",
+  "control_dt_s": 0.02,
+  "device": "cuda",
+  "graphics": {
+    "GL_RENDERER": "llvmpipe (LLVM 20.1.2, 256 bits)",
+    "GL_VENDOR": "Mesa",
+    "GL_VERSION": "4.5 (Compatibility Profile) Mesa 25.2.8-0ubuntu0.24.04.2"
+  },
+  "mujoco": "3.9.0",
+  "physics_25_substeps_equivalent_ms": 1.6521647249987836,
+  "physics_dt_s": 0.0008,
+  "physics_step": {
+    "iterations": 1000,
+    "mean_ms": 0.06608658899995135,
+    "total_seconds": 0.06608658899995135
+  },
+  "platform": "Linux-6.17.0-1019-aws-x86_64-with-glibc2.39",
+  "policy_render_64x64": {
+    "iterations": 1000,
+    "mean_ms": 22.26750475300014,
+    "total_seconds": 22.26750475300014
+  },
+  "python": "3.12.3",
+  "renderer": "egl",
+  "torch": "2.12.0+cu130",
+  "torch_cuda_gpu": "NVIDIA A10G",
+  "torch_threads": 1,
+  "visual_actor_predict": {
+    "iterations": 1000,
+    "mean_ms": 0.9494749400000728,
+    "total_seconds": 0.9494749400000728
+  }
+}

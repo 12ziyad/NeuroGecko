@@ -166,10 +166,19 @@ def analyze_trace(trace, settle_s=None, debounce_s=None):
     distance = float(np.sum(np.linalg.norm(planar_delta[interval_keep], axis=1)))
     first = int(np.flatnonzero(keep)[0])
     elapsed = float(t[-1]-t[first])
+    commanded_frequency = meta.get("frequency_hz")
+    if commanded_frequency is not None:
+        commanded_frequency = float(commanded_frequency)
+        if not np.isfinite(commanded_frequency) or commanded_frequency <= 0:
+            raise ValueError("Recorded commanded frequency must be finite and positive.")
+    warning_ratio = float(parameter_value("contact_cycle_warning_ratio"))
+    if not np.isfinite(warning_ratio) or warning_ratio <= 1:
+        raise ValueError("Contact-cycle diagnostic gross-ratio threshold must exceed 1.")
     result = {"status": "measured", "observed_duration_s": elapsed, "sample_rate_hz": 1/dt,
               "settle_s": settle_s, "contact_debounce_s": debounce_s,
               "foot_order": list(FEET), "distance_path_m": distance,
               "stride_length_definition": "Planar net displacement of trunk_middle between observed same-foot touchdowns; not a speed-residualized laboratory mean.",
+              "cycle_metric_semantics": "Fields named stride refer operationally to observed same-foot contact cycles; these are NOT verified biological strides or guaranteed oscillator cycles.",
               "event_time_resolution_s": dt,
               "mean_path_speed_m_s": distance/elapsed,
               "mean_path_speed_svl_s": distance/elapsed/svl,
@@ -190,11 +199,26 @@ def analyze_trace(trace, settle_s=None, debounce_s=None):
     for j, foot in enumerate(FEET):
         cyc = strides[foot]
         periods = [c["period_s"] for c in cyc]
+        # Count / total observed complete-cycle time is a duration-weighted
+        # event rate, distinct from the existing raw mean of inverse periods.
+        contact_rate = len(periods)/sum(periods) if periods else None
+        frequency_ratio = (contact_rate/commanded_frequency
+                           if contact_rate is not None and commanded_frequency is not None else None)
+        gross_mismatch = (not 1/warning_ratio <= frequency_ratio <= warning_ratio
+                          if frequency_ratio is not None else None)
         length = [float(np.linalg.norm(xyz[c["end"], :2]-xyz[c["start"], :2]))/svl for c in cyc]
         limb = {"complete_strides": len(cyc), "duty_factor": numeric_summary([c["duty_factor"] for c in cyc]),
                 "stance_duration_s": numeric_summary([c["stance_s"] for c in cyc]),
                 "stride_period_s": numeric_summary(periods),
                 "stride_frequency_hz": numeric_summary([1/p for p in periods]),
+                "contact_cycle_diagnostic": {
+                    "complete_cycle_count": len(periods),
+                    "complete_cycle_time_s": float(sum(periods)),
+                    "observed_contact_cycle_rate_hz": contact_rate,
+                    "commanded_frequency_hz": commanded_frequency,
+                    "observed_to_commanded_ratio": frequency_ratio,
+                    "gross_frequency_mismatch_warning": gross_mismatch,
+                    "status": "measured comparison" if frequency_ratio is not None else "unavailable: no complete cycles or no recorded commanded frequency"},
                 "stride_length_svl": numeric_summary(length),
                 "contact_time_fraction_including_censored": float(np.mean(contacts[keep, j])),
                 "stride_period_cv": float(np.std(periods, ddof=1)/np.mean(periods)) if len(periods)>1 else None,
@@ -236,6 +260,12 @@ def analyze_trace(trace, settle_s=None, debounce_s=None):
         "all_feet_have_complete_cycles": all(bool(strides[f]) for f in FEET),
         "HR_reference_cycles": len(strides["HR"]),
         "reference_cycles_with_one_touchdown_each_foot": int(sum(orders.values())),
+        "frequency_warning_ratio_band": [1/warning_ratio, warning_ratio],
+        "frequency_warning_rule": "ENGINEERED diagnostic, not a biological gate; cycle count divided by total observed complete-cycle time versus recorded commanded frequency.",
+        "frequency_warning_registry_key": "contact_cycle_warning_ratio",
+        "warnings": [
+            foot+": observed same-foot contact-cycle rate differs grossly from the commanded oscillator. Possible repeated impacts/contact chatter, missed contacts, or non-entrainment; cause is not identified. Raw cycles are retained and are not verified biological strides."
+            for foot in FEET if result["limbs"][foot]["contact_cycle_diagnostic"]["gross_frequency_mismatch_warning"]],
         "note": "No-cycle limbs are unmeasurable, not a valid zero-frequency gait. Sub-control-step contacts are not resolved."}
     result["touchdown_events"] = [{"time_s": float(t[i]), "feet": [f for f in FEET if i in touchdown[f]]}
                                  for i in sorted(set(int(i) for f in FEET for i in touchdown[f] if t[i]>=settle_s))]
@@ -336,6 +366,7 @@ class TraceRecorder:
         svl = float(np.linalg.norm(neutral.site_xpos[self.site_ids["nose_tip"]]-neutral.site_xpos[self.site_ids["vent"]]))
         names = [mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_JOINT, i) for i in self.hinge_ids]
         self.metadata = {"schema_version": 1, "svl_m": svl, "svl_definition": "nose_tip to vent in model zero-joint reference pose, fixed across episode",
+                         "frequency_hz": env.gait.frequency_hz,
                          "contact_threshold_N": env.contact_threshold, "foot_order": list(FEET), "hinge_names": names,
                          "control_dt_s": env.dt, "physics_dt_s": m.opt.timestep,
                          "anatomical_proxy_names": [name+"_"+side for side in ("L", "R") for name in
@@ -387,6 +418,8 @@ class TraceRecorder:
                   "trunk_pitch_deg": float(np.degrees(np.arctan2(rotation[2, 0], np.linalg.norm(rotation[:2, 0])))),
                   "trunk_up_z": float(rotation[2, 2]), "forward_speed_m_s": float(e._s("vel_trunk")[0]),
                   "tail_floor_contact": tail_contact, "anatomical_proxy_deg": angles,
+                  "gait_target_time_s": info.get("gait_target_time_s"),
+                  "gait_target_contacts": info.get("target_contacts"),
                   "fallen": bool(info.get("fallen", False))}
         for kind in ("positive", "negative", "abs"):
             key = "mechanical_work_"+kind+"_J"
@@ -430,16 +463,19 @@ def main(argv=None):
     p.add_argument("--vecnormalize", type=Path)
     p.add_argument("--zero-residual", action="store_true", help="Use the CPG base and its contact reflex with zero policy action.")
     p.add_argument("--zero-tail-drive", action="store_true", help="Zero tail tendon commands only; NOT mechanical restriction.")
+    p.add_argument("--gait-profile", choices=("legacy", "lab"), default="legacy",
+                   help="Lab opts into shared touchdown delays/stance; legacy preserves the checkpoint's original controller/reward mismatch.")
     p.add_argument("--xml", type=Path, default=REPO/"morphology/gecko_body_r.xml")
     p.add_argument("--episodes", type=int, default=20)
     p.add_argument("--duration", type=float, default=parameter_value("evaluation_duration_s"))
     p.add_argument("--settle", type=float, default=parameter_value("evaluation_settle_s"))
     p.add_argument("--debounce", type=float, default=parameter_value("contact_debounce_s"))
-    p.add_argument("--contact-thresh", type=float, default=parameter_value("legacy_contact_threshold_N"))
-    p.add_argument("--reset-noise", type=float, default=0., help="0 is deterministic calibration; nonzero explicitly changes the repeat protocol.")
-    p.add_argument("--residual-scale", type=float, default=.25)
-    p.add_argument("--front-stance-press", type=float, default=.40)
-    p.add_argument("--front-swing-lift", type=float, default=.40)
+    p.add_argument("--contact-thresh", type=float, default=None,
+                   help="Explicit force override; omitted uses historical .0564 N in legacy or model-bodyweight-scaled engineering threshold in lab.")
+    p.add_argument("--reset-noise", type=float, default=parameter_value("evaluation_reset_noise"), help="0 is deterministic calibration; nonzero explicitly changes the repeat protocol.")
+    p.add_argument("--residual-scale", type=float, default=parameter_value("legacy_residual_scale"))
+    p.add_argument("--front-stance-press", type=float, default=parameter_value("legacy_front_stance_press"))
+    p.add_argument("--front-swing-lift", type=float, default=parameter_value("legacy_front_swing_lift"))
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--device", default="cpu")
     p.add_argument("--output", type=Path, required=True)
@@ -455,11 +491,14 @@ def main(argv=None):
         os.environ.setdefault("MUJOCO_GL", "egl")
     import mujoco
     from envs.gecko_walk_env import GeckoWalkEnv
+    contact_thresh = args.contact_thresh
+    if contact_thresh is None and args.gait_profile == "legacy":
+        contact_thresh = parameter_value("legacy_contact_threshold_N")
     env = GeckoWalkEnv(xml_path=args.xml, control_mode="cpg_residual", max_steps=1,
-                       contact_thresh=args.contact_thresh, reset_noise=args.reset_noise,
+                       contact_thresh=contact_thresh, reset_noise=args.reset_noise,
                        residual_scale=args.residual_scale, front_stance_press=args.front_stance_press,
-                       front_swing_lift=args.front_swing_lift)
-    if not np.isclose(env.dt, .02):
+                       front_swing_lift=args.front_swing_lift, gait_profile=args.gait_profile)
+    if not np.isclose(env.dt, 1/parameter_value("gait_acquisition_hz")):
         env.close()
         p.error("CLI protocol expects 50 Hz; XML timestep/frame_skip changed.")
     steps = int(round(args.duration/env.dt))
@@ -468,7 +507,7 @@ def main(argv=None):
         p.error("Duration must be an integer number of control steps.")
     env.max_steps = steps
     floor = mujoco.mj_name2id(env.model, mujoco.mjtObj.mjOBJ_GEOM, "floor")
-    if floor < 0 or not np.isclose(env.model.geom_friction[floor, 0], .9):
+    if floor < 0 or not np.isclose(env.model.geom_friction[floor, 0], parameter_value("calibration_friction")):
         env.close()
         p.error("Calibration requires a named floor with friction .9; evaluator does not silently edit it.")
     normalizer = None
@@ -497,6 +536,13 @@ def main(argv=None):
     meta = {"xml_sha256": sha256(args.xml), "model_sha256": sha256(args.model) if policy else None,
             "normalizer_sha256": sha256(args.vecnormalize) if normalizer else None,
             "controller": "zero residual with contact reflex" if args.zero_residual else "frozen PPO residual",
+            "gait_profile": args.gait_profile,
+            "reward_calibration": env.reward_calibration,
+            "phase_offset_convention": "shared positive touchdown delays, local=(cycle-delay)%1" if args.gait_profile=="lab" else "legacy controller adds offsets; legacy reward subtracts offsets (preserved mismatch)",
+            "reward_schedule_time_reference": "executed control interval start; observation clock remains current" if args.gait_profile=="lab" else "historical control interval end",
+            "phase_offsets_cycle": dict(env.cpg.phase),
+            "commanded_stance_by_foot": {foot: env.cpg.stance_for(foot) for foot in FEET},
+            "frequency_hz": env.cpg.freq,
             "ablation": "zero tail tendon drive; joints remain mechanically free" if args.zero_tail_drive else "none",
             "friction": float(env.model.geom_friction[floor, 0]), "temperature_C_context_only": parameter_value("calibration_temperature_C"),
             "reset_noise": args.reset_noise, "requested_duration_s": args.duration,

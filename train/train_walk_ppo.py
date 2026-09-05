@@ -28,6 +28,8 @@ Examples (run from the repo root C:\\Users\\ziyad\\GeckoBrain):
 """
 from __future__ import annotations
 import argparse, sys
+from dataclasses import asdict
+import json
 import math
 import platform
 import subprocess
@@ -35,10 +37,101 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO))
 from envs.gecko_walk_env import GeckoWalkEnv
+from common.gait_config import get_gait_profile
 from common.checkpoints import (
     CheckpointBundleCallback, atomic_json, export_legacy_final,
     sha256_file, verify_checkpoint_bundle,
 )
+
+
+def gait_profile_parameters(profile: str) -> dict:
+    """JSON-normalized resolved values, so later registry edits are detectable."""
+    return json.loads(json.dumps(asdict(get_gait_profile(profile))))
+
+
+def resume_gait_contract(model_path: Path | str) -> dict:
+    """Old walker checkpoints predate profiles and use the legacy controller.
+
+    New runs always save an explicit profile and resolved parameter snapshot.
+    Do not infer a lab profile from a run's name or from unchanged tensor sizes.
+    """
+    config_path = Path(model_path).parent / "train_config.json"
+    source = json.loads(config_path.read_text(encoding="utf-8")) if config_path.is_file() else {}
+    if not isinstance(source, dict):
+        raise ValueError("Resume train_config.json must be a JSON object")
+    profile = source.get("gait_profile", "legacy")
+    if profile not in ("legacy", "lab"):
+        raise ValueError(f"Unrecognized saved gait profile: {profile!r}")
+    return {
+        "gait_profile": profile,
+        "legacy_inferred_from_missing_metadata": "gait_profile" not in source,
+        "parameters": source.get("gait_profile_parameters"),
+        "config_path": str(config_path.resolve()) if config_path.is_file() else None,
+        "config_sha256": sha256_file(config_path) if config_path.is_file() else None,
+    }
+
+
+def resolve_training_contact_threshold(gait_profile: str, requested: float | None):
+    """Retain the legacy CLI default; let the lab environment derive its own."""
+    if requested is not None and (not math.isfinite(requested) or requested < 0):
+        raise ValueError("--contact-thresh must be finite and nonnegative")
+    if requested is not None:
+        return float(requested)
+    return .0564 if gait_profile == "legacy" else None
+
+
+def environment_calibration_snapshot(vector) -> dict:
+    """Persist what every created environment actually uses, not just CLI intent."""
+    calibrations = vector.get_attr("reward_calibration")
+    thresholds = vector.get_attr("contact_threshold")
+    rewards = [reward.w for reward in vector.get_attr("reward_fn")]
+    if not calibrations:
+        raise ValueError("Cannot record calibration for an empty vector environment")
+    if any(c != calibrations[0] for c in calibrations) or any(w != rewards[0] for w in rewards):
+        raise ValueError("Vector workers resolved different reward calibrations")
+    if any(value != thresholds[0] for value in thresholds):
+        raise ValueError("Vector workers resolved different contact thresholds")
+    return json.loads(json.dumps({
+        "reward_calibration": calibrations[0],
+        "effective_contact_threshold_N": float(thresholds[0]),
+        "effective_reward_cfg": rewards[0],
+    }, allow_nan=False))
+
+
+def validate_resume_calibration(args, run_config: dict) -> dict:
+    """Never silently reuse a lab policy under different body-derived guards.
+
+    Curriculum weight changes may be intentional and are enumerated in config;
+    changes to lab physical inputs, derived guards, or contact are incompatible.
+    Legacy runs without calibration metadata retain their recorded inference.
+    """
+    if not args.resume_from:
+        return {}
+    source_path = Path(args.resume_from).parent / "train_config.json"
+    source = json.loads(source_path.read_text(encoding="utf-8")) if source_path.exists() else {}
+    old_calibration = source.get("reward_calibration")
+    old_contact = source.get("effective_contact_threshold_N", source.get("contact_thresh"))
+    if args.gait_profile == "lab":
+        if not isinstance(old_calibration, dict):
+            raise ValueError("Lab resume requires its saved reward_calibration; start fresh instead of guessing")
+        if source.get("xml_sha256") != run_config["xml_sha256"]:
+            raise ValueError("Lab resume XML differs from its training body; start a fresh run")
+        current = run_config["reward_calibration"]
+        for key in ("model_inputs", "reward_overrides"):
+            if old_calibration.get(key) != current.get(key):
+                raise ValueError(f"Lab resume calibration changed ({key}); restore its configuration or start fresh")
+        if old_contact is None or old_contact != run_config["effective_contact_threshold_N"]:
+            raise ValueError("Lab resume contact threshold changed; restore its threshold or start fresh")
+    changes = {}
+    if old_contact is not None and old_contact != run_config["effective_contact_threshold_N"]:
+        changes["contact_threshold_N"] = {"saved": old_contact, "requested_effective": run_config["effective_contact_threshold_N"]}
+    old_weights = source.get("effective_reward_cfg")
+    if isinstance(old_weights, dict):
+        for key in set(old_weights) | set(run_config["effective_reward_cfg"]):
+            old, new = old_weights.get(key), run_config["effective_reward_cfg"].get(key)
+            if old != new:
+                changes["reward." + key] = {"saved": old, "requested_effective": new}
+    return changes
 
 
 def validate_training_args(args) -> None:
@@ -54,6 +147,8 @@ def validate_training_args(args) -> None:
             raise ValueError(f"--{name.replace('_', '-')} must be positive")
     if args.batch < 2 or args.envs * args.n_steps < 2:
         raise ValueError("PPO requires batch and rollout sizes greater than one")
+    requested_gait = gait_profile_parameters(args.gait_profile)
+    resolve_training_contact_threshold(args.gait_profile, getattr(args, "contact_thresh", None))
     for name in ("max_wall_seconds", "backup_ack_timeout"):
         value = getattr(args, name)
         if value is not None and (not math.isfinite(value) or value <= 0):
@@ -67,6 +162,16 @@ def validate_training_args(args) -> None:
             verify_checkpoint_bundle(model_path.parent)
             if model_path.name != "model.zip" or vec_path.resolve() != (model_path.parent / "vecnormalize.pkl").resolve():
                 raise ValueError("A checkpoint bundle must resume its own model/normalizer pair")
+        source_gait = resume_gait_contract(model_path)
+        if source_gait["gait_profile"] != args.gait_profile:
+            raise ValueError(
+                f"Resume gait profile is {source_gait['gait_profile']!r}, but requested "
+                f"{args.gait_profile!r}. Use the matching profile or start a fresh run."
+            )
+        if source_gait["parameters"] is not None and source_gait["parameters"] != requested_gait:
+            raise ValueError("Saved gait parameters differ from the current profile; restore its registry or start fresh")
+        if args.gait_profile == "lab" and source_gait["parameters"] is None:
+            raise ValueError("Lab resume requires its saved gait_profile_parameters; do not guess its timing")
     if args.xml_path is not None and not Path(args.xml_path).is_file():
         raise FileNotFoundError("--xml-path must be an existing MJCF file")
 
@@ -86,6 +191,10 @@ def training_config(args, reward_cfg) -> dict:
     config = dict(vars(args))
     config.update({"reward_cfg": reward_cfg, "python": platform.python_version(),
                    "checkpoint_contract": "atomic paired bundles; off-instance backup requires external verification"})
+    config["gait_profile_parameters"] = gait_profile_parameters(args.gait_profile)
+    config["contact_thresh_argument_after_legacy_default"] = resolve_training_contact_threshold(
+        args.gait_profile, args.contact_thresh
+    )
     try:
         config["git_commit"] = subprocess.check_output(
             ["git", "rev-parse", "HEAD"], cwd=REPO, text=True,
@@ -97,6 +206,7 @@ def training_config(args, reward_cfg) -> dict:
         config["resume_sha256"] = {
             "model": sha256_file(args.resume_from), "vecnormalize": sha256_file(args.resume_vec)
         }
+        config["resume_gait_contract"] = resume_gait_contract(args.resume_from)
     xml_path = Path(args.xml_path) if args.xml_path else REPO / "morphology" / "gecko_body_r.xml"
     config["xml_path_resolved"] = str(xml_path.resolve())
     config["xml_sha256"] = sha256_file(xml_path)
@@ -104,18 +214,20 @@ def training_config(args, reward_cfg) -> dict:
 
 
 def make_env(seed, control_mode="raw", residual_scale=0.25,
-             contact_thresh=1e-6, front_stance_press=0.40,
-             front_swing_lift=0.40, reward_cfg=None, xml_path=None):
+             contact_thresh=None, front_stance_press=0.40,
+             front_swing_lift=0.40, reward_cfg=None, xml_path=None,
+             gait_profile="legacy"):
     def _f():
         return GeckoWalkEnv(
             xml_path=xml_path,
             seed=seed,
             control_mode=control_mode,
             residual_scale=residual_scale,
-            contact_thresh=contact_thresh,
+            contact_thresh=resolve_training_contact_threshold(gait_profile, contact_thresh),
             front_stance_press=front_stance_press,
             front_swing_lift=front_swing_lift,
             reward_cfg=reward_cfg,
+            gait_profile=gait_profile,
         )
     return _f
 
@@ -127,6 +239,8 @@ def main():
     p.add_argument("--run", type=str, default="v3_cpg_sanity_200k")
     p.add_argument("--xml-path", default=None,
                    help="optional candidate MJCF; default keeps the established body path")
+    p.add_argument("--gait-profile", choices=["legacy", "lab"], default="legacy",
+                   help="lab uses shared measured timing targets; incompatible with legacy-checkpoint resume")
     p.add_argument("--vec", choices=["subproc", "dummy"], default="subproc")
     p.add_argument("--n-steps", type=int, default=2048)
     p.add_argument("--batch", type=int, default=4096)
@@ -153,7 +267,8 @@ def main():
     p.add_argument("--residual-scale", type=float, default=0.25)
     p.add_argument("--front-stance-press", type=float, default=0.40)
     p.add_argument("--front-swing-lift", type=float, default=0.40)
-    p.add_argument("--contact-thresh", type=float, default=0.0564)
+    p.add_argument("--contact-thresh", type=float, default=None,
+                   help="explicit force threshold in N; omitted means legacy0.0564 or lab body-derived classifier (not skin sensitivity)")
     p.add_argument("--phase", choices=["p1", "p2", "v43", "none"], default="none",
                    help="V4.2.8 curriculum. p1=contact acquisition (low speed "
                         "pressure, early gate), p2=speed restoration. "
@@ -208,12 +323,14 @@ def main():
     out = reserve_run_directory(REPO / "models", args.run)
     run_config = training_config(args, reward_cfg)
     atomic_json(out / "train_config.json", run_config)
+    if run_config.get("resume_gait_contract", {}).get("legacy_inferred_from_missing_metadata"):
+        print("[resume] no saved gait-profile metadata; explicitly using historical legacy profile", flush=True)
     tb = REPO / "renders" / "tb"; tb.mkdir(parents=True, exist_ok=True)
 
     env_fns = [
         make_env(args.seed + i, args.control_mode, args.residual_scale,
                  args.contact_thresh, args.front_stance_press, args.front_swing_lift,
-                 reward_cfg=reward_cfg, xml_path=args.xml_path)
+                 reward_cfg=reward_cfg, xml_path=args.xml_path, gait_profile=args.gait_profile)
         for i in range(args.envs)
     ]
     venv = VecCls(env_fns)
@@ -225,10 +342,21 @@ def main():
     else:
         venv = VecNormalize(venv, norm_obs=True, norm_reward=True, clip_obs=10.0, gamma=0.99)
 
+    try:
+        run_config.update(environment_calibration_snapshot(venv))
+        run_config["resume_environment_changes"] = validate_resume_calibration(args, run_config)
+        atomic_json(out / "train_config.json", run_config)
+        if run_config["resume_environment_changes"]:
+            print("[resume] explicitly recorded environment/curriculum changes: "
+                  + json.dumps(run_config["resume_environment_changes"], sort_keys=True), flush=True)
+    except Exception:
+        venv.close()
+        raise
+
     eval_env = DummyVecEnv([
         make_env(10_000, args.control_mode, args.residual_scale,
                  args.contact_thresh, args.front_stance_press, args.front_swing_lift,
-                 reward_cfg=reward_cfg, xml_path=args.xml_path)
+                 reward_cfg=reward_cfg, xml_path=args.xml_path, gait_profile=args.gait_profile)
     ])
     eval_env = VecMonitor(eval_env)
     eval_env = VecNormalize(eval_env, norm_obs=True, norm_reward=False, training=False, clip_obs=10.0)

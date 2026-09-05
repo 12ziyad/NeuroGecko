@@ -29,8 +29,11 @@ NO XML change. obs/action shape unchanged. CPG base identical to V4.2.3.
 """
 
 import math
+from types import MappingProxyType
 import numpy as np
 import mujoco
+
+from common.gait_config import FOOT_ORDER, get_gait_profile, require_lab_value
 
 
 FREQ_HZ = 1.1888
@@ -73,7 +76,7 @@ def _limb_signals(phi, stance):
 
 class CPGResidualController:
 
-    def __init__(self, model, mapping=None, freq=FREQ_HZ, stance=STANCE,
+    def __init__(self, model, mapping=None, freq=None, stance=None,
                  phase=None, amp=None, sign=None,
                  residual_scale=0.25, lock_front_lift=True,
                  front_lift_residual_scale=0.0,
@@ -85,11 +88,20 @@ class CPGResidualController:
                  spine_amp=0.30, spine_phase=0.0,
                  tail_amp=0.15, tail_phase_lag=0.15,
                  residual_overrides=None,            # V4.2.4: per-joint caps
-                 verbose=True):
+                 verbose=True, gait_profile="legacy"):
         self.model = model
-        self.freq = float(freq)
-        self.stance = float(stance)
-        self.phase = dict(PHASE if phase is None else phase)
+        self.profile = get_gait_profile(gait_profile)
+        self.gait_profile = self.profile.name
+        if self.gait_profile == "legacy":
+            self.freq = float(FREQ_HZ if freq is None else freq)
+            self.stance = float(STANCE if stance is None else stance)
+            self.phase = dict(PHASE if phase is None else phase)
+        else:
+            self.freq = require_lab_value("frequency", freq, self.profile.frequency_hz)
+            self.stance = require_lab_value("hind stance", stance, self.profile.stance_for("HL"))
+            if phase is not None and dict(phase) != self.profile.touchdown_delays:
+                raise ValueError("Lab phase is a fixed touchdown-delay map, not legacy additive offsets.")
+            self.phase = MappingProxyType(self.profile.touchdown_delays)
         self.amp = dict(AMP if amp is None else amp)
         self.sign = dict(SIGN if sign is None else sign)
         self.residual_scale = float(residual_scale)
@@ -150,6 +162,26 @@ class CPGResidualController:
             self.report()
 
     # ------------------------------------------------------------------ API
+    def foot_phase_fraction(self, foot, time_s):
+        if self.gait_profile == "lab":
+            return self.profile.phase_fraction(foot, time_s)
+        # Deliberately preserve the old ADDITIVE controller convention.
+        return (time_s*self.freq+self.phase[foot]) % 1.0
+
+    def stance_for(self, foot):
+        if self.gait_profile == "lab":
+            return self.profile.stance_for(foot)
+        return FRONT_STANCE.get(foot, self.stance)
+
+    def commanded_contacts(self, time_s):
+        """Controller schedule, not measured physical foot contacts."""
+        return {foot: float(self.foot_phase_fraction(foot, time_s) < self.stance_for(foot))
+                for foot in FOOT_ORDER}
+
+    def commanded_contact_array(self, time_s, order=FOOT_ORDER):
+        contact = self.commanded_contacts(time_s)
+        return np.array([contact[foot] for foot in order], dtype=np.float32)
+
     def base_ctrl(self, t, front_contact=None):
         # front_contact: optional dict {"FL": bool, "FR": bool} of CURRENT
         # load-bearing contact. When provided, the controller seeks the ground
@@ -160,8 +192,8 @@ class CPGResidualController:
         ctrl = self.neutral.copy()
         sig = {}
         for limb, off in self.phase.items():
-            phi = (t * self.freq + off) % 1.0
-            limb_stance = FRONT_STANCE.get(limb, self.stance)
+            phi = self.foot_phase_fraction(limb, t)
+            limb_stance = self.stance_for(limb)
             sig[limb] = _limb_signals(phi, limb_stance)
         for aid, limb, role in self.entries:
             fa, lift = sig[limb]
@@ -230,6 +262,12 @@ class CPGResidualController:
         both_off = 0
         for k in range(n):
             t = k / (n * self.freq)
+            if self.gait_profile == "lab":
+                contact = self.commanded_contacts(t)
+                both_off += int(not contact["FL"] and not contact["FR"])
+                continue
+            # Historical helper also uses hind stance for the fore pair; retained
+            # in legacy mode to avoid silently rewriting compatibility behavior.
             phiL = (t * self.freq + self.phase["FL"]) % 1.0
             phiR = (t * self.freq + self.phase["FR"]) % 1.0
             both_off += int((phiL >= self.stance) and (phiR >= self.stance))

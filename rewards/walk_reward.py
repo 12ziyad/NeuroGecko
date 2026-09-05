@@ -84,6 +84,98 @@ DEFAULTS = dict(
 )
 
 
+def lab_reward_calibration(model, gait_profile="lab"):
+    """Resolve engineered lab guards from this model, without changing its state.
+
+    This is reward calibration, not a successful biological validation. In
+    particular, the scalar touch-force stance threshold is NOT skin tactile
+    sensitivity. The height guard is a one-sided root-height proxy and cannot
+    verify both girdle heights, trunk pitch, or excessive body elevation.
+    """
+    import mujoco
+    from common.gait_config import get_gait_profile
+    from common.provenance import parameter_value
+
+    profile = get_gait_profile(gait_profile)
+    if profile.name != "lab":
+        raise ValueError("Body-aware reward calibration is opt-in for lab only.")
+    gravity = np.asarray(model.opt.gravity, dtype=float)
+    if not (np.isfinite(gravity).all() and gravity[2] < 0 and np.allclose(gravity[:2], 0, atol=1e-12)):
+        raise ValueError("Lab root-height calibration requires downward vertical gravity and a level-floor model.")
+
+    def required(kind, name):
+        index = mujoco.mj_name2id(model, kind, name)
+        if index < 0:
+            raise ValueError("Lab reward calibration requires model landmark/key: " + name)
+        return index
+
+    site = {name: required(mujoco.mjtObj.mjOBJ_SITE, name)
+            for name in ("nose_tip", "vent", "hip_L", "hip_R", "shoulder_L", "shoulder_R")}
+    trunk = required(mujoco.mjtObj.mjOBJ_BODY, "trunk_middle")
+    stand = required(mujoco.mjtObj.mjOBJ_KEY, "stand")
+    reference = mujoco.MjData(model)
+    mujoco.mj_forward(model, reference)
+    svl = float(np.linalg.norm(reference.site_xpos[site["nose_tip"]] - reference.site_xpos[site["vent"]]))
+    mujoco.mj_resetDataKeyframe(model, reference, stand)
+    mujoco.mj_forward(model, reference)
+    root_height = float(reference.xpos[trunk, 2])
+    offsets = {girdle: float(np.mean([reference.site_xpos[site[girdle+"_"+side], 2]
+                                    for side in ("L", "R")]) - root_height)
+               for girdle in ("hip", "shoulder")}
+    mass = float(np.sum(model.body_mass[1:]))
+    if not (np.isfinite(svl) and svl > 0 and np.isfinite(mass) and mass > 0):
+        raise ValueError("Lab calibration requires positive finite neutral SVL and total moving-body mass.")
+    bodyweight = mass * float(-gravity[2])
+    force_fraction = float(parameter_value("lab_contact_bodyweight_fraction"))
+    force_scale = force_fraction * bodyweight
+    root_targets = {g: float(parameter_value(g+"_height_svl"))*svl-offsets[g]
+                    for g in ("hip", "shoulder")}
+    nominal_root = float(np.mean(list(root_targets.values())))
+    accepted_height_margin = float(parameter_value("girdle_height_svl_tolerance"))*svl
+    transition = float(parameter_value("lab_height_guard_transition_svl"))*svl
+    height_target = nominal_root - accepted_height_margin
+    height_min = height_target - transition
+    stride_range = np.asarray(parameter_value("stride_length_svl_range"), dtype=float)
+    stride_choice = float(parameter_value("lab_speed_stride_fraction"))
+    if not (force_fraction > 0 and transition > 0 and accepted_height_margin >= 0 and
+            height_min > 0 and stride_range.shape == (2,) and
+            0 < stride_range[0] < stride_choice < stride_range[1]):
+        raise ValueError("Invalid lab calibration registry values or incompatible model geometry.")
+    metres_per_stride_fraction_second = svl * profile.frequency_hz
+    speed = stride_choice * metres_per_stride_fraction_second
+    speed_floor = float(stride_range[0]) * metres_per_stride_fraction_second
+    speed_sigma = float((stride_range[1]-stride_range[0])/2) * metres_per_stride_fraction_second
+    overrides = dict(
+        trunk_height_min=height_min, trunk_height_target=height_target,
+        front_load_force_scale=force_scale,
+        front_duty_fl_target=profile.stance_for("FL"), front_duty_fr_target=profile.stance_for("FR"),
+        target_speed=speed, speed_floor=speed_floor, speed_track_sigma=speed_sigma,
+        slow_speed=speed_floor, slow_penalty=0.0,
+    )
+    return {
+        "profile": "lab", "schema_version": 1,
+        "status": "ENGINEERED reward guards; not biological validation or a cutaneous-sensitivity model",
+        "contact_threshold_N": force_scale, "reward_overrides": overrides,
+        "model_inputs": {"mass_kg": mass, "gravity_m_s2": float(-gravity[2]),
+                         "bodyweight_N": bodyweight, "neutral_svl_m": svl,
+                         "stand_root_height_m": root_height, "stand_girdle_offsets_from_root_m": offsets},
+        "height_guard": {"girdle_implied_root_targets_m": root_targets,
+                         "nominal_root_target_m": nominal_root,
+                         "saturation_margin_m": accepted_height_margin, "linear_transition_m": transition,
+                         "method": "mean(target girdle height minus stand-site/root offset), saturating one tolerance below that mean; linear guard one engineered width lower",
+                         "limitation": "Root-height support only; high posture is not penalized here and both girdle heights still require independent measurement."},
+        "contact_classifier": {"bodyweight_fraction": force_fraction,
+                               "method": "scalar foot touch force > engineered fraction * model mass * vertical gravity; front-load tanh scale uses same derived force",
+                               "limitation": "No equivalence to skin tactile sensitivity; not a measured optimal contact detector; endpoint force can chatter."},
+        "speed_reference": {"chosen_stride_svl": stride_choice, "frequency_hz": profile.frequency_hz,
+                            "method": "chosen stride * neutral SVL * locked frequency; lower supplied stride bound sets ramp floor, half supplied interval sets engineered Gaussian width",
+                            "limitation": "Single operating point; supplied speed/stride ranges are context, not a joint biological acceptance region."},
+        "registry_keys": ["lab_contact_bodyweight_fraction", "hip_height_svl", "shoulder_height_svl",
+                          "girdle_height_svl_tolerance", "lab_height_guard_transition_svl", "lab_speed_stride_fraction",
+                          "stride_length_svl_range", "lab_gait_frequency_hz", "fore_duty_factor"],
+    }
+
+
 class WalkReward:
     def __init__(self, cfg=None):
         self.w = dict(DEFAULTS)

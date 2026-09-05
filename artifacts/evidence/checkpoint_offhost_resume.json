@@ -1,0 +1,45 @@
+{
+  "action_shape": [
+    25
+  ],
+  "all_rollout_values_finite": true,
+  "bundle": "C:\\Users\\ziyad\\GeckoBrain\\models_recovered\\build-20260904T233438Z\\recovery_pipeline_smoke\\step-256-final",
+  "caveat": "Resume plumbing only; not gait quality, exact RNG continuation, or training convergence",
+  "checked_vector_steps": 64,
+  "complete": true,
+  "effective_batch_size": 256,
+  "effective_n_epochs": 10,
+  "effective_n_steps": 64,
+  "elapsed_wall_seconds": 1.3280000000013388,
+  "gait_profile": "legacy",
+  "initial_prediction_finite": true,
+  "kind": "offhost_checkpoint_resume_smoke",
+  "legacy_gait_inferred_from_missing_metadata": true,
+  "normalizer_stats_loaded_unchanged_before_learning": true,
+  "observation_shape": [
+    92
+  ],
+  "optimizer_updates_after": 20,
+  "optimizer_updates_before": 10,
+  "parameters_finite_after_learning": true,
+  "policy_parameter_sha256_after": "56c8de2c70374365b33f35fc5fe7103553547c37c08d0beed81c4d3675d37975",
+  "policy_parameter_sha256_before": "4a6d05718f36c83be45e7d93bb505b244dc5e8f1f8e2d4b21e3781f6bbf24277",
+  "policy_parameters_changed": true,
+  "python": "3.12.10",
+  "requested_additional_steps": 64,
+  "source_bundle_unchanged": true,
+  "source_file_sha256": {
+    "model.zip": "776ba320f6e45cf09baa24025e5ab8e066e5671418b74f1a7986c22535f3e98e",
+    "train_config.json": "27ba4a22878f423b335095f0dcd7765fed3ecc3343d37505ae331c1b13a6fa62",
+    "vecnormalize.pkl": "5b31f236234a5bce71851db4e471761bb3ae24da8f658a7b641f8677355592ba"
+  },
+  "source_manifest_sha256": "61573d05e28b2763d37b23dd7b7c3a8eef03ffee429c4f4dbb6caa5321234103",
+  "source_num_envs": 4,
+  "timesteps_after": 320,
+  "timesteps_before": 256,
+  "torch": "2.12.0+cpu",
+  "verification_device": "cpu",
+  "verification_num_envs": 1,
+  "xml_path": "C:\\Users\\ziyad\\GeckoBrain\\build_sessions\\build-20260904T233438Z\\resume_verification\\morphology\\gecko_body_r.xml",
+  "xml_sha256": "92f48b3e30a7d42d65c78fa3f084dfcfd101ddb107f3a07611af389e24f89020"
+}

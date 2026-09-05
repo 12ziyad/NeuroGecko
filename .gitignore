@@ -31,6 +31,11 @@ tb/
 *.pkl
 *.npz
 
+# Raw measured trajectories stay local/cloud; compact reports and one baseline
+# movie are versioned. Do not silently commit 100+ MB of repeated JSON traces.
+artifacts/evidence/**/traces/
+!artifacts/evidence/baseline/before.mp4
+
 # OS / IDE
 .DS_Store
 Thumbs.db

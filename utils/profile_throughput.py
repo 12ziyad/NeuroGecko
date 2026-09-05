@@ -15,6 +15,7 @@ if platform.system() == 'Linux' and not os.environ.get('DISPLAY'):
 
 import mujoco
 import torch
+from OpenGL import GL
 from common.checkpoints import atomic_json
 from eval.recovered_brain import load_actor
 from envs.gecko_brain_env import GeckoBrainEnv
@@ -50,12 +51,17 @@ def main():
                        policy_camera_mode='sealed')
     try:
         obs, _ = env.reset(seed=100)
+        graphics = {}
+        for name in ('GL_VENDOR', 'GL_RENDERER', 'GL_VERSION'):
+            value = GL.glGetString(getattr(GL, name))
+            graphics[name] = value.decode('utf-8', errors='replace') if value else None
         result = dict(platform=platform.platform(), python=platform.python_version(),
                       mujoco=mujoco.__version__, torch=torch.__version__, device=args.device,
-                      gpu=torch.cuda.get_device_name(0) if torch.cuda.is_available() else None,
+                      torch_cuda_gpu=torch.cuda.get_device_name(0) if torch.cuda.is_available() else None,
+                      graphics=graphics,
                       torch_threads=1, renderer=os.environ.get('MUJOCO_GL', 'default'),
                       physics_dt_s=env.walk_env.model.opt.timestep, control_dt_s=env.walk_env.dt,
-                      caveat='Static-pose component timing; not end-to-end training throughput')
+                      caveat='Separate component timing, not training throughput: physics evolves at neutral control; rendering uses a reset pose; actor prediction includes data transfer and output synchronization. Torch CUDA availability does not establish GPU-accelerated rendering; inspect GL_RENDERER.')
         result['physics_step'] = benchmark(lambda: mujoco.mj_step(env.walk_env.model, env.walk_env.data), args.steps)
         obs, _ = env.reset(seed=100)
         result['policy_render_64x64'] = benchmark(env._head_cam_image, args.steps)

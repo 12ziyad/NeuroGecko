@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import os
 from pathlib import Path
 import platform
@@ -55,7 +56,7 @@ def main():
     p.add_argument('--video', type=Path)
     p.add_argument('--max-wall-seconds', type=float, default=600)
     args = p.parse_args()
-    if args.episodes <= 0 or args.steps <= 0 or args.max_wall_seconds <= 0:
+    if args.episodes <= 0 or args.steps <= 0 or not math.isfinite(args.max_wall_seconds) or args.max_wall_seconds <= 0:
         p.error('Positive episode, step and wall limits are required')
     torch.set_num_threads(1)
     actor, cfg = load_actor(args.brain_run, args.device)
@@ -65,6 +66,9 @@ def main():
                        food_radius=cfg['food_radius'], eat_radius=cfg['eat_radius'])
     result = dict(kind='legacy_visual_student_task_evaluation', camera=args.camera,
                   actor_sha256=sha256_file(args.brain_run / 'final.pt'),
+                  brain_config_sha256=sha256_file(args.brain_run / 'train_config.json'),
+                  walker_sha256=sha256_file(REPO / 'models' / args.walker_run / 'final.zip'),
+                  normalizer_sha256=sha256_file(REPO / 'models' / args.walker_run / 'vecnormalize.pkl'),
                   xml_sha256=sha256_file(args.xml or REPO / 'morphology/gecko_body_r.xml'),
                   device=args.device, food_half_angle_deg=cfg['food_spawn_angle_deg'],
                   eat_radius_m=cfg['eat_radius'], privileged_input=False,

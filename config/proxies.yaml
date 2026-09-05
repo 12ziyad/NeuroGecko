@@ -74,9 +74,10 @@
       "species": "E_macularius",
       "sample_size": 7,
       "source": "Jagnandan, Russell & Higham (2014), J Exp Biol 217:3891–3897, doi:10.1242/jeb.110916",
-      "confidence": "likely",
-      "recording_temp_C": 30,
-      "notes": "Supplied-source target. Compare axial projection in neutral pose; this is not full walking CoM validation."
+      "confidence": "verified",
+      "recording_temp_C": null,
+      "notes": "Primary Results verified: mean 65.9% SVL. Methods used frozen rigid animals and thread suspension; the original tail was reattached. Cohort SVL121.9mm, not106mm. Neutral axial projection and size transfer are explicit model assumptions, not walking CoM validation.",
+      "url": "https://doi.org/10.1242/jeb.110916"
     },
     "com_tail_excluded_svl": {
       "value": 0.527,
@@ -84,9 +85,10 @@
       "species": "E_macularius",
       "sample_size": 7,
       "source": "Jagnandan, Russell & Higham (2014), J Exp Biol 217:3891–3897, doi:10.1242/jeb.110916",
-      "confidence": "likely",
-      "recording_temp_C": 30,
-      "notes": "Supplied-source target after complete tail loss. Audit excludes tail masses in the SAME pose; it does not simulate surgery or compensation."
+      "confidence": "verified",
+      "recording_temp_C": null,
+      "notes": "Primary Results verified: mean52.7%SVL. Frozen animals were measured after removing regenerated tail, not live immediately-after-autotomy posture. Audit excludes tail masses in the SAME neutral pose. Source cohort7adult females39.4g/SVL121.9mm.",
+      "url": "https://doi.org/10.1242/jeb.110916"
     },
     "com_svl_tolerance": {
       "value": 0.02,
@@ -721,6 +723,113 @@
         "confidence": "uncertain",
         "recording_temp_C": null,
         "notes": "Engineering mass scaling, not biological muscle calibration. Joint damping, stiffness, and armature remain legacy estimates; fresh training/tuning still needed."
+      },
+      "lab_hip_rot_range_deg": {
+        "value": 30,
+        "units": "deg total",
+        "species": "INVENTED",
+        "sample_size": null,
+        "source": "CODEX_PROMPT.md +/-15 degree engineering limit based on Iguana proxy",
+        "confidence": "uncertain",
+        "recording_temp_C": null,
+        "notes": "Candidate-specific engineering range; not measured E. macularius anatomical ROM."
+      },
+      "lab_gait_frequency_hz": {
+        "value": 1.1888,
+        "units": "Hz",
+        "species": "INVENTED",
+        "sample_size": null,
+        "source": "Legacy checkpoint-compatible controller frequency, retained by user build brief",
+        "confidence": "uncertain",
+        "recording_temp_C": null,
+        "notes": "Locked engineering frequency, not measured gecko cadence. No frequency optimization permitted in this build."
+      },
+      "lab_gait_touchdown_delays": {
+        "value": {"HL": 0.0, "FL": 0.44, "HR": 0.50, "FR": 0.94},
+        "units": "stride fraction",
+        "species": "derived",
+        "sample_size": null,
+        "source": "McElroy, Hickey & Reilly (2008) ipsilateral limb-phase target + engineered symmetric contralateral offset",
+        "confidence": "likely",
+        "recording_temp_C": [26, 30],
+        "notes": "Touchdown DELAYS from reference HL, not additive oscillator phase offsets. Contralateral half-cycle symmetry is a model choice."
+      },
+      "com_study_body_mass_kg": {
+        "value": 0.0394, "units": "kg", "species": "E_macularius", "sample_size": 7,
+        "source": "Jagnandan, Russell & Higham (2014), Methods, https://doi.org/10.1242/jeb.110916",
+        "confidence": "verified", "recording_temp_C": null,
+        "notes": "Adult female cohort mean39.4g, SEM1.2g. Different body-condition/length cohort from2017; not substituted for our38g population choice."
+      },
+      "com_study_svl_m": {
+        "value": 0.1219, "units": "m", "species": "E_macularius", "sample_size": 7,
+        "source": "Jagnandan, Russell & Higham (2014), Methods, https://doi.org/10.1242/jeb.110916",
+        "confidence": "verified", "recording_temp_C": null,
+        "notes": "Source mean121.9mm, SEM2.2mm. Transferring dimensionless CoM targets to106mm is an unverified scaling assumption."
+      },
+      "com_study_tail_volume_m3": {
+        "value": 0.0000078, "units": "m^3", "species": "E_macularius", "sample_size": 7,
+        "source": "Jagnandan, Russell & Higham (2014), Results/Methods, https://doi.org/10.1242/jeb.110916",
+        "confidence": "verified", "recording_temp_C": null,
+        "notes": "Original tail mean volume7.8cm^3 measured by liquid displacement. Product of cohortmeanmass and22% divided by this volume is only an approximate bulk-density anchor, not per-segment tissue density."
+      },
+      "com_fit_non_tail_mass_bounds": {
+        "value": [0.5, 2.0], "units": "multiple of v1 group mass", "species": "INVENTED", "sample_size": null,
+        "source": "NeuroGecko constrained inverse calibration v2 engineering regularizer",
+        "confidence": "uncertain", "recording_temp_C": null,
+        "notes": "Broad finite group bounds; bilateral limbs share one total-mass variable. Minimum relative entropy to the v1 mass prior selects one solution among many. No resulting segmentmass is claimed measured."
+      },
+      "com_fit_tail_min_mass_fraction": {
+        "value": 0.1, "units": "multiple of v1 segmentmass", "species": "INVENTED", "sample_size": null,
+        "source": "NeuroGecko constrained inverse calibration v2 engineering regularizer",
+        "confidence": "uncertain", "recording_temp_C": null,
+        "notes": "Positive lower mass guard prevents zero-mass mobile distal segments; not a biological bound."
+      },
+      "com_fit_tail_density_guard_factor": {
+        "value": 1.5, "units": "multiple of source-derived bulk density", "species": "INVENTED", "sample_size": null,
+        "source": "NeuroGecko constrained inverse calibration v2 engineering guard",
+        "confidence": "uncertain", "recording_temp_C": null,
+        "notes": "Deliberately generous sensitivity guard, NOT a measured material-density limit. Uses collision capsulevolumes as proxy envelopes; overlap makes summed volume an overestimate. Existing bodyshape/density mismatch remains explicit."
+      },
+      "com_fit_density_sensitivity_factors": {
+        "value": [1.0, 1.35, 1.5, 1.62, 1.8, 2.0, 2.35, 2.5], "units": "multiple of source-derived bulk density", "species": "INVENTED", "sample_size": null,
+        "source": "NeuroGecko constrained inverse calibration v2 diagnostic sweep",
+        "confidence": "uncertain", "recording_temp_C": null,
+        "notes": "Sensitivity cases quantify feasibility and bound choices. A feasible stress case is not evidence that its effective density is biologically correct."
+      },
+      "lab_contact_bodyweight_fraction": {
+        "value": 0.09394175611121104, "units": "fraction of bodyweight", "species": "INVENTED", "sample_size": null,
+        "source": "Legacy threshold 0.0564N divided by legacy model weight0.0612kg*9.81m/s^2",
+        "confidence": "uncertain", "recording_temp_C": null,
+        "notes": "Preserves controller force threshold in bodyweight units. NOT cutaneous mechanoreceptor sensitivity."
+      },
+      "lab_height_guard_transition_svl": {
+        "value": 0.010, "units": "SVL", "species": "INVENTED", "sample_size": null,
+        "source": "NeuroGecko opt-in lab reward engineering calibration",
+        "confidence": "uncertain", "recording_temp_C": null,
+        "notes": "Height guard transition width, not biological tolerance or measured skin clearance."
+      },
+      "lab_speed_stride_fraction": {
+        "value": 0.72, "units": "SVL per stride", "species": "INVENTED", "sample_size": null,
+        "source": "Engineering midpoint of supplied0.62–0.82SVL stride interval",
+        "confidence": "uncertain", "recording_temp_C": null,
+        "notes": "Lab reward speed target=0.72*neutralSVL*lockedfrequency. Does not add independent cadence/speed validation."
+      },
+      "contact_cycle_warning_ratio": {
+        "value": 2.0, "units": "observed / commanded frequency ratio", "species": "INVENTED", "sample_size": null,
+        "source": "NeuroGecko measurement-quality diagnostic engineering choice",
+        "confidence": "uncertain", "recording_temp_C": null,
+        "notes": "Warn when complete same-foot contact-cycle rate lies outside [1/2,2] times the recorded commanded frequency. Not a biological acceptance gate. Never removes, merges or relabels measured cycles to fit the oscillator."
+      },
+      "emg_hindlimb_preautotomy": {
+        "value": {
+          "caudofemoralis": [{"onset": -0.0168, "duration": 0.8145, "peak": 0.1401, "amplitude": 0.5373}],
+          "gastrocnemius": [{"onset": 0.0640, "duration": 0.6441, "peak": 0.3379, "amplitude": 0.3849}, {"onset": 0.8506, "duration": 0.1323, "peak": 0.9474, "amplitude": 0.5450}]
+        },
+        "units": "timing=stride fraction; amplitude=within-muscle peak fraction",
+        "species": "E_macularius", "sample_size": 10,
+        "source": "Jagnandan & Higham (2018), J Exp Biol221:jeb179564, Table3, https://doi.org/10.1242/jeb.179564",
+        "confidence": "verified", "recording_temp_C": 30,
+        "notes": "Root visually verified supplied PDFTable3; n10cohort, per-muscle subset not assumed. SEMs in source-table percent: CF onset2.26,duration2.00,peak3.08,amp9.04; G1 onset2.30,duration4.26,peak5.49,amp5.12; G2 onset2.31,duration1.56,peak1.28,amp5.90. Smoothstep envelope SHAPE is an invented interpolation, not observed waveform or force. Table1 is stanceRIA, not timing. PDFSHA256008ee101c9a00a1a873ad83e558244489c84ef7a045622d5d5be0142921de1cc."
       }
   }
 }

@@ -68,9 +68,9 @@ class GeckoWalkEnv(gym.Env):
     def __init__(self, xml_path=None, frame_skip=25, max_steps=1000,
                  target_radius=0.25, reach_dist=0.04, action_scale=1.0,
                  action_ema=0.0, reset_noise=0.02, reward_cfg=None,
-                 control_mode="raw", residual_scale=0.2, contact_thresh=1e-6,
+                 control_mode="raw", residual_scale=0.2, contact_thresh=None,
                  front_stance_press=0.40, front_swing_lift=0.40,
-                 render_mode=None, seed=None):
+                 render_mode=None, seed=None, gait_profile="legacy"):
         super().__init__()
         self.model = mujoco.MjModel.from_xml_path(str(xml_path or DEFAULT_XML))
         self.data = mujoco.MjData(self.model)
@@ -90,8 +90,34 @@ class GeckoWalkEnv(gym.Env):
         self.front_swing_lift = float(front_swing_lift)
         self.render_mode = render_mode
         self._rng = np.random.default_rng(seed)
-        self.gait = LateralSequenceCPG()
-        self.contact_threshold = float(contact_thresh)
+        self.gait = LateralSequenceCPG(gait_profile=gait_profile)
+        self.gait_profile = self.gait.gait_profile
+        from rewards.walk_reward import WalkReward, lab_reward_calibration
+        if self.gait_profile == "lab":
+            self.reward_calibration = lab_reward_calibration(self.model, self.gait.profile)
+            self.contact_threshold = float(self.reward_calibration["contact_threshold_N"]
+                                           if contact_thresh is None else contact_thresh)
+            if not np.isfinite(self.contact_threshold) or self.contact_threshold < 0:
+                raise ValueError("Lab contact threshold must be finite and nonnegative.")
+            # Old phase presets contain old-body dimensional targets. Keep their
+            # weights but resolve these lab targets from this body's landmarks.
+            overrides = self.reward_calibration["reward_overrides"]
+            self.reward_calibration["superseded_reward_cfg"] = {
+                k: {"requested": reward_cfg[k], "resolved": v}
+                for k, v in overrides.items() if reward_cfg and k in reward_cfg and reward_cfg[k] != v
+            }
+            resolved_reward_cfg = dict(reward_cfg or {})
+            resolved_reward_cfg.update(overrides)
+            self.reward_calibration["effective_contact_threshold_N"] = self.contact_threshold
+            self.reward_calibration["contact_threshold_source"] = (
+                "derived bodyweight-scaled engineering default" if contact_thresh is None else "explicit caller override")
+        else:
+            # None preserves the original environment default; training/eval
+            # CLIs separately retain their historical .0564 N legacy default.
+            self.contact_threshold = float(1e-6 if contact_thresh is None else contact_thresh)
+            self.reward_calibration = {"profile": "legacy", "status": "historical reward/contact behavior preserved",
+                                       "effective_contact_threshold_N": self.contact_threshold}
+            resolved_reward_cfg = reward_cfg
 
         M, O = self.model, mujoco.mjtObj
         self._kf_stand = mujoco.mj_name2id(M, O.mjOBJ_KEY, "stand")
@@ -109,6 +135,7 @@ class GeckoWalkEnv(gym.Env):
         self.nu = M.nu
         self.control_dt = self.dt
         self._cpg_t = 0.0
+        self._last_cpg_command_time_s = 0.0
         self.cpg = None
         if self.control_mode == "cpg_residual":
             self.cpg = CPGResidualController(
@@ -117,6 +144,7 @@ class GeckoWalkEnv(gym.Env):
                 front_stance_press=self.front_stance_press,
                 front_swing_lift=self.front_swing_lift,
                 verbose=False,
+                gait_profile=self.gait.profile,
             )
 
         # build one obs to size the space
@@ -138,8 +166,7 @@ class GeckoWalkEnv(gym.Env):
         self.observation_space = spaces.Box(-np.inf, np.inf, obs.shape, np.float32)
         self.action_space = spaces.Box(-1.0, 1.0, (self.nu,), np.float32)
 
-        from rewards.walk_reward import WalkReward
-        self.reward_fn = WalkReward(reward_cfg)
+        self.reward_fn = WalkReward(resolved_reward_cfg)
         self._renderer = None
 
     # ---- sensor access ----------------------------------------------------
@@ -195,7 +222,13 @@ class GeckoWalkEnv(gym.Env):
         return np.concatenate([qp, qv, tp, tv, feet, belly, up, gyro, vel, task, phase]).astype(np.float32)
 
     def _step_metrics(self, dist, head, up_z, reached, fallen):
-        time_s = self._gait_time()
+        # Lab scores the stance schedule that generated this held control
+        # interval, not the next interval's schedule. Keep historical end-time
+        # reward timing untouched for legacy checkpoints. The policy's phase
+        # observation still uses the current clock in _obs().
+        time_s = (self._last_cpg_command_time_s
+                  if self.gait_profile == "lab" and self.cpg is not None
+                  else self._gait_time())
         target_contacts = self.gait.target_contact_array(time_s, _GAIT_FEET)
         foot_forces = self._foot_contact_forces()
         foot_contacts = (foot_forces > self.contact_threshold).astype(np.float32)
@@ -236,6 +269,7 @@ class GeckoWalkEnv(gym.Env):
             foot_contact_forces=foot_forces.copy(),
             foot_speed=foot_speed.astype(np.float32),
             gait_phase=self.gait.phase(time_s),
+            gait_target_time_s=float(time_s),
             mechanical_work_positive_J=float(self._step_work[0]),
             mechanical_work_negative_J=float(self._step_work[1]),
             mechanical_work_abs_J=float(self._step_work[2]),
@@ -262,6 +296,7 @@ class GeckoWalkEnv(gym.Env):
         self._ctrl = np.zeros(self.nu)
         self._step = 0
         self._cpg_t = 0.0
+        self._last_cpg_command_time_s = 0.0
         _, self._prev_dist, _ = self._target_egocentric()
         self._prev_foot_xy = self._foot_xy().copy()
         self._last_step_metrics = {}
@@ -278,6 +313,7 @@ class GeckoWalkEnv(gym.Env):
         if self.control_mode == "cpg_residual":
             fc = self._foot_contacts()  # [HL, FL, HR, FR] in _GAIT_FEET order
             front_contact = {"FL": bool(fc[1] > 0.5), "FR": bool(fc[3] > 0.5)}
+            self._last_cpg_command_time_s = self._cpg_t
             self._ctrl = self.cpg.compute(action, self._cpg_t, front_contact=front_contact)
             self._cpg_t += self.control_dt
         else:

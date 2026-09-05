@@ -10,8 +10,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 import math
 from typing import Iterable
+from types import MappingProxyType
 
 import numpy as np
+
+from common.gait_config import get_gait_profile, require_lab_value
 
 
 TAU = 2.0 * math.pi
@@ -31,6 +34,7 @@ class GaitPriorConfig:
     belly_clearance_target_m: tuple[float, float] = (0.005, 0.015)
     spine_wave: str = "medium-small"
     tail_wave: str = "small counter-wave"
+    gait_profile: str = "legacy"
 
 
 class LateralSequenceCPG:
@@ -38,16 +42,28 @@ class LateralSequenceCPG:
 
     def __init__(
         self,
-        frequency_hz: float = 1.1888,
-        stance_ratio: float = 0.62,
-        swing_ratio: float = 0.38,
+        frequency_hz: float | None = None,
+        stance_ratio: float | None = None,
+        swing_ratio: float | None = None,
         phase_order: Iterable[str] = LATERAL_SEQUENCE_ORDER,
+        gait_profile="legacy",
     ):
+        self.profile = get_gait_profile(gait_profile)
+        self.gait_profile = self.profile.name
+        if self.gait_profile == "lab":
+            frequency_hz = require_lab_value("frequency", frequency_hz, self.profile.frequency_hz)
+            stance_ratio = require_lab_value("hind stance", stance_ratio, self.profile.stance_for("HL"))
+            swing_ratio = require_lab_value("hind swing", swing_ratio, 1-self.profile.stance_for("HL"))
+        else:
+            frequency_hz = 1.1888 if frequency_hz is None else frequency_hz
+            stance_ratio = .62 if stance_ratio is None else stance_ratio
+            swing_ratio = .38 if swing_ratio is None else swing_ratio
         self.config = GaitPriorConfig(
             phase_order=tuple(phase_order),
             frequency_hz=float(frequency_hz),
             stance_ratio=float(stance_ratio),
             swing_ratio=float(swing_ratio),
+            gait_profile=self.gait_profile,
         )
         if self.config.gait_type != "lateral_sequence":
             raise ValueError("Only lateral_sequence gait is supported by this prior.")
@@ -67,6 +83,9 @@ class LateralSequenceCPG:
             foot: i * step for i, foot in enumerate(self.config.phase_order)
         }
         self.front_stance = dict(FRONT_STANCE)
+        if self.gait_profile == "lab":
+            self.phase_offsets = MappingProxyType(self.profile.touchdown_delays)
+            self.front_stance = MappingProxyType({foot: self.profile.stance_for(foot) for foot in ("FL", "FR")})
 
     @property
     def foot_order(self) -> tuple[str, ...]:
@@ -97,9 +116,13 @@ class LateralSequenceCPG:
     def foot_phase_fraction(self, foot: str, time_s: float) -> float:
         if foot not in self.phase_offsets:
             raise KeyError(f"Unknown foot label {foot!r}; expected {self.foot_order}.")
+        if self.gait_profile == "lab":
+            return self.profile.phase_fraction(foot, time_s)
         return float((self.cycle_fraction(time_s) - self.phase_offsets[foot]) % 1.0)
 
     def _stance_for(self, foot: str) -> float:
+        if self.gait_profile == "lab":
+            return self.profile.stance_for(foot)
         return self.front_stance.get(foot, self.stance_ratio)
 
     def target_contacts(self, time_s: float) -> dict[str, float]:

@@ -1,29 +1,34 @@
 {
-  "caveat": "Static-pose component timing; not end-to-end training throughput",
+  "caveat": "Separate component timing, not training throughput: physics evolves at neutral control; rendering uses a reset pose; actor prediction includes data transfer and output synchronization. Torch CUDA availability does not establish GPU-accelerated rendering; inspect GL_RENDERER.",
   "control_dt_s": 0.02,
   "device": "cpu",
-  "gpu": null,
+  "graphics": {
+    "GL_RENDERER": "Intel(R) UHD Graphics 770",
+    "GL_VENDOR": "Intel",
+    "GL_VERSION": "4.6.0 - Build 32.0.101.7026"
+  },
   "mujoco": "3.9.0",
-  "physics_25_substeps_equivalent_ms": 0.946375000057742,
+  "physics_25_substeps_equivalent_ms": 1.0244650000458932,
   "physics_dt_s": 0.0008,
   "physics_step": {
     "iterations": 1000,
-    "mean_ms": 0.03785500000230968,
-    "total_seconds": 0.03785500000230968
+    "mean_ms": 0.04097860000183573,
+    "total_seconds": 0.04097860000183573
   },
   "platform": "Windows-11-10.0.26200-SP0",
   "policy_render_64x64": {
     "iterations": 1000,
-    "mean_ms": 4.351576900000509,
-    "total_seconds": 4.351576900000509
+    "mean_ms": 4.2975748000026215,
+    "total_seconds": 4.2975748000026215
   },
   "python": "3.12.10",
   "renderer": "glfw",
   "torch": "2.12.0+cpu",
+  "torch_cuda_gpu": null,
   "torch_threads": 1,
   "visual_actor_predict": {
     "iterations": 1000,
-    "mean_ms": 0.5936784999939846,
-    "total_seconds": 0.5936784999939846
+    "mean_ms": 0.5075619000053848,
+    "total_seconds": 0.5075619000053848
   }
 }

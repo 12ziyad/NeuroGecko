@@ -1,0 +1,785 @@
+{
+  "schema_version": 1,
+  "created_utc": "2026-09-05T00:17:58.401958+00:00",
+  "model_path": "C:\\Users\\ziyad\\GeckoBrain\\morphology\\gecko_body_lab_v2.xml",
+  "model_sha256": "cfc485e6fab752dc4ab25d25beebf549fded5fb241b3da6c828df55156b9c22d",
+  "registry_path": "C:\\Users\\ziyad\\GeckoBrain\\config\\proxies.yaml",
+  "registry_sha256": "c6c6f0d55a57fb0ef16c3886b18e0d99aa9a3a8d5fecdd8dd6f632842c7acc4e",
+  "protocol": {
+    "neutral_keyframe": "neutral",
+    "settle_seconds_requested": 2.0,
+    "settle_seconds_actual": 1.9999999999999103,
+    "settle_steps": 2500,
+    "actuator_targets": "all zero (position targets, not zero applied force)",
+    "ground": "model floor z=0; no environmental randomization",
+    "com": "neutral-pose body-mass weighted axial projection; tail exclusion is mathematical",
+    "bilateral_gates": "both sides and both joint/actuator ranges must pass",
+    "claim": "engineering morphology audit; not walking or kinematic validation"
+  },
+  "structural_counts": {
+    "nq": 39,
+    "nv": 38,
+    "nu": 25,
+    "hinge_joints": 32,
+    "sites": 18,
+    "sensors": 83
+  },
+  "metrics": {
+    "total_mass_kg": 0.038000000000000006,
+    "tail_mass_fraction": 0.22,
+    "tail_length_svl": 0.73,
+    "com_intact_svl": 0.6781123225136587,
+    "com_tail_excluded_svl": 0.527,
+    "femur_tibia_ratio": {
+      "L": 1.0198675496688743,
+      "R": 1.0198675496688743
+    },
+    "hindlimb_length_svl": {
+      "L": 0.417,
+      "R": 0.417
+    },
+    "hip_proret_range_deg": {
+      "L_joint_deg": 90.0,
+      "L_actuator_deg": 90.0,
+      "R_joint_deg": 90.0,
+      "R_actuator_deg": 90.0
+    },
+    "hip_rot_range_deg": {
+      "L_joint_deg": 29.999999999999996,
+      "L_actuator_deg": 29.999999999999996,
+      "R_joint_deg": 29.999999999999996,
+      "R_actuator_deg": 29.999999999999996
+    },
+    "head_width_svl": 0.185,
+    "interorbital_distance_m": 0.01,
+    "hip_height_svl": {
+      "L": 0.14887688620854372,
+      "R": 0.14887688620854372
+    },
+    "shoulder_height_svl": {
+      "L": 0.1093076252491482,
+      "R": 0.1093076252491482
+    },
+    "shoulder_hip_ratio": {
+      "L": 0.7342148807171603,
+      "R": 0.7342148807171603
+    }
+  },
+  "diagnostics": {
+    "svl_m": 0.106,
+    "tail_chain_length_m": 0.07737999999999999,
+    "neutral_com_m": [
+      -0.007379906186447817,
+      -2.2290340717218426e-20,
+      0.026364897576182014
+    ],
+    "neutral_tail_excluded_com_m": [
+      0.00863800000000001,
+      -2.857735989386978e-20,
+      0.02590371484125899
+    ],
+    "hindlimb_segments": {
+      "L": {
+        "femur_m": 0.015327699530516435,
+        "tibia_m": 0.015029107981220658,
+        "ankle_to_fourth_digit_m": 0.0075166462187707325,
+        "fourth_digit_m": 0.006328546269492177,
+        "total_m": 0.044202
+      },
+      "R": {
+        "femur_m": 0.015327699530516435,
+        "tibia_m": 0.015029107981220658,
+        "ankle_to_fourth_digit_m": 0.0075166462187707325,
+        "fourth_digit_m": 0.006328546269492177,
+        "total_m": 0.044202
+      }
+    },
+    "head_collision_width_m": 0.01961,
+    "head_visual_skin_width_m": 0.01961,
+    "eye_center_distance_m": 0.0166,
+    "settled_hip_z_m": {
+      "L": 0.015780949938105634,
+      "R": 0.015780949938105634
+    },
+    "settled_shoulder_z_m": {
+      "L": 0.011586608276409708,
+      "R": 0.011586608276409708
+    },
+    "settled_max_abs_qvel": 0.00010422333966236648,
+    "settled_touch_forces_N": {
+      "touch_fore_L": 0.09713048442294614,
+      "touch_fore_R": 0.09713048442294715,
+      "touch_hind_L": 0.08925950689082049,
+      "touch_hind_R": 0.0892595068908196,
+      "touch_belly_mid": 0.0,
+      "touch_belly_post": 0.0
+    }
+  },
+  "corrections_and_limits": [
+    "The model has 32 hinge joints, not the 26 asserted in parts of the supplied documents.",
+    "Fuller Table1 femur/tibia is 1.54/1.51=1.0199, not 0.98. The requested 0.90\u20131.06 pass band is retained explicitly.",
+    "Fuller Table1 tibia SEM is 0.02 cm, not the 0.04 cm transcribed in the supplied scorecard.",
+    "Interorbital distance is approximated by the inner spherical-eye gap, not center-to-center separation.",
+    "The source limb total includes fourth toe. MJCF ankle-to-digit geometry is a proxy, not a measured metatarsal segment.",
+    "Static zero-control heights are engineering gates using walking reference values; they do not establish dynamic posture validity.",
+    "A root spawn-height edit alone cannot set the eventual mechanically settled hip height.",
+    "Gate tolerances are engineering choices. Passing them is not a statistical claim about individual animals.",
+    "Tail CoM exclusion holds all remaining segments in the same neutral pose and is not an autotomy behavior experiment."
+  ],
+  "gates": [
+    {
+      "id": "total_mass_kg",
+      "label": "Total mass",
+      "actual": 0.038000000000000006,
+      "target": 0.038,
+      "lower": 0.034,
+      "upper": 0.041999999999999996,
+      "units": "kg",
+      "passed": true,
+      "provenance_refs": [
+        "body_mass_kg",
+        "body_mass_tolerance_kg"
+      ],
+      "source": "Jagnandan, Russell & Higham (2014), J Exp Biol 217:3891\u20133897, doi:10.1242/jeb.110916; Jagnandan & Higham (2017), Sci Rep 7:10865, doi:10.1038/s41598-017-11484-7; CODEX_PROMPT.md (user build brief, 2026-09-05)",
+      "confidence": "likely",
+      "notes": "Engineering population choice near lab cohorts, not one published individual or a mean of pooled animals."
+    },
+    {
+      "id": "tail_mass_fraction",
+      "label": "Tail mass fraction",
+      "actual": 0.22,
+      "target": 0.22,
+      "lower": 0.19,
+      "upper": 0.25,
+      "units": "fraction",
+      "passed": true,
+      "provenance_refs": [
+        "tail_mass_fraction",
+        "tail_mass_fraction_range"
+      ],
+      "source": "Jagnandan, Russell & Higham (2014), J Exp Biol 217:3891\u20133897, doi:10.1242/jeb.110916",
+      "confidence": "likely",
+      "notes": "Transcribed from supplied research; anatomical partition remains approximate."
+    },
+    {
+      "id": "tail_length_svl",
+      "label": "Tail chain / SVL",
+      "actual": 0.73,
+      "target": 0.73,
+      "lower": 0.69,
+      "upper": 0.77,
+      "units": "SVL",
+      "passed": true,
+      "provenance_refs": [
+        "tail_length_svl",
+        "tail_length_svl_tolerance"
+      ],
+      "source": "Rawat et al. (2019), Reptiles & Amphibians 26(1):58\u201361, Table 1, doi:10.17161/randa.v26i1.14342",
+      "confidence": "verified",
+      "notes": "87 mm / 119 mm from the ONE intact-tail specimen; second specimen had a regenerated tail. Transferred to lab-cohort body size."
+    },
+    {
+      "id": "com_intact_svl",
+      "label": "Intact CoM behind nose / SVL",
+      "actual": 0.6781123225136587,
+      "target": 0.659,
+      "lower": 0.639,
+      "upper": 0.679,
+      "units": "SVL behind snout",
+      "passed": true,
+      "provenance_refs": [
+        "com_intact_svl",
+        "com_svl_tolerance"
+      ],
+      "source": "Jagnandan, Russell & Higham (2014), J Exp Biol 217:3891\u20133897, doi:10.1242/jeb.110916",
+      "confidence": "verified",
+      "notes": "Primary Results verified: mean 65.9% SVL. Methods used frozen rigid animals and thread suspension; the original tail was reattached. Cohort SVL121.9mm, not106mm. Neutral axial projection and size transfer are explicit model assumptions, not walking CoM validation."
+    },
+    {
+      "id": "com_tail_excluded_svl",
+      "label": "Tail-excluded CoM / SVL",
+      "actual": 0.527,
+      "target": 0.527,
+      "lower": 0.507,
+      "upper": 0.547,
+      "units": "SVL behind snout",
+      "passed": true,
+      "provenance_refs": [
+        "com_tail_excluded_svl",
+        "com_svl_tolerance"
+      ],
+      "source": "Jagnandan, Russell & Higham (2014), J Exp Biol 217:3891\u20133897, doi:10.1242/jeb.110916",
+      "confidence": "verified",
+      "notes": "Primary Results verified: mean52.7%SVL. Frozen animals were measured after removing regenerated tail, not live immediately-after-autotomy posture. Audit excludes tail masses in the SAME neutral pose. Source cohort7adult females39.4g/SVL121.9mm."
+    },
+    {
+      "id": "hip_height_svl",
+      "label": "Settled hip height / SVL",
+      "actual": {
+        "L": 0.14887688620854372,
+        "R": 0.14887688620854372
+      },
+      "target": 0.15,
+      "lower": 0.13999999999999999,
+      "upper": 0.16,
+      "units": "SVL",
+      "passed": true,
+      "provenance_refs": [
+        "hip_height_svl",
+        "girdle_height_svl_tolerance"
+      ],
+      "source": "Jagnandan, Russell & Higham (2014), J Exp Biol 217:3891\u20133897, doi:10.1242/jeb.110916",
+      "confidence": "likely",
+      "notes": "Walking measurement used as a static neutral-control engineering gate. Settled stance is not the same experimental protocol."
+    },
+    {
+      "id": "shoulder_height_svl",
+      "label": "Settled shoulder height / SVL",
+      "actual": {
+        "L": 0.1093076252491482,
+        "R": 0.1093076252491482
+      },
+      "target": 0.113,
+      "lower": 0.10300000000000001,
+      "upper": 0.123,
+      "units": "SVL",
+      "passed": true,
+      "provenance_refs": [
+        "shoulder_height_svl",
+        "girdle_height_svl_tolerance"
+      ],
+      "source": "Jagnandan, Russell & Higham (2014), J Exp Biol 217:3891\u20133897, doi:10.1242/jeb.110916; CODEX_PROMPT.md (user build brief, 2026-09-05)",
+      "confidence": "likely",
+      "notes": "Build target; the supplied paper table rounds shoulder height to 0.11 SVL. Static neutral-control proxy for walking height."
+    },
+    {
+      "id": "shoulder_hip_ratio",
+      "label": "Shoulder / hip height",
+      "actual": {
+        "L": 0.7342148807171603,
+        "R": 0.7342148807171603
+      },
+      "target": 0.73,
+      "lower": 0.6799999999999999,
+      "upper": 0.78,
+      "units": "ratio",
+      "passed": true,
+      "provenance_refs": [
+        "shoulder_hip_ratio",
+        "shoulder_hip_ratio_tolerance"
+      ],
+      "source": "Jagnandan, Russell & Higham (2014), J Exp Biol 217:3891\u20133897, doi:10.1242/jeb.110916",
+      "confidence": "likely",
+      "notes": "0.11/0.15 rounded; compare bilateral ratios."
+    },
+    {
+      "id": "femur_tibia_ratio",
+      "label": "Femur / tibia length",
+      "actual": {
+        "L": 1.0198675496688743,
+        "R": 1.0198675496688743
+      },
+      "target": 1.0198675496688743,
+      "lower": 0.9,
+      "upper": 1.06,
+      "units": "ratio",
+      "passed": true,
+      "provenance_refs": [
+        "femur_tibia_ratio",
+        "femur_tibia_ratio_range"
+      ],
+      "source": "Fuller, Higham & Clark (2011), Zoology 114:104\u2013112, Table 1, doi:10.1016/j.zool.2010.11.003",
+      "confidence": "verified",
+      "notes": "Correct femur/tibia ratio is 1.0199, not 0.98. The latter reverses the ratio; requested pass band is retained separately."
+    },
+    {
+      "id": "hindlimb_length_svl",
+      "label": "Hindlimb chain / SVL",
+      "actual": {
+        "L": 0.417,
+        "R": 0.417
+      },
+      "target": 0.417,
+      "lower": 0.387,
+      "upper": 0.44699999999999995,
+      "units": "SVL",
+      "passed": true,
+      "provenance_refs": [
+        "hindlimb_length_svl",
+        "hindlimb_length_svl_tolerance"
+      ],
+      "source": "Jagnandan, Russell & Higham (2014), J Exp Biol 217:3891\u20133897, doi:10.1242/jeb.110916; Fuller, Higham & Clark (2011), Zoology 114:104\u2013112, Table 1, doi:10.1016/j.zool.2010.11.003",
+      "confidence": "likely",
+      "notes": "Cross-study ratio 0.15/0.36. Fuller absolute total/SVL is 4.41/10.65=0.414. Total limb includes fourth toe; current model digit is an engineering proxy."
+    },
+    {
+      "id": "hip_proret_range_deg",
+      "label": "Hip pro/retraction range",
+      "actual": {
+        "L_joint_deg": 90.0,
+        "L_actuator_deg": 90.0,
+        "R_joint_deg": 90.0,
+        "R_actuator_deg": 90.0
+      },
+      "target": 90.0,
+      "lower": 90.0,
+      "upper": null,
+      "units": "deg",
+      "passed": true,
+      "provenance_refs": [
+        "hip_proret_min_range_deg"
+      ],
+      "source": "Jagnandan & Higham (2017), Sci Rep 7:10865, doi:10.1038/s41598-017-11484-7; CODEX_PROMPT.md (user build brief, 2026-09-05)",
+      "confidence": "likely",
+      "notes": "Engineering range allowance for observed 82.57-degree excursion, NOT a cadaveric anatomical ROM. Both joint limits and position actuator ranges must permit it."
+    },
+    {
+      "id": "hip_rot_range_deg",
+      "label": "Hip rotation range",
+      "actual": {
+        "L_joint_deg": 29.999999999999996,
+        "L_actuator_deg": 29.999999999999996,
+        "R_joint_deg": 29.999999999999996,
+        "R_actuator_deg": 29.999999999999996
+      },
+      "target": 35.0,
+      "lower": null,
+      "upper": 35.0,
+      "units": "deg",
+      "passed": true,
+      "provenance_refs": [
+        "hip_rot_max_range_deg"
+      ],
+      "source": "Arnold et al. (2014), Iguana proxy as cited in docs/research/gecko_scorecard.md",
+      "confidence": "uncertain",
+      "notes": "Cross-species engineering ceiling from supplied research, not leopard-gecko ROM. Primary source not independently rechecked."
+    },
+    {
+      "id": "head_width_svl",
+      "label": "Skin head width / SVL",
+      "actual": 0.185,
+      "target": 0.185,
+      "lower": 0.165,
+      "upper": 0.205,
+      "units": "SVL",
+      "passed": true,
+      "provenance_refs": [
+        "head_width_svl",
+        "head_width_svl_tolerance"
+      ],
+      "source": "Rawat et al. (2019), Reptiles & Amphibians 26(1):58\u201361, Table 1, doi:10.17161/randa.v26i1.14342",
+      "confidence": "verified",
+      "notes": "22/119=0.185 for specimen1; specimen2 21/109=0.193. Gate measures skin geometry excluding protruding eye spheres; collision width is reported separately."
+    },
+    {
+      "id": "interorbital_distance_m",
+      "label": "Inner-eye gap",
+      "actual": 0.01,
+      "target": 0.01,
+      "lower": 0.009000000000000001,
+      "upper": 0.011,
+      "units": "m",
+      "passed": true,
+      "provenance_refs": [
+        "interorbital_distance_m",
+        "interorbital_distance_tolerance_m"
+      ],
+      "source": "Rawat et al. (2019), Reptiles & Amphibians 26(1):58\u201361, Table 1, doi:10.17161/randa.v26i1.14342",
+      "confidence": "verified",
+      "notes": "Both specimens measured 10 mm between eyes. Model uses shortest inner gap between visual spherical eyes, not center separation; that landmark mapping remains an engineering approximation."
+    }
+  ],
+  "passed_count": 14,
+  "gate_count": 14,
+  "all_passed": true,
+  "candidate_derivations": {
+    "source_sha256": "c4293da9a0e86ed3e43d23c561b55fec32ccc9b32ec99699737c4294345c3c73",
+    "registry_sha256": "c6c6f0d55a57fb0ef16c3886b18e0d99aa9a3a8d5fecdd8dd6f632842c7acc4e",
+    "tail_length_scale": 0.7034545454545453,
+    "hind_foot_scale": 0.8438083199062558,
+    "fore_chain_scale": 0.7906648654334761,
+    "actuator_scale": 0.6209150326797386,
+    "mass_partition": "bounded relative-entropy non-tail fit + closest density-guarded tail fit",
+    "inverse_mass_calibration": {
+      "primary_paper": "https://doi.org/10.1242/jeb.110916",
+      "source_protocol": "Frozen rigid animals, thread suspension; original tail reattached with glue. Source7females39.4g/SVL121.9mm.",
+      "coordinate_assumption": "Normalized longitudinal distance from snout; neutral pose approximates source rigid specimen pose (not provided in paper).",
+      "unknown_degrees_of_freedom": {
+        "non_tail_symmetric_mass_groups": 12,
+        "non_tail_mass_and_moment_constraints": 2,
+        "tail_mass_variables": 5,
+        "tail_mass_and_moment_constraints_requested": 2
+      },
+      "body_fit": {
+        "target_feasible": true,
+        "feasible_centroid_range": [
+          0.46399838976221,
+          0.7580392669083553
+        ],
+        "solution": "minimum relative-entropy mass change",
+        "requested_com_svl": 0.527,
+        "achieved_com_svl": 0.5269999999999999,
+        "bounds_multiple_prior": [
+          0.5,
+          2.0
+        ],
+        "groups": [
+          "trunk_middle",
+          "trunk_anterior",
+          "neck",
+          "head",
+          "humerus",
+          "forearm",
+          "manus",
+          "trunk_posterior",
+          "pelvis",
+          "femur",
+          "tibia",
+          "pes"
+        ],
+        "prior_group_masses_kg": [
+          0.005132467532467533,
+          0.005132467532467533,
+          0.0012831168831168832,
+          0.003207792207792208,
+          0.0015397402597402596,
+          0.0010264935064935065,
+          0.0002566233766233766,
+          0.005132467532467533,
+          0.003207792207792208,
+          0.002052987012987013,
+          0.0011548051948051948,
+          0.0005132467532467532
+        ],
+        "fitted_group_masses_kg": [
+          0.004893815256829122,
+          0.006007445605964718,
+          0.0017346030445535244,
+          0.005238457205532683,
+          0.0018340330296954918,
+          0.001238343701391039,
+          0.0003311443685730272,
+          0.0039866241558965424,
+          0.002086775718687037,
+          0.00128745218727595,
+          0.0006874814856235148,
+          0.0003138242399773543
+        ]
+      },
+      "tail_fit": {
+        "target_feasible": false,
+        "feasible_centroid_range": [
+          1.2138741932439032,
+          1.2348330539652388
+        ],
+        "solution": "minimum feasible centroid",
+        "requested_com_svl": 1.127,
+        "achieved_com_svl": 1.2138741932439032,
+        "coordinates_svl": [
+          1.092909090909091,
+          1.2654545454545454,
+          1.4180909090909088,
+          1.5541363636363632,
+          1.673590909090909
+        ],
+        "fitted_masses_kg": [
+          0.0042819129123997605,
+          0.002426619563041428,
+          0.001292166525755036,
+          0.00030356766547044354,
+          5.5733333333333344e-05
+        ],
+        "capsule_volumes_m3": [
+          2.5687525547391272e-06,
+          1.4557477766284523e-06,
+          7.751806568904231e-07,
+          3.2788350326574107e-07,
+          9.866842887029284e-08
+        ],
+        "effective_density_kg_m3": [
+          1666.923076923077,
+          1666.923076923077,
+          1666.923076923077,
+          925.8400085606314,
+          564.8547764614663
+        ],
+        "guard_density_kg_m3": 1666.923076923077,
+        "source_approximate_bulk_density_kg_m3": 1111.2820512820513
+      },
+      "geometry_lower_bound": {
+        "minimum_fraction_tail_mass_in_first_segment_for_exact_mean": 0.8024236037934673,
+        "minimum_first_segment_mass_kg": 0.006708261327713388,
+        "minimum_first_segment_density_kg_m3": 2611.485997488245,
+        "minimum_first_density_with_positive_distal_guards_kg_m3": 2792.986846361607,
+        "assumption": "All remaining tail mass optimistically at segment2 centroid; any mass farther caudal tightens this bound."
+      },
+      "density_guard_sensitivity": [
+        {
+          "factor": 1.0,
+          "effective_density_cap_kg_m3": 1111.2820512820513,
+          "total_mass_capacity_kg": 0.00580781884025327,
+          "mass_feasible": false,
+          "reason": "Total mass is infeasible under selected bounds"
+        },
+        {
+          "factor": 1.35,
+          "effective_density_cap_kg_m3": 1500.2307692307693,
+          "total_mass_capacity_kg": 0.007840555434341916,
+          "mass_feasible": false,
+          "reason": "Total mass is infeasible under selected bounds"
+        },
+        {
+          "factor": 1.5,
+          "effective_density_cap_kg_m3": 1666.923076923077,
+          "total_mass_capacity_kg": 0.008711728260379904,
+          "mass_feasible": true,
+          "exact_tail_com_target_feasible": false,
+          "minimum_tail_com_svl": 1.2138741932439032,
+          "achieved_tail_com_svl": 1.2138741932439032,
+          "whole_com_if_body_target_exact_svl": 0.6781123225136587,
+          "segment_masses_kg": [
+            0.0042819129123997605,
+            0.0024266195630414274,
+            0.0012921665257550358,
+            0.0003035676654704442,
+            5.5733333333333344e-05
+          ]
+        },
+        {
+          "factor": 1.62,
+          "effective_density_cap_kg_m3": 1800.2769230769231,
+          "total_mass_capacity_kg": 0.009408666521210298,
+          "mass_feasible": true,
+          "exact_tail_com_target_feasible": false,
+          "minimum_tail_com_svl": 1.1938792510578453,
+          "achieved_tail_com_svl": 1.1938792510578453,
+          "whole_com_if_body_target_exact_svl": 0.6737134352327261,
+          "segment_masses_kg": [
+            0.004624465945391742,
+            0.002620749128084742,
+            0.0009475849265235175,
+            0.00011146666666666669,
+            5.5733333333333344e-05
+          ]
+        },
+        {
+          "factor": 1.8,
+          "effective_density_cap_kg_m3": 2000.3076923076924,
+          "total_mass_capacity_kg": 0.010454073912455886,
+          "mass_feasible": true,
+          "exact_tail_com_target_feasible": false,
+          "minimum_tail_com_svl": 1.1690258933309952,
+          "achieved_tail_com_svl": 1.1690258933309952,
+          "whole_com_if_body_target_exact_svl": 0.668245696532819,
+          "segment_masses_kg": [
+            0.005138295494879712,
+            0.002887304505120289,
+            0.00016720000000000003,
+            0.00011146666666666669,
+            5.5733333333333344e-05
+          ]
+        },
+        {
+          "factor": 2.0,
+          "effective_density_cap_kg_m3": 2222.5641025641025,
+          "total_mass_capacity_kg": 0.01161563768050654,
+          "mass_feasible": true,
+          "exact_tail_com_target_feasible": false,
+          "minimum_tail_com_svl": 1.1572424067314087,
+          "achieved_tail_com_svl": 1.1572424067314087,
+          "whole_com_if_body_target_exact_svl": 0.6656533294809099,
+          "segment_masses_kg": [
+            0.005709217216533014,
+            0.0023163827834669875,
+            0.00016720000000000003,
+            0.00011146666666666669,
+            5.5733333333333344e-05
+          ]
+        },
+        {
+          "factor": 2.35,
+          "effective_density_cap_kg_m3": 2611.512820512821,
+          "total_mass_capacity_kg": 0.013648374274595186,
+          "mass_feasible": true,
+          "exact_tail_com_target_feasible": false,
+          "minimum_tail_com_svl": 1.1366213051821326,
+          "achieved_tail_com_svl": 1.1366213051821326,
+          "whole_com_if_body_target_exact_svl": 0.6611166871400692,
+          "segment_masses_kg": [
+            0.0067083302294262915,
+            0.0013172697705737097,
+            0.00016720000000000003,
+            0.00011146666666666669,
+            5.5733333333333344e-05
+          ]
+        },
+        {
+          "factor": 2.5,
+          "effective_density_cap_kg_m3": 2778.205128205128,
+          "total_mass_capacity_kg": 0.014519547100633176,
+          "mass_feasible": true,
+          "exact_tail_com_target_feasible": false,
+          "minimum_tail_com_svl": 1.1277836902324427,
+          "achieved_tail_com_svl": 1.1277836902324427,
+          "whole_com_if_body_target_exact_svl": 0.6591724118511375,
+          "segment_masses_kg": [
+            0.007136521520666267,
+            0.0008890784793337343,
+            0.00016720000000000003,
+            0.00011146666666666669,
+            5.5733333333333344e-05
+          ]
+        }
+      ],
+      "mass_table": [
+        {
+          "body": "trunk_middle",
+          "prior_mass_kg": 0.005132467532467533,
+          "fitted_mass_kg": 0.004893815256829122,
+          "neutral_axial_com_svl": 0.6084905660377359
+        },
+        {
+          "body": "trunk_anterior",
+          "prior_mass_kg": 0.005132467532467533,
+          "fitted_mass_kg": 0.006007445605964718,
+          "neutral_axial_com_svl": 0.4339622641509434
+        },
+        {
+          "body": "neck",
+          "prior_mass_kg": 0.0012831168831168832,
+          "fitted_mass_kg": 0.0017346030445535244,
+          "neutral_axial_com_svl": 0.3113207547169812
+        },
+        {
+          "body": "head",
+          "prior_mass_kg": 0.003207792207792208,
+          "fitted_mass_kg": 0.005238457205532683,
+          "neutral_axial_com_svl": 0.1504716981132076
+        },
+        {
+          "body": "humerus_L",
+          "prior_mass_kg": 0.0007698701298701298,
+          "fitted_mass_kg": 0.0009170165148477459,
+          "neutral_axial_com_svl": 0.4190735404685813
+        },
+        {
+          "body": "forearm_L",
+          "prior_mass_kg": 0.0005132467532467532,
+          "fitted_mass_kg": 0.0006191718506955195,
+          "neutral_axial_com_svl": 0.40824360349071653
+        },
+        {
+          "body": "manus_L",
+          "prior_mass_kg": 0.0001283116883116883,
+          "fitted_mass_kg": 0.0001655721842865136,
+          "neutral_axial_com_svl": 0.35093893275514587
+        },
+        {
+          "body": "humerus_R",
+          "prior_mass_kg": 0.0007698701298701298,
+          "fitted_mass_kg": 0.0009170165148477459,
+          "neutral_axial_com_svl": 0.4190735404685813
+        },
+        {
+          "body": "forearm_R",
+          "prior_mass_kg": 0.0005132467532467532,
+          "fitted_mass_kg": 0.0006191718506955195,
+          "neutral_axial_com_svl": 0.40824360349071653
+        },
+        {
+          "body": "manus_R",
+          "prior_mass_kg": 0.0001283116883116883,
+          "fitted_mass_kg": 0.0001655721842865136,
+          "neutral_axial_com_svl": 0.35093893275514587
+        },
+        {
+          "body": "trunk_posterior",
+          "prior_mass_kg": 0.005132467532467533,
+          "fitted_mass_kg": 0.0039866241558965424,
+          "neutral_axial_com_svl": 0.7830188679245284
+        },
+        {
+          "body": "pelvis",
+          "prior_mass_kg": 0.003207792207792208,
+          "fitted_mass_kg": 0.002086775718687037,
+          "neutral_axial_com_svl": 0.9339622641509434
+        },
+        {
+          "body": "femur_L",
+          "prior_mass_kg": 0.0010264935064935065,
+          "fitted_mass_kg": 0.000643726093637975,
+          "neutral_axial_com_svl": 0.9651755300025622
+        },
+        {
+          "body": "tibia_L",
+          "prior_mass_kg": 0.0005774025974025974,
+          "fitted_mass_kg": 0.0003437407428117574,
+          "neutral_axial_com_svl": 1.0094584638346664
+        },
+        {
+          "body": "pes_L",
+          "prior_mass_kg": 0.0002566233766233766,
+          "fitted_mass_kg": 0.00015691211998867716,
+          "neutral_axial_com_svl": 0.986706080498377
+        },
+        {
+          "body": "femur_R",
+          "prior_mass_kg": 0.0010264935064935065,
+          "fitted_mass_kg": 0.000643726093637975,
+          "neutral_axial_com_svl": 0.9651755300025622
+        },
+        {
+          "body": "tibia_R",
+          "prior_mass_kg": 0.0005774025974025974,
+          "fitted_mass_kg": 0.0003437407428117574,
+          "neutral_axial_com_svl": 1.0094584638346664
+        },
+        {
+          "body": "pes_R",
+          "prior_mass_kg": 0.0002566233766233766,
+          "fitted_mass_kg": 0.00015691211998867716,
+          "neutral_axial_com_svl": 0.986706080498377
+        },
+        {
+          "body": "tail1",
+          "prior_mass_kg": 0.002786666666666667,
+          "fitted_mass_kg": 0.0042819129123997605,
+          "neutral_axial_com_svl": 1.092909090909091
+        },
+        {
+          "body": "tail2",
+          "prior_mass_kg": 0.0022293333333333336,
+          "fitted_mass_kg": 0.002426619563041428,
+          "neutral_axial_com_svl": 1.2654545454545454
+        },
+        {
+          "body": "tail3",
+          "prior_mass_kg": 0.001672,
+          "fitted_mass_kg": 0.001292166525755036,
+          "neutral_axial_com_svl": 1.4180909090909088
+        },
+        {
+          "body": "tail4",
+          "prior_mass_kg": 0.0011146666666666668,
+          "fitted_mass_kg": 0.00030356766547044354,
+          "neutral_axial_com_svl": 1.5541363636363632
+        },
+        {
+          "body": "tail5",
+          "prior_mass_kg": 0.0005573333333333334,
+          "fitted_mass_kg": 5.5733333333333344e-05,
+          "neutral_axial_com_svl": 1.673590909090909
+        }
+      ],
+      "limitations": [
+        "Fit uses calibration targets, not held-out validation.",
+        "Every per-segment mass remains inferred and non-unique; the entropy prior and bounds are invented engineering assumptions.",
+        "Capsules are collision envelopes, not segmented anatomical tissue volumes; overlap makes the summed volume overestimate occupied solid volume.",
+        "Density-cap feasibility is conditional on the engineering guard, not proof of a universal biological impossibility.",
+        "Whole-animal and tail-excluded mean CoMs plus mean tail fraction ignore between-animal covariance; exact pooled means need not obey this identity.",
+        "No geometry, landmarks, segment lengths, total mass, tail fraction, joint topology or actuator settings are moved by the inverse fit."
+      ]
+    },
+    "warning": "CoM acceptance bands can pass although the paired mean targets are infeasible under the selected guard. Calibration is not held-out validation."
+  }
+}

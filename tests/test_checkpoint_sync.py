@@ -1,9 +1,9 @@
 import hashlib
 import tempfile
 import unittest
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
-from utils.sync_checkpoints import EXPECTED_FILES, validate_manifest, verify_bundle
+from utils.sync_checkpoints import EXPECTED_FILES, Puller, validate_manifest, verify_bundle
 
 
 class CheckpointSyncTests(unittest.TestCase):
@@ -33,6 +33,13 @@ class CheckpointSyncTests(unittest.TestCase):
         manifest['complete'] = False
         with self.assertRaises(ValueError):
             validate_manifest(manifest)
+
+    def test_discovery_ignores_unpublished_staging_bundles(self):
+        puller = object.__new__(Puller)
+        puller.remote_root = PurePosixPath('/session/checkpoints')
+        puller.ssh = lambda command: ('/session/checkpoints/.step-0.incomplete-abc/manifest.json\n'
+                                      '/session/checkpoints/step-0/manifest.json\n')
+        self.assertEqual(puller.manifests(), [PurePosixPath('/session/checkpoints/step-0/manifest.json')])
 
 
 if __name__ == '__main__':

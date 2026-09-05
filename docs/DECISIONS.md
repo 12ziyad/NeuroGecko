@@ -50,6 +50,24 @@ Primary-source checks used in the morphology implementation include Fuller et al
 2011's author-hosted PDF: https://biomechanics.ucr.edu/Fuller_etal_2011.pdf.
 More detailed source/measurement definitions accompany the audit and registry.
 
+## Static fitting and timing-prior limits
+
+Keep the lab morphology opt-in, with both v1 and v2 retained. Fitting mass
+distribution to published CoM constraints is an inverse calibration, not a claim
+that per-segment animal masses were measured. Bound positive changes and record
+the prior and density guard as invented. Passing a tolerance band must never be
+renamed matching the exact population mean or validating held-out behavior.
+
+The supplied EMG PDF's Table 3, not Table 1, gives hindlimb burst timing. Table 1
+reports stance integrated activity. Use two separate gastrocnemius bursts;
+54.50% is relative to the same muscle's observed maximum, not a motor-force
+command or a percent of the first burst. The smoothstep timing prior is tested
+but remains separate until the muscle-to-actuator mapping is explicitly designed.
+
+The AWS instance has CUDA but currently renders through Mesa llvmpipe. Preserve
+the measured CPU-rendering baseline and record graphics identity in profiles.
+Do not silently install/replace GPU drivers or change the original machine setup.
+
 ## Frozen compatibility constraints
 
 Keep the legacy frequency at 1.1888 Hz. Do not add a shoulder joint. Do not mutate

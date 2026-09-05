@@ -1,0 +1,29 @@
+{
+  "caveat": "Separate component timing, not training throughput: physics evolves at neutral control; rendering uses a reset pose; actor prediction includes data transfer and output synchronization",
+  "control_dt_s": 0.02,
+  "device": "cuda",
+  "gpu": "NVIDIA A10G",
+  "mujoco": "3.9.0",
+  "physics_25_substeps_equivalent_ms": 1.6442543499920248,
+  "physics_dt_s": 0.0008,
+  "physics_step": {
+    "iterations": 1000,
+    "mean_ms": 0.06577017399968099,
+    "total_seconds": 0.06577017399968099
+  },
+  "platform": "Linux-6.17.0-1019-aws-x86_64-with-glibc2.39",
+  "policy_render_64x64": {
+    "iterations": 1000,
+    "mean_ms": 22.30458627200005,
+    "total_seconds": 22.30458627200005
+  },
+  "python": "3.12.3",
+  "renderer": "egl",
+  "torch": "2.12.0+cu130",
+  "torch_threads": 1,
+  "visual_actor_predict": {
+    "iterations": 1000,
+    "mean_ms": 0.9631627260000641,
+    "total_seconds": 0.9631627260000641
+  }
+}

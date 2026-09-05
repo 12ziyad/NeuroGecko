@@ -20,6 +20,35 @@ the independently downloaded AWS `files.sha256` manifest.
 
 ## Interpretation
 
+### New safety-test run (separate from the 55-file recovery)
+
+`recovery_pipeline_smoke` is a **256-step plumbing test, not a new trained walker**.
+It ran on the existing AWS A10G with four subprocess environments. Before
+learning and at each checkpoint, the laptop downloaded and verified the paired
+model, normalization state and full training configuration before acknowledging.
+The default production checkpoint interval is 100,000 aggregate steps; this
+tiny test deliberately used 128 to exercise the path.
+
+Local bundles: `models_recovered/build-20260904T233438Z/recovery_pipeline_smoke/`.
+Remote bundles: `build_sessions/build-20260904T233438Z/models/recovery_pipeline_smoke/checkpoints/`.
+
+| Bundle | Manifest SHA256 |
+|---|---|
+| step-0 | `e7408a4a3292929b612c1e823e91b69b20d4c6e8e8faa959f879f0776563fea2` |
+| step-128 | `137bd57a1f154d82bf6126f8a62f1840ae73b81273317fac6b4a477ed308ae59` |
+| step-256 | `aae77df24accfeae6547f0138d03fe6f89984e27a262f0bd3ca431d88b1abc72` |
+| step-256-final | `61573d05e28b2763d37b23dd7b7c3a8eef03ffee429c4f4dbb6caa5321234103` |
+
+Final paired model SHA256: `776ba320f6e45cf09baa24025e5ab8e066e5671418b74f1a7986c22535f3e98e`.
+Final normalizer SHA256: `5b31f236234a5bce71851db4e471761bb3ae24da8f658a7b641f8677355592ba`.
+Full config SHA256: `27ba4a22878f423b335095f0dcd7765fed3ecc3343d37505ae331c1b13a6fa62`.
+All three exact files are included in each downloaded bundle. The final pair
+successfully resumed locally from 256 to 320 steps with 10 additional optimizer
+updates; original files remained unchanged. See
+`artifacts/evidence/checkpoint_offhost_resume.json` for that verification.
+
+### Recovered lineage
+
 - `brain_v1_patch38c_visual_dagger_80k_seed0`: recovered visual student / named champion.
 - `brain_v1_patch37b_dagger_200k_seed1`: recovered privileged teacher.
 - `v4_5b_speed_polish_1m`: frozen low-level walker and normalization state.

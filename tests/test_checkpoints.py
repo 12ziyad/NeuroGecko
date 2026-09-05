@@ -4,6 +4,7 @@ import argparse
 import json
 from pathlib import Path
 import tempfile
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
@@ -18,7 +19,11 @@ from common.checkpoints import (
     mirror_checkpoint_bundle, save_checkpoint_bundle, sha256_file,
     verify_checkpoint_bundle, wait_for_backup_receipt,
 )
-from train.train_walk_ppo import reserve_run_directory, validate_training_args
+from train.train_walk_ppo import (
+    environment_calibration_snapshot, gait_profile_parameters, make_env,
+    reserve_run_directory, resolve_training_contact_threshold,
+    resume_gait_contract, validate_resume_calibration, validate_training_args,
+)
 
 
 class FakeModel:
@@ -127,12 +132,99 @@ class BundleTests(unittest.TestCase):
         defaults = dict(resume_from=None, resume_vec=None, reset_timesteps=False,
                         run="safe", envs=1, steps=32, n_steps=8, batch=8,
                         eval_freq=1000, checkpoint_freq=8, max_wall_seconds=None,
-                        backup_ack_timeout=1.0, xml_path=None)
+                        backup_ack_timeout=1.0, xml_path=None, gait_profile="legacy")
         validate_training_args(argparse.Namespace(**defaults))
         for change in ({"resume_from": "unpaired.zip"}, {"checkpoint_freq": 0},
                        {"max_wall_seconds": float("nan")}, {"run": "../escape"}):
             with self.assertRaises(ValueError):
                 validate_training_args(argparse.Namespace(**(defaults | change)))
+
+    def resume_args(self, model_path, normalizer_path, gait_profile):
+        return argparse.Namespace(
+            resume_from=str(model_path), resume_vec=str(normalizer_path),
+            reset_timesteps=False, run="resume-test", envs=1, steps=32,
+            n_steps=8, batch=8, eval_freq=1000, checkpoint_freq=8,
+            max_wall_seconds=None, backup_ack_timeout=1.0, xml_path=None,
+            gait_profile=gait_profile,
+        )
+
+    def test_old_resume_explicitly_infers_legacy_and_rejects_lab(self):
+        bundle = self.bundle()
+        args = self.resume_args(bundle / "model.zip", bundle / "vecnormalize.pkl", "legacy")
+        validate_training_args(args)
+        contract = resume_gait_contract(args.resume_from)
+        self.assertEqual(contract["gait_profile"], "legacy")
+        self.assertTrue(contract["legacy_inferred_from_missing_metadata"])
+        args.gait_profile = "lab"
+        with self.assertRaisesRegex(ValueError, "Resume gait profile"):
+            validate_training_args(args)
+
+    def test_explicit_lab_resume_requires_matching_profile_and_parameters(self):
+        bundle = save_checkpoint_bundle(FakeModel(), FakeNormalizer(), self.run, {
+            "gait_profile": "lab", "gait_profile_parameters": gait_profile_parameters("lab")
+        })
+        args = self.resume_args(bundle / "model.zip", bundle / "vecnormalize.pkl", "lab")
+        validate_training_args(args)
+        self.assertFalse(resume_gait_contract(args.resume_from)["legacy_inferred_from_missing_metadata"])
+        args.gait_profile = "legacy"
+        with self.assertRaisesRegex(ValueError, "Resume gait profile"):
+            validate_training_args(args)
+
+    def test_lab_resume_rejects_changed_registry_parameters(self):
+        previous = gait_profile_parameters("lab")
+        previous["stance_ratios"][0] -= .01  # Synthetic incompatible fixture.
+        bundle = save_checkpoint_bundle(FakeModel(), FakeNormalizer(), self.run, {
+            "gait_profile": "lab", "gait_profile_parameters": previous
+        })
+        args = self.resume_args(bundle / "model.zip", bundle / "vecnormalize.pkl", "lab")
+        with self.assertRaisesRegex(ValueError, "Saved gait parameters differ"):
+            validate_training_args(args)
+
+    def test_make_env_forwards_selected_profile(self):
+        with patch("train.train_walk_ppo.GeckoWalkEnv") as constructor:
+            make_env(17, gait_profile="lab", xml_path="candidate.xml")()
+            self.assertEqual(constructor.call_args.kwargs["gait_profile"], "lab")
+            self.assertEqual(constructor.call_args.kwargs["xml_path"], "candidate.xml")
+            self.assertIsNone(constructor.call_args.kwargs["contact_thresh"])
+
+    def test_contact_threshold_default_is_profile_aware(self):
+        self.assertEqual(resolve_training_contact_threshold("legacy", None), .0564)
+        self.assertIsNone(resolve_training_contact_threshold("lab", None))
+        self.assertEqual(resolve_training_contact_threshold("lab", .02), .02)
+        with self.assertRaises(ValueError):
+            resolve_training_contact_threshold("legacy", float("nan"))
+
+    def test_actual_worker_calibration_is_recorded(self):
+        calibration = {"profile": "lab", "effective_contact_threshold_N": .03}
+        data = {"reward_calibration": [calibration, dict(calibration)],
+                "contact_threshold": [.03, .03],
+                "reward_fn": [SimpleNamespace(w={"slow_penalty": 0.}), SimpleNamespace(w={"slow_penalty": 0.})]}
+        snapshot = environment_calibration_snapshot(SimpleNamespace(get_attr=lambda name: data[name]))
+        self.assertEqual(snapshot["effective_contact_threshold_N"], .03)
+        self.assertEqual(snapshot["effective_reward_cfg"], {"slow_penalty": 0.})
+        data["contact_threshold"][1] = .04
+        with self.assertRaises(ValueError):
+            environment_calibration_snapshot(SimpleNamespace(get_attr=lambda name: data[name]))
+
+    def test_lab_resume_calibration_guard(self):
+        calibration = {"model_inputs": {"mass_kg": .038}, "reward_overrides": {"slow_penalty": 0.}}
+        source = {"gait_profile": "lab", "reward_calibration": calibration,
+                  "effective_contact_threshold_N": .03, "xml_sha256": "test_xml_hash",
+                  "effective_reward_cfg": {"slow_penalty": 0., "progress": 7.}}
+        self.run.mkdir(parents=True)
+        atomic_json(self.run / "train_config.json", source)
+        args = argparse.Namespace(resume_from=str(self.run / "model.zip"), gait_profile="lab")
+        current = json.loads(json.dumps(source))
+        current["effective_reward_cfg"]["progress"] = 12.
+        changes = validate_resume_calibration(args, current)
+        self.assertEqual(changes["reward.progress"], {"saved": 7., "requested_effective": 12.})
+        current["effective_contact_threshold_N"] = .04
+        with self.assertRaisesRegex(ValueError, "contact threshold changed"):
+            validate_resume_calibration(args, current)
+        current["effective_contact_threshold_N"] = .03
+        current["xml_sha256"] = "changed"
+        with self.assertRaisesRegex(ValueError, "XML differs"):
+            validate_resume_calibration(args, current)
 
     def test_callback_counts_aggregate_steps_not_calls(self):
         model = FakeModel()

@@ -112,6 +112,45 @@ class GaitAnalysisTests(unittest.TestCase):
         self.assertEqual(result["limbs"]["HL"]["complete_strides"], 0)
         self.assertEqual(result["observed_footfall_orders_HR_anchored"], {})
 
+    def test_excess_contact_cycles_warn_without_forcefitting(self):
+        trace = synthetic_trace()
+        trace["metadata"]["frequency_hz"] = 1.1888
+        # 5 Hz touchdown cycles remain after 40 ms debounce: a deliberately
+        # incompatible contact trace, not a biological or oscillator stride.
+        ticks = np.arange(len(trace["samples"]["time_s"]))
+        trace["samples"]["foot_force_N"][:] = ((ticks % 10) < 6)[:, None]
+        result = analyze_trace(trace, settle_s=1.)
+        self.assertEqual(len(result["contact_quality"]["warnings"]), 4)
+        for foot in FEET:
+            limb = result["limbs"][foot]
+            diagnostic = limb["contact_cycle_diagnostic"]
+            self.assertTrue(diagnostic["gross_frequency_mismatch_warning"])
+            self.assertAlmostEqual(diagnostic["observed_contact_cycle_rate_hz"], 5.)
+            self.assertAlmostEqual(limb["stride_frequency_hz"]["mean"], 5.)
+            self.assertGreater(limb["complete_strides"], 20)
+        self.assertIn("NOT verified biological", result["cycle_metric_semantics"])
+
+    def test_slow_contact_cycles_warn_but_matched_and_unknown_do_not(self):
+        trace = synthetic_trace()
+        trace["metadata"]["frequency_hz"] = 3.
+        result = analyze_trace(trace, settle_s=1.)
+        self.assertEqual(len(result["contact_quality"]["warnings"]), 4)
+        trace["metadata"]["frequency_hz"] = 1.
+        matched = analyze_trace(trace, settle_s=1.)
+        self.assertEqual(matched["contact_quality"]["warnings"], [])
+        self.assertFalse(matched["limbs"]["HL"]["contact_cycle_diagnostic"]["gross_frequency_mismatch_warning"])
+        del trace["metadata"]["frequency_hz"]
+        unknown = analyze_trace(trace, settle_s=1.)
+        self.assertIsNone(unknown["limbs"]["HL"]["contact_cycle_diagnostic"]["gross_frequency_mismatch_warning"])
+        self.assertEqual(unknown["contact_quality"]["warnings"], [])
+
+    def test_invalid_recorded_frequency_is_not_silently_replaced(self):
+        trace = synthetic_trace()
+        for frequency in (0., float("nan"), -1.):
+            trace["metadata"]["frequency_hz"] = frequency
+            with self.assertRaisesRegex(ValueError, "commanded frequency"):
+                analyze_trace(trace, settle_s=1.)
+
     def test_coarse_gait_rejected(self):
         with self.assertRaisesRegex(ValueError, "50 Hz"):
             analyze_trace(synthetic_trace(dt=.04), settle_s=1.)

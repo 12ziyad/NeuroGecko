@@ -1,0 +1,44 @@
+{
+  "actor_sha256": "90b79bb0805ad243365fbbea72bf219ee6f01a122be17205a427934dc16ff7cb",
+  "brain_config_sha256": "7074a6414acb176a1144477081f3a6ff390f5dadfe407d815832b78957c18c25",
+  "camera": "sealed",
+  "caveat": "Marker-proximity scores, not prey-strike or whole-brain validation",
+  "complete": true,
+  "device": "cpu",
+  "eat_radius_m": 0.1,
+  "elapsed_wall_seconds": 140.33803256800002,
+  "episodes": [
+    {
+      "eats": 7,
+      "fell": false,
+      "mean_food_visible_fraction": 0.01390869140625,
+      "seed": 100,
+      "steps": 1000
+    },
+    {
+      "eats": 6,
+      "fell": false,
+      "mean_food_visible_fraction": 0.012978271484375,
+      "seed": 101,
+      "steps": 1000
+    },
+    {
+      "eats": 7,
+      "fell": false,
+      "mean_food_visible_fraction": 0.0132216796875,
+      "seed": 102,
+      "steps": 1000
+    }
+  ],
+  "episodes_with_eats": 3,
+  "falls": 0,
+  "food_half_angle_deg": 60.0,
+  "kind": "legacy_visual_student_task_evaluation",
+  "max_steps": 1000,
+  "normalizer_sha256": "32377b7763e901e3e078ec2323e7a2ae9e75e3e43cd9a3773b2cebdf98aea4dd",
+  "privileged_input": false,
+  "requested_episodes": 3,
+  "total_eats": 20,
+  "walker_sha256": "77b7a99d56315f3e5edb1f352e465e13683b00ab986682c82abc55fac4832dfe",
+  "xml_sha256": "58cdb1e8a84290c8eb1aeec9d12f47714a9ed13ed1eed7ac6306fb664daadf62"
+}

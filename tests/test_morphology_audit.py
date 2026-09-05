@@ -20,6 +20,7 @@ from common.morphology_audit import (
     format_table, sphere_surface_gap, weighted_com,
 )
 from common.provenance import load_registry, parameter_value
+from utils.build_lab_morphology import DEFAULT_OUTPUT, V2_OUTPUT, bounded_entropy_fit, extreme_masses, make_candidate
 
 
 class MeasurementMathTests(unittest.TestCase):
@@ -114,6 +115,82 @@ class AuditContractTests(unittest.TestCase):
                 np.testing.assert_array_equal(old_data.qpos, new_data.qpos)
                 np.testing.assert_array_equal(old_data.qvel, new_data.qvel)
                 np.testing.assert_array_equal(old_data.sensordata, new_data.sensordata)
+
+
+class LabCandidateTests(unittest.TestCase):
+    def test_generator_is_reproducible_and_does_not_change_legacy(self):
+        before = DEFAULT_XML.read_bytes()
+        generated, derivations = make_candidate()
+        self.assertEqual(generated.strip(), DEFAULT_OUTPUT.read_text(encoding="utf-8").strip())
+        self.assertEqual(before, DEFAULT_XML.read_bytes())
+        self.assertAlmostEqual(derivations["actuator_scale"], .038 / .0612)
+
+    def test_candidate_compiles_without_action_or_observation_topology_change(self):
+        legacy = mujoco.MjModel.from_xml_path(str(DEFAULT_XML))
+        candidate = mujoco.MjModel.from_xml_path(str(DEFAULT_OUTPUT))
+        self.assertEqual((legacy.nq, legacy.nv, legacy.nu, legacy.nsensor),
+                         (candidate.nq, candidate.nv, candidate.nu, candidate.nsensor))
+        self.assertEqual(len(candidate.key("stand").qpos), candidate.nq)
+        self.assertEqual([legacy.actuator(i).name for i in range(legacy.nu)],
+                         [candidate.actuator(i).name for i in range(candidate.nu)])
+
+    def test_regenerated_stand_stays_finite_with_all_feet_and_no_belly_contact(self):
+        model = mujoco.MjModel.from_xml_path(str(DEFAULT_OUTPUT))
+        data = mujoco.MjData(model)
+        mujoco.mj_resetDataKeyframe(model, data, model.key("stand").id)
+        data.ctrl[:] = 0
+        for _ in range(round(3.0 / model.opt.timestep)):
+            mujoco.mj_step(model, data)
+        mujoco.mj_forward(model, data)
+        self.assertTrue(np.all(np.isfinite(data.qpos)))
+        self.assertTrue(np.all(np.isfinite(data.qvel)))
+        for foot in ("fore_L", "fore_R", "hind_L", "hind_R"):
+            self.assertGreater(float(data.sensor(f"touch_{foot}").data[0]), 0.0)
+        for region in ("mid", "post"):
+            self.assertEqual(float(data.sensor(f"touch_belly_{region}").data[0]), 0.0)
+
+
+class InverseMassCalibrationTests(unittest.TestCase):
+    def test_entropy_solver_matches_known_two_mass_solution(self):
+        masses, info = bounded_entropy_fit([1., 1.], [0., 1.], 2., .75, [.1, .1], [2., 2.])
+        np.testing.assert_allclose(masses, [.5, 1.5], atol=1e-10)
+        self.assertTrue(info["target_feasible"])
+
+    def test_infeasible_mean_is_reported_not_silently_claimed(self):
+        masses, info = bounded_entropy_fit([1., 1.], [0., 1.], 2., .05, [.5, .5], [1.5, 1.5])
+        np.testing.assert_array_equal(masses, [1.5, .5])
+        self.assertFalse(info["target_feasible"])
+        self.assertEqual(info["feasible_centroid_range"], [.25, .75])
+
+    def test_impossible_total_mass_raises_before_writing(self):
+        with self.assertRaises(ValueError):
+            extreme_masses([0., 1.], [.1, .1], [.5, .5], total=2.)
+
+    def test_v2_changes_only_mass_inertia_and_regenerated_stand(self):
+        v1 = mujoco.MjModel.from_xml_path(str(DEFAULT_OUTPUT))
+        v2 = mujoco.MjModel.from_xml_path(str(V2_OUTPUT))
+        for field in ("body_pos", "body_quat", "geom_pos", "geom_quat", "geom_size", "site_pos", "site_size", "jnt_range", "actuator_gainprm", "actuator_biasprm", "actuator_forcerange", "actuator_ctrlrange"):
+            np.testing.assert_array_equal(getattr(v1, field), getattr(v2, field), err_msg=field)
+        self.assertEqual((v1.nq, v1.nv, v1.nu), (v2.nq, v2.nv, v2.nu))
+        self.assertAlmostEqual(v1.body_mass.sum(), v2.body_mass.sum(), places=12)
+        tails = [v2.body(f"tail{i}").id for i in range(1, 6)]
+        self.assertAlmostEqual(v1.body_mass[tails].sum(), v2.body_mass[tails].sum(), places=12)
+        ratios = v2.body_mass[1:] / v1.body_mass[1:]
+        np.testing.assert_allclose(v2.body_inertia[1:], v1.body_inertia[1:] * ratios[:, None], rtol=1e-12, atol=1e-18)
+        self.assertTrue(np.all(v2.body_inertia[1:] > 0))
+        self.assertTrue(np.all(np.isfinite(v2.body_inertia)))
+        self.assertTrue(np.all(2 * v2.body_inertia[1:].max(axis=1) <= v2.body_inertia[1:].sum(axis=1) + 1e-16))
+        for part in ("humerus", "forearm", "manus", "femur", "tibia", "pes"):
+            self.assertEqual(v2.body(f"{part}_L").mass[0], v2.body(f"{part}_R").mass[0])
+
+    def test_v2_reproducible_and_exact_mean_limit_explicit(self):
+        generated, derivations = make_candidate(fit_com=True)
+        self.assertEqual(generated.strip(), V2_OUTPUT.read_text(encoding="utf-8").strip())
+        fitted = derivations["inverse_mass_calibration"]
+        self.assertTrue(fitted["body_fit"]["target_feasible"])
+        self.assertFalse(fitted["tail_fit"]["target_feasible"])
+        self.assertGreater(fitted["geometry_lower_bound"]["minimum_first_segment_density_kg_m3"],
+                           fitted["tail_fit"]["guard_density_kg_m3"])
 
 
 if __name__ == "__main__":
