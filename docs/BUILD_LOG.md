@@ -39,6 +39,11 @@ not by treating these events as verified animal strides. High-rate path distance
 also captures small within-control-step excursions missed by the old sampler;
 old and new sampling estimates are not identical protocols.
 
+Effort accounting: 27 focused tests pass, including a real paired frozen-control
+alpha ramp. The ramp changes only the reward charge, not qpos, observations or
+work. The proposed Gate 1 training correlation is not identified in this no-
+training session. Formula and zero-residual base-power charge are verified.
+
 ## Brain recovery completed — 2026-09-04 UTC / 2026-09-05 India
 
 Before code changes, connected to the existing instance with the user's supplied

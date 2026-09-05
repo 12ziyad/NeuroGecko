@@ -1,5 +1,34 @@
 # Build decisions
 
+## Session 2 — correct the brief where measured mechanics disagree
+
+- No training, CMA-ES, GPU or AWS jobs. Preserve legacy defaults and recovered files.
+- Acquisition and physical entrainment are separate: real 250 Hz sampling can
+  correctly show contact chatter. Gate 0's physical failure is not hidden by
+  forcing one touchdown per oscillator cycle; continue only to diagnose/fix it.
+- Mechanical effort uses conjugate actuator force and actuator transmission
+  velocity (both length 25), not generalized qvel (length 38). Sum absolute
+  per-actuator/substep work, then divide by control dt. This avoids cancellation.
+  Existing reward had action-delta smoothness, not a residual-magnitude effort
+  term. Lab adds an explicit power penalty; legacy remains exactly unchanged.
+- A frozen controller cannot respond to a reward coefficient ramp. Gate 1's
+  proposed causal/anticorrelation criterion is unidentifiable without learning;
+  test accounting and unchanged frozen dynamics instead, report that limitation.
+- A continuous periodic foot loop necessarily returns its net stance excursion
+  during swing. Unequal endpoint excursions would create a discontinuity. Fix
+  elevated return and loaded stance, not this impossible cyclic requirement.
+- V2 has 90-degree hip and 80-degree shoulder control spans. A normalized
+  amplitude ratio is not the anatomical excursion ratio from Jagnandan & Higham.
+  Treat .54 as an engineering angular-command proxy, not biological validation.
+- Lab already subtracts touchdown delays. Only legacy has the historical
+  additive convention, intentionally preserved. Change lab .44 to .435 only as
+  a measured separate trial. Retain symmetric .70 fore duty from the existing
+  lab profile and Jagnandan & Higham; do not import legacy FL .68 asymmetry.
+- The research's 11.9% net/path belongs to legacy, not lab (20.9% in old trace).
+  Its reported 80–89% swing loading is not reproduced at the declared thresholds
+  and held command-time convention. Use original-trace diagnosis with hashes.
+  Frozen-trunk clearance is geometry only; soft-contact load must be measured.
+
 ## Preserve evidence before changing behavior
 
 Recover all remote models, verify both archive and file checksums, and save the

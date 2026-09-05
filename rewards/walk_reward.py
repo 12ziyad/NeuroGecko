@@ -8,7 +8,10 @@ front stance loading, and a higher supported trunk.
 from __future__ import annotations
 
 from collections import deque
+import math
 import numpy as np
+
+from common.energetics import mean_absolute_actuator_power
 
 _FOOT_INDEX = {"HL": 0, "FL": 1, "HR": 2, "FR": 3}
 
@@ -151,6 +154,7 @@ def lab_reward_calibration(model, gait_profile="lab"):
         front_duty_fl_target=profile.stance_for("FL"), front_duty_fr_target=profile.stance_for("FR"),
         target_speed=speed, speed_floor=speed_floor, speed_track_sigma=speed_sigma,
         slow_speed=speed_floor, slow_penalty=0.0,
+        total_power_effort_alpha=float(parameter_value("lab_total_power_effort_alpha")),
     )
     return {
         "profile": "lab", "schema_version": 1,
@@ -170,9 +174,16 @@ def lab_reward_calibration(model, gait_profile="lab"):
         "speed_reference": {"chosen_stride_svl": stride_choice, "frequency_hz": profile.frequency_hz,
                             "method": "chosen stride * neutral SVL * locked frequency; lower supplied stride bound sets ramp floor, half supplied interval sets engineered Gaussian width",
                             "limitation": "Single operating point; supplied speed/stride ranges are context, not a joint biological acceptance region."},
+        "effort_reference": {
+            "measure": "mean total absolute actuator mechanical power over the control interval",
+            "calculation": "sum of per-actuator absolute force*actuator_velocity work at physics substeps / control interval seconds",
+            "coefficient_units": "reward units per watt per control sample",
+            "limitation": "Engineered coefficient, not animal metabolic cost; alpha ramps alone cannot demonstrate learned residual/effort adaptation.",
+        },
         "registry_keys": ["lab_contact_bodyweight_fraction", "hip_height_svl", "shoulder_height_svl",
                           "girdle_height_svl_tolerance", "lab_height_guard_transition_svl", "lab_speed_stride_fraction",
-                          "stride_length_svl_range", "lab_gait_frequency_hz", "fore_duty_factor"],
+                          "stride_length_svl_range", "lab_gait_frequency_hz", "fore_duty_factor",
+                          "lab_total_power_effort_alpha"],
     }
 
 
@@ -181,6 +192,7 @@ class WalkReward:
         self.w = dict(DEFAULTS)
         if cfg:
             self.w.update(cfg)
+        self._validate_effort_alpha(self.w.get("total_power_effort_alpha", 0.0))
         window = int(self.w["v4_metric_window"])
         self._contact_history = deque(maxlen=window)
         self._belly_history = deque(maxlen=window)
@@ -189,6 +201,38 @@ class WalkReward:
         self._prev_hind_body_x = None
         self._fls_ema = 0.0
         self._fds_ema = 0.0    # V4.2.7: EMA of front_duty_score (gate input)
+
+    @staticmethod
+    def _validate_effort_alpha(alpha):
+        alpha = float(alpha)
+        if not math.isfinite(alpha) or alpha < 0:
+            raise ValueError("Total-power effort alpha must be finite and nonnegative")
+        return alpha
+
+    def set_total_power_effort_alpha(self, alpha):
+        """Explicit caller-controlled coefficient; no automatic adaptive ratchet.
+
+        This can replay an offline coefficient ramp against frozen controls.
+        Changing a reward coefficient does not itself train or change a policy.
+        """
+        self.w["total_power_effort_alpha"] = self._validate_effort_alpha(alpha)
+
+    def total_power_effort_terms(self, env, metrics):
+        """Charge total plant work, never residual magnitude or net signed work."""
+        alpha = self._validate_effort_alpha(self.w.get("total_power_effort_alpha", 0.0))
+        if getattr(env, "gait_profile", "legacy") != "lab":
+            if alpha != 0.0:
+                raise ValueError("Total-power effort is opt-in for the lab profile only")
+            # Preserve legacy reward arithmetic and info dictionary exactly.
+            return None
+        if "mechanical_work_abs_J" not in metrics:
+            raise ValueError("Total-power effort requires integrated absolute actuator work")
+        power = mean_absolute_actuator_power(float(metrics["mechanical_work_abs_J"]), float(env.dt))
+        return {
+            "mechanical_power_abs_mean_W": power,
+            "total_power_effort_alpha": alpha,
+            "r_total_power_effort": -alpha * power,
+        }
 
     def _reset_v4_history(self):
         self._contact_history.clear()
@@ -290,6 +334,7 @@ class WalkReward:
 
     def __call__(self, env, action, metrics):
         w = self.w
+        effort_terms = self.total_power_effort_terms(env, metrics)
         v4 = self._v4_metrics(env, metrics)
 
         progress = float(np.clip(
@@ -311,6 +356,8 @@ class WalkReward:
             and abs(metrics["forward_speed"]) < w["freeze_speed"]
         )
 
+        # Action-delta regularization is retained for checkpoint compatibility.
+        # It is NOT a mechanical-effort proxy or a residual-magnitude penalty.
         smooth = float(np.mean((action - env._prev_action) ** 2))
         spin_excess = max(0.0, float(metrics["yaw_rate"]) - w["yaw_rate_cap"])
         speed_gate = float(np.clip(
@@ -468,7 +515,7 @@ class WalkReward:
             + r_front_swing_touch
         )
 
-        return total, dict(
+        reward_info = dict(
             r_alive=r_alive,
             r_progress=r_progress,
             r_forward=r_forward,
@@ -523,4 +570,10 @@ class WalkReward:
             front_track_hit=track_hit,
             front_track_miss=track_miss,
         )
+        if effort_terms is not None:
+            # Do not add even a zero term to the legacy expression above: exact
+            # historical reward arithmetic is part of checkpoint reproducibility.
+            total += effort_terms["r_total_power_effort"]
+            reward_info.update(effort_terms)
+        return total, reward_info
 
