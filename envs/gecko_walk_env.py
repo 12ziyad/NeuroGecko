@@ -70,7 +70,8 @@ class GeckoWalkEnv(gym.Env):
                  action_ema=0.0, reset_noise=0.02, reward_cfg=None,
                  control_mode="raw", residual_scale=0.2, contact_thresh=None,
                  front_stance_press=0.40, front_swing_lift=0.40,
-                 render_mode=None, seed=None, gait_profile="legacy", lab_parameters=None):
+                 render_mode=None, seed=None, gait_profile="legacy", lab_parameters=None,
+                 hind_stance_compensation=False):
         super().__init__()
         self.model = mujoco.MjModel.from_xml_path(str(xml_path or DEFAULT_XML))
         self.data = mujoco.MjData(self.model)
@@ -148,6 +149,7 @@ class GeckoWalkEnv(gym.Env):
                 verbose=False,
                 gait_profile=self.gait.profile,
                 lab_parameters=lab_parameters,
+                hind_stance_compensation=hind_stance_compensation,
             )
 
         # build one obs to size the space

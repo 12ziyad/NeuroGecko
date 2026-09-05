@@ -89,7 +89,8 @@ class CPGResidualController:
                  spine_amp=0.30, spine_phase=0.0,
                  tail_amp=0.15, tail_phase_lag=0.15,
                  residual_overrides=None,            # V4.2.4: per-joint caps
-                 verbose=True, gait_profile="legacy", lab_parameters=None):
+                 verbose=True, gait_profile="legacy", lab_parameters=None,
+                 hind_stance_compensation=False):
         self.model = model
         self.profile = get_gait_profile(gait_profile)
         self.gait_profile = self.profile.name
@@ -146,6 +147,34 @@ class CPGResidualController:
             for name in ("front_stance_press", "front_stance_press_fr", "front_swing_lift",
                          "front_stance_seek", "front_seek_relax", "shoulder_sprawl_tuck"):
                 setattr(self, name, float(values[name]))
+
+        # Opt-in hind knee/ankle stance compensation (Session 3). The frozen-pose
+        # table holds the hind collision foot at a constant commanded height
+        # through stance instead of letting the hip sweep trace a 2.06 mm arc
+        # that leaves the foot 0.863 mm airborne at commanded touchdown. Legacy
+        # is untouched, and the default is off, so no existing run changes.
+        # The table's reference assumes zero base knee/ankle/sprawl/rotation
+        # targets; that holds for lab only while other_amplitude == 0, which is
+        # asserted here rather than assumed.
+        self._hind_comp = None
+        self._hind_comp_ids = None
+        if hind_stance_compensation:
+            if self.gait_profile == "legacy":
+                raise ValueError("hind_stance_compensation is an opt-in lab control; legacy must remain unchanged.")
+            if float(self.lab_parameters["other_amplitude"]) != 0.:
+                raise ValueError(
+                    "hind_stance_compensation requires other_amplitude == 0; its frozen-pose table is "
+                    "solved with zero ankle/sprawl/rotation base targets and would be invalid otherwise.")
+            from common.hind_stance_geometry import HindStanceCompensator
+            self._hind_comp = HindStanceCompensator(model)
+            ids = {}
+            for foot, side in (("HL", "L"), ("HR", "R")):
+                ids[foot] = tuple(
+                    mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_ACTUATOR, name + side)
+                    for name in ("hip_proret_", "knee_", "ankle_"))
+                if min(ids[foot]) < 0:
+                    raise ValueError(f"Missing hip_proret/knee/ankle actuators for {foot}.")
+            self._hind_comp_ids = ids
 
         nu = model.nu
         lo = model.actuator_ctrlrange[:, 0].copy()
@@ -274,6 +303,18 @@ class CPGResidualController:
             else:
                 s = self.amp["other"] * fa
             ctrl[aid] = self.neutral[aid] + self._sign(aid) * s * self.half[aid]
+
+        if self._hind_comp is not None:
+            # Applied after the limb loop so the hip command is final, and before
+            # the shoulder/spine/tail terms, which do not move the hind foot.
+            # Offsets fade smoothly to zero at mid-swing, so the existing swing
+            # lift command is preserved unchanged.
+            for foot, (hip_aid, knee_aid, ankle_aid) in self._hind_comp_ids.items():
+                phi = self.foot_phase_fraction(foot, t)
+                knee_delta, ankle_delta = self._hind_comp.offsets(
+                    foot, float(ctrl[hip_aid]), phi, self.stance_for(foot))
+                ctrl[knee_aid] += knee_delta
+                ctrl[ankle_aid] += ankle_delta
 
         if self._ssl >= 0: ctrl[self._ssl] -= self.shoulder_sprawl_tuck
         if self._ssr >= 0: ctrl[self._ssr] += self.shoulder_sprawl_tuck

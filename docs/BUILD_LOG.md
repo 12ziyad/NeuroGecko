@@ -382,3 +382,103 @@ are still compared tightly; no research tolerance was widened.
 This is a completed recovery/instrumentation/body-calibration build increment,
 not completion of the full research program. The gait remains untuned; see
 `docs/BLOCKED.md` for the actual remaining implementation work.
+
+## Session 3 (continued in Claude Code) — hind stance compensation implemented and tested
+
+The Session 3 Codex run ended mid-implementation when the ChatGPT subscription
+lapsed. Commit `ad54e9a` (baseline + hypothesis protocol) had landed; the
+compensator module `common/hind_stance_geometry.py` was written but uncommitted,
+untested and unwired. Work resumed here.
+
+### Solver corrections to the module as written
+
+`HindStanceCompensator` could not build: `_solve` raised at HL hip=0.3068 rad
+with an 18 um residual against a 0.1 um failure threshold. Diagnosis before
+changing anything: the offset bounds are NOT binding at that pose (reachable
+clearance spans +0.03 to -7.72 mm around a -0.60 mm target, and zero offsets
+already give -0.68 mm). Two real causes:
+
+1. A 10 nm convergence tolerance probed with 10 urad finite differences that
+   move the foot only ~90 nm. Loosened to 2 um convergence / 10 um failure,
+   with 100 urad probes. 2 um is 0.3% of the 0.6 mm headroom to either edge of
+   the declared [-1.2 mm, 0] band.
+2. `clearance()` takes a `min` over several foot collision geoms, so it is
+   continuous but not differentiable where the lowest geom switches. The
+   Newton line search stalls at that kink. Added a bisection fallback along
+   +[knee, ankle], which is monotone (probed: (0,0) -> -0.68 mm,
+   (0.35,0.35) -> -7.72 mm) and needs no derivative.
+
+The post-build dense-interpolation guard against the stance band is unchanged.
+Built table: max node error 1.98 um; dense-interpolation clearance -1.098 to
+-0.594 mm, i.e. in contact at every hip angle.
+
+### Assumption checked, not assumed
+
+The table's reference requires zero base knee/ankle/sprawl/rotation targets.
+In the lab profile `other_amplitude == 0.0`, so it holds; the constructor now
+asserts this rather than trusting it. Verified against real base commands:
+
+| local phase | base clearance | with compensation |
+|---|---|---|
+| 0.000 | +0.8629 mm | -0.5984 mm |
+| 0.312 | -0.0025 mm | -0.5998 mm |
+| 0.780 | -1.1999 mm | -0.9955 mm |
+
+Worst deviation from the -0.600 mm target across stance: 0.396 mm, at the
+stance/swing boundary. The commanded foot is now below ground at every phase
+of stance instead of 0.863 mm airborne at commanded touchdown.
+
+### Integration
+
+`hind_stance_compensation` is an opt-in constructor flag on
+`CPGResidualController`, forwarded by `GeckoWalkEnv` and exposed as
+`--hind-stance-compensation` on `realism_metrics.py`. Default off; legacy
+raises if it is requested. Offsets are applied after the limb loop (so the hip
+command is final) and fade to zero at mid-swing, leaving swing commands intact.
+
+### Gate 2 result — FAIL. Hypothesis partially refuted.
+
+Identical protocol, V2 + lab, zero residual, seed 0, 20 s, 250 Hz. n=1
+deterministic runs; the difference is the flag only.
+
+| Metric | Baseline | +Compensation | Target | |
+|---|---|---|---|---|
+| forward speed m/s | 0.0424 | 0.0406 | >= 0.04 | pass, slightly worse |
+| net / path | 0.8253 | 0.7323 | >= 0.50 | pass, worse |
+| duty HL | 0.6408 | 0.7001 | 0.73-0.83 | FAIL, improved |
+| duty HR | 0.6312 | 0.7013 | 0.73-0.83 | FAIL, improved |
+| limb phase HL->FL | 0.5774 | 0.6070 | 0.405-0.465 | FAIL, worse |
+| limb phase HR->FR | 0.5690 | 0.6031 | 0.405-0.465 | FAIL, worse |
+| trunk pitch deg | 3.298 | 4.078 | 3.11-4.33 | pass |
+| hip height SVL | 0.1561 | 0.1589 | 0.140-0.160 | pass |
+| shoulder height SVL | 0.1161 | 0.1279 | 0.103-0.123 | now FAIL |
+| stride period CV HL | 0.0288 | 0.0193 | single digits | pass, improved |
+| duty FL / FR | 0.3766/0.3778 | 0.3886/0.3962 | ~0.70 | FAIL |
+| stride length HL SVL | 0.3307 | 0.3174 | 0.62-0.82 | FAIL |
+
+Answering the three questions the brief required:
+
+1. **Direct effect confirmed.** The commanded hind foot is no longer airborne
+   at touchdown; clearance is negative through the whole of commanded stance.
+2. **Hind duty moved, limb phase did not.** Hind duty rose 0.64 -> 0.70,
+   covering about 60% of the gap to the 0.73 floor. Limb phase moved the
+   *wrong way*, 0.577 -> 0.607, away from 0.435. **The claim that the airborne
+   hind foot explained the limb-phase failure is refuted.** Recorded as a
+   finding, not a partial success.
+3. **The front-load question is superseded by a larger front failure.**
+   Forefoot duty factor is 0.38-0.40 against a commanded 0.70 — the forefoot
+   is now the limb that will not stay down. Shoulder height rose 0.116 ->
+   0.128 SVL and left its band, and net/path and forward speed both fell
+   slightly. The coherent reading is that planting the hind foot through full
+   stance levers the front of the body up, unloading the forefeet. That is a
+   mechanical coupling, not a threshold-provenance question, so the tail-heavy
+   hypothesis is neither supported nor needed here.
+
+Also newly visible, and not previously gated: **stride length is 0.32 SVL
+against a published 0.62-0.82.** The animal is taking roughly half-length
+steps. This is independent of the compensator (0.3307 baseline) and is a
+large, separate defect.
+
+**Gate 2 remains failed. No plant change, CMA-ES or training was started.**
+The remaining bottleneck has moved from the hind limb to the forelimb and to
+stride length.

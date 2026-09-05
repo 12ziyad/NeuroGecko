@@ -522,6 +522,8 @@ def main(argv=None):
     p.add_argument("--model", type=Path)
     p.add_argument("--vecnormalize", type=Path)
     p.add_argument("--zero-residual", action="store_true", help="Use the CPG base and its contact reflex with zero policy action.")
+    p.add_argument("--hind-stance-compensation", action="store_true",
+                   help="Lab-only opt-in: hold the hind collision foot at a constant commanded height through stance.")
     p.add_argument("--zero-tail-drive", action="store_true", help="Zero tail tendon commands only; NOT mechanical restriction.")
     p.add_argument("--gait-profile", choices=("legacy", "lab"), default="legacy",
                    help="Lab opts into shared touchdown delays/stance; legacy preserves the checkpoint's original controller/reward mismatch.")
@@ -558,7 +560,8 @@ def main(argv=None):
     env = GeckoWalkEnv(xml_path=args.xml, control_mode="cpg_residual", max_steps=1,
                        contact_thresh=contact_thresh, reset_noise=args.reset_noise,
                        residual_scale=args.residual_scale, front_stance_press=args.front_stance_press,
-                       front_swing_lift=args.front_swing_lift, gait_profile=args.gait_profile)
+                       front_swing_lift=args.front_swing_lift, gait_profile=args.gait_profile,
+                       hind_stance_compensation=args.hind_stance_compensation)
     if not np.isclose(env.dt, 1/parameter_value("gait_acquisition_hz")):
         env.close()
         p.error("CLI protocol expects 50 Hz; XML timestep/frame_skip changed.")
@@ -600,6 +603,7 @@ def main(argv=None):
             "normalizer_sha256": sha256(args.vecnormalize) if normalizer else None,
             "controller": "zero residual with contact reflex" if args.zero_residual else "frozen PPO residual",
             "gait_profile": args.gait_profile,
+            "hind_stance_compensation": bool(args.hind_stance_compensation),
             "reward_calibration": env.reward_calibration,
             "phase_offset_convention": "shared positive touchdown delays, local=(cycle-delay)%1" if args.gait_profile=="lab" else "legacy controller adds offsets; legacy reward subtracts offsets (preserved mismatch)",
             "reward_schedule_time_reference": "executed control interval start; observation clock remains current" if args.gait_profile=="lab" else "historical control interval end",
