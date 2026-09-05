@@ -1,0 +1,131 @@
+{
+ "score": 5.002525542845034,
+ "measurements": {
+  "forward_speed": 0.04703382710994196,
+  "net_over_path": 0.5920113980131073,
+  "hind_swing_load": 0.02040816326530612,
+  "front_stance_load": 0.6234567901234568,
+  "hind_duty": 0.6428571428571429,
+  "limb_phase": 0.47717975126558754
+ },
+ "parameters": {
+  "hind_fa_amplitude": 0.9414299107534541,
+  "fore_hind_amplitude_ratio": 1.172011910882412,
+  "front_stance_press": -0.39286806864064155,
+  "front_stance_press_fr": -0.3933273362898065,
+  "front_swing_lift": 0.033533491940772375,
+  "hind_lift_multiplier": -0.9295681517553529,
+  "spine_amp": 0.8882578388176358,
+  "tail_amp": 0.5544218808656364,
+  "tail_phase_lag": 0.03882049981885527,
+  "fl_touchdown_delay": 0.3315486080644534
+ },
+ "baseline_score": 5.259538950715418,
+ "baseline_measurements": {
+  "forward_speed": 0.047931012196826155,
+  "net_over_path": 0.5812051644476324,
+  "hind_swing_load": 0.04838709677419355,
+  "front_stance_load": 0.6114864864864865,
+  "hind_duty": 0.6376470588235295,
+  "limb_phase": 0.4545942833070482
+ },
+ "space": [
+  [
+   "hind_fa_amplitude",
+   0.4,
+   1.0,
+   0.98
+  ],
+  [
+   "fore_hind_amplitude_ratio",
+   0.2,
+   1.2,
+   0.54
+  ],
+  [
+   "front_stance_press",
+   -0.4,
+   0.4,
+   0.05
+  ],
+  [
+   "front_stance_press_fr",
+   -0.4,
+   0.4,
+   0.05
+  ],
+  [
+   "front_swing_lift",
+   -0.9,
+   0.1,
+   -0.4
+  ],
+  [
+   "hind_lift_multiplier",
+   -2.5,
+   0.0,
+   -1.3333333333333333
+  ],
+  [
+   "spine_amp",
+   0.0,
+   1.0,
+   0.3
+  ],
+  [
+   "tail_amp",
+   0.0,
+   0.8,
+   0.15
+  ],
+  [
+   "tail_phase_lag",
+   0.0,
+   0.5,
+   0.15
+  ],
+  [
+   "fl_touchdown_delay",
+   0.05,
+   0.95,
+   0.435
+  ]
+ ],
+ "gates": [
+  [
+   "forward_speed",
+   0.04,
+   null
+  ],
+  [
+   "net_over_path",
+   0.5,
+   null
+  ],
+  [
+   "hind_swing_load",
+   null,
+   0.1
+  ],
+  [
+   "front_stance_load",
+   0.65,
+   null
+  ],
+  [
+   "hind_duty",
+   0.73,
+   0.83
+  ],
+  [
+   "limb_phase",
+   0.405,
+   0.465
+  ]
+ ],
+ "generations": 60,
+ "popsize": 12,
+ "eval_seconds": 20.0,
+ "settle_s": 3.0,
+ "xml": "morphology/gecko_body_lab_v2.xml"
+}

@@ -1,0 +1,85 @@
+warm start from artifacts/evidence/session3/cma_gate2.json
+baseline score 5.2595
+  forward_speed=0.0479  net_over_path=0.5812  hind_swing_load=0.0484  front_stance_load=0.6115  hind_duty=0.6376  limb_phase=0.4546
+gen   1/60  best 2.4578  gen-best 2.4578  median 3.0697  14s
+gen   2/60  best 2.4578  gen-best 2.4617  median 2.9397  27s
+gen   3/60  best 2.2757  gen-best 2.2757  median 2.7656  40s
+gen   4/60  best 2.2757  gen-best 2.4399  median 3.0540  54s
+gen   5/60  best 2.1621  gen-best 2.1621  median 2.7560  68s
+gen   6/60  best 2.1621  gen-best 2.5231  median 2.8846  81s
+gen   7/60  best 2.1621  gen-best 2.4537  median 3.0026  95s
+gen   8/60  best 2.1621  gen-best 2.4915  median 2.9121  109s
+gen   9/60  best 2.1621  gen-best 2.2188  median 2.8876  122s
+gen  10/60  best 2.1621  gen-best 2.2987  median 2.7889  136s
+gen  11/60  best 2.1621  gen-best 2.3166  median 2.8472  149s
+gen  12/60  best 2.0733  gen-best 2.0733  median 2.9018  163s
+gen  13/60  best 2.0733  gen-best 2.3606  median 2.7269  177s
+gen  14/60  best 2.0733  gen-best 2.3954  median 2.7821  191s
+gen  15/60  best 2.0733  gen-best 2.5116  median 2.9220  205s
+gen  16/60  best 2.0733  gen-best 2.2368  median 2.7033  219s
+gen  17/60  best 2.0733  gen-best 2.4944  median 3.0368  232s
+gen  18/60  best 2.0733  gen-best 2.0913  median 2.6860  260s
+gen  19/60  best 2.0733  gen-best 2.5527  median 2.9101  279s
+gen  20/60  best 2.0733  gen-best 2.5392  median 2.8369  293s
+gen  21/60  best 2.0733  gen-best 2.4068  median 2.9735  306s
+gen  22/60  best 2.0733  gen-best 2.4097  median 2.7650  319s
+gen  23/60  best 2.0733  gen-best 2.4087  median 2.9442  332s
+gen  24/60  best 2.0733  gen-best 2.5579  median 2.8861  345s
+gen  25/60  best 2.0733  gen-best 2.1515  median 2.7265  358s
+gen  26/60  best 2.0733  gen-best 2.4915  median 2.9586  372s
+gen  27/60  best 2.0733  gen-best 2.5156  median 2.9377  385s
+gen  28/60  best 2.0733  gen-best 2.3136  median 2.8335  399s
+gen  29/60  best 2.0733  gen-best 2.2976  median 2.8479  412s
+gen  30/60  best 2.0733  gen-best 2.3081  median 2.5427  425s
+gen  31/60  best 2.0733  gen-best 2.2062  median 2.6283  438s
+gen  32/60  best 2.0733  gen-best 2.5359  median 2.7789  451s
+gen  33/60  best 2.0733  gen-best 2.1891  median 2.6829  465s
+gen  34/60  best 2.0733  gen-best 2.3041  median 2.7675  478s
+gen  35/60  best 2.0733  gen-best 2.4275  median 2.6738  491s
+gen  36/60  best 2.0733  gen-best 2.3606  median 2.8057  504s
+gen  37/60  best 2.0733  gen-best 2.3689  median 2.6561  517s
+gen  38/60  best 2.0733  gen-best 2.1021  median 2.6846  530s
+gen  39/60  best 2.0733  gen-best 2.3156  median 2.6977  543s
+gen  40/60  best 2.0733  gen-best 2.2456  median 2.7898  557s
+gen  41/60  best 2.0733  gen-best 2.3377  median 2.7412  571s
+gen  42/60  best 2.0733  gen-best 2.3944  median 2.9439  588s
+gen  43/60  best 2.0733  gen-best 2.5160  median 3.1092  601s
+gen  44/60  best 2.0733  gen-best 2.1509  median 2.8786  614s
+gen  45/60  best 2.0733  gen-best 2.3902  median 2.7489  628s
+gen  46/60  best 2.0733  gen-best 2.0821  median 2.5278  641s
+gen  47/60  best 2.0733  gen-best 2.2225  median 2.7024  654s
+gen  48/60  best 2.0733  gen-best 2.4332  median 2.7375  667s
+gen  49/60  best 2.0733  gen-best 2.4067  median 2.7023  680s
+gen  50/60  best 2.0733  gen-best 2.1766  median 2.7903  693s
+gen  51/60  best 2.0733  gen-best 2.2935  median 2.6773  706s
+gen  52/60  best 2.0733  gen-best 2.5377  median 2.7261  719s
+gen  53/60  best 1.9216  gen-best 1.9216  median 2.5175  732s
+gen  54/60  best 1.9216  gen-best 2.2381  median 2.7012  746s
+gen  55/60  best 1.9216  gen-best 2.0981  median 2.6780  759s
+gen  56/60  best 1.9216  gen-best 2.3649  median 2.7238  772s
+gen  57/60  best 1.9216  gen-best 2.5366  median 2.7558  785s
+gen  58/60  best 1.9216  gen-best 2.1304  median 2.5549  799s
+gen  59/60  best 1.9216  gen-best 2.2827  median 2.6722  812s
+gen  60/60  best 1.9216  gen-best 2.1499  median 2.6933  827s
+
+BEST score 5.0025 (re-scored on a 17 s rollout)
+  forward_speed           0.0470   PASS
+  net_over_path           0.5920   PASS
+  hind_swing_load         0.0204   PASS
+  front_stance_load       0.6235   FAIL
+  hind_duty               0.6429   FAIL
+  limb_phase              0.4772   FAIL
+
+parameters:
+  hind_fa_amplitude            +0.94143
+  fore_hind_amplitude_ratio    +1.17201
+  front_stance_press           -0.39287
+  front_stance_press_fr        -0.39333
+  front_swing_lift             +0.03353
+  hind_lift_multiplier         -0.92957
+  spine_amp                    +0.88826
+  tail_amp                     +0.55442
+  tail_phase_lag               +0.03882
+  fl_touchdown_delay           +0.33155
+
+wrote artifacts\evidence\session3\cma_gate2_refine.json

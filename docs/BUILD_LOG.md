@@ -790,3 +790,81 @@ is fore/hind touchdown-lateness difference; hind slip is 41% of body advance.
 The single unexplained mechanism is the forefoot: late touchdown and extra
 contact cycles, with stance geometry, plant bandwidth, gearing and friction all
 eliminated.
+
+## Session 3f — CMA-ES fixes the limb-phase gate that eight hand fixes could not
+
+### Why the method changed
+
+Eight single-parameter interventions were tried and all failed to move realised
+limb phase: hind stance height, fore stance height, actuator bandwidth (both
+without and, after finding the first test invalid, with force headroom), spine
+amplitude, fore/hind gearing, contact softness, and commanded-delay calibration.
+
+The last of those is the decisive one. Commanding the forefoot to land 0.197
+cycle earlier, exactly cancelling its measured lateness, moved realised phase
+the WRONG way (0.635 -> 0.688). If lateness were a fixed offset that would have
+worked exactly. It is a coupled nonlinear plant, so single-parameter reasoning
+does not apply and joint search is the correct tool.
+
+An error in my own earlier work, recorded: the first stiff-plant test raised kp
+15x but left forcerange unchanged, so the actuator saturated at 0.144 rad of
+error and could never deliver the commanded stiffness. That test did not
+measure what it claimed. Repeating it with force headroom (kp x15/force x4 and
+kp x5/force x3) still did not fix limb phase, so the conclusion survives, but it
+was unearned the first time.
+
+### The fit
+
+`tools/fit_gate2_cma.py`. CMA-ES over 10 controller parameters against the six
+Gate 2 checks directly, so a pass is a pass on the same measurement rather than
+a surrogate. It searches controller values only: no body geometry, no locked
+cadence, no published stance ratio or target. 70 generations, popsize 12, on the
+laptop's 12 cores. The harness reproduces the `realism_metrics` baseline to
+within measurement scatter once two harness bugs were fixed (`commanded_contacts`
+returns a dict, so iterating it yielded key strings; and the calibration scenario
+sets a distant goal for heading, which the harness had omitted).
+
+| check | hand-tuned | CMA-ES | target | |
+|---|---|---|---|---|
+| forward speed | 0.0416 | **0.0479** | >= 0.04 | PASS |
+| net/path | 0.7427 | 0.5802 | >= 0.50 | PASS |
+| hind swing load | 0.0806 | **0.0506** | < 0.10 | PASS |
+| front stance load | 0.5841 | 0.6070 | >= 0.65 | FAIL |
+| hind duty | **0.7334** | 0.6286 | 0.73-0.83 | FAIL |
+| **limb phase** | 0.6347 | **0.4497** | 0.405-0.465 | **PASS** |
+| gates | 4/6 | **4/6** | | different four |
+
+**Limb phase is solved.** Stable across episode length, which was checked
+explicitly after a scoring discrepancy: 11/14/17/20/25 s give 0.4295, 0.4237,
+0.4497, 0.4546, 0.4463 — inside the band at every length. The apparent
+instability was my own `--scale-override` changing the objective between the
+search and the re-score, not a property of the measurement.
+
+The solution is not one a human would have proposed: front stance press flipped
+from +0.05 to -0.39, spine amplitude tripled (0.30 -> 0.94), tail amplitude
+quintupled (0.15 -> 0.77), fore/hind ratio raised past 1.0, and the FL touchdown
+delay moved to 0.358. Nine interacting changes.
+
+### 6/6 appears unreachable with these parameters
+
+Two further searches were run. A refinement with the two failing checks weighted
+2.5x harder reached 1.92 on its own modified objective but scored worse on the
+original one and lost the limb-phase gate. A third search warm-started from the
+best solution with correct weights plateaued at 2.23 across ~55 generations,
+i.e. slightly worse than the 2.10 it started from, and was stopped.
+
+Roughly 150 generations across three independent searches all converge to
+2.1-2.3 and none crosses it. On the evidence available this is a genuine limit
+of the ten searched controller parameters on this body, not an under-converged
+search. **Hind duty and limb phase trade against each other**; the optimiser can
+buy either but not both.
+
+### Adopted
+
+The CMA-ES solution is preferred over the hand-tuned one: it wins the limb-phase
+gate (the footfall pattern, which is the biologically meaningful one), is 15%
+faster, and has lower hind swing load. It loses hind duty and net/path. Both
+remain opt-in; the default is unchanged and legacy is untouched.
+
+Gate 2 stands at 4/6 with the two failures documented and their cause
+characterised as a parameter-space limit rather than an unfound bug.

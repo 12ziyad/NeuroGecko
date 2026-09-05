@@ -1,0 +1,94 @@
+baseline score 4.2779
+  forward_speed=0.0411  net_over_path=0.7466  hind_swing_load=0.1630  front_stance_load=0.5794  hind_duty=0.7165  limb_phase=0.6015
+gen   1/70  best 3.3001  gen-best 3.3001  median 5.1259  53s
+gen   2/70  best 2.8048  gen-best 2.8048  median 4.0585  115s
+gen   3/70  best 2.8048  gen-best 3.4893  median 4.4607  175s
+gen   4/70  best 2.8048  gen-best 3.2785  median 3.6994  238s
+gen   5/70  best 2.8048  gen-best 3.4392  median 3.9685  297s
+gen   6/70  best 2.8048  gen-best 2.9244  median 3.7196  356s
+gen   7/70  best 2.8048  gen-best 3.0458  median 3.6613  414s
+gen   8/70  best 2.8048  gen-best 3.0034  median 3.7596  486s
+gen   9/70  best 2.8048  gen-best 2.8050  median 4.0519  546s
+gen  10/70  best 2.7914  gen-best 2.7914  median 3.3179  606s
+gen  11/70  best 2.5738  gen-best 2.5738  median 3.7069  671s
+gen  12/70  best 2.5738  gen-best 2.7833  median 3.1693  730s
+gen  13/70  best 2.5738  gen-best 2.9840  median 3.6072  789s
+gen  14/70  best 2.5738  gen-best 2.6052  median 3.3595  847s
+gen  15/70  best 2.5738  gen-best 2.6836  median 3.3879  904s
+gen  16/70  best 2.5738  gen-best 2.8929  median 3.4323  961s
+gen  17/70  best 2.5738  gen-best 2.9532  median 3.2099  1017s
+gen  18/70  best 2.5738  gen-best 2.9882  median 3.2774  1076s
+gen  19/70  best 2.2811  gen-best 2.2811  median 3.4512  1132s
+gen  20/70  best 2.2811  gen-best 2.6778  median 3.6694  1194s
+gen  21/70  best 2.2811  gen-best 2.6460  median 3.5706  1260s
+gen  22/70  best 2.2811  gen-best 2.4849  median 3.2269  1317s
+gen  23/70  best 2.2811  gen-best 2.5563  median 3.4234  1379s
+gen  24/70  best 2.2811  gen-best 2.6028  median 3.2484  1436s
+gen  25/70  best 2.2811  gen-best 2.5386  median 3.4375  1496s
+gen  26/70  best 2.2811  gen-best 2.5356  median 3.4716  1555s
+gen  27/70  best 2.2811  gen-best 2.8205  median 3.2272  1608s
+gen  28/70  best 2.2811  gen-best 2.5802  median 3.1999  1621s
+gen  29/70  best 2.2811  gen-best 2.6440  median 3.1181  1634s
+gen  30/70  best 2.2811  gen-best 2.3692  median 2.9918  1647s
+gen  31/70  best 2.2811  gen-best 3.0288  median 3.2284  1660s
+gen  32/70  best 2.2811  gen-best 2.6720  median 3.1661  1673s
+gen  33/70  best 2.2811  gen-best 2.6616  median 3.0568  1686s
+gen  34/70  best 2.2811  gen-best 2.5263  median 3.0536  1699s
+gen  35/70  best 2.2811  gen-best 2.3592  median 2.8442  1712s
+gen  36/70  best 2.2811  gen-best 2.3606  median 3.0670  1725s
+gen  37/70  best 2.2811  gen-best 2.6385  median 2.8422  1738s
+gen  38/70  best 2.2811  gen-best 2.6610  median 3.0736  1751s
+gen  39/70  best 2.2811  gen-best 2.6432  median 2.8703  1765s
+gen  40/70  best 2.2811  gen-best 2.5714  median 3.1168  1778s
+gen  41/70  best 2.2811  gen-best 2.5110  median 2.9986  1791s
+gen  42/70  best 2.2811  gen-best 2.4909  median 2.8444  1805s
+gen  43/70  best 2.2732  gen-best 2.2732  median 2.7813  1818s
+gen  44/70  best 2.2732  gen-best 2.5073  median 2.9932  1832s
+gen  45/70  best 2.2732  gen-best 2.5914  median 3.0470  1845s
+gen  46/70  best 2.2732  gen-best 2.4451  median 2.9051  1859s
+gen  47/70  best 2.2732  gen-best 2.4823  median 2.8719  1872s
+gen  48/70  best 2.2732  gen-best 2.7404  median 2.9652  1886s
+gen  49/70  best 2.2732  gen-best 2.3972  median 2.8459  1900s
+gen  50/70  best 2.2732  gen-best 2.5579  median 2.7771  1913s
+gen  51/70  best 2.2732  gen-best 2.3102  median 2.8989  1927s
+gen  52/70  best 2.2732  gen-best 2.7228  median 3.1434  1941s
+gen  53/70  best 2.2732  gen-best 2.5406  median 2.9686  1954s
+gen  54/70  best 2.2732  gen-best 2.5491  median 3.1161  1968s
+gen  55/70  best 2.2732  gen-best 2.3186  median 2.8513  1982s
+gen  56/70  best 2.1263  gen-best 2.1263  median 2.7356  1996s
+gen  57/70  best 2.1263  gen-best 2.4291  median 2.7778  2010s
+gen  58/70  best 2.1263  gen-best 2.3043  median 2.9452  2023s
+gen  59/70  best 2.1263  gen-best 2.5121  median 2.8853  2037s
+gen  60/70  best 2.1263  gen-best 2.5611  median 3.0878  2052s
+gen  61/70  best 2.1263  gen-best 2.2900  median 2.9215  2082s
+gen  62/70  best 2.1038  gen-best 2.1038  median 3.1395  2095s
+gen  63/70  best 2.1038  gen-best 2.4915  median 2.9324  2109s
+gen  64/70  best 2.1038  gen-best 2.4819  median 2.9236  2123s
+gen  65/70  best 2.1038  gen-best 2.3474  median 2.9324  2137s
+gen  66/70  best 2.1038  gen-best 2.2333  median 2.9222  2151s
+gen  67/70  best 2.1038  gen-best 2.5930  median 2.9290  2165s
+gen  68/70  best 2.1038  gen-best 2.3463  median 2.8829  2179s
+gen  69/70  best 2.1038  gen-best 2.5293  median 2.7910  2192s
+gen  70/70  best 2.1038  gen-best 2.4091  median 2.9920  2206s
+
+BEST score 2.3153 (re-scored on a 17 s rollout)
+  forward_speed           0.0479   PASS
+  net_over_path           0.5802   PASS
+  hind_swing_load         0.0506   PASS
+  front_stance_load       0.6070   FAIL
+  hind_duty               0.6286   FAIL
+  limb_phase              0.4497   PASS
+
+parameters:
+  hind_fa_amplitude            +0.98013
+  fore_hind_amplitude_ratio    +1.10714
+  front_stance_press           -0.39008
+  front_stance_press_fr        -0.40000
+  front_swing_lift             +0.09797
+  hind_lift_multiplier         -0.89111
+  spine_amp                    +0.93971
+  tail_amp                     +0.76941
+  tail_phase_lag               +0.05756
+  fl_touchdown_delay           +0.35819
+
+wrote artifacts\evidence\session3\cma_gate2.json
