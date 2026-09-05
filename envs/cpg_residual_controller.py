@@ -34,6 +34,7 @@ import numpy as np
 import mujoco
 
 from common.gait_config import FOOT_ORDER, get_gait_profile, require_lab_value
+from common.provenance import parameter_value
 
 
 FREQ_HZ = 1.1888
@@ -88,7 +89,7 @@ class CPGResidualController:
                  spine_amp=0.30, spine_phase=0.0,
                  tail_amp=0.15, tail_phase_lag=0.15,
                  residual_overrides=None,            # V4.2.4: per-joint caps
-                 verbose=True, gait_profile="legacy"):
+                 verbose=True, gait_profile="legacy", lab_parameters=None):
         self.model = model
         self.profile = get_gait_profile(gait_profile)
         self.gait_profile = self.profile.name
@@ -119,6 +120,32 @@ class CPGResidualController:
         self.tail_phase_lag = float(tail_phase_lag)
         self.residual_overrides = dict(RESIDUAL_OVERRIDES if residual_overrides is None
                                        else residual_overrides)
+        self.lab_parameters = None
+        if self.gait_profile == "legacy":
+            if lab_parameters is not None:
+                raise ValueError("lab_parameters are opt-in lab controls; legacy must remain unchanged.")
+        else:
+            values = dict(parameter_value("lab_base_parameters"))
+            supplied = {} if lab_parameters is None else dict(lab_parameters)
+            unknown = set(supplied) - set(values)
+            if unknown:
+                raise ValueError(f"Unknown lab parameters: {sorted(unknown)}")
+            values.update(supplied)
+            for name, value in values.items():
+                if name in ("mirror_left_fa", "continuous_front_lift"):
+                    if type(value) is not bool:
+                        raise ValueError(f"{name} must be boolean.")
+                elif isinstance(value, bool) or not isinstance(value, (int, float, np.number)) or not math.isfinite(value):
+                    raise ValueError(f"{name} must be a finite scalar.")
+            for name in ("hind_fa_amplitude", "fore_hind_amplitude_ratio", "heading_gain"):
+                if values[name] < 0:
+                    raise ValueError(f"{name} must be nonnegative.")
+            self.lab_parameters = MappingProxyType(values)
+            # Lab dictionaries are authoritative for these channels. Legacy
+            # constructor defaults/overrides continue through their original path.
+            for name in ("front_stance_press", "front_stance_press_fr", "front_swing_lift",
+                         "front_stance_seek", "front_seek_relax", "shoulder_sprawl_tuck"):
+                setattr(self, name, float(values[name]))
 
         nu = model.nu
         lo = model.actuator_ctrlrange[:, 0].copy()
@@ -137,6 +164,25 @@ class CPGResidualController:
                 missing.append(name); continue
             self.entries.append((aid, limb, role))
         self.mapped_ids = {e[0] for e in self.entries}
+        self._lab_fa_amplitude = {}
+        if self.gait_profile == "lab":
+            requested_ratio = self.lab_parameters["fore_hind_amplitude_ratio"]
+            hind_amplitude = self.lab_parameters["hind_fa_amplitude"]
+            for side in ("L", "R"):
+                hind_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_ACTUATOR, "hip_proret_" + side)
+                fore_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_ACTUATOR, "shoulder_proret_" + side)
+                if min(hind_id, fore_id) < 0 or min(self.half[hind_id], self.half[fore_id]) <= 0:
+                    raise ValueError("Lab angular ratio requires hip/shoulder protraction actuator ranges.")
+                natural_ratio = self.half[fore_id] / self.half[hind_id]
+                # 8/9 is the versioned equal-normalized compatibility setting.
+                # V2's inherited shoulder ctrlrange is rounded to 0.698132 rad,
+                # so its actual original angular ratio is approximately 0.88888927.
+                # Recognize that declared baseline explicitly, not via a loose
+                # tolerance. Other requested ratios use the real model ranges.
+                fore_amplitude = (hind_amplitude if requested_ratio == 8/9 or math.isclose(requested_ratio, natural_ratio, rel_tol=0, abs_tol=1e-12)
+                                  else hind_amplitude * requested_ratio / natural_ratio)
+                self._lab_fa_amplitude["H" + side] = hind_amplitude
+                self._lab_fa_amplitude["F" + side] = fore_amplitude
 
         def _id(n):
             return mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_ACTUATOR, n)
@@ -182,7 +228,7 @@ class CPGResidualController:
         contact = self.commanded_contacts(time_s)
         return np.array([contact[foot] for foot in order], dtype=np.float32)
 
-    def base_ctrl(self, t, front_contact=None):
+    def base_ctrl(self, t, front_contact=None, heading_error=0.0):
         # front_contact: optional dict {"FL": bool, "FR": bool} of CURRENT
         # load-bearing contact. When provided, the controller seeks the ground
         # (slightly stronger press) if a commanded-stance front foot is airborne,
@@ -190,6 +236,14 @@ class CPGResidualController:
         # is a small reflex assist, NOT a hard override. front_contact=None keeps
         # the exact V4.2.7 open-loop behavior.
         ctrl = self.neutral.copy()
+        steer = 0.0
+        if self.gait_profile == "lab":
+            if not math.isfinite(heading_error):
+                raise ValueError("heading_error must be a finite angle in radians.")
+            # Positive bearing error means turn left: more right-side rearward
+            # stance travel, less left-side travel. Clip bounds are engineering
+            # definitions recorded in lab_base_parameters, not animal gains.
+            steer = float(np.clip(self.lab_parameters["heading_gain"] * heading_error, -1., 1.))
         sig = {}
         for limb, off in self.phase.items():
             phi = self.foot_phase_fraction(limb, t)
@@ -197,7 +251,9 @@ class CPGResidualController:
             sig[limb] = _limb_signals(phi, limb_stance)
         for aid, limb, role in self.entries:
             fa, lift = sig[limb]
-            if role == "fa":
+            if self.gait_profile == "lab":
+                s = self._lab_limb_signal(limb, role, fa, lift, front_contact, steer)
+            elif role == "fa":
                 s = self.amp["fa"] * fa
             elif role == "lift":
                 if limb in ("FL", "FR"):
@@ -231,9 +287,9 @@ class CPGResidualController:
                 ctrl[self._tail_r] = -self.tail_amp * self.half[self._tail_r] * wt
         return ctrl
 
-    def compute(self, action, t, front_contact=None):
+    def compute(self, action, t, front_contact=None, heading_error=0.0):
         action = np.asarray(action, dtype=float).reshape(-1)
-        base = self.base_ctrl(t, front_contact=front_contact)
+        base = self.base_ctrl(t, front_contact=front_contact, heading_error=heading_error)
         residual = action * self.res_scale_vec * self.half
         ctrl = base + residual
         ctrl = np.where(self.lim, np.clip(ctrl, self.lo, self.hi), ctrl)
@@ -242,6 +298,42 @@ class CPGResidualController:
     __call__ = compute
 
     # ----------------------------------------------------------- internals
+    def _lab_limb_signal(self, limb, role, fa, lift, front_contact, steer):
+        params = self.lab_parameters
+        if role == "fa":
+            signal = self._lab_fa_amplitude[limb] * fa
+            if params["mirror_left_fa"] and limb.endswith("L"):
+                signal = -signal
+            if steer != 0.:
+                signal *= 1. - steer if limb.endswith("L") else 1. + steer
+            return signal
+        if role != "lift":
+            return params["other_amplitude"] * fa
+        if limb.startswith("H"):
+            signal = self.amp["lift"] * lift
+            return signal if params["hind_lift_multiplier"] == 1. else signal * params["hind_lift_multiplier"]
+        press = self.front_stance_press if limb == "FL" else self.front_stance_press_fr
+        if params["continuous_front_lift"]:
+            # A single closed, continuous command: stance press plus a signed
+            # swing excursion. With this body's +Y elbows a negative excursion
+            # lifts the collision foot. The optional contact reflex is disabled
+            # in this mode, avoiding a stance-to-swing target discontinuity.
+            if lift > 0.:
+                return press + self.front_swing_lift * lift
+            # No phase-dependent stance reflex here: keeping a contact-dependent
+            # jump would defeat this option's continuity contract. For open-loop
+            # base trials, press remains the explicit stance target.
+            return press
+        # Exactly the original front branch when the continuity option is off.
+        if lift > 0.:
+            return self.front_swing_lift * lift
+        in_contact = None if front_contact is None else bool(front_contact.get(limb, False))
+        if in_contact is False:
+            return +(press + self.front_stance_seek)
+        if in_contact is True:
+            return +(press * self.front_seek_relax)
+        return +press
+
     def _sign(self, aid):
         nm = mujoco.mj_id2name(self.model, mujoco.mjtObj.mjOBJ_ACTUATOR, aid)
         return float(self.sign.get(nm, 1.0))

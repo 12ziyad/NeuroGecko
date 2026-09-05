@@ -424,17 +424,14 @@
       "notes": "Validity-envelope metadata only. Simulator currently has no temperature-dependent physiology."
     },
     "hind_duty_factor": {
-      "value": 0.765,
+      "value": 0.78,
       "units": "fraction",
-      "species": "derived",
-      "sample_size": null,
-      "source": "Jagnandan & Higham (2017), Sci Rep 7:10865, doi:10.1038/s41598-017-11484-7; McElroy, Hickey & Reilly (2008)",
-      "confidence": "likely",
-      "recording_temp_C": [
-        26,
-        30
-      ],
-      "notes": "Chosen aggregate target; source-study values differ. Not a pooled statistical estimate."
+      "species": "E_macularius",
+      "sample_size": 10,
+      "source": "Jagnandan & Higham (2017), Table1 original-tail hind duty, https://pmc.ncbi.nlm.nih.gov/articles/PMC5589804/",
+      "confidence": "verified",
+      "recording_temp_C": 30,
+      "notes": "Primary Table1 verified Session2: 0.78 +/-0.01 SEM, means plus speed residuals over individual averages; not within-stride variability or a universal raw-trace tolerance. Replaces old engineered aggregate0.765."
     },
     "hind_duty_factor_range": {
       "value": [
@@ -745,14 +742,14 @@
         "notes": "Locked engineering frequency, not measured gecko cadence. No frequency optimization permitted in this build."
       },
       "lab_gait_touchdown_delays": {
-        "value": {"HL": 0.0, "FL": 0.44, "HR": 0.50, "FR": 0.94},
+        "value": {"HL": 0.0, "FL": 0.435, "HR": 0.50, "FR": 0.935},
         "units": "stride fraction",
         "species": "derived",
         "sample_size": null,
         "source": "McElroy, Hickey & Reilly (2008) ipsilateral limb-phase target + engineered symmetric contralateral offset",
         "confidence": "likely",
         "recording_temp_C": [26, 30],
-        "notes": "Touchdown DELAYS from reference HL, not additive oscillator phase offsets. Contralateral half-cycle symmetry is a model choice."
+        "notes": "Touchdown DELAYS from HL, not additive offsets.0.435 is an engineered midpoint of supplied0.43/0.44 targets, not a newly measured mean; half-cycle symmetry is a model choice. Actual contacts still fail the requested phase gate."
       },
       "com_study_body_mass_kg": {
         "value": 0.0394, "units": "kg", "species": "E_macularius", "sample_size": 7,
@@ -813,6 +810,18 @@
         "source": "Engineering midpoint of supplied0.62–0.82SVL stride interval",
         "confidence": "uncertain", "recording_temp_C": null,
         "notes": "Lab reward speed target=0.72*neutralSVL*lockedfrequency. Does not add independent cadence/speed validation."
+      },
+      "session2_gate2": {
+        "value": {"minimum_forward_m_s":0.04,"minimum_net_path":0.5,"maximum_hind_swing_load":0.1,"minimum_front_stance_load":0.65,"hind_duty_target":0.78,"hind_duty_tolerance":0.05,"limb_phase_target":0.435,"limb_phase_tolerance":0.03},
+        "units": "mixed; named fields", "species": "INVENTED", "sample_size": null,
+        "source": "User Session 2 minimum engineering viability requirements", "confidence": "uncertain", "recording_temp_C": null,
+        "notes": "Every named limb must pass. Duty .78 is informed by Jagnandan & Higham2017; .435 phase is supplied near-trot target. Tolerances and speed/load cutoffs are engineering gates, not animal confidence intervals. Also require full no-fall rollout and independently measured entrainment."
+      },
+      "lab_base_parameters": {
+        "value": {"mirror_left_fa":true,"hind_lift_multiplier":-1.3333333333333333,"front_stance_press":0.05,"front_stance_press_fr":0.05,"front_swing_lift":-0.4,"front_stance_seek":0.0,"front_seek_relax":0.35,"shoulder_sprawl_tuck":0.0,"fore_hind_amplitude_ratio":0.54,"hind_fa_amplitude":0.98,"heading_gain":1.0,"continuous_front_lift":true,"other_amplitude":0.0},
+        "units": "normalized actuator half-ranges except tuck radians and heading_gain per radian", "species": "INVENTED", "sample_size": null,
+        "source": "Session 2 manual trial19_front_height; experimental candidate, Gate2 FAIL", "confidence": "uncertain", "recording_temp_C": null,
+        "notes": "Engineering choices, not neural/muscle data. Selected for >.04m/s, >.8 net/path and low swing loads, not as a biological optimum. Fore/hind.54 is an angular-command proxy inspired by published44.41/82.57, not anatomical validation. Continuous front mode disables seek/relax. Heading input changes left/right amplitudes with clipped gain. Live default remains legacy. Previous lab control can be reconstructed with versioned test/evidence parameters and profile."
       },
       "lab_total_power_effort_alpha": {
         "value": 0.01, "units": "reward per watt", "species": "INVENTED", "sample_size": null,

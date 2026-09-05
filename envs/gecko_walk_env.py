@@ -70,7 +70,7 @@ class GeckoWalkEnv(gym.Env):
                  action_ema=0.0, reset_noise=0.02, reward_cfg=None,
                  control_mode="raw", residual_scale=0.2, contact_thresh=None,
                  front_stance_press=0.40, front_swing_lift=0.40,
-                 render_mode=None, seed=None, gait_profile="legacy"):
+                 render_mode=None, seed=None, gait_profile="legacy", lab_parameters=None):
         super().__init__()
         self.model = mujoco.MjModel.from_xml_path(str(xml_path or DEFAULT_XML))
         self.data = mujoco.MjData(self.model)
@@ -147,6 +147,7 @@ class GeckoWalkEnv(gym.Env):
                 front_swing_lift=self.front_swing_lift,
                 verbose=False,
                 gait_profile=self.gait.profile,
+                lab_parameters=lab_parameters,
             )
 
         # build one obs to size the space
@@ -316,7 +317,12 @@ class GeckoWalkEnv(gym.Env):
             fc = self._foot_contacts()  # [HL, FL, HR, FR] in _GAIT_FEET order
             front_contact = {"FL": bool(fc[1] > 0.5), "FR": bool(fc[3] > 0.5)}
             self._last_cpg_command_time_s = self._cpg_t
-            self._ctrl = self.cpg.compute(action, self._cpg_t, front_contact=front_contact)
+            if self.gait_profile == "lab":
+                _, _, heading_error = self._target_egocentric()
+                self._ctrl = self.cpg.compute(action, self._cpg_t, front_contact=front_contact,
+                                              heading_error=heading_error)
+            else:
+                self._ctrl = self.cpg.compute(action, self._cpg_t, front_contact=front_contact)
             self._cpg_t += self.control_dt
         else:
             # affine map [-1,1] -> [low, high]

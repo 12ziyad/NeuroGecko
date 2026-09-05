@@ -1,0 +1,438 @@
+{
+  "schema_version": 1,
+  "claim": "Three deterministic steering probes, no pooling/SD and no biological or Gate2 pass claim.",
+  "runs": {
+    "final_candidate": {
+      "goal_angle_rad": 0.0,
+      "commanded_frequency_hz": 1.1888,
+      "commanded_period_s": 0.8411843876177657,
+      "quaternion_convention": "wxyz; rotate trunk-local +X into world, project to XY, atan2(y,x). Quaternion sign does not change heading.",
+      "maximum_quaternion_norm_deviation": 9.992007221626409e-16,
+      "undefined_planar_heading_sample_count": 0,
+      "goal_reconstruction": {
+        "target_xy_m": [
+          9.99887987719462,
+          5.084861705487789e-19
+        ],
+        "distance_m": 10.0,
+        "source": "INFERRED from historical eval/session2_controller.py: initial trunk XY + 10*[cos(goal_angle),sin(goal_angle)]; angle is directly logged, target coordinates/distance are not.",
+        "assumption": "No goal resampling in these short distant-goal trials; commanded angle comparison is also given independently."
+      },
+      "angle_units": "radians; positive error means target lies left/counter-clockwise of body heading",
+      "cycle_window_definition": "First and last complete commanded cycles anchored at t=0; final partial cycle excluded. These are clock windows, not inferred contact strides.",
+      "windows": {
+        "first_full_commanded_cycle": {
+          "cycle_index": 0,
+          "commanded_window_s": [
+            0.0,
+            0.8411843876177657
+          ],
+          "actual_sample_window_s": [
+            0.0,
+            0.8400000000000158
+          ],
+          "sample_count": 211,
+          "mean_body_heading_rad": 0.07306375361416893,
+          "mean_finite_goal_bearing_rad": -0.00030356008045560884,
+          "mean_signed_goal_bearing_error_rad": -0.07336685154187968,
+          "mean_absolute_goal_bearing_error_rad": 0.07864056805225354,
+          "mean_signed_error_to_recorded_command_angle_rad": -0.07306375361416893,
+          "mean_absolute_error_to_recorded_command_angle_rad": 0.07832265469777379
+        },
+        "last_full_commanded_cycle": {
+          "cycle_index": 22,
+          "commanded_window_s": [
+            18.506056527590847,
+            19.347240915208612
+          ],
+          "actual_sample_window_s": [
+            18.508000000003662,
+            19.344000000005426
+          ],
+          "sample_count": 210,
+          "mean_body_heading_rad": 0.0027500446554197255,
+          "mean_finite_goal_bearing_rad": -0.0018679968606336226,
+          "mean_signed_goal_bearing_error_rad": -0.004618038582834125,
+          "mean_absolute_goal_bearing_error_rad": 0.08675405609984829,
+          "mean_signed_error_to_recorded_command_angle_rad": -0.0027500446554197255,
+          "mean_absolute_error_to_recorded_command_angle_rad": 0.08644228815397594
+        },
+        "first_full_commanded_cycle_after_3s": {
+          "cycle_index": 4,
+          "commanded_window_s": [
+            3.364737550471063,
+            4.205921938088829
+          ],
+          "actual_sample_window_s": [
+            3.3679999999997596,
+            4.203999999999668
+          ],
+          "sample_count": 210,
+          "mean_body_heading_rad": 0.013389273329549823,
+          "mean_finite_goal_bearing_rad": -0.0011287679681964674,
+          "mean_signed_goal_bearing_error_rad": -0.014518030513031329,
+          "mean_absolute_goal_bearing_error_rad": 0.08569632060049454,
+          "mean_signed_error_to_recorded_command_angle_rad": -0.013389273329549823,
+          "mean_absolute_error_to_recorded_command_angle_rad": 0.08537987037444528
+        }
+      },
+      "displacement": {
+        "full_run": {
+          "actual_window_s": [
+            0.0,
+            20.00000000000681
+          ],
+          "delta_xy_m": [
+            0.8332623652256994,
+            0.02057097833091898
+          ],
+          "net_distance_m": 0.8335162472627742,
+          "displacement_heading_rad": 0.02468226292564221,
+          "heading_minus_recorded_goal_angle_rad": 0.02468226292564221
+        },
+        "after_3s": {
+          "actual_window_s": [
+            2.9999999999998,
+            20.00000000000681
+          ],
+          "delta_xy_m": [
+            0.7123680547129685,
+            0.01494710477694083
+          ],
+          "net_distance_m": 0.7125248496135077,
+          "displacement_heading_rad": 0.020979199923096197,
+          "heading_minus_recorded_goal_angle_rad": 0.020979199923096197
+        }
+      },
+      "directional_check": {
+        "initial_body_heading_rad": -9.309297604188794e-19,
+        "requested_turn_from_initial_rad": 9.309297604188794e-19,
+        "last_cycle_body_turn_from_initial_rad": 0.0027500446554197264,
+        "turn_sign_matches_request": null,
+        "mean_absolute_goal_error_reduced_first_to_last_cycle": false,
+        "status": "Directional response checks only; no steering tolerance, robustness, biological, or walking pass is inferred."
+      },
+      "original_trace": {
+        "path": "C:\\Users\\ziyad\\GeckoBrain\\artifacts\\evidence\\session2\\trials\\final_candidate\\traces\\episode_000.json",
+        "sha256": "35acda8b732cad0b012ed7ebf45a804013f09e0880c1d8a43671ebb9ebf3ea9c",
+        "bytes": 39676786
+      },
+      "source_report": {
+        "path": "C:\\Users\\ziyad\\GeckoBrain\\artifacts\\evidence\\session2\\trials\\final_candidate\\report.json",
+        "sha256": "40b8bf10cfc6b1d8f79f84415c720e111f76d52cae0fad201def7ccdded86df7",
+        "bytes": 466636
+      },
+      "xml_sha256": "756765356417749c72150b05da59565ffc97825cf2457e638cd04ea2e1885c4b",
+      "gate2_pass_as_recorded": false,
+      "source_sha256": {
+        "envs/cpg_residual_controller.py": "54734d387cdb79a8d0a4dfdb3780f9526f78a6f52607c7f3b99701906b937336",
+        "envs/gecko_walk_env.py": "4c3ca566c6bdb6a7a659fe40f4f25168cdc560254979c40092228c73b7cab293",
+        "realism_metrics.py": "2f59ddc4dd964044440cff68290b72fe3820e31f275881e0d50b2b865471566c",
+        "config/proxies.yaml": "94c44a58ca4ab3428d6e32d700273f598cd0eddf49634aa03643a95d62acc120"
+      }
+    },
+    "steering_left": {
+      "goal_angle_rad": 0.4,
+      "commanded_frequency_hz": 1.1888,
+      "commanded_period_s": 0.8411843876177657,
+      "quaternion_convention": "wxyz; rotate trunk-local +X into world, project to XY, atan2(y,x). Quaternion sign does not change heading.",
+      "maximum_quaternion_norm_deviation": 9.992007221626409e-16,
+      "undefined_planar_heading_sample_count": 0,
+      "goal_reconstruction": {
+        "target_xy_m": [
+          9.20948981722347,
+          3.8941834230865053
+        ],
+        "distance_m": 10.0,
+        "source": "INFERRED from historical eval/session2_controller.py: initial trunk XY + 10*[cos(goal_angle),sin(goal_angle)]; angle is directly logged, target coordinates/distance are not.",
+        "assumption": "No goal resampling in these short distant-goal trials; commanded angle comparison is also given independently."
+      },
+      "angle_units": "radians; positive error means target lies left/counter-clockwise of body heading",
+      "cycle_window_definition": "First and last complete commanded cycles anchored at t=0; final partial cycle excluded. These are clock windows, not inferred contact strides.",
+      "windows": {
+        "first_full_commanded_cycle": {
+          "cycle_index": 0,
+          "commanded_window_s": [
+            0.0,
+            0.8411843876177657
+          ],
+          "actual_sample_window_s": [
+            0.0,
+            0.8400000000000158
+          ],
+          "sample_count": 211,
+          "mean_body_heading_rad": 0.1572747589029989,
+          "mean_finite_goal_bearing_rad": 0.4004832662797469,
+          "mean_signed_goal_bearing_error_rad": 0.24320897978788125,
+          "mean_absolute_goal_bearing_error_rad": 0.24313671372192983,
+          "mean_signed_error_to_recorded_command_angle_rad": 0.24272524109700117,
+          "mean_absolute_error_to_recorded_command_angle_rad": 0.24265344744308684
+        },
+        "last_full_commanded_cycle": {
+          "cycle_index": 22,
+          "commanded_window_s": [
+            18.506056527590847,
+            19.347240915208612
+          ],
+          "actual_sample_window_s": [
+            18.508000000003662,
+            19.344000000005426
+          ],
+          "sample_count": 210,
+          "mean_body_heading_rad": 0.4081887336665447,
+          "mean_finite_goal_bearing_rad": 0.4022829865086237,
+          "mean_signed_goal_bearing_error_rad": -0.0059057443134956,
+          "mean_absolute_goal_bearing_error_rad": 0.08667691085303061,
+          "mean_signed_error_to_recorded_command_angle_rad": -0.008188733666544677,
+          "mean_absolute_error_to_recorded_command_angle_rad": 0.08646717459620794
+        },
+        "first_full_commanded_cycle_after_3s": {
+          "cycle_index": 4,
+          "commanded_window_s": [
+            3.364737550471063,
+            4.205921938088829
+          ],
+          "actual_sample_window_s": [
+            3.3679999999997596,
+            4.203999999999668
+          ],
+          "sample_count": 210,
+          "mean_body_heading_rad": 0.3718740619199481,
+          "mean_finite_goal_bearing_rad": 0.4021826948853986,
+          "mean_signed_goal_bearing_error_rad": 0.030308591076693075,
+          "mean_absolute_goal_bearing_error_rad": 0.08784976958866102,
+          "mean_signed_error_to_recorded_command_angle_rad": 0.028125938080051895,
+          "mean_absolute_error_to_recorded_command_angle_rad": 0.0873697312800698
+        }
+      },
+      "displacement": {
+        "full_run": {
+          "actual_window_s": [
+            0.0,
+            20.00000000000681
+          ],
+          "delta_xy_m": [
+            0.7744034440722931,
+            0.3095921576151698
+          ],
+          "net_distance_m": 0.833995202772681,
+          "displacement_heading_rad": 0.38031798653313514,
+          "heading_minus_recorded_goal_angle_rad": -0.01968201346686488
+        },
+        "after_3s": {
+          "actual_window_s": [
+            2.9999999999998,
+            20.00000000000681
+          ],
+          "delta_xy_m": [
+            0.6558292286671292,
+            0.28580905395972134
+          ],
+          "net_distance_m": 0.7154011409688082,
+          "displacement_heading_rad": 0.41098096955231717,
+          "heading_minus_recorded_goal_angle_rad": 0.010980969552317144
+        }
+      },
+      "directional_check": {
+        "initial_body_heading_rad": -9.309297604188794e-19,
+        "requested_turn_from_initial_rad": 0.4,
+        "last_cycle_body_turn_from_initial_rad": 0.4081887336665447,
+        "turn_sign_matches_request": true,
+        "mean_absolute_goal_error_reduced_first_to_last_cycle": true,
+        "status": "Directional response checks only; no steering tolerance, robustness, biological, or walking pass is inferred."
+      },
+      "original_trace": {
+        "path": "C:\\Users\\ziyad\\GeckoBrain\\artifacts\\evidence\\session2\\trials\\steering_left\\traces\\episode_000.json",
+        "sha256": "38c00a1e1d269fdfaa33a3ba348348348d0dd0209de4a683a10ff0784f385460",
+        "bytes": 39617248
+      },
+      "source_report": {
+        "path": "C:\\Users\\ziyad\\GeckoBrain\\artifacts\\evidence\\session2\\trials\\steering_left\\report.json",
+        "sha256": "13d364e6c01c1787540d5285c047334ec5f93bf84d67904e9ca44e9e68aba71e",
+        "bytes": 464151
+      },
+      "xml_sha256": "756765356417749c72150b05da59565ffc97825cf2457e638cd04ea2e1885c4b",
+      "gate2_pass_as_recorded": false,
+      "source_sha256": {
+        "envs/cpg_residual_controller.py": "54734d387cdb79a8d0a4dfdb3780f9526f78a6f52607c7f3b99701906b937336",
+        "envs/gecko_walk_env.py": "4c3ca566c6bdb6a7a659fe40f4f25168cdc560254979c40092228c73b7cab293",
+        "realism_metrics.py": "2f59ddc4dd964044440cff68290b72fe3820e31f275881e0d50b2b865471566c",
+        "config/proxies.yaml": "94c44a58ca4ab3428d6e32d700273f598cd0eddf49634aa03643a95d62acc120"
+      }
+    },
+    "steering_right": {
+      "goal_angle_rad": -0.4,
+      "commanded_frequency_hz": 1.1888,
+      "commanded_period_s": 0.8411843876177657,
+      "quaternion_convention": "wxyz; rotate trunk-local +X into world, project to XY, atan2(y,x). Quaternion sign does not change heading.",
+      "maximum_quaternion_norm_deviation": 9.992007221626409e-16,
+      "undefined_planar_heading_sample_count": 0,
+      "goal_reconstruction": {
+        "target_xy_m": [
+          9.20948981722347,
+          -3.8941834230865053
+        ],
+        "distance_m": 10.0,
+        "source": "INFERRED from historical eval/session2_controller.py: initial trunk XY + 10*[cos(goal_angle),sin(goal_angle)]; angle is directly logged, target coordinates/distance are not.",
+        "assumption": "No goal resampling in these short distant-goal trials; commanded angle comparison is also given independently."
+      },
+      "angle_units": "radians; positive error means target lies left/counter-clockwise of body heading",
+      "cycle_window_definition": "First and last complete commanded cycles anchored at t=0; final partial cycle excluded. These are clock windows, not inferred contact strides.",
+      "windows": {
+        "first_full_commanded_cycle": {
+          "cycle_index": 0,
+          "commanded_window_s": [
+            0.0,
+            0.8411843876177657
+          ],
+          "actual_sample_window_s": [
+            0.0,
+            0.8400000000000158
+          ],
+          "sample_count": 211,
+          "mean_body_heading_rad": -0.058859090873679444,
+          "mean_finite_goal_bearing_rad": -0.4008998159248519,
+          "mean_signed_goal_bearing_error_rad": -0.3420406066583475,
+          "mean_absolute_goal_bearing_error_rad": 0.34204395700088025,
+          "mean_signed_error_to_recorded_command_angle_rad": -0.34114090912632067,
+          "mean_absolute_error_to_recorded_command_angle_rad": 0.34114414106869273
+        },
+        "last_full_commanded_cycle": {
+          "cycle_index": 22,
+          "commanded_window_s": [
+            18.506056527590847,
+            19.347240915208612
+          ],
+          "actual_sample_window_s": [
+            18.508000000003662,
+            19.344000000005426
+          ],
+          "sample_count": 210,
+          "mean_body_heading_rad": -0.3984888209374729,
+          "mean_finite_goal_bearing_rad": -0.403397903138495,
+          "mean_signed_goal_bearing_error_rad": -0.0049090305852934,
+          "mean_absolute_goal_bearing_error_rad": 0.08906255272853439,
+          "mean_signed_error_to_recorded_command_angle_rad": -0.0015111790625271548,
+          "mean_absolute_error_to_recorded_command_angle_rad": 0.08870589712353462
+        },
+        "first_full_commanded_cycle_after_3s": {
+          "cycle_index": 4,
+          "commanded_window_s": [
+            3.364737550471063,
+            4.205921938088829
+          ],
+          "actual_sample_window_s": [
+            3.3679999999997596,
+            4.203999999999668
+          ],
+          "sample_count": 210,
+          "mean_body_heading_rad": -0.36502163837035695,
+          "mean_finite_goal_bearing_rad": -0.4030100276292023,
+          "mean_signed_goal_bearing_error_rad": -0.03798837147785531,
+          "mean_absolute_goal_bearing_error_rad": 0.08870421449632047,
+          "mean_signed_error_to_recorded_command_angle_rad": -0.03497836162964311,
+          "mean_absolute_error_to_recorded_command_angle_rad": 0.08804899440467895
+        }
+      },
+      "displacement": {
+        "full_run": {
+          "actual_window_s": [
+            0.0,
+            20.00000000000681
+          ],
+          "delta_xy_m": [
+            0.7780274455089532,
+            -0.29176126579765405
+          ],
+          "net_distance_m": 0.8309340179491007,
+          "displacement_heading_rad": -0.35877176750991085,
+          "heading_minus_recorded_goal_angle_rad": 0.04122823249008916
+        },
+        "after_3s": {
+          "actual_window_s": [
+            2.9999999999998,
+            20.00000000000681
+          ],
+          "delta_xy_m": [
+            0.6611960764191015,
+            -0.26852049810305423
+          ],
+          "net_distance_m": 0.7136410227653163,
+          "displacement_heading_rad": -0.38576529955205824,
+          "heading_minus_recorded_goal_angle_rad": 0.014234700447941784
+        }
+      },
+      "directional_check": {
+        "initial_body_heading_rad": -9.309297604188794e-19,
+        "requested_turn_from_initial_rad": -0.4,
+        "last_cycle_body_turn_from_initial_rad": -0.3984888209374729,
+        "turn_sign_matches_request": true,
+        "mean_absolute_goal_error_reduced_first_to_last_cycle": true,
+        "status": "Directional response checks only; no steering tolerance, robustness, biological, or walking pass is inferred."
+      },
+      "original_trace": {
+        "path": "C:\\Users\\ziyad\\GeckoBrain\\artifacts\\evidence\\session2\\trials\\steering_right\\traces\\episode_000.json",
+        "sha256": "dce969e91358f9b4e78c0c004f361038292d015459e8a814791ca6213affb0ae",
+        "bytes": 39677743
+      },
+      "source_report": {
+        "path": "C:\\Users\\ziyad\\GeckoBrain\\artifacts\\evidence\\session2\\trials\\steering_right\\report.json",
+        "sha256": "f835b0b699454af2903d4c3c79826f690cd21fc047199a246870a98d5380eb8a",
+        "bytes": 459018
+      },
+      "xml_sha256": "756765356417749c72150b05da59565ffc97825cf2457e638cd04ea2e1885c4b",
+      "gate2_pass_as_recorded": false,
+      "source_sha256": {
+        "envs/cpg_residual_controller.py": "54734d387cdb79a8d0a4dfdb3780f9526f78a6f52607c7f3b99701906b937336",
+        "envs/gecko_walk_env.py": "4c3ca566c6bdb6a7a659fe40f4f25168cdc560254979c40092228c73b7cab293",
+        "realism_metrics.py": "2f59ddc4dd964044440cff68290b72fe3820e31f275881e0d50b2b865471566c",
+        "config/proxies.yaml": "94c44a58ca4ab3428d6e32d700273f598cd0eddf49634aa03643a95d62acc120"
+      }
+    }
+  },
+  "paired_directional_comparisons": {
+    "steering_left": {
+      "recorded_goal_angle_shift_from_center_rad": 0.4,
+      "last_cycle_body_heading_shift_from_center_rad": 0.40543868901112495,
+      "postsettle_displacement_heading_shift_from_center_rad": 0.39000176962922095,
+      "body_shift_sign_matches_goal_shift": true,
+      "displacement_shift_sign_matches_goal_shift": true
+    },
+    "steering_right": {
+      "recorded_goal_angle_shift_from_center_rad": -0.4,
+      "last_cycle_body_heading_shift_from_center_rad": -0.4012388655928926,
+      "postsettle_displacement_heading_shift_from_center_rad": -0.40674449947515445,
+      "body_shift_sign_matches_goal_shift": true,
+      "displacement_shift_sign_matches_goal_shift": true
+    }
+  },
+  "controlled_comparison": {
+    "steering_left": {
+      "xml_sha256": true,
+      "lab_parameters": true,
+      "commanded_stance_by_foot": true,
+      "phase_offsets_cycle": true,
+      "commanded_frequency_hz": true,
+      "seed": true,
+      "reset_noise": true,
+      "source_sha256": true,
+      "initial_qpos": true
+    },
+    "steering_right": {
+      "xml_sha256": true,
+      "lab_parameters": true,
+      "commanded_stance_by_foot": true,
+      "phase_offsets_cycle": true,
+      "commanded_frequency_hz": true,
+      "seed": true,
+      "reset_noise": true,
+      "source_sha256": true,
+      "initial_qpos": true
+    }
+  },
+  "limitations": [
+    "One goal per deterministic trial; response direction is not evidence of disturbance rejection, broad steering robustness, or successful locomotion gates.",
+    "First complete cycle includes reset/startup. First complete post3s cycle is additionally reported. Body heading comes from orientation; displacement heading is distinct.",
+    "Reconstructed finite target requires the historical10m target rule; exact command-angle errors do not rely on that distance."
+  ]
+}

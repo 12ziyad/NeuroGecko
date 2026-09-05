@@ -232,6 +232,19 @@ def make_env(seed, control_mode="raw", residual_scale=0.25,
     return _f
 
 
+def require_lab_training_readiness(gait_profile):
+    """Session 2 deliberately leaves lab learning closed after failed Gate 2.
+
+    Reopening requires validated gait evidence AND recording/comparing effective
+    lab controller parameters in checkpoint resume contracts. See BLOCKED.md.
+    Legacy training behavior is not changed by this experimental-candidate gate.
+    """
+    if gait_profile == "lab":
+        raise ValueError("Lab training/resume is blocked: Session 2 Gate 2 failed. "
+                         "Fix contact support/timing and persist the effective lab controller "
+                         "parameter resume contract before reopening training; see docs/BLOCKED.md.")
+
+
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--envs", type=int, default=16)
@@ -276,6 +289,7 @@ def main():
                         "existing commands are unchanged.")
     args = p.parse_args()
     try:
+        require_lab_training_readiness(args.gait_profile)
         validate_training_args(args)
     except (ValueError, FileNotFoundError) as exc:
         p.error(str(exc))

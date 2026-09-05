@@ -25,8 +25,8 @@ class GaitProfileTests(unittest.TestCase):
     def test_registry_lab_profile(self):
         profile = get_gait_profile("lab")
         self.assertEqual(profile.frequency_hz, LOCKED_FREQUENCY_HZ)
-        self.assertEqual(profile.touchdown_delays, {"HL":0., "FL":.44, "HR":.5, "FR":.94})
-        self.assertEqual(profile.stance_by_foot, {"HL":.765, "FL":.70, "HR":.765, "FR":.70})
+        self.assertEqual(profile.touchdown_delays, {"HL":0., "FL":.435, "HR":.5, "FR":.935})
+        self.assertEqual(profile.stance_by_foot, {"HL":.78, "FL":.70, "HR":.78, "FR":.70})
         with self.assertRaises(FrozenInstanceError):
             profile.frequency_hz = 2
 

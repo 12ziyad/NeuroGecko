@@ -6,6 +6,112 @@
 only OS Python services were running. EC2 remained on and billing. This session
 does not require AWS and launches no training, PPO learning, CMA-ES or GPU job.
 The owner's existing $60 ceiling is not a spending target.
+Rechecked at **11:21 UTC**: still reachable, only the same two OS Python
+services, no project training process. The instance has NOT been stopped.
+
+### Session 2 outcome: improved base, Gate 2 FAIL — no retrain
+
+The selected experimental lab base is manual trial `19_front_height`, reproduced
+exactly in `final_candidate` and `verified_final`. It moves at **0.042444 m/s**
+signed body-forward speed, with **0.825320 net/path**. The comparable 250 Hz
+pre-edit reference is 0.011811 m/s and 0.205647. These are one deterministic
+20-second run per condition, scoring after 3 seconds, not independent animals.
+
+| Gate 2 requirement | Final measured result | Outcome |
+|---|---|---|
+| Signed forward >=0.04 m/s | 0.042444 | PASS |
+| Net/path >=0.5 | 0.825320 | PASS |
+| Hind swing load <10%, each foot | HL 1.290%; HR 1.087% | PASS |
+| Front commanded-stance load >=65%, each foot | FL 61.139%; FR 60.641% | FAIL |
+| Hind observed duty 0.78 +/-0.05 | HL 0.640784; HR 0.631227 | FAIL |
+| Observed limb phase 0.435 +/-0.03 | left 0.577408; right 0.569030 | FAIL |
+
+All four final contact-cycle rates are 1.18869–1.19167 Hz, with period CV
+1.67–3.13%; acquisition is genuine 250 Hz. Thus the selected candidate satisfies
+the engineering entrainment/regularity check without editing observed events.
+The legacy walker still fails that check; its behavior was deliberately preserved.
+No falls occurred in the selected 20-second run. The six biological-inspired
+engineering requirements do NOT all pass merely because the clock now matches.
+
+The candidate is selected for forward movement, low swing loading and relatively
+straight travel, not as a globally optimal gait or biological validation. All
+failed alternatives remain saved. The default XML/profile remain legacy; opting
+into lab now selects these experimental controller values. Old lab commands can
+be reconstructed using the explicit versioned profile/parameters in compatibility
+tests and the committed baseline evidence. No existing checkpoint was replaced.
+
+### One-change-at-a-time mechanical trials
+
+Each numbered row changes the preceding row's single named parameter; rows 10
+and 11 change timing only. Row 00b separately verifies exact old-lab compatibility.
+Every trial reruns legacy fixtures and high-rate isolation tests before stepping.
+Values are rounded below; full six checks, seeds, force diagnostics, effective
+parameters and source hashes are in each `artifacts/evidence/session2/trials/*/report.json`.
+No optimizer, learning algorithm or fitted objective was used.
+
+| Trial/change | Forward m/s | Net/path | Hind swing load HL/HR | Front stance load FL/FR | Hind duty HL/HR | Limb phase L/R |
+|---|---:|---:|---|---|---|---|
+| 00b exact old reference | .01181 | .206 | .511/.691 | .504/.563 | .485/.567 | .470/.537 |
+| 01 knee lift multiplier -1.3333 | .00067 | .093 | .240/.318 | .514/.608 | .487/.391 | .454/.361 |
+| 02 mirror left fore-aft signs | .00955 | .284 | .435/.249 | .549/.550 | .529/.501 | .354/.492 |
+| 03 shoulder tuck 0 rad | .00557 | .121 | .449/.424 | .544/.481 | .630/.675 | .566/.575 |
+| 04 left front press 0 | -.00135 | .019 | .502/.460 | .488/.552 | .560/.538 | .559/.432 |
+| 05 right front press 0 | -.00484 | .077 | .490/.517 | .539/.379 | .492/.605 | .513/.570 |
+| 06 front seek 0 | -.00666 | .082 | .530/.527 | .540/.345 | .434/.627 | .428/.635 |
+| 07 continuous front lift | -.00666 | .082 | .530/.527 | .540/.345 | .434/.627 | .428/.635 |
+| 08 front swing delta -.8 | .03351 | .704 | .071/.005 | .651/.570 | .657/.713 | .565/.646 |
+| 09 fore/hind angular ratio .54 | .02959 | .655 | .064/.010 | .642/.560 | .655/.707 | .573/.644 |
+| 10 commanded hind duty .78 | .02949 | .632 | .059/.003 | .638/.556 | .647/.720 | .575/.652 |
+| 11 front touchdown delay .435 | .02993 | .632 | .067/.009 | .634/.552 | .642/.710 | .590/.655 |
+| 12 heading gain 1/rad | .03191 | .638 | .061/.018 | .630/.564 | .613/.693 | .581/.654 |
+| 13 hind amplitude .9 | .03966 | .737 | .041/.059 | .652/.575 | .621/.663 | .574/.617 |
+| 14 front swing delta -.6 | .03850 | .761 | .052/.061 | .657/.582 | .617/.681 | .579/.625 |
+| 15 right front press .05 | .03930 | .753 | .046/.047 | .644/.581 | .621/.675 | .585/.609 |
+| 16 left front press .05 | .03906 | .758 | .053/.050 | .653/.572 | .653/.685 | .589/.627 |
+| 17 hind amplitude .98 | .04105 | .778 | .062/.053 | .661/.581 | .657/.660 | .576/.590 |
+| 18 other-channel amplitude 0 | .04619 | .777 | .016/.012 | .582/.571 | .667/.668 | .613/.617 |
+| 19 front swing delta -.4; SELECTED | .04244 | .825 | .013/.011 | .611/.606 | .641/.631 | .577/.569 |
+| 20 front swing delta -.2; rejected | .03550 | .767 | .157/.139 | .604/.613 | .633/.685 | .635/.562 |
+| 21 knee multiplier -1; rejected | .03398 | .793 | .130/.142 | .625/.629 | .657/.689 | .636/.561 |
+
+Rows 00–09 initially used the mathematically ideal 8/9 shoulder/hip range ratio;
+a test caught that the legacy shoulder range is rounded, making its actual ratio
+0.8888892698450486. The resulting command difference was about 2e-7 rad. An
+explicit compatibility branch restores exact old commands, confirmed by 00b and
+4,000 old/new full-command comparisons across both bodies/profiles. The .54-ratio
+selected candidate is unaffected. Rows 06/07 are exactly equal because zero press
+and seek already make the compatibility front curve continuous at its boundaries.
+
+### Geometry, verification and stop decision
+
+Frozen-trunk collision geometry, not site height, confirms selected mid-swing
+clearance **+2.065 mm hind / +2.735 mm front**, respectively 2.278/3.495 mm above
+mid-stance. All four stance pad sweeps now travel rearward. Front commanded stance
+overlap fell from 12.905/14.093 mm to **0.760 mm each**, but did NOT become zero;
+hind overlap remains 0.212 mm. Soft-contact force and dynamic support remain
+separate measurements. No contact geometry was secretly removed or altered.
+
+Final morphology: **14/14** static gates. Guarded software verification:
+**189 executed, 188 passed, one optional SciPy skip**, plus three deliberately
+excluded tests (one actual PPO-learning smoke test and two OpenGL pixel tests).
+Zero guarded learning, graphics or CUDA calls occurred. Existing camera pixels
+were not re-rendered in this no-GPU session. No new video is claimed.
+
+Gate 2 remains red after the bounded mechanical trials. Activation lag,
+integrator changes, force-ceiling changes and the optional frequency-gain sweep
+were NOT started. `FREQ_HZ` stays 1.1888. The training CLI now explicitly refuses
+lab training/resume pending validated support/timing and a complete effective-
+controller checkpoint contract; legacy CLI behavior remains unchanged.
+
+Steering verification used the selected parameters without further tuning, with
+goal bearings 0/+0.4/-0.4 rad. Relative to center, final-cycle mean body heading
+shifted +0.40544/-0.40124 rad; post-settle displacement heading shifted
++0.39000/-0.40674 rad. This verifies directional response in three deterministic
+probes, not perturbation robustness. Last-cycle mean absolute target-bearing error
+remained about0.087–0.089rad (about5degrees), so heading still oscillates.
+See `artifacts/evidence/session2/steering_checks.json` and the complete 27-report
+comparison. Trial19, final_candidate and verified_final have exactly equal six
+gate results; those verification repeats are NOT three independent samples.
 
 Starting code: `3efa2f6`. Research documents remain read-only. Candidate work is
 explicitly V2 + lab; the live default stays legacy body + legacy controller.

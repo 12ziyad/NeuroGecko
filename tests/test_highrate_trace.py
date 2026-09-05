@@ -55,7 +55,8 @@ class HighRateTraceTests(unittest.TestCase):
     def test_bad_sampling_divisor_rejected(self):
         env = GeckoWalkEnv()
         try:
-            with self.assertRaises(ValueError):
-                TraceRecorder(env, physics_substeps=6)
+            for interval in (6, 2.5, True, 0):
+                with self.assertRaises(ValueError):
+                    TraceRecorder(env, physics_substeps=interval)
         finally:
             env.close()

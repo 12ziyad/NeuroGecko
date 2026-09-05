@@ -1,5 +1,45 @@
 # Build blockers and deferred work
 
+## Session 2 decision — Gate 2 FAIL, stop before training or plant changes
+
+Selected V2 + lab base, zero policy action, seed0,20s with first3s excluded,
+genuine250Hz sampling. Each condition is n=1; repeated verification is not new data.
+
+| Requirement | Measured | Pass? |
+|---|---|---|
+| Forward >=.04m/s | .042444 | Yes |
+| Net/path >=.5 | .825320 | Yes |
+| Each hind swing load <.10 | .012903/.010870 | Yes |
+| Each front stance load >=.65 | .611390/.606408 | NO |
+| Each hind duty within.05 of.78 | .640784/.631227 | NO |
+| Each limb phase within.03 of.435 | .577408/.569030 | NO |
+
+Contact cycles are now near1.1888Hz with CV1.67–3.13%, but stance support and
+touchdown timing remain wrong. A further reward-trained residual must not be used
+to conceal this defect. All failed manual trials are retained in the build log.
+
+Also incomplete: zero commanded front penetration (still0.760mm at the frozen
+mid-stance pose), biological angle/waveform validation, and Gate1's proposed
+learning-correlation claim (unidentifiable without learning). Mechanical power
+accounting itself is implemented and tested; the old residual-only effort term
+asserted by the brief did not exist.
+
+No activation lag, integrator/force-ceiling modification, frequency-gain sweep,
+PPO, CMA-ES or GPU operation was performed. This is an improved experimental base,
+not a validated animal brain or production walker.
+
+Before any future lab training or resume, persist and validate the exact effective
+`cpg.lab_parameters` in checkpoint contracts; the older timing-only contract does
+not cover the new mechanical controls. The training CLI now fails closed for lab
+until that contract and the failed gait gate are deliberately resolved. A reward
+override or `--allow-*` resume switch does not bypass this explicit stop.
+
+AWS recheck11:21UTC: instance reachable and idle, still on/billing. No remote
+project Python process was running; only OS services. The owner can stop it.
+
+Earlier-session notes follow for historical context; their old gait numbers are
+superseded by the table above, not silently erased.
+
 No blocker prevented model recovery.
 
 ## Completed prerequisites

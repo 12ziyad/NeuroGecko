@@ -1,0 +1,14 @@
+{
+  "mirror_left_fa": true,
+  "hind_lift_multiplier": -1.3333333333333333,
+  "front_stance_press": 0.0,
+  "front_stance_press_fr": 0.0,
+  "front_swing_lift": 0.4,
+  "front_stance_seek": 0.0,
+  "front_seek_relax": 0.35,
+  "shoulder_sprawl_tuck": 0.0,
+  "fore_hind_amplitude_ratio": 0.8888888888888888,
+  "hind_fa_amplitude": 0.68,
+  "heading_gain": 0.0,
+  "continuous_front_lift": true
+}

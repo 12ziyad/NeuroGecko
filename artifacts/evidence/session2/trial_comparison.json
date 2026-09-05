@@ -1,0 +1,3803 @@
+{
+  "schema_version": 1,
+  "claim": "Retained CPU-only manual trials; no biological validation. Gate2 remains failed; no further tuning, training, or plant changes are implied.",
+  "repeat_unit": "Each case is n=1 deterministic trajectory, not an independent-animal sample. Replays are not pooled and no across-case/replay SD is computed.",
+  "selection": "Root selected19_front_height as experimental lab defaults; final_candidate and verified_final are retained confirmations. Later failed alternatives are not hidden.",
+  "value_policy": "Copy six gate values/pass flags from each saved report. Early reports may use earlier endpoint masks; source report hashes and missing validity fields remain explicit.",
+  "trial_count": 27,
+  "gate2_passing_cases": [],
+  "trials": [
+    {
+      "case": "00_reference",
+      "source_report": {
+        "path": "C:\\Users\\ziyad\\GeckoBrain\\artifacts\\evidence\\session2\\trials\\00_reference\\report.json",
+        "sha256": "7e5e2bcc69b17af8478d028bbd671c85620c9ee7325a0414eeefbd1d7b21dcab",
+        "bytes": 689163
+      },
+      "retained_trace": null,
+      "trace_provenance_status": "raw trace was not retained; saved report hash only",
+      "protocol": {
+        "seed": 0,
+        "gait_profile": "lab",
+        "xml_sha256": "756765356417749c72150b05da59565ffc97825cf2457e638cd04ea2e1885c4b",
+        "n": 1,
+        "reset_noise": 0,
+        "goal_angle_rad": 0,
+        "lab_parameters": {
+          "mirror_left_fa": false,
+          "hind_lift_multiplier": 1.0,
+          "front_stance_press": 0.4,
+          "front_stance_press_fr": 0.5,
+          "front_swing_lift": 0.4,
+          "front_stance_seek": 0.12,
+          "front_seek_relax": 0.35,
+          "shoulder_sprawl_tuck": 0.3,
+          "fore_hind_amplitude_ratio": 0.8888888888888888,
+          "hind_fa_amplitude": 0.68,
+          "heading_gain": 0.0,
+          "continuous_front_lift": false
+        },
+        "commanded_stance_by_foot": {
+          "HL": 0.765,
+          "FL": 0.7,
+          "HR": 0.765,
+          "FR": 0.7
+        },
+        "phase_offsets_cycle": {
+          "HL": 0.0,
+          "FL": 0.44,
+          "HR": 0.5,
+          "FR": 0.94
+        },
+        "source_sha256": {
+          "envs/cpg_residual_controller.py": "664c030090952cf59ffb4a3e273306fbb1b9e5fce1c69384398a86bf336d67a9",
+          "envs/gecko_walk_env.py": "4c3ca566c6bdb6a7a659fe40f4f25168cdc560254979c40092228c73b7cab293",
+          "realism_metrics.py": "060de4d2085c1430ea7d2facac811830c6296cb0dfbbc6539e710f0177ec2aff",
+          "config/proxies.yaml": "62fbebeab5ac18309d2e4c86d270407bde7e589d1adbfe06bfa76483ebc3b448"
+        }
+      },
+      "gate2_pass_as_recorded": false,
+      "completed_without_fall": true,
+      "six_checks_as_recorded": {
+        "signed_forward": {
+          "value_m_s": 0.011810890911878093,
+          "pass": false
+        },
+        "net_path": {
+          "value": 0.20564689942916742,
+          "pass": false
+        },
+        "hind_swing_load": {
+          "values": {
+            "HL": 0.5111111111111111,
+            "HR": 0.6909090909090909
+          },
+          "pass": false
+        },
+        "front_stance_load": {
+          "values": {
+            "FL": 0.5036666666666667,
+            "FR": 0.5632996632996633
+          },
+          "pass": false
+        },
+        "hind_duty": {
+          "values": {
+            "HL": 0.48545874671362704,
+            "HR": 0.5671810149414118
+          },
+          "pass": false
+        },
+        "limb_phase": {
+          "values": {
+            "HL_to_FL": 0.4699075641572175,
+            "HR_to_FR": 0.537085624668582
+          },
+          "pass": false
+        }
+      },
+      "requirements_as_recorded": {
+        "minimum_forward_m_s": 0.04,
+        "minimum_net_path": 0.5,
+        "maximum_hind_swing_load": 0.1,
+        "minimum_front_stance_load": 0.65,
+        "hind_duty_target": 0.78,
+        "hind_duty_tolerance": 0.05,
+        "limb_phase_target": 0.435,
+        "limb_phase_tolerance": 0.03
+      },
+      "contact_timing": {
+        "per_foot": {
+          "HL": {
+            "observed_contact_cycle_rate_hz": 3.9835828102350406,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.28504281318666824,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 66
+          },
+          "FL": {
+            "observed_contact_cycle_rate_hz": 3.8172564226838577,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.25439156774501837,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 63
+          },
+          "HR": {
+            "observed_contact_cycle_rate_hz": 3.087885985746977,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.31912142310762526,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 52
+          },
+          "FR": {
+            "observed_contact_cycle_rate_hz": 2.7226524685371687,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.37050116775041425,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 45
+          }
+        },
+        "rate_entrainment_all_feet": false,
+        "period_cv_single_digits_all_feet": false,
+        "acquisition_at_least_200_hz": true,
+        "timing_and_acquisition_valid_recorded": null,
+        "timing_and_acquisition_valid_from_report_components": false
+      },
+      "sample_rate_hz": 250.00000000002754,
+      "observed_duration_s": 17.00000000000701
+    },
+    {
+      "case": "00b_exact_reference",
+      "source_report": {
+        "path": "C:\\Users\\ziyad\\GeckoBrain\\artifacts\\evidence\\session2\\trials\\00b_exact_reference\\report.json",
+        "sha256": "ccaccd4d5137edabc3e09322cc36f983a9dd890bda0be59ba8fb674fc8b29e6a",
+        "bytes": 689166
+      },
+      "retained_trace": null,
+      "trace_provenance_status": "raw trace was not retained; saved report hash only",
+      "protocol": {
+        "seed": 0,
+        "gait_profile": "lab",
+        "xml_sha256": "756765356417749c72150b05da59565ffc97825cf2457e638cd04ea2e1885c4b",
+        "n": 1,
+        "reset_noise": 0,
+        "goal_angle_rad": 0,
+        "lab_parameters": {
+          "mirror_left_fa": false,
+          "hind_lift_multiplier": 1.0,
+          "front_stance_press": 0.4,
+          "front_stance_press_fr": 0.5,
+          "front_swing_lift": 0.4,
+          "front_stance_seek": 0.12,
+          "front_seek_relax": 0.35,
+          "shoulder_sprawl_tuck": 0.3,
+          "fore_hind_amplitude_ratio": 0.8888888888888888,
+          "hind_fa_amplitude": 0.68,
+          "heading_gain": 0.0,
+          "continuous_front_lift": false
+        },
+        "commanded_stance_by_foot": {
+          "HL": 0.765,
+          "FL": 0.7,
+          "HR": 0.765,
+          "FR": 0.7
+        },
+        "phase_offsets_cycle": {
+          "HL": 0.0,
+          "FL": 0.44,
+          "HR": 0.5,
+          "FR": 0.94
+        },
+        "source_sha256": {
+          "envs/cpg_residual_controller.py": "fda4afde22db3a152353fe2e3bd80e605804c903cde5698a2cb57429ff61bf6a",
+          "envs/gecko_walk_env.py": "4c3ca566c6bdb6a7a659fe40f4f25168cdc560254979c40092228c73b7cab293",
+          "realism_metrics.py": "4c6fbb6e653dff35c52ca017ffa0914e41a7c3c1981bc0c4c72587e0f95b4661",
+          "config/proxies.yaml": "62fbebeab5ac18309d2e4c86d270407bde7e589d1adbfe06bfa76483ebc3b448"
+        }
+      },
+      "gate2_pass_as_recorded": false,
+      "completed_without_fall": true,
+      "six_checks_as_recorded": {
+        "signed_forward": {
+          "value_m_s": 0.01181090103271686,
+          "pass": false
+        },
+        "net_path": {
+          "value": 0.2056468751686222,
+          "pass": false
+        },
+        "hind_swing_load": {
+          "values": {
+            "HL": 0.5111111111111111,
+            "HR": 0.6909090909090909
+          },
+          "pass": false
+        },
+        "front_stance_load": {
+          "values": {
+            "FL": 0.5036666666666667,
+            "FR": 0.5632996632996633
+          },
+          "pass": false
+        },
+        "hind_duty": {
+          "values": {
+            "HL": 0.48545874671362704,
+            "HR": 0.5671810149414118
+          },
+          "pass": false
+        },
+        "limb_phase": {
+          "values": {
+            "HL_to_FL": 0.4699075641572175,
+            "HR_to_FR": 0.537085624668582
+          },
+          "pass": false
+        }
+      },
+      "requirements_as_recorded": {
+        "minimum_forward_m_s": 0.04,
+        "minimum_net_path": 0.5,
+        "maximum_hind_swing_load": 0.1,
+        "minimum_front_stance_load": 0.65,
+        "hind_duty_target": 0.78,
+        "hind_duty_tolerance": 0.05,
+        "limb_phase_target": 0.435,
+        "limb_phase_tolerance": 0.03
+      },
+      "contact_timing": {
+        "per_foot": {
+          "HL": {
+            "observed_contact_cycle_rate_hz": 3.9835828102350406,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.28504281318666824,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 66
+          },
+          "FL": {
+            "observed_contact_cycle_rate_hz": 3.8172564226838577,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.25439156774501837,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 63
+          },
+          "HR": {
+            "observed_contact_cycle_rate_hz": 3.087885985746977,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.31912142310762526,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 52
+          },
+          "FR": {
+            "observed_contact_cycle_rate_hz": 2.7226524685371687,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.37050116775041425,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 45
+          }
+        },
+        "rate_entrainment_all_feet": false,
+        "period_cv_single_digits_all_feet": false,
+        "acquisition_at_least_200_hz": true,
+        "timing_and_acquisition_valid_recorded": false,
+        "timing_and_acquisition_valid_from_report_components": false
+      },
+      "sample_rate_hz": 250.00000000002754,
+      "observed_duration_s": 17.00000000000701
+    },
+    {
+      "case": "01_hind_lift",
+      "source_report": {
+        "path": "C:\\Users\\ziyad\\GeckoBrain\\artifacts\\evidence\\session2\\trials\\01_hind_lift\\report.json",
+        "sha256": "7f530ecaf2f4997b6b04f76ce710b50948cbbada2c50f6bd45f3b1c8dc541568",
+        "bytes": 651820
+      },
+      "retained_trace": null,
+      "trace_provenance_status": "raw trace was not retained; saved report hash only",
+      "protocol": {
+        "seed": 0,
+        "gait_profile": "lab",
+        "xml_sha256": "756765356417749c72150b05da59565ffc97825cf2457e638cd04ea2e1885c4b",
+        "n": 1,
+        "reset_noise": 0,
+        "goal_angle_rad": 0,
+        "lab_parameters": {
+          "mirror_left_fa": false,
+          "hind_lift_multiplier": -1.3333333333333333,
+          "front_stance_press": 0.4,
+          "front_stance_press_fr": 0.5,
+          "front_swing_lift": 0.4,
+          "front_stance_seek": 0.12,
+          "front_seek_relax": 0.35,
+          "shoulder_sprawl_tuck": 0.3,
+          "fore_hind_amplitude_ratio": 0.8888888888888888,
+          "hind_fa_amplitude": 0.68,
+          "heading_gain": 0.0,
+          "continuous_front_lift": false
+        },
+        "commanded_stance_by_foot": {
+          "HL": 0.765,
+          "FL": 0.7,
+          "HR": 0.765,
+          "FR": 0.7
+        },
+        "phase_offsets_cycle": {
+          "HL": 0.0,
+          "FL": 0.44,
+          "HR": 0.5,
+          "FR": 0.94
+        },
+        "source_sha256": {
+          "envs/cpg_residual_controller.py": "664c030090952cf59ffb4a3e273306fbb1b9e5fce1c69384398a86bf336d67a9",
+          "envs/gecko_walk_env.py": "4c3ca566c6bdb6a7a659fe40f4f25168cdc560254979c40092228c73b7cab293",
+          "realism_metrics.py": "060de4d2085c1430ea7d2facac811830c6296cb0dfbbc6539e710f0177ec2aff",
+          "config/proxies.yaml": "62fbebeab5ac18309d2e4c86d270407bde7e589d1adbfe06bfa76483ebc3b448"
+        }
+      },
+      "gate2_pass_as_recorded": false,
+      "completed_without_fall": true,
+      "six_checks_as_recorded": {
+        "signed_forward": {
+          "value_m_s": 0.000673923007159223,
+          "pass": false
+        },
+        "net_path": {
+          "value": 0.09270428314934653,
+          "pass": false
+        },
+        "hind_swing_load": {
+          "values": {
+            "HL": 0.2404040404040404,
+            "HR": 0.3181818181818182
+          },
+          "pass": false
+        },
+        "front_stance_load": {
+          "values": {
+            "FL": 0.5136666666666667,
+            "FR": 0.6084175084175084
+          },
+          "pass": false
+        },
+        "hind_duty": {
+          "values": {
+            "HL": 0.48691121511893,
+            "HR": 0.39091848282962854
+          },
+          "pass": false
+        },
+        "limb_phase": {
+          "values": {
+            "HL_to_FL": 0.4539151823518634,
+            "HR_to_FR": 0.3606360128976335
+          },
+          "pass": false
+        }
+      },
+      "requirements_as_recorded": {
+        "minimum_forward_m_s": 0.04,
+        "minimum_net_path": 0.5,
+        "maximum_hind_swing_load": 0.1,
+        "minimum_front_stance_load": 0.65,
+        "hind_duty_target": 0.78,
+        "hind_duty_tolerance": 0.05,
+        "limb_phase_target": 0.435,
+        "limb_phase_tolerance": 0.03
+      },
+      "contact_timing": {
+        "per_foot": {
+          "HL": {
+            "observed_contact_cycle_rate_hz": 3.6160823731294043,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.3313046602626449,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 59
+          },
+          "FL": {
+            "observed_contact_cycle_rate_hz": 4.100309008793183,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.3872871144334897,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 69
+          },
+          "HR": {
+            "observed_contact_cycle_rate_hz": 3.6302032913828564,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.19517392890058274,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 60
+          },
+          "FR": {
+            "observed_contact_cycle_rate_hz": 3.6266349583813655,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.23275152620737885,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 61
+          }
+        },
+        "rate_entrainment_all_feet": false,
+        "period_cv_single_digits_all_feet": false,
+        "acquisition_at_least_200_hz": true,
+        "timing_and_acquisition_valid_recorded": null,
+        "timing_and_acquisition_valid_from_report_components": false
+      },
+      "sample_rate_hz": 250.00000000002754,
+      "observed_duration_s": 17.00000000000701
+    },
+    {
+      "case": "02_mirror",
+      "source_report": {
+        "path": "C:\\Users\\ziyad\\GeckoBrain\\artifacts\\evidence\\session2\\trials\\02_mirror\\report.json",
+        "sha256": "fb0f90a2965a5be360389a28d0bd6b0c29c59b1869d55000ca772f373408bb69",
+        "bytes": 537664
+      },
+      "retained_trace": null,
+      "trace_provenance_status": "raw trace was not retained; saved report hash only",
+      "protocol": {
+        "seed": 0,
+        "gait_profile": "lab",
+        "xml_sha256": "756765356417749c72150b05da59565ffc97825cf2457e638cd04ea2e1885c4b",
+        "n": 1,
+        "reset_noise": 0,
+        "goal_angle_rad": 0,
+        "lab_parameters": {
+          "mirror_left_fa": true,
+          "hind_lift_multiplier": -1.3333333333333333,
+          "front_stance_press": 0.4,
+          "front_stance_press_fr": 0.5,
+          "front_swing_lift": 0.4,
+          "front_stance_seek": 0.12,
+          "front_seek_relax": 0.35,
+          "shoulder_sprawl_tuck": 0.3,
+          "fore_hind_amplitude_ratio": 0.8888888888888888,
+          "hind_fa_amplitude": 0.68,
+          "heading_gain": 0.0,
+          "continuous_front_lift": false
+        },
+        "commanded_stance_by_foot": {
+          "HL": 0.765,
+          "FL": 0.7,
+          "HR": 0.765,
+          "FR": 0.7
+        },
+        "phase_offsets_cycle": {
+          "HL": 0.0,
+          "FL": 0.44,
+          "HR": 0.5,
+          "FR": 0.94
+        },
+        "source_sha256": {
+          "envs/cpg_residual_controller.py": "664c030090952cf59ffb4a3e273306fbb1b9e5fce1c69384398a86bf336d67a9",
+          "envs/gecko_walk_env.py": "4c3ca566c6bdb6a7a659fe40f4f25168cdc560254979c40092228c73b7cab293",
+          "realism_metrics.py": "060de4d2085c1430ea7d2facac811830c6296cb0dfbbc6539e710f0177ec2aff",
+          "config/proxies.yaml": "62fbebeab5ac18309d2e4c86d270407bde7e589d1adbfe06bfa76483ebc3b448"
+        }
+      },
+      "gate2_pass_as_recorded": false,
+      "completed_without_fall": true,
+      "six_checks_as_recorded": {
+        "signed_forward": {
+          "value_m_s": 0.009553599819357633,
+          "pass": false
+        },
+        "net_path": {
+          "value": 0.2835944308182538,
+          "pass": false
+        },
+        "hind_swing_load": {
+          "values": {
+            "HL": 0.4353535353535353,
+            "HR": 0.2494949494949495
+          },
+          "pass": false
+        },
+        "front_stance_load": {
+          "values": {
+            "FL": 0.5493333333333333,
+            "FR": 0.5498316498316498
+          },
+          "pass": false
+        },
+        "hind_duty": {
+          "values": {
+            "HL": 0.5288357309716628,
+            "HR": 0.501077749378832
+          },
+          "pass": false
+        },
+        "limb_phase": {
+          "values": {
+            "HL_to_FL": 0.3537482891927449,
+            "HR_to_FR": 0.4919576425668066
+          },
+          "pass": false
+        }
+      },
+      "requirements_as_recorded": {
+        "minimum_forward_m_s": 0.04,
+        "minimum_net_path": 0.5,
+        "maximum_hind_swing_load": 0.1,
+        "minimum_front_stance_load": 0.65,
+        "hind_duty_target": 0.78,
+        "hind_duty_tolerance": 0.05,
+        "limb_phase_target": 0.435,
+        "limb_phase_tolerance": 0.03
+      },
+      "contact_timing": {
+        "per_foot": {
+          "HL": {
+            "observed_contact_cycle_rate_hz": 1.563281640819793,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.46122167410921,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 25
+          },
+          "FL": {
+            "observed_contact_cycle_rate_hz": 2.4958402662219403,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.5739619134839685,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 42
+          },
+          "HR": {
+            "observed_contact_cycle_rate_hz": 3.565486094602804,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.25291445658214956,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 60
+          },
+          "FR": {
+            "observed_contact_cycle_rate_hz": 3.5637918745530417,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.22362707980148938,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 60
+          }
+        },
+        "rate_entrainment_all_feet": false,
+        "period_cv_single_digits_all_feet": false,
+        "acquisition_at_least_200_hz": true,
+        "timing_and_acquisition_valid_recorded": null,
+        "timing_and_acquisition_valid_from_report_components": false
+      },
+      "sample_rate_hz": 250.00000000002754,
+      "observed_duration_s": 17.00000000000701
+    },
+    {
+      "case": "03_tuck",
+      "source_report": {
+        "path": "C:\\Users\\ziyad\\GeckoBrain\\artifacts\\evidence\\session2\\trials\\03_tuck\\report.json",
+        "sha256": "fb4368cc7682bb75bedb1ac6b703ac43d0d2c41e324cf1f04b2e71cc1a70c484",
+        "bytes": 647387
+      },
+      "retained_trace": null,
+      "trace_provenance_status": "raw trace was not retained; saved report hash only",
+      "protocol": {
+        "seed": 0,
+        "gait_profile": "lab",
+        "xml_sha256": "756765356417749c72150b05da59565ffc97825cf2457e638cd04ea2e1885c4b",
+        "n": 1,
+        "reset_noise": 0,
+        "goal_angle_rad": 0,
+        "lab_parameters": {
+          "mirror_left_fa": true,
+          "hind_lift_multiplier": -1.3333333333333333,
+          "front_stance_press": 0.4,
+          "front_stance_press_fr": 0.5,
+          "front_swing_lift": 0.4,
+          "front_stance_seek": 0.12,
+          "front_seek_relax": 0.35,
+          "shoulder_sprawl_tuck": 0.0,
+          "fore_hind_amplitude_ratio": 0.8888888888888888,
+          "hind_fa_amplitude": 0.68,
+          "heading_gain": 0.0,
+          "continuous_front_lift": false
+        },
+        "commanded_stance_by_foot": {
+          "HL": 0.765,
+          "FL": 0.7,
+          "HR": 0.765,
+          "FR": 0.7
+        },
+        "phase_offsets_cycle": {
+          "HL": 0.0,
+          "FL": 0.44,
+          "HR": 0.5,
+          "FR": 0.94
+        },
+        "source_sha256": {
+          "envs/cpg_residual_controller.py": "59b01a7163708743ee472f1f4709a5858503a344fbff54a99431e7401ba992eb",
+          "envs/gecko_walk_env.py": "4c3ca566c6bdb6a7a659fe40f4f25168cdc560254979c40092228c73b7cab293",
+          "realism_metrics.py": "060de4d2085c1430ea7d2facac811830c6296cb0dfbbc6539e710f0177ec2aff",
+          "config/proxies.yaml": "62fbebeab5ac18309d2e4c86d270407bde7e589d1adbfe06bfa76483ebc3b448"
+        }
+      },
+      "gate2_pass_as_recorded": false,
+      "completed_without_fall": true,
+      "six_checks_as_recorded": {
+        "signed_forward": {
+          "value_m_s": 0.005565458404870085,
+          "pass": false
+        },
+        "net_path": {
+          "value": 0.12057506108456548,
+          "pass": false
+        },
+        "hind_swing_load": {
+          "values": {
+            "HL": 0.4494949494949495,
+            "HR": 0.42424242424242425
+          },
+          "pass": false
+        },
+        "front_stance_load": {
+          "values": {
+            "FL": 0.5436666666666666,
+            "FR": 0.4808080808080808
+          },
+          "pass": false
+        },
+        "hind_duty": {
+          "values": {
+            "HL": 0.6301659028265666,
+            "HR": 0.6750995429983103
+          },
+          "pass": false
+        },
+        "limb_phase": {
+          "values": {
+            "HL_to_FL": 0.5656152132535199,
+            "HR_to_FR": 0.5749688535293602
+          },
+          "pass": false
+        }
+      },
+      "requirements_as_recorded": {
+        "minimum_forward_m_s": 0.04,
+        "minimum_net_path": 0.5,
+        "maximum_hind_swing_load": 0.1,
+        "minimum_front_stance_load": 0.65,
+        "hind_duty_target": 0.78,
+        "hind_duty_tolerance": 0.05,
+        "limb_phase_target": 0.435,
+        "limb_phase_tolerance": 0.03
+      },
+      "contact_timing": {
+        "per_foot": {
+          "HL": {
+            "observed_contact_cycle_rate_hz": 2.404438964240733,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.4909048217226991,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 39
+          },
+          "FL": {
+            "observed_contact_cycle_rate_hz": 3.5018993352312267,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.2661572756739115,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 59
+          },
+          "HR": {
+            "observed_contact_cycle_rate_hz": 2.561353347628255,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.3292691267961268,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 43
+          },
+          "FR": {
+            "observed_contact_cycle_rate_hz": 3.095238095236806,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.32835384343511215,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 52
+          }
+        },
+        "rate_entrainment_all_feet": false,
+        "period_cv_single_digits_all_feet": false,
+        "acquisition_at_least_200_hz": true,
+        "timing_and_acquisition_valid_recorded": null,
+        "timing_and_acquisition_valid_from_report_components": false
+      },
+      "sample_rate_hz": 250.00000000002754,
+      "observed_duration_s": 17.00000000000701
+    },
+    {
+      "case": "04_left_press",
+      "source_report": {
+        "path": "C:\\Users\\ziyad\\GeckoBrain\\artifacts\\evidence\\session2\\trials\\04_left_press\\report.json",
+        "sha256": "93b890409b6e54bd382e2b2d0abd069371eef3a740786464fedce5cb0881c5ec",
+        "bytes": 647055
+      },
+      "retained_trace": null,
+      "trace_provenance_status": "raw trace was not retained; saved report hash only",
+      "protocol": {
+        "seed": 0,
+        "gait_profile": "lab",
+        "xml_sha256": "756765356417749c72150b05da59565ffc97825cf2457e638cd04ea2e1885c4b",
+        "n": 1,
+        "reset_noise": 0,
+        "goal_angle_rad": 0,
+        "lab_parameters": {
+          "mirror_left_fa": true,
+          "hind_lift_multiplier": -1.3333333333333333,
+          "front_stance_press": 0.0,
+          "front_stance_press_fr": 0.5,
+          "front_swing_lift": 0.4,
+          "front_stance_seek": 0.12,
+          "front_seek_relax": 0.35,
+          "shoulder_sprawl_tuck": 0.0,
+          "fore_hind_amplitude_ratio": 0.8888888888888888,
+          "hind_fa_amplitude": 0.68,
+          "heading_gain": 0.0,
+          "continuous_front_lift": false
+        },
+        "commanded_stance_by_foot": {
+          "HL": 0.765,
+          "FL": 0.7,
+          "HR": 0.765,
+          "FR": 0.7
+        },
+        "phase_offsets_cycle": {
+          "HL": 0.0,
+          "FL": 0.44,
+          "HR": 0.5,
+          "FR": 0.94
+        },
+        "source_sha256": {
+          "envs/cpg_residual_controller.py": "59b01a7163708743ee472f1f4709a5858503a344fbff54a99431e7401ba992eb",
+          "envs/gecko_walk_env.py": "4c3ca566c6bdb6a7a659fe40f4f25168cdc560254979c40092228c73b7cab293",
+          "realism_metrics.py": "060de4d2085c1430ea7d2facac811830c6296cb0dfbbc6539e710f0177ec2aff",
+          "config/proxies.yaml": "62fbebeab5ac18309d2e4c86d270407bde7e589d1adbfe06bfa76483ebc3b448"
+        }
+      },
+      "gate2_pass_as_recorded": false,
+      "completed_without_fall": true,
+      "six_checks_as_recorded": {
+        "signed_forward": {
+          "value_m_s": -0.001354201387440164,
+          "pass": false
+        },
+        "net_path": {
+          "value": 0.018984452714220137,
+          "pass": false
+        },
+        "hind_swing_load": {
+          "values": {
+            "HL": 0.502020202020202,
+            "HR": 0.4595959595959596
+          },
+          "pass": false
+        },
+        "front_stance_load": {
+          "values": {
+            "FL": 0.48833333333333334,
+            "FR": 0.5515151515151515
+          },
+          "pass": false
+        },
+        "hind_duty": {
+          "values": {
+            "HL": 0.5596233437602501,
+            "HR": 0.537595164232118
+          },
+          "pass": false
+        },
+        "limb_phase": {
+          "values": {
+            "HL_to_FL": 0.5586961348575418,
+            "HR_to_FR": 0.43226712072320556
+          },
+          "pass": false
+        }
+      },
+      "requirements_as_recorded": {
+        "minimum_forward_m_s": 0.04,
+        "minimum_net_path": 0.5,
+        "maximum_hind_swing_load": 0.1,
+        "minimum_front_stance_load": 0.65,
+        "hind_duty_target": 0.78,
+        "hind_duty_tolerance": 0.05,
+        "limb_phase_target": 0.435,
+        "limb_phase_tolerance": 0.03
+      },
+      "contact_timing": {
+        "per_foot": {
+          "HL": {
+            "observed_contact_cycle_rate_hz": 3.5637918745530417,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.14101702410102052,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 60
+          },
+          "FL": {
+            "observed_contact_cycle_rate_hz": 3.5808068751477644,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.09970586280326998,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 60
+          },
+          "HR": {
+            "observed_contact_cycle_rate_hz": 2.555872563004202,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.42165077132493317,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 43
+          },
+          "FR": {
+            "observed_contact_cycle_rate_hz": 3.5637918745530404,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.3183857515872137,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 60
+          }
+        },
+        "rate_entrainment_all_feet": false,
+        "period_cv_single_digits_all_feet": false,
+        "acquisition_at_least_200_hz": true,
+        "timing_and_acquisition_valid_recorded": null,
+        "timing_and_acquisition_valid_from_report_components": false
+      },
+      "sample_rate_hz": 250.00000000002754,
+      "observed_duration_s": 17.00000000000701
+    },
+    {
+      "case": "05_right_press",
+      "source_report": {
+        "path": "C:\\Users\\ziyad\\GeckoBrain\\artifacts\\evidence\\session2\\trials\\05_right_press\\report.json",
+        "sha256": "0e8992fe3a22a739887c10e466aca9c9e5a368359cb4ddefcf298ea0cbe47686",
+        "bytes": 671000
+      },
+      "retained_trace": null,
+      "trace_provenance_status": "raw trace was not retained; saved report hash only",
+      "protocol": {
+        "seed": 0,
+        "gait_profile": "lab",
+        "xml_sha256": "756765356417749c72150b05da59565ffc97825cf2457e638cd04ea2e1885c4b",
+        "n": 1,
+        "reset_noise": 0,
+        "goal_angle_rad": 0,
+        "lab_parameters": {
+          "mirror_left_fa": true,
+          "hind_lift_multiplier": -1.3333333333333333,
+          "front_stance_press": 0.0,
+          "front_stance_press_fr": 0.0,
+          "front_swing_lift": 0.4,
+          "front_stance_seek": 0.12,
+          "front_seek_relax": 0.35,
+          "shoulder_sprawl_tuck": 0.0,
+          "fore_hind_amplitude_ratio": 0.8888888888888888,
+          "hind_fa_amplitude": 0.68,
+          "heading_gain": 0.0,
+          "continuous_front_lift": false
+        },
+        "commanded_stance_by_foot": {
+          "HL": 0.765,
+          "FL": 0.7,
+          "HR": 0.765,
+          "FR": 0.7
+        },
+        "phase_offsets_cycle": {
+          "HL": 0.0,
+          "FL": 0.44,
+          "HR": 0.5,
+          "FR": 0.94
+        },
+        "source_sha256": {
+          "envs/cpg_residual_controller.py": "59b01a7163708743ee472f1f4709a5858503a344fbff54a99431e7401ba992eb",
+          "envs/gecko_walk_env.py": "4c3ca566c6bdb6a7a659fe40f4f25168cdc560254979c40092228c73b7cab293",
+          "realism_metrics.py": "060de4d2085c1430ea7d2facac811830c6296cb0dfbbc6539e710f0177ec2aff",
+          "config/proxies.yaml": "62fbebeab5ac18309d2e4c86d270407bde7e589d1adbfe06bfa76483ebc3b448"
+        }
+      },
+      "gate2_pass_as_recorded": false,
+      "completed_without_fall": true,
+      "six_checks_as_recorded": {
+        "signed_forward": {
+          "value_m_s": -0.004842635169550943,
+          "pass": false
+        },
+        "net_path": {
+          "value": 0.07692174785465086,
+          "pass": false
+        },
+        "hind_swing_load": {
+          "values": {
+            "HL": 0.4898989898989899,
+            "HR": 0.5171717171717172
+          },
+          "pass": false
+        },
+        "front_stance_load": {
+          "values": {
+            "FL": 0.539,
+            "FR": 0.3787878787878788
+          },
+          "pass": false
+        },
+        "hind_duty": {
+          "values": {
+            "HL": 0.4915700273450419,
+            "HR": 0.6046288170827033
+          },
+          "pass": false
+        },
+        "limb_phase": {
+          "values": {
+            "HL_to_FL": 0.5128079356808206,
+            "HR_to_FR": 0.5702548770274685
+          },
+          "pass": false
+        }
+      },
+      "requirements_as_recorded": {
+        "minimum_forward_m_s": 0.04,
+        "minimum_net_path": 0.5,
+        "maximum_hind_swing_load": 0.1,
+        "minimum_front_stance_load": 0.65,
+        "hind_duty_target": 0.78,
+        "hind_duty_tolerance": 0.05,
+        "limb_phase_target": 0.435,
+        "limb_phase_tolerance": 0.03
+      },
+      "contact_timing": {
+        "per_foot": {
+          "HL": {
+            "observed_contact_cycle_rate_hz": 3.568030447191663,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.12172475296511048,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 60
+          },
+          "FL": {
+            "observed_contact_cycle_rate_hz": 3.6790885354839054,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.20691327108085333,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 62
+          },
+          "HR": {
+            "observed_contact_cycle_rate_hz": 3.585943103034691,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.18008731991724944,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 60
+          },
+          "FR": {
+            "observed_contact_cycle_rate_hz": 3.5671819262767515,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.024262052756131296,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 60
+          }
+        },
+        "rate_entrainment_all_feet": false,
+        "period_cv_single_digits_all_feet": false,
+        "acquisition_at_least_200_hz": true,
+        "timing_and_acquisition_valid_recorded": null,
+        "timing_and_acquisition_valid_from_report_components": false
+      },
+      "sample_rate_hz": 250.00000000002754,
+      "observed_duration_s": 17.00000000000701
+    },
+    {
+      "case": "06_seek",
+      "source_report": {
+        "path": "C:\\Users\\ziyad\\GeckoBrain\\artifacts\\evidence\\session2\\trials\\06_seek\\report.json",
+        "sha256": "922aac875ca92df11a6fbac2e8685769bb88d8e5b376d24abb389cb946bf8eef",
+        "bytes": 681210
+      },
+      "retained_trace": null,
+      "trace_provenance_status": "raw trace was not retained; saved report hash only",
+      "protocol": {
+        "seed": 0,
+        "gait_profile": "lab",
+        "xml_sha256": "756765356417749c72150b05da59565ffc97825cf2457e638cd04ea2e1885c4b",
+        "n": 1,
+        "reset_noise": 0,
+        "goal_angle_rad": 0,
+        "lab_parameters": {
+          "mirror_left_fa": true,
+          "hind_lift_multiplier": -1.3333333333333333,
+          "front_stance_press": 0.0,
+          "front_stance_press_fr": 0.0,
+          "front_swing_lift": 0.4,
+          "front_stance_seek": 0.0,
+          "front_seek_relax": 0.35,
+          "shoulder_sprawl_tuck": 0.0,
+          "fore_hind_amplitude_ratio": 0.8888888888888888,
+          "hind_fa_amplitude": 0.68,
+          "heading_gain": 0.0,
+          "continuous_front_lift": false
+        },
+        "commanded_stance_by_foot": {
+          "HL": 0.765,
+          "FL": 0.7,
+          "HR": 0.765,
+          "FR": 0.7
+        },
+        "phase_offsets_cycle": {
+          "HL": 0.0,
+          "FL": 0.44,
+          "HR": 0.5,
+          "FR": 0.94
+        },
+        "source_sha256": {
+          "envs/cpg_residual_controller.py": "59b01a7163708743ee472f1f4709a5858503a344fbff54a99431e7401ba992eb",
+          "envs/gecko_walk_env.py": "4c3ca566c6bdb6a7a659fe40f4f25168cdc560254979c40092228c73b7cab293",
+          "realism_metrics.py": "060de4d2085c1430ea7d2facac811830c6296cb0dfbbc6539e710f0177ec2aff",
+          "config/proxies.yaml": "62fbebeab5ac18309d2e4c86d270407bde7e589d1adbfe06bfa76483ebc3b448"
+        }
+      },
+      "gate2_pass_as_recorded": false,
+      "completed_without_fall": true,
+      "six_checks_as_recorded": {
+        "signed_forward": {
+          "value_m_s": -0.006661714312206731,
+          "pass": false
+        },
+        "net_path": {
+          "value": 0.08181818889192632,
+          "pass": false
+        },
+        "hind_swing_load": {
+          "values": {
+            "HL": 0.5303030303030303,
+            "HR": 0.5272727272727272
+          },
+          "pass": false
+        },
+        "front_stance_load": {
+          "values": {
+            "FL": 0.5396666666666666,
+            "FR": 0.34545454545454546
+          },
+          "pass": false
+        },
+        "hind_duty": {
+          "values": {
+            "HL": 0.4336379673835822,
+            "HR": 0.6266807901335754
+          },
+          "pass": false
+        },
+        "limb_phase": {
+          "values": {
+            "HL_to_FL": 0.4282210025437141,
+            "HR_to_FR": 0.635342734981055
+          },
+          "pass": false
+        }
+      },
+      "requirements_as_recorded": {
+        "minimum_forward_m_s": 0.04,
+        "minimum_net_path": 0.5,
+        "maximum_hind_swing_load": 0.1,
+        "minimum_front_stance_load": 0.65,
+        "hind_duty_target": 0.78,
+        "hind_duty_tolerance": 0.05,
+        "limb_phase_target": 0.435,
+        "limb_phase_tolerance": 0.03
+      },
+      "contact_timing": {
+        "per_foot": {
+          "HL": {
+            "observed_contact_cycle_rate_hz": 3.567181926276753,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.13802308473450095,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 60
+          },
+          "FL": {
+            "observed_contact_cycle_rate_hz": 4.514136374433891,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.2829596394979101,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 76
+          },
+          "HR": {
+            "observed_contact_cycle_rate_hz": 3.5236938031577614,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.22863864214089458,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 58
+          },
+          "FR": {
+            "observed_contact_cycle_rate_hz": 3.6257727056570683,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.11555321054456395,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 61
+          }
+        },
+        "rate_entrainment_all_feet": false,
+        "period_cv_single_digits_all_feet": false,
+        "acquisition_at_least_200_hz": true,
+        "timing_and_acquisition_valid_recorded": null,
+        "timing_and_acquisition_valid_from_report_components": false
+      },
+      "sample_rate_hz": 250.00000000002754,
+      "observed_duration_s": 17.00000000000701
+    },
+    {
+      "case": "07_continuity",
+      "source_report": {
+        "path": "C:\\Users\\ziyad\\GeckoBrain\\artifacts\\evidence\\session2\\trials\\07_continuity\\report.json",
+        "sha256": "ab6c595f043ec76eb8373706972dbfd24dfda3925a8f71a2eaf5f08e48d3fe5b",
+        "bytes": 681215
+      },
+      "retained_trace": null,
+      "trace_provenance_status": "raw trace was not retained; saved report hash only",
+      "protocol": {
+        "seed": 0,
+        "gait_profile": "lab",
+        "xml_sha256": "756765356417749c72150b05da59565ffc97825cf2457e638cd04ea2e1885c4b",
+        "n": 1,
+        "reset_noise": 0,
+        "goal_angle_rad": 0,
+        "lab_parameters": {
+          "mirror_left_fa": true,
+          "hind_lift_multiplier": -1.3333333333333333,
+          "front_stance_press": 0.0,
+          "front_stance_press_fr": 0.0,
+          "front_swing_lift": 0.4,
+          "front_stance_seek": 0.0,
+          "front_seek_relax": 0.35,
+          "shoulder_sprawl_tuck": 0.0,
+          "fore_hind_amplitude_ratio": 0.8888888888888888,
+          "hind_fa_amplitude": 0.68,
+          "heading_gain": 0.0,
+          "continuous_front_lift": true
+        },
+        "commanded_stance_by_foot": {
+          "HL": 0.765,
+          "FL": 0.7,
+          "HR": 0.765,
+          "FR": 0.7
+        },
+        "phase_offsets_cycle": {
+          "HL": 0.0,
+          "FL": 0.44,
+          "HR": 0.5,
+          "FR": 0.94
+        },
+        "source_sha256": {
+          "envs/cpg_residual_controller.py": "59b01a7163708743ee472f1f4709a5858503a344fbff54a99431e7401ba992eb",
+          "envs/gecko_walk_env.py": "4c3ca566c6bdb6a7a659fe40f4f25168cdc560254979c40092228c73b7cab293",
+          "realism_metrics.py": "060de4d2085c1430ea7d2facac811830c6296cb0dfbbc6539e710f0177ec2aff",
+          "config/proxies.yaml": "62fbebeab5ac18309d2e4c86d270407bde7e589d1adbfe06bfa76483ebc3b448"
+        }
+      },
+      "gate2_pass_as_recorded": false,
+      "completed_without_fall": true,
+      "six_checks_as_recorded": {
+        "signed_forward": {
+          "value_m_s": -0.006661714312206731,
+          "pass": false
+        },
+        "net_path": {
+          "value": 0.08181818889192632,
+          "pass": false
+        },
+        "hind_swing_load": {
+          "values": {
+            "HL": 0.5303030303030303,
+            "HR": 0.5272727272727272
+          },
+          "pass": false
+        },
+        "front_stance_load": {
+          "values": {
+            "FL": 0.5396666666666666,
+            "FR": 0.34545454545454546
+          },
+          "pass": false
+        },
+        "hind_duty": {
+          "values": {
+            "HL": 0.4336379673835822,
+            "HR": 0.6266807901335754
+          },
+          "pass": false
+        },
+        "limb_phase": {
+          "values": {
+            "HL_to_FL": 0.4282210025437141,
+            "HR_to_FR": 0.635342734981055
+          },
+          "pass": false
+        }
+      },
+      "requirements_as_recorded": {
+        "minimum_forward_m_s": 0.04,
+        "minimum_net_path": 0.5,
+        "maximum_hind_swing_load": 0.1,
+        "minimum_front_stance_load": 0.65,
+        "hind_duty_target": 0.78,
+        "hind_duty_tolerance": 0.05,
+        "limb_phase_target": 0.435,
+        "limb_phase_tolerance": 0.03
+      },
+      "contact_timing": {
+        "per_foot": {
+          "HL": {
+            "observed_contact_cycle_rate_hz": 3.567181926276753,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.13802308473450095,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 60
+          },
+          "FL": {
+            "observed_contact_cycle_rate_hz": 4.514136374433891,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.2829596394979101,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 76
+          },
+          "HR": {
+            "observed_contact_cycle_rate_hz": 3.5236938031577614,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.22863864214089458,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 58
+          },
+          "FR": {
+            "observed_contact_cycle_rate_hz": 3.6257727056570683,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.11555321054456395,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 61
+          }
+        },
+        "rate_entrainment_all_feet": false,
+        "period_cv_single_digits_all_feet": false,
+        "acquisition_at_least_200_hz": true,
+        "timing_and_acquisition_valid_recorded": null,
+        "timing_and_acquisition_valid_from_report_components": false
+      },
+      "sample_rate_hz": 250.00000000002754,
+      "observed_duration_s": 17.00000000000701
+    },
+    {
+      "case": "08_front_lift",
+      "source_report": {
+        "path": "C:\\Users\\ziyad\\GeckoBrain\\artifacts\\evidence\\session2\\trials\\08_front_lift\\report.json",
+        "sha256": "b1372562a4f62914a5f36d7dccdd397490f8894eff3719d60a2fea4718f75960",
+        "bytes": 470406
+      },
+      "retained_trace": null,
+      "trace_provenance_status": "raw trace was not retained; saved report hash only",
+      "protocol": {
+        "seed": 0,
+        "gait_profile": "lab",
+        "xml_sha256": "756765356417749c72150b05da59565ffc97825cf2457e638cd04ea2e1885c4b",
+        "n": 1,
+        "reset_noise": 0,
+        "goal_angle_rad": 0,
+        "lab_parameters": {
+          "mirror_left_fa": true,
+          "hind_lift_multiplier": -1.3333333333333333,
+          "front_stance_press": 0.0,
+          "front_stance_press_fr": 0.0,
+          "front_swing_lift": -0.8,
+          "front_stance_seek": 0.0,
+          "front_seek_relax": 0.35,
+          "shoulder_sprawl_tuck": 0.0,
+          "fore_hind_amplitude_ratio": 0.8888888888888888,
+          "hind_fa_amplitude": 0.68,
+          "heading_gain": 0.0,
+          "continuous_front_lift": true
+        },
+        "commanded_stance_by_foot": {
+          "HL": 0.765,
+          "FL": 0.7,
+          "HR": 0.765,
+          "FR": 0.7
+        },
+        "phase_offsets_cycle": {
+          "HL": 0.0,
+          "FL": 0.44,
+          "HR": 0.5,
+          "FR": 0.94
+        },
+        "source_sha256": {
+          "envs/cpg_residual_controller.py": "59b01a7163708743ee472f1f4709a5858503a344fbff54a99431e7401ba992eb",
+          "envs/gecko_walk_env.py": "4c3ca566c6bdb6a7a659fe40f4f25168cdc560254979c40092228c73b7cab293",
+          "realism_metrics.py": "060de4d2085c1430ea7d2facac811830c6296cb0dfbbc6539e710f0177ec2aff",
+          "config/proxies.yaml": "62fbebeab5ac18309d2e4c86d270407bde7e589d1adbfe06bfa76483ebc3b448"
+        }
+      },
+      "gate2_pass_as_recorded": false,
+      "completed_without_fall": true,
+      "six_checks_as_recorded": {
+        "signed_forward": {
+          "value_m_s": 0.03350665634126062,
+          "pass": false
+        },
+        "net_path": {
+          "value": 0.7038390896493263,
+          "pass": true
+        },
+        "hind_swing_load": {
+          "values": {
+            "HL": 0.0707070707070707,
+            "HR": 0.005050505050505051
+          },
+          "pass": true
+        },
+        "front_stance_load": {
+          "values": {
+            "FL": 0.6506666666666666,
+            "FR": 0.5696969696969697
+          },
+          "pass": false
+        },
+        "hind_duty": {
+          "values": {
+            "HL": 0.6574513232098582,
+            "HR": 0.7133746688997213
+          },
+          "pass": false
+        },
+        "limb_phase": {
+          "values": {
+            "HL_to_FL": 0.5646580535329022,
+            "HR_to_FR": 0.6463391236445045
+          },
+          "pass": false
+        }
+      },
+      "requirements_as_recorded": {
+        "minimum_forward_m_s": 0.04,
+        "minimum_net_path": 0.5,
+        "maximum_hind_swing_load": 0.1,
+        "minimum_front_stance_load": 0.65,
+        "hind_duty_target": 0.78,
+        "hind_duty_tolerance": 0.05,
+        "limb_phase_target": 0.435,
+        "limb_phase_tolerance": 0.03
+      },
+      "contact_timing": {
+        "per_foot": {
+          "HL": {
+            "observed_contact_cycle_rate_hz": 1.1886886886882475,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.017073964067657908,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 19
+          },
+          "FL": {
+            "observed_contact_cycle_rate_hz": 1.6658733936214045,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.49789746254017725,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 28
+          },
+          "HR": {
+            "observed_contact_cycle_rate_hz": 1.1889862327904903,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.0021516557293138824,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 19
+          },
+          "FR": {
+            "observed_contact_cycle_rate_hz": 1.1898797595185893,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.020310673146827468,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 19
+          }
+        },
+        "rate_entrainment_all_feet": false,
+        "period_cv_single_digits_all_feet": false,
+        "acquisition_at_least_200_hz": true,
+        "timing_and_acquisition_valid_recorded": null,
+        "timing_and_acquisition_valid_from_report_components": false
+      },
+      "sample_rate_hz": 250.00000000002754,
+      "observed_duration_s": 17.00000000000701
+    },
+    {
+      "case": "09_fore_ratio",
+      "source_report": {
+        "path": "C:\\Users\\ziyad\\GeckoBrain\\artifacts\\evidence\\session2\\trials\\09_fore_ratio\\report.json",
+        "sha256": "b40247308b98cee35036aad2b5a69d1b91455f50f6ca166a068e5c4d6b25efae",
+        "bytes": 446887
+      },
+      "retained_trace": null,
+      "trace_provenance_status": "raw trace was not retained; saved report hash only",
+      "protocol": {
+        "seed": 0,
+        "gait_profile": "lab",
+        "xml_sha256": "756765356417749c72150b05da59565ffc97825cf2457e638cd04ea2e1885c4b",
+        "n": 1,
+        "reset_noise": 0,
+        "goal_angle_rad": 0,
+        "lab_parameters": {
+          "mirror_left_fa": true,
+          "hind_lift_multiplier": -1.3333333333333333,
+          "front_stance_press": 0.0,
+          "front_stance_press_fr": 0.0,
+          "front_swing_lift": -0.8,
+          "front_stance_seek": 0.0,
+          "front_seek_relax": 0.35,
+          "shoulder_sprawl_tuck": 0.0,
+          "fore_hind_amplitude_ratio": 0.54,
+          "hind_fa_amplitude": 0.68,
+          "heading_gain": 0.0,
+          "continuous_front_lift": true
+        },
+        "commanded_stance_by_foot": {
+          "HL": 0.765,
+          "FL": 0.7,
+          "HR": 0.765,
+          "FR": 0.7
+        },
+        "phase_offsets_cycle": {
+          "HL": 0.0,
+          "FL": 0.44,
+          "HR": 0.5,
+          "FR": 0.94
+        },
+        "source_sha256": {
+          "envs/cpg_residual_controller.py": "59b01a7163708743ee472f1f4709a5858503a344fbff54a99431e7401ba992eb",
+          "envs/gecko_walk_env.py": "4c3ca566c6bdb6a7a659fe40f4f25168cdc560254979c40092228c73b7cab293",
+          "realism_metrics.py": "060de4d2085c1430ea7d2facac811830c6296cb0dfbbc6539e710f0177ec2aff",
+          "config/proxies.yaml": "62fbebeab5ac18309d2e4c86d270407bde7e589d1adbfe06bfa76483ebc3b448"
+        }
+      },
+      "gate2_pass_as_recorded": false,
+      "completed_without_fall": true,
+      "six_checks_as_recorded": {
+        "signed_forward": {
+          "value_m_s": 0.02958917047748917,
+          "pass": false
+        },
+        "net_path": {
+          "value": 0.6550354841302963,
+          "pass": true
+        },
+        "hind_swing_load": {
+          "values": {
+            "HL": 0.06363636363636363,
+            "HR": 0.010101010101010102
+          },
+          "pass": true
+        },
+        "front_stance_load": {
+          "values": {
+            "FL": 0.6423333333333333,
+            "FR": 0.55993265993266
+          },
+          "pass": false
+        },
+        "hind_duty": {
+          "values": {
+            "HL": 0.6550355448141871,
+            "HR": 0.7067729829412933
+          },
+          "pass": false
+        },
+        "limb_phase": {
+          "values": {
+            "HL_to_FL": 0.5731148036971411,
+            "HR_to_FR": 0.6435213639514679
+          },
+          "pass": false
+        }
+      },
+      "requirements_as_recorded": {
+        "minimum_forward_m_s": 0.04,
+        "minimum_net_path": 0.5,
+        "maximum_hind_swing_load": 0.1,
+        "minimum_front_stance_load": 0.65,
+        "hind_duty_target": 0.78,
+        "hind_duty_tolerance": 0.05,
+        "limb_phase_target": 0.435,
+        "limb_phase_tolerance": 0.03
+      },
+      "contact_timing": {
+        "per_foot": {
+          "HL": {
+            "observed_contact_cycle_rate_hz": 1.2518778167246234,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.16425135127762389,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 20
+          },
+          "FL": {
+            "observed_contact_cycle_rate_hz": 1.8478779208385436,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.601138497474397,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 31
+          },
+          "HR": {
+            "observed_contact_cycle_rate_hz": 1.1889862327904916,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.03282950029366276,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 19
+          },
+          "FR": {
+            "observed_contact_cycle_rate_hz": 1.1895817680937122,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.03511944670936729,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 19
+          }
+        },
+        "rate_entrainment_all_feet": false,
+        "period_cv_single_digits_all_feet": false,
+        "acquisition_at_least_200_hz": true,
+        "timing_and_acquisition_valid_recorded": null,
+        "timing_and_acquisition_valid_from_report_components": false
+      },
+      "sample_rate_hz": 250.00000000002754,
+      "observed_duration_s": 17.00000000000701
+    },
+    {
+      "case": "10_hind_duty",
+      "source_report": {
+        "path": "C:\\Users\\ziyad\\GeckoBrain\\artifacts\\evidence\\session2\\trials\\10_hind_duty\\report.json",
+        "sha256": "738ac6cdb767699d58eadd4c3a1946970de3e2dcfc71f3529db9b2ebaf6504d0",
+        "bytes": 450393
+      },
+      "retained_trace": null,
+      "trace_provenance_status": "raw trace was not retained; saved report hash only",
+      "protocol": {
+        "seed": 0,
+        "gait_profile": "lab",
+        "xml_sha256": "756765356417749c72150b05da59565ffc97825cf2457e638cd04ea2e1885c4b",
+        "n": 1,
+        "reset_noise": 0,
+        "goal_angle_rad": 0,
+        "lab_parameters": {
+          "mirror_left_fa": true,
+          "hind_lift_multiplier": -1.3333333333333333,
+          "front_stance_press": 0.0,
+          "front_stance_press_fr": 0.0,
+          "front_swing_lift": -0.8,
+          "front_stance_seek": 0.0,
+          "front_seek_relax": 0.35,
+          "shoulder_sprawl_tuck": 0.0,
+          "fore_hind_amplitude_ratio": 0.54,
+          "hind_fa_amplitude": 0.68,
+          "heading_gain": 0.0,
+          "continuous_front_lift": true
+        },
+        "commanded_stance_by_foot": {
+          "HL": 0.78,
+          "FL": 0.7,
+          "HR": 0.78,
+          "FR": 0.7
+        },
+        "phase_offsets_cycle": {
+          "HL": 0.0,
+          "FL": 0.44,
+          "HR": 0.5,
+          "FR": 0.94
+        },
+        "source_sha256": {
+          "envs/cpg_residual_controller.py": "fda4afde22db3a152353fe2e3bd80e605804c903cde5698a2cb57429ff61bf6a",
+          "envs/gecko_walk_env.py": "4c3ca566c6bdb6a7a659fe40f4f25168cdc560254979c40092228c73b7cab293",
+          "realism_metrics.py": "4c6fbb6e653dff35c52ca017ffa0914e41a7c3c1981bc0c4c72587e0f95b4661",
+          "config/proxies.yaml": "62fbebeab5ac18309d2e4c86d270407bde7e589d1adbfe06bfa76483ebc3b448"
+        }
+      },
+      "gate2_pass_as_recorded": false,
+      "completed_without_fall": true,
+      "six_checks_as_recorded": {
+        "signed_forward": {
+          "value_m_s": 0.029493751718788073,
+          "pass": false
+        },
+        "net_path": {
+          "value": 0.6319442461139771,
+          "pass": true
+        },
+        "hind_swing_load": {
+          "values": {
+            "HL": 0.05913978494623656,
+            "HR": 0.003260869565217391
+          },
+          "pass": true
+        },
+        "front_stance_load": {
+          "values": {
+            "FL": 0.6376666666666667,
+            "FR": 0.5562289562289562
+          },
+          "pass": false
+        },
+        "hind_duty": {
+          "values": {
+            "HL": 0.6466560614876328,
+            "HR": 0.7198281848482523
+          },
+          "pass": false
+        },
+        "limb_phase": {
+          "values": {
+            "HL_to_FL": 0.5752006226266974,
+            "HR_to_FR": 0.6518734709500189
+          },
+          "pass": false
+        }
+      },
+      "requirements_as_recorded": {
+        "minimum_forward_m_s": 0.04,
+        "minimum_net_path": 0.5,
+        "maximum_hind_swing_load": 0.1,
+        "minimum_front_stance_load": 0.65,
+        "hind_duty_target": 0.78,
+        "hind_duty_tolerance": 0.05,
+        "limb_phase_target": 0.435,
+        "limb_phase_tolerance": 0.03
+      },
+      "contact_timing": {
+        "per_foot": {
+          "HL": {
+            "observed_contact_cycle_rate_hz": 1.191371958865876,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.009022762945760801,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 19
+          },
+          "FL": {
+            "observed_contact_cycle_rate_hz": 1.9610173520315264,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.615550574794031,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 33
+          },
+          "HR": {
+            "observed_contact_cycle_rate_hz": 1.1892839258883274,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.03565486335459472,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 19
+          },
+          "FR": {
+            "observed_contact_cycle_rate_hz": 1.1874999999995495,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.020175445747554626,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 19
+          }
+        },
+        "rate_entrainment_all_feet": false,
+        "period_cv_single_digits_all_feet": false,
+        "acquisition_at_least_200_hz": true,
+        "timing_and_acquisition_valid_recorded": false,
+        "timing_and_acquisition_valid_from_report_components": false
+      },
+      "sample_rate_hz": 250.00000000002754,
+      "observed_duration_s": 17.00000000000701
+    },
+    {
+      "case": "11_phase",
+      "source_report": {
+        "path": "C:\\Users\\ziyad\\GeckoBrain\\artifacts\\evidence\\session2\\trials\\11_phase\\report.json",
+        "sha256": "eebf6259044edb4997b98f250ca24ec534d3767236afeeedd4d6827b49f2a5fa",
+        "bytes": 452351
+      },
+      "retained_trace": null,
+      "trace_provenance_status": "raw trace was not retained; saved report hash only",
+      "protocol": {
+        "seed": 0,
+        "gait_profile": "lab",
+        "xml_sha256": "756765356417749c72150b05da59565ffc97825cf2457e638cd04ea2e1885c4b",
+        "n": 1,
+        "reset_noise": 0,
+        "goal_angle_rad": 0,
+        "lab_parameters": {
+          "mirror_left_fa": true,
+          "hind_lift_multiplier": -1.3333333333333333,
+          "front_stance_press": 0.0,
+          "front_stance_press_fr": 0.0,
+          "front_swing_lift": -0.8,
+          "front_stance_seek": 0.0,
+          "front_seek_relax": 0.35,
+          "shoulder_sprawl_tuck": 0.0,
+          "fore_hind_amplitude_ratio": 0.54,
+          "hind_fa_amplitude": 0.68,
+          "heading_gain": 0.0,
+          "continuous_front_lift": true
+        },
+        "commanded_stance_by_foot": {
+          "HL": 0.78,
+          "FL": 0.7,
+          "HR": 0.78,
+          "FR": 0.7
+        },
+        "phase_offsets_cycle": {
+          "HL": 0.0,
+          "FL": 0.435,
+          "HR": 0.5,
+          "FR": 0.935
+        },
+        "source_sha256": {
+          "envs/cpg_residual_controller.py": "fda4afde22db3a152353fe2e3bd80e605804c903cde5698a2cb57429ff61bf6a",
+          "envs/gecko_walk_env.py": "4c3ca566c6bdb6a7a659fe40f4f25168cdc560254979c40092228c73b7cab293",
+          "realism_metrics.py": "4c6fbb6e653dff35c52ca017ffa0914e41a7c3c1981bc0c4c72587e0f95b4661",
+          "config/proxies.yaml": "62fbebeab5ac18309d2e4c86d270407bde7e589d1adbfe06bfa76483ebc3b448"
+        }
+      },
+      "gate2_pass_as_recorded": false,
+      "completed_without_fall": true,
+      "six_checks_as_recorded": {
+        "signed_forward": {
+          "value_m_s": 0.029933884155217968,
+          "pass": false
+        },
+        "net_path": {
+          "value": 0.6323776690939166,
+          "pass": true
+        },
+        "hind_swing_load": {
+          "values": {
+            "HL": 0.06666666666666667,
+            "HR": 0.008695652173913044
+          },
+          "pass": true
+        },
+        "front_stance_load": {
+          "values": {
+            "FL": 0.6338358458961474,
+            "FR": 0.5517706576728499
+          },
+          "pass": false
+        },
+        "hind_duty": {
+          "values": {
+            "HL": 0.6422043279767464,
+            "HR": 0.7098234281362842
+          },
+          "pass": false
+        },
+        "limb_phase": {
+          "values": {
+            "HL_to_FL": 0.590424153685958,
+            "HR_to_FR": 0.6550411822950044
+          },
+          "pass": false
+        }
+      },
+      "requirements_as_recorded": {
+        "minimum_forward_m_s": 0.04,
+        "minimum_net_path": 0.5,
+        "maximum_hind_swing_load": 0.1,
+        "minimum_front_stance_load": 0.65,
+        "hind_duty_target": 0.78,
+        "hind_duty_tolerance": 0.05,
+        "limb_phase_target": 0.435,
+        "limb_phase_tolerance": 0.03
+      },
+      "contact_timing": {
+        "per_foot": {
+          "HL": {
+            "observed_contact_cycle_rate_hz": 1.1877969492368663,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.006787609598087922,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 19
+          },
+          "FL": {
+            "observed_contact_cycle_rate_hz": 1.4285714285708397,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.3758192470821084,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 24
+          },
+          "HR": {
+            "observed_contact_cycle_rate_hz": 1.1892839258883354,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.02071032912772299,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 19
+          },
+          "FR": {
+            "observed_contact_cycle_rate_hz": 1.189879759518588,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.0201863676500324,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 19
+          }
+        },
+        "rate_entrainment_all_feet": false,
+        "period_cv_single_digits_all_feet": false,
+        "acquisition_at_least_200_hz": true,
+        "timing_and_acquisition_valid_recorded": false,
+        "timing_and_acquisition_valid_from_report_components": false
+      },
+      "sample_rate_hz": 250.00000000002754,
+      "observed_duration_s": 17.00000000000701
+    },
+    {
+      "case": "12_heading",
+      "source_report": {
+        "path": "C:\\Users\\ziyad\\GeckoBrain\\artifacts\\evidence\\session2\\trials\\12_heading\\report.json",
+        "sha256": "ec05d6b532854939b72dd98ddfcafbc1c2609e3c04ca4a06125241667caa634f",
+        "bytes": 456270
+      },
+      "retained_trace": null,
+      "trace_provenance_status": "raw trace was not retained; saved report hash only",
+      "protocol": {
+        "seed": 0,
+        "gait_profile": "lab",
+        "xml_sha256": "756765356417749c72150b05da59565ffc97825cf2457e638cd04ea2e1885c4b",
+        "n": 1,
+        "reset_noise": 0,
+        "goal_angle_rad": 0,
+        "lab_parameters": {
+          "mirror_left_fa": true,
+          "hind_lift_multiplier": -1.3333333333333333,
+          "front_stance_press": 0.0,
+          "front_stance_press_fr": 0.0,
+          "front_swing_lift": -0.8,
+          "front_stance_seek": 0.0,
+          "front_seek_relax": 0.35,
+          "shoulder_sprawl_tuck": 0.0,
+          "fore_hind_amplitude_ratio": 0.54,
+          "hind_fa_amplitude": 0.68,
+          "heading_gain": 1.0,
+          "continuous_front_lift": true
+        },
+        "commanded_stance_by_foot": {
+          "HL": 0.78,
+          "FL": 0.7,
+          "HR": 0.78,
+          "FR": 0.7
+        },
+        "phase_offsets_cycle": {
+          "HL": 0.0,
+          "FL": 0.435,
+          "HR": 0.5,
+          "FR": 0.935
+        },
+        "source_sha256": {
+          "envs/cpg_residual_controller.py": "fda4afde22db3a152353fe2e3bd80e605804c903cde5698a2cb57429ff61bf6a",
+          "envs/gecko_walk_env.py": "4c3ca566c6bdb6a7a659fe40f4f25168cdc560254979c40092228c73b7cab293",
+          "realism_metrics.py": "4c6fbb6e653dff35c52ca017ffa0914e41a7c3c1981bc0c4c72587e0f95b4661",
+          "config/proxies.yaml": "62fbebeab5ac18309d2e4c86d270407bde7e589d1adbfe06bfa76483ebc3b448"
+        }
+      },
+      "gate2_pass_as_recorded": false,
+      "completed_without_fall": true,
+      "six_checks_as_recorded": {
+        "signed_forward": {
+          "value_m_s": 0.031914003146794434,
+          "pass": false
+        },
+        "net_path": {
+          "value": 0.6376385426256089,
+          "pass": true
+        },
+        "hind_swing_load": {
+          "values": {
+            "HL": 0.06129032258064516,
+            "HR": 0.01847826086956522
+          },
+          "pass": true
+        },
+        "front_stance_load": {
+          "values": {
+            "FL": 0.6298157453936348,
+            "FR": 0.5639123102866779
+          },
+          "pass": false
+        },
+        "hind_duty": {
+          "values": {
+            "HL": 0.6133875373862857,
+            "HR": 0.6929298680834469
+          },
+          "pass": false
+        },
+        "limb_phase": {
+          "values": {
+            "HL_to_FL": 0.5808446933362137,
+            "HR_to_FR": 0.6539116219445447
+          },
+          "pass": false
+        }
+      },
+      "requirements_as_recorded": {
+        "minimum_forward_m_s": 0.04,
+        "minimum_net_path": 0.5,
+        "maximum_hind_swing_load": 0.1,
+        "minimum_front_stance_load": 0.65,
+        "hind_duty_target": 0.78,
+        "hind_duty_tolerance": 0.05,
+        "limb_phase_target": 0.435,
+        "limb_phase_tolerance": 0.03
+      },
+      "contact_timing": {
+        "per_foot": {
+          "HL": {
+            "observed_contact_cycle_rate_hz": 1.1886886886882462,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.022021390068109218,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 19
+          },
+          "FL": {
+            "observed_contact_cycle_rate_hz": 1.3048635824431125,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.2777083215088886,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 22
+          },
+          "HR": {
+            "observed_contact_cycle_rate_hz": 1.18868868868819,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.0031906225390442907,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 19
+          },
+          "FR": {
+            "observed_contact_cycle_rate_hz": 1.1889862327905367,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.02323674340726664,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 19
+          }
+        },
+        "rate_entrainment_all_feet": true,
+        "period_cv_single_digits_all_feet": false,
+        "acquisition_at_least_200_hz": true,
+        "timing_and_acquisition_valid_recorded": false,
+        "timing_and_acquisition_valid_from_report_components": false
+      },
+      "sample_rate_hz": 250.00000000002754,
+      "observed_duration_s": 17.00000000000701
+    },
+    {
+      "case": "13_amplitude",
+      "source_report": {
+        "path": "C:\\Users\\ziyad\\GeckoBrain\\artifacts\\evidence\\session2\\trials\\13_amplitude\\report.json",
+        "sha256": "16e4c4b4c5292b88f5689fc06da1154a8c524b471e68ef7ceca53a20bb6d14ae",
+        "bytes": 473193
+      },
+      "retained_trace": null,
+      "trace_provenance_status": "raw trace was not retained; saved report hash only",
+      "protocol": {
+        "seed": 0,
+        "gait_profile": "lab",
+        "xml_sha256": "756765356417749c72150b05da59565ffc97825cf2457e638cd04ea2e1885c4b",
+        "n": 1,
+        "reset_noise": 0,
+        "goal_angle_rad": 0,
+        "lab_parameters": {
+          "mirror_left_fa": true,
+          "hind_lift_multiplier": -1.3333333333333333,
+          "front_stance_press": 0.0,
+          "front_stance_press_fr": 0.0,
+          "front_swing_lift": -0.8,
+          "front_stance_seek": 0.0,
+          "front_seek_relax": 0.35,
+          "shoulder_sprawl_tuck": 0.0,
+          "fore_hind_amplitude_ratio": 0.54,
+          "hind_fa_amplitude": 0.9,
+          "heading_gain": 1.0,
+          "continuous_front_lift": true
+        },
+        "commanded_stance_by_foot": {
+          "HL": 0.78,
+          "FL": 0.7,
+          "HR": 0.78,
+          "FR": 0.7
+        },
+        "phase_offsets_cycle": {
+          "HL": 0.0,
+          "FL": 0.435,
+          "HR": 0.5,
+          "FR": 0.935
+        },
+        "source_sha256": {
+          "envs/cpg_residual_controller.py": "fda4afde22db3a152353fe2e3bd80e605804c903cde5698a2cb57429ff61bf6a",
+          "envs/gecko_walk_env.py": "4c3ca566c6bdb6a7a659fe40f4f25168cdc560254979c40092228c73b7cab293",
+          "realism_metrics.py": "4c6fbb6e653dff35c52ca017ffa0914e41a7c3c1981bc0c4c72587e0f95b4661",
+          "config/proxies.yaml": "62fbebeab5ac18309d2e4c86d270407bde7e589d1adbfe06bfa76483ebc3b448"
+        }
+      },
+      "gate2_pass_as_recorded": false,
+      "completed_without_fall": true,
+      "six_checks_as_recorded": {
+        "signed_forward": {
+          "value_m_s": 0.03966108586738433,
+          "pass": false
+        },
+        "net_path": {
+          "value": 0.7373412813124947,
+          "pass": true
+        },
+        "hind_swing_load": {
+          "values": {
+            "HL": 0.04086021505376344,
+            "HR": 0.058695652173913045
+          },
+          "pass": true
+        },
+        "front_stance_load": {
+          "values": {
+            "FL": 0.6515912897822446,
+            "FR": 0.5747048903878583
+          },
+          "pass": false
+        },
+        "hind_duty": {
+          "values": {
+            "HL": 0.6206271598921606,
+            "HR": 0.6630966667972679
+          },
+          "pass": false
+        },
+        "limb_phase": {
+          "values": {
+            "HL_to_FL": 0.5739976595738983,
+            "HR_to_FR": 0.6166785733080291
+          },
+          "pass": false
+        }
+      },
+      "requirements_as_recorded": {
+        "minimum_forward_m_s": 0.04,
+        "minimum_net_path": 0.5,
+        "maximum_hind_swing_load": 0.1,
+        "minimum_front_stance_load": 0.65,
+        "hind_duty_target": 0.78,
+        "hind_duty_tolerance": 0.05,
+        "limb_phase_target": 0.435,
+        "limb_phase_tolerance": 0.03
+      },
+      "contact_timing": {
+        "per_foot": {
+          "HL": {
+            "observed_contact_cycle_rate_hz": 1.1886886886882468,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.010030495665602794,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 19
+          },
+          "FL": {
+            "observed_contact_cycle_rate_hz": 1.1893434823972269,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.03394287554569993,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 20
+          },
+          "HR": {
+            "observed_contact_cycle_rate_hz": 1.1857214178726871,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.035782276102803476,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 19
+          },
+          "FR": {
+            "observed_contact_cycle_rate_hz": 1.189283925888385,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.02136766335250671,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 19
+          }
+        },
+        "rate_entrainment_all_feet": true,
+        "period_cv_single_digits_all_feet": true,
+        "acquisition_at_least_200_hz": true,
+        "timing_and_acquisition_valid_recorded": true,
+        "timing_and_acquisition_valid_from_report_components": true
+      },
+      "sample_rate_hz": 250.00000000002754,
+      "observed_duration_s": 17.00000000000701
+    },
+    {
+      "case": "14_front_height",
+      "source_report": {
+        "path": "C:\\Users\\ziyad\\GeckoBrain\\artifacts\\evidence\\session2\\trials\\14_front_height\\report.json",
+        "sha256": "fef37c9e239b87f481056c51cba5862a24bfaa7c08196cec06c08d945e1b7af6",
+        "bytes": 471441
+      },
+      "retained_trace": null,
+      "trace_provenance_status": "raw trace was not retained; saved report hash only",
+      "protocol": {
+        "seed": 0,
+        "gait_profile": "lab",
+        "xml_sha256": "756765356417749c72150b05da59565ffc97825cf2457e638cd04ea2e1885c4b",
+        "n": 1,
+        "reset_noise": 0,
+        "goal_angle_rad": 0,
+        "lab_parameters": {
+          "mirror_left_fa": true,
+          "hind_lift_multiplier": -1.3333333333333333,
+          "front_stance_press": 0.0,
+          "front_stance_press_fr": 0.0,
+          "front_swing_lift": -0.6,
+          "front_stance_seek": 0.0,
+          "front_seek_relax": 0.35,
+          "shoulder_sprawl_tuck": 0.0,
+          "fore_hind_amplitude_ratio": 0.54,
+          "hind_fa_amplitude": 0.9,
+          "heading_gain": 1.0,
+          "continuous_front_lift": true
+        },
+        "commanded_stance_by_foot": {
+          "HL": 0.78,
+          "FL": 0.7,
+          "HR": 0.78,
+          "FR": 0.7
+        },
+        "phase_offsets_cycle": {
+          "HL": 0.0,
+          "FL": 0.435,
+          "HR": 0.5,
+          "FR": 0.935
+        },
+        "source_sha256": {
+          "envs/cpg_residual_controller.py": "fda4afde22db3a152353fe2e3bd80e605804c903cde5698a2cb57429ff61bf6a",
+          "envs/gecko_walk_env.py": "4c3ca566c6bdb6a7a659fe40f4f25168cdc560254979c40092228c73b7cab293",
+          "realism_metrics.py": "4c6fbb6e653dff35c52ca017ffa0914e41a7c3c1981bc0c4c72587e0f95b4661",
+          "config/proxies.yaml": "62fbebeab5ac18309d2e4c86d270407bde7e589d1adbfe06bfa76483ebc3b448"
+        }
+      },
+      "gate2_pass_as_recorded": false,
+      "completed_without_fall": true,
+      "six_checks_as_recorded": {
+        "signed_forward": {
+          "value_m_s": 0.03850152246742307,
+          "pass": false
+        },
+        "net_path": {
+          "value": 0.7614786309726387,
+          "pass": true
+        },
+        "hind_swing_load": {
+          "values": {
+            "HL": 0.05161290322580645,
+            "HR": 0.06086956521739131
+          },
+          "pass": true
+        },
+        "front_stance_load": {
+          "values": {
+            "FL": 0.6569514237855947,
+            "FR": 0.5824620573355818
+          },
+          "pass": false
+        },
+        "hind_duty": {
+          "values": {
+            "HL": 0.6174480482039332,
+            "HR": 0.6808005011999254
+          },
+          "pass": false
+        },
+        "limb_phase": {
+          "values": {
+            "HL_to_FL": 0.5787822489566623,
+            "HR_to_FR": 0.6246460514364973
+          },
+          "pass": false
+        }
+      },
+      "requirements_as_recorded": {
+        "minimum_forward_m_s": 0.04,
+        "minimum_net_path": 0.5,
+        "maximum_hind_swing_load": 0.1,
+        "minimum_front_stance_load": 0.65,
+        "hind_duty_target": 0.78,
+        "hind_duty_tolerance": 0.05,
+        "limb_phase_target": 0.435,
+        "limb_phase_tolerance": 0.03
+      },
+      "contact_timing": {
+        "per_foot": {
+          "HL": {
+            "observed_contact_cycle_rate_hz": 1.1889862327905467,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.01638652183700606,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 19
+          },
+          "FL": {
+            "observed_contact_cycle_rate_hz": 1.1899095668724287,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.035311930891254444,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 20
+          },
+          "HR": {
+            "observed_contact_cycle_rate_hz": 1.18868868868819,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.03994033716056458,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 19
+          },
+          "FR": {
+            "observed_contact_cycle_rate_hz": 1.1889862327905407,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.022578475618312183,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 19
+          }
+        },
+        "rate_entrainment_all_feet": true,
+        "period_cv_single_digits_all_feet": true,
+        "acquisition_at_least_200_hz": true,
+        "timing_and_acquisition_valid_recorded": true,
+        "timing_and_acquisition_valid_from_report_components": true
+      },
+      "sample_rate_hz": 250.00000000002754,
+      "observed_duration_s": 17.00000000000701
+    },
+    {
+      "case": "15_right_support",
+      "source_report": {
+        "path": "C:\\Users\\ziyad\\GeckoBrain\\artifacts\\evidence\\session2\\trials\\15_right_support\\report.json",
+        "sha256": "ca82a0556e178308aa572018711f3f96a4a855ec05a8a148a957ec57df866d4a",
+        "bytes": 486095
+      },
+      "retained_trace": null,
+      "trace_provenance_status": "raw trace was not retained; saved report hash only",
+      "protocol": {
+        "seed": 0,
+        "gait_profile": "lab",
+        "xml_sha256": "756765356417749c72150b05da59565ffc97825cf2457e638cd04ea2e1885c4b",
+        "n": 1,
+        "reset_noise": 0,
+        "goal_angle_rad": 0,
+        "lab_parameters": {
+          "mirror_left_fa": true,
+          "hind_lift_multiplier": -1.3333333333333333,
+          "front_stance_press": 0.0,
+          "front_stance_press_fr": 0.05,
+          "front_swing_lift": -0.6,
+          "front_stance_seek": 0.0,
+          "front_seek_relax": 0.35,
+          "shoulder_sprawl_tuck": 0.0,
+          "fore_hind_amplitude_ratio": 0.54,
+          "hind_fa_amplitude": 0.9,
+          "heading_gain": 1.0,
+          "continuous_front_lift": true
+        },
+        "commanded_stance_by_foot": {
+          "HL": 0.78,
+          "FL": 0.7,
+          "HR": 0.78,
+          "FR": 0.7
+        },
+        "phase_offsets_cycle": {
+          "HL": 0.0,
+          "FL": 0.435,
+          "HR": 0.5,
+          "FR": 0.935
+        },
+        "source_sha256": {
+          "envs/cpg_residual_controller.py": "fda4afde22db3a152353fe2e3bd80e605804c903cde5698a2cb57429ff61bf6a",
+          "envs/gecko_walk_env.py": "4c3ca566c6bdb6a7a659fe40f4f25168cdc560254979c40092228c73b7cab293",
+          "realism_metrics.py": "4c6fbb6e653dff35c52ca017ffa0914e41a7c3c1981bc0c4c72587e0f95b4661",
+          "config/proxies.yaml": "62fbebeab5ac18309d2e4c86d270407bde7e589d1adbfe06bfa76483ebc3b448"
+        }
+      },
+      "gate2_pass_as_recorded": false,
+      "completed_without_fall": true,
+      "six_checks_as_recorded": {
+        "signed_forward": {
+          "value_m_s": 0.039298752366065406,
+          "pass": false
+        },
+        "net_path": {
+          "value": 0.7530814781902205,
+          "pass": true
+        },
+        "hind_swing_load": {
+          "values": {
+            "HL": 0.046236559139784944,
+            "HR": 0.04673913043478261
+          },
+          "pass": true
+        },
+        "front_stance_load": {
+          "values": {
+            "FL": 0.6438860971524288,
+            "FR": 0.5814502529510961
+          },
+          "pass": false
+        },
+        "hind_duty": {
+          "values": {
+            "HL": 0.6205046477082171,
+            "HR": 0.6752250022449857
+          },
+          "pass": false
+        },
+        "limb_phase": {
+          "values": {
+            "HL_to_FL": 0.5853770334482501,
+            "HR_to_FR": 0.6092363904653745
+          },
+          "pass": false
+        }
+      },
+      "requirements_as_recorded": {
+        "minimum_forward_m_s": 0.04,
+        "minimum_net_path": 0.5,
+        "maximum_hind_swing_load": 0.1,
+        "minimum_front_stance_load": 0.65,
+        "hind_duty_target": 0.78,
+        "hind_duty_tolerance": 0.05,
+        "limb_phase_target": 0.435,
+        "limb_phase_tolerance": 0.03
+      },
+      "contact_timing": {
+        "per_foot": {
+          "HL": {
+            "observed_contact_cycle_rate_hz": 1.1886886886882468,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.015206349602627935,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 19
+          },
+          "FL": {
+            "observed_contact_cycle_rate_hz": 1.1887779362810147,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.036381061983154696,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 20
+          },
+          "HR": {
+            "observed_contact_cycle_rate_hz": 1.1890606420922731,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.044986242497584185,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 20
+          },
+          "FR": {
+            "observed_contact_cycle_rate_hz": 1.189581768093717,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.023271152359761273,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 19
+          }
+        },
+        "rate_entrainment_all_feet": true,
+        "period_cv_single_digits_all_feet": true,
+        "acquisition_at_least_200_hz": true,
+        "timing_and_acquisition_valid_recorded": true,
+        "timing_and_acquisition_valid_from_report_components": true
+      },
+      "sample_rate_hz": 250.00000000002754,
+      "observed_duration_s": 17.00000000000701
+    },
+    {
+      "case": "16_left_support",
+      "source_report": {
+        "path": "C:\\Users\\ziyad\\GeckoBrain\\artifacts\\evidence\\session2\\trials\\16_left_support\\report.json",
+        "sha256": "90bcc6d62e4302e44b84d8bcac3a374c2fea9df55466521e57fa3b04d1201c03",
+        "bytes": 480225
+      },
+      "retained_trace": null,
+      "trace_provenance_status": "raw trace was not retained; saved report hash only",
+      "protocol": {
+        "seed": 0,
+        "gait_profile": "lab",
+        "xml_sha256": "756765356417749c72150b05da59565ffc97825cf2457e638cd04ea2e1885c4b",
+        "n": 1,
+        "reset_noise": 0,
+        "goal_angle_rad": 0,
+        "lab_parameters": {
+          "mirror_left_fa": true,
+          "hind_lift_multiplier": -1.3333333333333333,
+          "front_stance_press": 0.05,
+          "front_stance_press_fr": 0.05,
+          "front_swing_lift": -0.6,
+          "front_stance_seek": 0.0,
+          "front_seek_relax": 0.35,
+          "shoulder_sprawl_tuck": 0.0,
+          "fore_hind_amplitude_ratio": 0.54,
+          "hind_fa_amplitude": 0.9,
+          "heading_gain": 1.0,
+          "continuous_front_lift": true
+        },
+        "commanded_stance_by_foot": {
+          "HL": 0.78,
+          "FL": 0.7,
+          "HR": 0.78,
+          "FR": 0.7
+        },
+        "phase_offsets_cycle": {
+          "HL": 0.0,
+          "FL": 0.435,
+          "HR": 0.5,
+          "FR": 0.935
+        },
+        "source_sha256": {
+          "envs/cpg_residual_controller.py": "fda4afde22db3a152353fe2e3bd80e605804c903cde5698a2cb57429ff61bf6a",
+          "envs/gecko_walk_env.py": "4c3ca566c6bdb6a7a659fe40f4f25168cdc560254979c40092228c73b7cab293",
+          "realism_metrics.py": "4c6fbb6e653dff35c52ca017ffa0914e41a7c3c1981bc0c4c72587e0f95b4661",
+          "config/proxies.yaml": "62fbebeab5ac18309d2e4c86d270407bde7e589d1adbfe06bfa76483ebc3b448"
+        }
+      },
+      "gate2_pass_as_recorded": false,
+      "completed_without_fall": true,
+      "six_checks_as_recorded": {
+        "signed_forward": {
+          "value_m_s": 0.03906244699682301,
+          "pass": false
+        },
+        "net_path": {
+          "value": 0.7579357990231518,
+          "pass": true
+        },
+        "hind_swing_load": {
+          "values": {
+            "HL": 0.05268817204301075,
+            "HR": 0.05
+          },
+          "pass": true
+        },
+        "front_stance_load": {
+          "values": {
+            "FL": 0.6532663316582915,
+            "FR": 0.5716694772344013
+          },
+          "pass": false
+        },
+        "hind_duty": {
+          "values": {
+            "HL": 0.6530192750327837,
+            "HR": 0.6853226555347679
+          },
+          "pass": false
+        },
+        "limb_phase": {
+          "values": {
+            "HL_to_FL": 0.5890032317107692,
+            "HR_to_FR": 0.6273352710380156
+          },
+          "pass": false
+        }
+      },
+      "requirements_as_recorded": {
+        "minimum_forward_m_s": 0.04,
+        "minimum_net_path": 0.5,
+        "maximum_hind_swing_load": 0.1,
+        "minimum_front_stance_load": 0.65,
+        "hind_duty_target": 0.78,
+        "hind_duty_tolerance": 0.05,
+        "limb_phase_target": 0.435,
+        "limb_phase_tolerance": 0.03
+      },
+      "contact_timing": {
+        "per_foot": {
+          "HL": {
+            "observed_contact_cycle_rate_hz": 1.1872031991997594,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.02257092452109662,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 19
+          },
+          "FL": {
+            "observed_contact_cycle_rate_hz": 1.187648456056517,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.024394389975313735,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 20
+          },
+          "HR": {
+            "observed_contact_cycle_rate_hz": 1.1889862327904899,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.02982087056570753,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 19
+          },
+          "FR": {
+            "observed_contact_cycle_rate_hz": 1.189879759518588,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.023897585526680178,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 19
+          }
+        },
+        "rate_entrainment_all_feet": true,
+        "period_cv_single_digits_all_feet": true,
+        "acquisition_at_least_200_hz": true,
+        "timing_and_acquisition_valid_recorded": true,
+        "timing_and_acquisition_valid_from_report_components": true
+      },
+      "sample_rate_hz": 250.00000000002754,
+      "observed_duration_s": 17.00000000000701
+    },
+    {
+      "case": "17_amplitude",
+      "source_report": {
+        "path": "C:\\Users\\ziyad\\GeckoBrain\\artifacts\\evidence\\session2\\trials\\17_amplitude\\report.json",
+        "sha256": "2821880f6e245899ab71cc7b019783e9d46c740a6226ad07c49cf2745cced7bc",
+        "bytes": 476159
+      },
+      "retained_trace": null,
+      "trace_provenance_status": "raw trace was not retained; saved report hash only",
+      "protocol": {
+        "seed": 0,
+        "gait_profile": "lab",
+        "xml_sha256": "756765356417749c72150b05da59565ffc97825cf2457e638cd04ea2e1885c4b",
+        "n": 1,
+        "reset_noise": 0,
+        "goal_angle_rad": 0,
+        "lab_parameters": {
+          "mirror_left_fa": true,
+          "hind_lift_multiplier": -1.3333333333333333,
+          "front_stance_press": 0.05,
+          "front_stance_press_fr": 0.05,
+          "front_swing_lift": -0.6,
+          "front_stance_seek": 0.0,
+          "front_seek_relax": 0.35,
+          "shoulder_sprawl_tuck": 0.0,
+          "fore_hind_amplitude_ratio": 0.54,
+          "hind_fa_amplitude": 0.98,
+          "heading_gain": 1.0,
+          "continuous_front_lift": true,
+          "other_amplitude": 0.15
+        },
+        "commanded_stance_by_foot": {
+          "HL": 0.78,
+          "FL": 0.7,
+          "HR": 0.78,
+          "FR": 0.7
+        },
+        "phase_offsets_cycle": {
+          "HL": 0.0,
+          "FL": 0.435,
+          "HR": 0.5,
+          "FR": 0.935
+        },
+        "source_sha256": {
+          "envs/cpg_residual_controller.py": "54734d387cdb79a8d0a4dfdb3780f9526f78a6f52607c7f3b99701906b937336",
+          "envs/gecko_walk_env.py": "4c3ca566c6bdb6a7a659fe40f4f25168cdc560254979c40092228c73b7cab293",
+          "realism_metrics.py": "2f59ddc4dd964044440cff68290b72fe3820e31f275881e0d50b2b865471566c",
+          "config/proxies.yaml": "0f3713af6aeba7341853f1e5a4f37a3d7e4fa7f776bbab1dcd99a51423ec7c85"
+        }
+      },
+      "gate2_pass_as_recorded": false,
+      "completed_without_fall": true,
+      "six_checks_as_recorded": {
+        "signed_forward": {
+          "value_m_s": 0.04105210101497841,
+          "pass": true
+        },
+        "net_path": {
+          "value": 0.777904301216143,
+          "pass": true
+        },
+        "hind_swing_load": {
+          "values": {
+            "HL": 0.06236559139784946,
+            "HR": 0.05326086956521739
+          },
+          "pass": true
+        },
+        "front_stance_load": {
+          "values": {
+            "FL": 0.6609715242881072,
+            "FR": 0.5807757166947723
+          },
+          "pass": false
+        },
+        "hind_duty": {
+          "values": {
+            "HL": 0.6565483313392585,
+            "HR": 0.6595179948945671
+          },
+          "pass": false
+        },
+        "limb_phase": {
+          "values": {
+            "HL_to_FL": 0.5761331726327066,
+            "HR_to_FR": 0.5902756221478813
+          },
+          "pass": false
+        }
+      },
+      "requirements_as_recorded": {
+        "minimum_forward_m_s": 0.04,
+        "minimum_net_path": 0.5,
+        "maximum_hind_swing_load": 0.1,
+        "minimum_front_stance_load": 0.65,
+        "hind_duty_target": 0.78,
+        "hind_duty_tolerance": 0.05,
+        "limb_phase_target": 0.435,
+        "limb_phase_tolerance": 0.03
+      },
+      "contact_timing": {
+        "per_foot": {
+          "HL": {
+            "observed_contact_cycle_rate_hz": 1.2512512512507896,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.17271256303215946,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 20
+          },
+          "FL": {
+            "observed_contact_cycle_rate_hz": 1.1887779362810116,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.026095033190480718,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 20
+          },
+          "HR": {
+            "observed_contact_cycle_rate_hz": 1.1887779362810278,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.021046123340022767,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 20
+          },
+          "FR": {
+            "observed_contact_cycle_rate_hz": 1.186906546726188,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.030572588028267005,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 19
+          }
+        },
+        "rate_entrainment_all_feet": true,
+        "period_cv_single_digits_all_feet": false,
+        "acquisition_at_least_200_hz": true,
+        "timing_and_acquisition_valid_recorded": false,
+        "timing_and_acquisition_valid_from_report_components": false
+      },
+      "sample_rate_hz": 250.00000000002754,
+      "observed_duration_s": 17.00000000000701
+    },
+    {
+      "case": "18_stance_rotation",
+      "source_report": {
+        "path": "C:\\Users\\ziyad\\GeckoBrain\\artifacts\\evidence\\session2\\trials\\18_stance_rotation\\report.json",
+        "sha256": "3cb22b00816abaa28c951af28aca7f776ff92a3f80877425c1c16cb82d3fe0a5",
+        "bytes": 473474
+      },
+      "retained_trace": null,
+      "trace_provenance_status": "raw trace was not retained; saved report hash only",
+      "protocol": {
+        "seed": 0,
+        "gait_profile": "lab",
+        "xml_sha256": "756765356417749c72150b05da59565ffc97825cf2457e638cd04ea2e1885c4b",
+        "n": 1,
+        "reset_noise": 0,
+        "goal_angle_rad": 0,
+        "lab_parameters": {
+          "mirror_left_fa": true,
+          "hind_lift_multiplier": -1.3333333333333333,
+          "front_stance_press": 0.05,
+          "front_stance_press_fr": 0.05,
+          "front_swing_lift": -0.6,
+          "front_stance_seek": 0.0,
+          "front_seek_relax": 0.35,
+          "shoulder_sprawl_tuck": 0.0,
+          "fore_hind_amplitude_ratio": 0.54,
+          "hind_fa_amplitude": 0.98,
+          "heading_gain": 1.0,
+          "continuous_front_lift": true,
+          "other_amplitude": 0.0
+        },
+        "commanded_stance_by_foot": {
+          "HL": 0.78,
+          "FL": 0.7,
+          "HR": 0.78,
+          "FR": 0.7
+        },
+        "phase_offsets_cycle": {
+          "HL": 0.0,
+          "FL": 0.435,
+          "HR": 0.5,
+          "FR": 0.935
+        },
+        "source_sha256": {
+          "envs/cpg_residual_controller.py": "54734d387cdb79a8d0a4dfdb3780f9526f78a6f52607c7f3b99701906b937336",
+          "envs/gecko_walk_env.py": "4c3ca566c6bdb6a7a659fe40f4f25168cdc560254979c40092228c73b7cab293",
+          "realism_metrics.py": "2f59ddc4dd964044440cff68290b72fe3820e31f275881e0d50b2b865471566c",
+          "config/proxies.yaml": "0f3713af6aeba7341853f1e5a4f37a3d7e4fa7f776bbab1dcd99a51423ec7c85"
+        }
+      },
+      "gate2_pass_as_recorded": false,
+      "completed_without_fall": true,
+      "six_checks_as_recorded": {
+        "signed_forward": {
+          "value_m_s": 0.04619132571033385,
+          "pass": true
+        },
+        "net_path": {
+          "value": 0.7770216637819953,
+          "pass": true
+        },
+        "hind_swing_load": {
+          "values": {
+            "HL": 0.016129032258064516,
+            "HR": 0.011956521739130435
+          },
+          "pass": true
+        },
+        "front_stance_load": {
+          "values": {
+            "FL": 0.5815745393634841,
+            "FR": 0.5706576728499156
+          },
+          "pass": false
+        },
+        "hind_duty": {
+          "values": {
+            "HL": 0.6672258514258831,
+            "HR": 0.6676846924766882
+          },
+          "pass": false
+        },
+        "limb_phase": {
+          "values": {
+            "HL_to_FL": 0.6127911215108937,
+            "HR_to_FR": 0.6165929569283319
+          },
+          "pass": false
+        }
+      },
+      "requirements_as_recorded": {
+        "minimum_forward_m_s": 0.04,
+        "minimum_net_path": 0.5,
+        "maximum_hind_swing_load": 0.1,
+        "minimum_front_stance_load": 0.65,
+        "hind_duty_target": 0.78,
+        "hind_duty_tolerance": 0.05,
+        "limb_phase_target": 0.435,
+        "limb_phase_tolerance": 0.03
+      },
+      "contact_timing": {
+        "per_foot": {
+          "HL": {
+            "observed_contact_cycle_rate_hz": 1.1889862327905534,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.016076853037873314,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 19
+          },
+          "FL": {
+            "observed_contact_cycle_rate_hz": 1.1868027533819003,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.020851070082016938,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 20
+          },
+          "HR": {
+            "observed_contact_cycle_rate_hz": 1.1893434823972462,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.01937686851243838,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 20
+          },
+          "FR": {
+            "observed_contact_cycle_rate_hz": 1.1877969492368596,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.02356344449754024,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 19
+          }
+        },
+        "rate_entrainment_all_feet": true,
+        "period_cv_single_digits_all_feet": true,
+        "acquisition_at_least_200_hz": true,
+        "timing_and_acquisition_valid_recorded": true,
+        "timing_and_acquisition_valid_from_report_components": true
+      },
+      "sample_rate_hz": 250.00000000002754,
+      "observed_duration_s": 17.00000000000701
+    },
+    {
+      "case": "19_front_height",
+      "source_report": {
+        "path": "C:\\Users\\ziyad\\GeckoBrain\\artifacts\\evidence\\session2\\trials\\19_front_height\\report.json",
+        "sha256": "f9fc72d65da21b13adf53d1536dd55d553821ee1a340bf332f674ba665169083",
+        "bytes": 466549
+      },
+      "retained_trace": null,
+      "trace_provenance_status": "raw trace was not retained; saved report hash only",
+      "protocol": {
+        "seed": 0,
+        "gait_profile": "lab",
+        "xml_sha256": "756765356417749c72150b05da59565ffc97825cf2457e638cd04ea2e1885c4b",
+        "n": 1,
+        "reset_noise": 0,
+        "goal_angle_rad": 0,
+        "lab_parameters": {
+          "mirror_left_fa": true,
+          "hind_lift_multiplier": -1.3333333333333333,
+          "front_stance_press": 0.05,
+          "front_stance_press_fr": 0.05,
+          "front_swing_lift": -0.4,
+          "front_stance_seek": 0.0,
+          "front_seek_relax": 0.35,
+          "shoulder_sprawl_tuck": 0.0,
+          "fore_hind_amplitude_ratio": 0.54,
+          "hind_fa_amplitude": 0.98,
+          "heading_gain": 1.0,
+          "continuous_front_lift": true,
+          "other_amplitude": 0.0
+        },
+        "commanded_stance_by_foot": {
+          "HL": 0.78,
+          "FL": 0.7,
+          "HR": 0.78,
+          "FR": 0.7
+        },
+        "phase_offsets_cycle": {
+          "HL": 0.0,
+          "FL": 0.435,
+          "HR": 0.5,
+          "FR": 0.935
+        },
+        "source_sha256": {
+          "envs/cpg_residual_controller.py": "54734d387cdb79a8d0a4dfdb3780f9526f78a6f52607c7f3b99701906b937336",
+          "envs/gecko_walk_env.py": "4c3ca566c6bdb6a7a659fe40f4f25168cdc560254979c40092228c73b7cab293",
+          "realism_metrics.py": "2f59ddc4dd964044440cff68290b72fe3820e31f275881e0d50b2b865471566c",
+          "config/proxies.yaml": "0f3713af6aeba7341853f1e5a4f37a3d7e4fa7f776bbab1dcd99a51423ec7c85"
+        }
+      },
+      "gate2_pass_as_recorded": false,
+      "completed_without_fall": true,
+      "six_checks_as_recorded": {
+        "signed_forward": {
+          "value_m_s": 0.04244402902699282,
+          "pass": true
+        },
+        "net_path": {
+          "value": 0.8253197508252181,
+          "pass": true
+        },
+        "hind_swing_load": {
+          "values": {
+            "HL": 0.012903225806451613,
+            "HR": 0.010869565217391304
+          },
+          "pass": true
+        },
+        "front_stance_load": {
+          "values": {
+            "FL": 0.6113902847571189,
+            "FR": 0.6064080944350759
+          },
+          "pass": false
+        },
+        "hind_duty": {
+          "values": {
+            "HL": 0.6407835487311943,
+            "HR": 0.6312274504904746
+          },
+          "pass": false
+        },
+        "limb_phase": {
+          "values": {
+            "HL_to_FL": 0.5774076174809721,
+            "HR_to_FR": 0.5690297620457196
+          },
+          "pass": false
+        }
+      },
+      "requirements_as_recorded": {
+        "minimum_forward_m_s": 0.04,
+        "minimum_net_path": 0.5,
+        "maximum_hind_swing_load": 0.1,
+        "minimum_front_stance_load": 0.65,
+        "hind_duty_target": 0.78,
+        "hind_duty_tolerance": 0.05,
+        "limb_phase_target": 0.435,
+        "limb_phase_tolerance": 0.03
+      },
+      "contact_timing": {
+        "per_foot": {
+          "HL": {
+            "observed_contact_cycle_rate_hz": 1.1886886886882462,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.028750112661713484,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 19
+          },
+          "FL": {
+            "observed_contact_cycle_rate_hz": 1.1910433539775978,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.016712176526911236,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 20
+          },
+          "HR": {
+            "observed_contact_cycle_rate_hz": 1.1887779362810227,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.031280426294398,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 20
+          },
+          "FR": {
+            "observed_contact_cycle_rate_hz": 1.1916708479674374,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.02152813903292722,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 19
+          }
+        },
+        "rate_entrainment_all_feet": true,
+        "period_cv_single_digits_all_feet": true,
+        "acquisition_at_least_200_hz": true,
+        "timing_and_acquisition_valid_recorded": true,
+        "timing_and_acquisition_valid_from_report_components": true
+      },
+      "sample_rate_hz": 250.00000000002754,
+      "observed_duration_s": 17.00000000000701
+    },
+    {
+      "case": "20_front_height",
+      "source_report": {
+        "path": "C:\\Users\\ziyad\\GeckoBrain\\artifacts\\evidence\\session2\\trials\\20_front_height\\report.json",
+        "sha256": "2a887ec4a41b35d255f31cbe9876374fd1257af47a26ff36c244dcd539b7fe36",
+        "bytes": 536878
+      },
+      "retained_trace": null,
+      "trace_provenance_status": "raw trace was not retained; saved report hash only",
+      "protocol": {
+        "seed": 0,
+        "gait_profile": "lab",
+        "xml_sha256": "756765356417749c72150b05da59565ffc97825cf2457e638cd04ea2e1885c4b",
+        "n": 1,
+        "reset_noise": 0,
+        "goal_angle_rad": 0,
+        "lab_parameters": {
+          "mirror_left_fa": true,
+          "hind_lift_multiplier": -1.3333333333333333,
+          "front_stance_press": 0.05,
+          "front_stance_press_fr": 0.05,
+          "front_swing_lift": -0.2,
+          "front_stance_seek": 0.0,
+          "front_seek_relax": 0.35,
+          "shoulder_sprawl_tuck": 0.0,
+          "fore_hind_amplitude_ratio": 0.54,
+          "hind_fa_amplitude": 0.98,
+          "heading_gain": 1.0,
+          "continuous_front_lift": true,
+          "other_amplitude": 0.0
+        },
+        "commanded_stance_by_foot": {
+          "HL": 0.78,
+          "FL": 0.7,
+          "HR": 0.78,
+          "FR": 0.7
+        },
+        "phase_offsets_cycle": {
+          "HL": 0.0,
+          "FL": 0.435,
+          "HR": 0.5,
+          "FR": 0.935
+        },
+        "source_sha256": {
+          "envs/cpg_residual_controller.py": "54734d387cdb79a8d0a4dfdb3780f9526f78a6f52607c7f3b99701906b937336",
+          "envs/gecko_walk_env.py": "4c3ca566c6bdb6a7a659fe40f4f25168cdc560254979c40092228c73b7cab293",
+          "realism_metrics.py": "2f59ddc4dd964044440cff68290b72fe3820e31f275881e0d50b2b865471566c",
+          "config/proxies.yaml": "0f3713af6aeba7341853f1e5a4f37a3d7e4fa7f776bbab1dcd99a51423ec7c85"
+        }
+      },
+      "gate2_pass_as_recorded": false,
+      "completed_without_fall": true,
+      "six_checks_as_recorded": {
+        "signed_forward": {
+          "value_m_s": 0.03550356250564431,
+          "pass": false
+        },
+        "net_path": {
+          "value": 0.7668089048994122,
+          "pass": true
+        },
+        "hind_swing_load": {
+          "values": {
+            "HL": 0.15698924731182795,
+            "HR": 0.1391304347826087
+          },
+          "pass": false
+        },
+        "front_stance_load": {
+          "values": {
+            "FL": 0.6036850921273031,
+            "FR": 0.6131534569983137
+          },
+          "pass": false
+        },
+        "hind_duty": {
+          "values": {
+            "HL": 0.6333754452091134,
+            "HR": 0.6854048199024438
+          },
+          "pass": false
+        },
+        "limb_phase": {
+          "values": {
+            "HL_to_FL": 0.6345794313364328,
+            "HR_to_FR": 0.5615368066963717
+          },
+          "pass": false
+        }
+      },
+      "requirements_as_recorded": {
+        "minimum_forward_m_s": 0.04,
+        "minimum_net_path": 0.5,
+        "maximum_hind_swing_load": 0.1,
+        "minimum_front_stance_load": 0.65,
+        "hind_duty_target": 0.78,
+        "hind_duty_tolerance": 0.05,
+        "limb_phase_target": 0.435,
+        "limb_phase_tolerance": 0.03
+      },
+      "contact_timing": {
+        "per_foot": {
+          "HL": {
+            "observed_contact_cycle_rate_hz": 1.7972235994043586,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.4794564691260659,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 29
+          },
+          "FL": {
+            "observed_contact_cycle_rate_hz": 2.1997621878706797,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.30246506082570257,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 37
+          },
+          "HR": {
+            "observed_contact_cycle_rate_hz": 1.4265335235372274,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.36515090781256376,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 24
+          },
+          "FR": {
+            "observed_contact_cycle_rate_hz": 1.773049645389414,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.37283943981560613,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 29
+          }
+        },
+        "rate_entrainment_all_feet": false,
+        "period_cv_single_digits_all_feet": false,
+        "acquisition_at_least_200_hz": true,
+        "timing_and_acquisition_valid_recorded": false,
+        "timing_and_acquisition_valid_from_report_components": false
+      },
+      "sample_rate_hz": 250.00000000002754,
+      "observed_duration_s": 17.00000000000701
+    },
+    {
+      "case": "21_hind_height",
+      "source_report": {
+        "path": "C:\\Users\\ziyad\\GeckoBrain\\artifacts\\evidence\\session2\\trials\\21_hind_height\\report.json",
+        "sha256": "596cfea9f7d7f7337515bf05ecbee20d7dfa7660d4c0f008c5cc4328b9adb4f8",
+        "bytes": 539301
+      },
+      "retained_trace": {
+        "path": "C:\\Users\\ziyad\\GeckoBrain\\artifacts\\evidence\\session2\\trials\\21_hind_height\\traces\\episode_000.json",
+        "sha256": "8aa2c022bc0b3972ecb43b83f14c22b3640097c159033a13241d1c71daad9922",
+        "matches_recorded_report_hash": true
+      },
+      "trace_provenance_status": "retained raw trace hash verified",
+      "protocol": {
+        "seed": 0,
+        "gait_profile": "lab",
+        "xml_sha256": "756765356417749c72150b05da59565ffc97825cf2457e638cd04ea2e1885c4b",
+        "n": 1,
+        "reset_noise": 0,
+        "goal_angle_rad": 0,
+        "lab_parameters": {
+          "mirror_left_fa": true,
+          "hind_lift_multiplier": -1.0,
+          "front_stance_press": 0.05,
+          "front_stance_press_fr": 0.05,
+          "front_swing_lift": -0.2,
+          "front_stance_seek": 0.0,
+          "front_seek_relax": 0.35,
+          "shoulder_sprawl_tuck": 0.0,
+          "fore_hind_amplitude_ratio": 0.54,
+          "hind_fa_amplitude": 0.98,
+          "heading_gain": 1.0,
+          "continuous_front_lift": true,
+          "other_amplitude": 0.0
+        },
+        "commanded_stance_by_foot": {
+          "HL": 0.78,
+          "FL": 0.7,
+          "HR": 0.78,
+          "FR": 0.7
+        },
+        "phase_offsets_cycle": {
+          "HL": 0.0,
+          "FL": 0.435,
+          "HR": 0.5,
+          "FR": 0.935
+        },
+        "source_sha256": {
+          "envs/cpg_residual_controller.py": "54734d387cdb79a8d0a4dfdb3780f9526f78a6f52607c7f3b99701906b937336",
+          "envs/gecko_walk_env.py": "4c3ca566c6bdb6a7a659fe40f4f25168cdc560254979c40092228c73b7cab293",
+          "realism_metrics.py": "2f59ddc4dd964044440cff68290b72fe3820e31f275881e0d50b2b865471566c",
+          "config/proxies.yaml": "0f3713af6aeba7341853f1e5a4f37a3d7e4fa7f776bbab1dcd99a51423ec7c85"
+        }
+      },
+      "gate2_pass_as_recorded": false,
+      "completed_without_fall": true,
+      "six_checks_as_recorded": {
+        "signed_forward": {
+          "value_m_s": 0.033976648398422654,
+          "pass": false
+        },
+        "net_path": {
+          "value": 0.7927401442833195,
+          "pass": true
+        },
+        "hind_swing_load": {
+          "values": {
+            "HL": 0.13010752688172042,
+            "HR": 0.1423913043478261
+          },
+          "pass": false
+        },
+        "front_stance_load": {
+          "values": {
+            "FL": 0.6251256281407035,
+            "FR": 0.6290050590219224
+          },
+          "pass": false
+        },
+        "hind_duty": {
+          "values": {
+            "HL": 0.6569611881273837,
+            "HR": 0.6893734050232269
+          },
+          "pass": false
+        },
+        "limb_phase": {
+          "values": {
+            "HL_to_FL": 0.6359938681062376,
+            "HR_to_FR": 0.5612330406925938
+          },
+          "pass": false
+        }
+      },
+      "requirements_as_recorded": {
+        "minimum_forward_m_s": 0.04,
+        "minimum_net_path": 0.5,
+        "maximum_hind_swing_load": 0.1,
+        "minimum_front_stance_load": 0.65,
+        "hind_duty_target": 0.78,
+        "hind_duty_tolerance": 0.05,
+        "limb_phase_target": 0.435,
+        "limb_phase_tolerance": 0.03
+      },
+      "contact_timing": {
+        "per_foot": {
+          "HL": {
+            "observed_contact_cycle_rate_hz": 2.603520952143795,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.6367978672658017,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 42
+          },
+          "FL": {
+            "observed_contact_cycle_rate_hz": 2.3769907297351827,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.14667992999820534,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 40
+          },
+          "HR": {
+            "observed_contact_cycle_rate_hz": 1.2497024517966893,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.19050959452618182,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 21
+          },
+          "FR": {
+            "observed_contact_cycle_rate_hz": 1.6048502139793581,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.3505456490211678,
+            "rate_entrainment_pass": false,
+            "complete_contact_cycle_count": 27
+          }
+        },
+        "rate_entrainment_all_feet": false,
+        "period_cv_single_digits_all_feet": false,
+        "acquisition_at_least_200_hz": true,
+        "timing_and_acquisition_valid_recorded": false,
+        "timing_and_acquisition_valid_from_report_components": false
+      },
+      "sample_rate_hz": 250.00000000002754,
+      "observed_duration_s": 17.00000000000701
+    },
+    {
+      "case": "final_candidate",
+      "source_report": {
+        "path": "C:\\Users\\ziyad\\GeckoBrain\\artifacts\\evidence\\session2\\trials\\final_candidate\\report.json",
+        "sha256": "40b8bf10cfc6b1d8f79f84415c720e111f76d52cae0fad201def7ccdded86df7",
+        "bytes": 466636
+      },
+      "retained_trace": {
+        "path": "C:\\Users\\ziyad\\GeckoBrain\\artifacts\\evidence\\session2\\trials\\final_candidate\\traces\\episode_000.json",
+        "sha256": "35acda8b732cad0b012ed7ebf45a804013f09e0880c1d8a43671ebb9ebf3ea9c",
+        "matches_recorded_report_hash": true
+      },
+      "trace_provenance_status": "retained raw trace hash verified",
+      "protocol": {
+        "seed": 0,
+        "gait_profile": "lab",
+        "xml_sha256": "756765356417749c72150b05da59565ffc97825cf2457e638cd04ea2e1885c4b",
+        "n": 1,
+        "reset_noise": 0,
+        "goal_angle_rad": 0,
+        "lab_parameters": {
+          "mirror_left_fa": true,
+          "hind_lift_multiplier": -1.3333333333333333,
+          "front_stance_press": 0.05,
+          "front_stance_press_fr": 0.05,
+          "front_swing_lift": -0.4,
+          "front_stance_seek": 0.0,
+          "front_seek_relax": 0.35,
+          "shoulder_sprawl_tuck": 0.0,
+          "fore_hind_amplitude_ratio": 0.54,
+          "hind_fa_amplitude": 0.98,
+          "heading_gain": 1.0,
+          "continuous_front_lift": true,
+          "other_amplitude": 0.0
+        },
+        "commanded_stance_by_foot": {
+          "HL": 0.78,
+          "FL": 0.7,
+          "HR": 0.78,
+          "FR": 0.7
+        },
+        "phase_offsets_cycle": {
+          "HL": 0.0,
+          "FL": 0.435,
+          "HR": 0.5,
+          "FR": 0.935
+        },
+        "source_sha256": {
+          "envs/cpg_residual_controller.py": "54734d387cdb79a8d0a4dfdb3780f9526f78a6f52607c7f3b99701906b937336",
+          "envs/gecko_walk_env.py": "4c3ca566c6bdb6a7a659fe40f4f25168cdc560254979c40092228c73b7cab293",
+          "realism_metrics.py": "2f59ddc4dd964044440cff68290b72fe3820e31f275881e0d50b2b865471566c",
+          "config/proxies.yaml": "94c44a58ca4ab3428d6e32d700273f598cd0eddf49634aa03643a95d62acc120"
+        }
+      },
+      "gate2_pass_as_recorded": false,
+      "completed_without_fall": true,
+      "six_checks_as_recorded": {
+        "signed_forward": {
+          "value_m_s": 0.04244402902699282,
+          "pass": true
+        },
+        "net_path": {
+          "value": 0.8253197508252181,
+          "pass": true
+        },
+        "hind_swing_load": {
+          "values": {
+            "HL": 0.012903225806451613,
+            "HR": 0.010869565217391304
+          },
+          "pass": true
+        },
+        "front_stance_load": {
+          "values": {
+            "FL": 0.6113902847571189,
+            "FR": 0.6064080944350759
+          },
+          "pass": false
+        },
+        "hind_duty": {
+          "values": {
+            "HL": 0.6407835487311943,
+            "HR": 0.6312274504904746
+          },
+          "pass": false
+        },
+        "limb_phase": {
+          "values": {
+            "HL_to_FL": 0.5774076174809721,
+            "HR_to_FR": 0.5690297620457196
+          },
+          "pass": false
+        }
+      },
+      "requirements_as_recorded": {
+        "minimum_forward_m_s": 0.04,
+        "minimum_net_path": 0.5,
+        "maximum_hind_swing_load": 0.1,
+        "minimum_front_stance_load": 0.65,
+        "hind_duty_target": 0.78,
+        "hind_duty_tolerance": 0.05,
+        "limb_phase_target": 0.435,
+        "limb_phase_tolerance": 0.03
+      },
+      "contact_timing": {
+        "per_foot": {
+          "HL": {
+            "observed_contact_cycle_rate_hz": 1.1886886886882462,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.028750112661713484,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 19
+          },
+          "FL": {
+            "observed_contact_cycle_rate_hz": 1.1910433539775978,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.016712176526911236,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 20
+          },
+          "HR": {
+            "observed_contact_cycle_rate_hz": 1.1887779362810227,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.031280426294398,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 20
+          },
+          "FR": {
+            "observed_contact_cycle_rate_hz": 1.1916708479674374,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.02152813903292722,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 19
+          }
+        },
+        "rate_entrainment_all_feet": true,
+        "period_cv_single_digits_all_feet": true,
+        "acquisition_at_least_200_hz": true,
+        "timing_and_acquisition_valid_recorded": true,
+        "timing_and_acquisition_valid_from_report_components": true
+      },
+      "sample_rate_hz": 250.00000000002754,
+      "observed_duration_s": 17.00000000000701
+    },
+    {
+      "case": "steering_left",
+      "source_report": {
+        "path": "C:\\Users\\ziyad\\GeckoBrain\\artifacts\\evidence\\session2\\trials\\steering_left\\report.json",
+        "sha256": "13d364e6c01c1787540d5285c047334ec5f93bf84d67904e9ca44e9e68aba71e",
+        "bytes": 464151
+      },
+      "retained_trace": {
+        "path": "C:\\Users\\ziyad\\GeckoBrain\\artifacts\\evidence\\session2\\trials\\steering_left\\traces\\episode_000.json",
+        "sha256": "38c00a1e1d269fdfaa33a3ba348348348d0dd0209de4a683a10ff0784f385460",
+        "matches_recorded_report_hash": true
+      },
+      "trace_provenance_status": "retained raw trace hash verified",
+      "protocol": {
+        "seed": 0,
+        "gait_profile": "lab",
+        "xml_sha256": "756765356417749c72150b05da59565ffc97825cf2457e638cd04ea2e1885c4b",
+        "n": 1,
+        "reset_noise": 0,
+        "goal_angle_rad": 0.4,
+        "lab_parameters": {
+          "mirror_left_fa": true,
+          "hind_lift_multiplier": -1.3333333333333333,
+          "front_stance_press": 0.05,
+          "front_stance_press_fr": 0.05,
+          "front_swing_lift": -0.4,
+          "front_stance_seek": 0.0,
+          "front_seek_relax": 0.35,
+          "shoulder_sprawl_tuck": 0.0,
+          "fore_hind_amplitude_ratio": 0.54,
+          "hind_fa_amplitude": 0.98,
+          "heading_gain": 1.0,
+          "continuous_front_lift": true,
+          "other_amplitude": 0.0
+        },
+        "commanded_stance_by_foot": {
+          "HL": 0.78,
+          "FL": 0.7,
+          "HR": 0.78,
+          "FR": 0.7
+        },
+        "phase_offsets_cycle": {
+          "HL": 0.0,
+          "FL": 0.435,
+          "HR": 0.5,
+          "FR": 0.935
+        },
+        "source_sha256": {
+          "envs/cpg_residual_controller.py": "54734d387cdb79a8d0a4dfdb3780f9526f78a6f52607c7f3b99701906b937336",
+          "envs/gecko_walk_env.py": "4c3ca566c6bdb6a7a659fe40f4f25168cdc560254979c40092228c73b7cab293",
+          "realism_metrics.py": "2f59ddc4dd964044440cff68290b72fe3820e31f275881e0d50b2b865471566c",
+          "config/proxies.yaml": "94c44a58ca4ab3428d6e32d700273f598cd0eddf49634aa03643a95d62acc120"
+        }
+      },
+      "gate2_pass_as_recorded": false,
+      "completed_without_fall": true,
+      "six_checks_as_recorded": {
+        "signed_forward": {
+          "value_m_s": 0.042617553699386634,
+          "pass": true
+        },
+        "net_path": {
+          "value": 0.823524210475787,
+          "pass": true
+        },
+        "hind_swing_load": {
+          "values": {
+            "HL": 0.010752688172043012,
+            "HR": 0.010869565217391304
+          },
+          "pass": true
+        },
+        "front_stance_load": {
+          "values": {
+            "FL": 0.6077051926298157,
+            "FR": 0.6057335581787521
+          },
+          "pass": false
+        },
+        "hind_duty": {
+          "values": {
+            "HL": 0.6356794918111299,
+            "HR": 0.6441652708420155
+          },
+          "pass": false
+        },
+        "limb_phase": {
+          "values": {
+            "HL_to_FL": 0.5721464508903762,
+            "HR_to_FR": 0.5853470114928258
+          },
+          "pass": false
+        }
+      },
+      "requirements_as_recorded": {
+        "minimum_forward_m_s": 0.04,
+        "minimum_net_path": 0.5,
+        "maximum_hind_swing_load": 0.1,
+        "minimum_front_stance_load": 0.65,
+        "hind_duty_target": 0.78,
+        "hind_duty_tolerance": 0.05,
+        "limb_phase_target": 0.435,
+        "limb_phase_tolerance": 0.03
+      },
+      "contact_timing": {
+        "per_foot": {
+          "HL": {
+            "observed_contact_cycle_rate_hz": 1.1904761904757506,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.030283784171861998,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 19
+          },
+          "FL": {
+            "observed_contact_cycle_rate_hz": 1.188212927756166,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.024303468428534813,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 20
+          },
+          "HR": {
+            "observed_contact_cycle_rate_hz": 1.1916110581501467,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.04119452664923319,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 20
+          },
+          "FR": {
+            "observed_contact_cycle_rate_hz": 1.1877969492368579,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.024807915629501538,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 19
+          }
+        },
+        "rate_entrainment_all_feet": true,
+        "period_cv_single_digits_all_feet": true,
+        "acquisition_at_least_200_hz": true,
+        "timing_and_acquisition_valid_recorded": true,
+        "timing_and_acquisition_valid_from_report_components": true
+      },
+      "sample_rate_hz": 250.00000000002754,
+      "observed_duration_s": 17.00000000000701
+    },
+    {
+      "case": "steering_right",
+      "source_report": {
+        "path": "C:\\Users\\ziyad\\GeckoBrain\\artifacts\\evidence\\session2\\trials\\steering_right\\report.json",
+        "sha256": "f835b0b699454af2903d4c3c79826f690cd21fc047199a246870a98d5380eb8a",
+        "bytes": 459018
+      },
+      "retained_trace": {
+        "path": "C:\\Users\\ziyad\\GeckoBrain\\artifacts\\evidence\\session2\\trials\\steering_right\\traces\\episode_000.json",
+        "sha256": "dce969e91358f9b4e78c0c004f361038292d015459e8a814791ca6213affb0ae",
+        "matches_recorded_report_hash": true
+      },
+      "trace_provenance_status": "retained raw trace hash verified",
+      "protocol": {
+        "seed": 0,
+        "gait_profile": "lab",
+        "xml_sha256": "756765356417749c72150b05da59565ffc97825cf2457e638cd04ea2e1885c4b",
+        "n": 1,
+        "reset_noise": 0,
+        "goal_angle_rad": -0.4,
+        "lab_parameters": {
+          "mirror_left_fa": true,
+          "hind_lift_multiplier": -1.3333333333333333,
+          "front_stance_press": 0.05,
+          "front_stance_press_fr": 0.05,
+          "front_swing_lift": -0.4,
+          "front_stance_seek": 0.0,
+          "front_seek_relax": 0.35,
+          "shoulder_sprawl_tuck": 0.0,
+          "fore_hind_amplitude_ratio": 0.54,
+          "hind_fa_amplitude": 0.98,
+          "heading_gain": 1.0,
+          "continuous_front_lift": true,
+          "other_amplitude": 0.0
+        },
+        "commanded_stance_by_foot": {
+          "HL": 0.78,
+          "FL": 0.7,
+          "HR": 0.78,
+          "FR": 0.7
+        },
+        "phase_offsets_cycle": {
+          "HL": 0.0,
+          "FL": 0.435,
+          "HR": 0.5,
+          "FR": 0.935
+        },
+        "source_sha256": {
+          "envs/cpg_residual_controller.py": "54734d387cdb79a8d0a4dfdb3780f9526f78a6f52607c7f3b99701906b937336",
+          "envs/gecko_walk_env.py": "4c3ca566c6bdb6a7a659fe40f4f25168cdc560254979c40092228c73b7cab293",
+          "realism_metrics.py": "2f59ddc4dd964044440cff68290b72fe3820e31f275881e0d50b2b865471566c",
+          "config/proxies.yaml": "94c44a58ca4ab3428d6e32d700273f598cd0eddf49634aa03643a95d62acc120"
+        }
+      },
+      "gate2_pass_as_recorded": false,
+      "completed_without_fall": true,
+      "six_checks_as_recorded": {
+        "signed_forward": {
+          "value_m_s": 0.04252789904990947,
+          "pass": true
+        },
+        "net_path": {
+          "value": 0.82437086486131,
+          "pass": true
+        },
+        "hind_swing_load": {
+          "values": {
+            "HL": 0.012903225806451613,
+            "HR": 0.011956521739130435
+          },
+          "pass": true
+        },
+        "front_stance_load": {
+          "values": {
+            "FL": 0.6056951423785595,
+            "FR": 0.6080944350758853
+          },
+          "pass": false
+        },
+        "hind_duty": {
+          "values": {
+            "HL": 0.6394956196246963,
+            "HR": 0.6374442106598679
+          },
+          "pass": false
+        },
+        "limb_phase": {
+          "values": {
+            "HL_to_FL": 0.5921479815169202,
+            "HR_to_FR": 0.5721928458905648
+          },
+          "pass": false
+        }
+      },
+      "requirements_as_recorded": {
+        "minimum_forward_m_s": 0.04,
+        "minimum_net_path": 0.5,
+        "maximum_hind_swing_load": 0.1,
+        "minimum_front_stance_load": 0.65,
+        "hind_duty_target": 0.78,
+        "hind_duty_tolerance": 0.05,
+        "limb_phase_target": 0.435,
+        "limb_phase_tolerance": 0.03
+      },
+      "contact_timing": {
+        "per_foot": {
+          "HL": {
+            "observed_contact_cycle_rate_hz": 1.1872031991997587,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.041740230273168796,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 19
+          },
+          "FL": {
+            "observed_contact_cycle_rate_hz": 1.1904761904757002,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.017950881783941535,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 20
+          },
+          "HR": {
+            "observed_contact_cycle_rate_hz": 1.1848341232222726,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.03417584147355782,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 20
+          },
+          "FR": {
+            "observed_contact_cycle_rate_hz": 1.1869065467261832,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.02791787773560964,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 19
+          }
+        },
+        "rate_entrainment_all_feet": true,
+        "period_cv_single_digits_all_feet": true,
+        "acquisition_at_least_200_hz": true,
+        "timing_and_acquisition_valid_recorded": true,
+        "timing_and_acquisition_valid_from_report_components": true
+      },
+      "sample_rate_hz": 250.00000000002754,
+      "observed_duration_s": 17.00000000000701
+    },
+    {
+      "case": "verified_final",
+      "source_report": {
+        "path": "C:\\Users\\ziyad\\GeckoBrain\\artifacts\\evidence\\session2\\trials\\verified_final\\report.json",
+        "sha256": "1124db46c55b5870a54a6cd187e7271558dedf71bfd9f4064b047a082125acb6",
+        "bytes": 466635
+      },
+      "retained_trace": {
+        "path": "C:\\Users\\ziyad\\GeckoBrain\\artifacts\\evidence\\session2\\trials\\verified_final\\traces\\episode_000.json",
+        "sha256": "7581cee3d5766360ccccc4f144391db3812ea100f522bba718f72fe30cca81b3",
+        "matches_recorded_report_hash": true
+      },
+      "trace_provenance_status": "retained raw trace hash verified",
+      "protocol": {
+        "seed": 0,
+        "gait_profile": "lab",
+        "xml_sha256": "756765356417749c72150b05da59565ffc97825cf2457e638cd04ea2e1885c4b",
+        "n": 1,
+        "reset_noise": 0,
+        "goal_angle_rad": 0,
+        "lab_parameters": {
+          "mirror_left_fa": true,
+          "hind_lift_multiplier": -1.3333333333333333,
+          "front_stance_press": 0.05,
+          "front_stance_press_fr": 0.05,
+          "front_swing_lift": -0.4,
+          "front_stance_seek": 0.0,
+          "front_seek_relax": 0.35,
+          "shoulder_sprawl_tuck": 0.0,
+          "fore_hind_amplitude_ratio": 0.54,
+          "hind_fa_amplitude": 0.98,
+          "heading_gain": 1.0,
+          "continuous_front_lift": true,
+          "other_amplitude": 0.0
+        },
+        "commanded_stance_by_foot": {
+          "HL": 0.78,
+          "FL": 0.7,
+          "HR": 0.78,
+          "FR": 0.7
+        },
+        "phase_offsets_cycle": {
+          "HL": 0.0,
+          "FL": 0.435,
+          "HR": 0.5,
+          "FR": 0.935
+        },
+        "source_sha256": {
+          "envs/cpg_residual_controller.py": "54734d387cdb79a8d0a4dfdb3780f9526f78a6f52607c7f3b99701906b937336",
+          "envs/gecko_walk_env.py": "4c3ca566c6bdb6a7a659fe40f4f25168cdc560254979c40092228c73b7cab293",
+          "realism_metrics.py": "cebcee5ed6127044452491fe1d7e43359ce726d5ada29de7ad0ea14c3e3b2259",
+          "config/proxies.yaml": "94c44a58ca4ab3428d6e32d700273f598cd0eddf49634aa03643a95d62acc120"
+        }
+      },
+      "gate2_pass_as_recorded": false,
+      "completed_without_fall": true,
+      "six_checks_as_recorded": {
+        "signed_forward": {
+          "value_m_s": 0.04244402902699282,
+          "pass": true
+        },
+        "net_path": {
+          "value": 0.8253197508252181,
+          "pass": true
+        },
+        "hind_swing_load": {
+          "values": {
+            "HL": 0.012903225806451613,
+            "HR": 0.010869565217391304
+          },
+          "pass": true
+        },
+        "front_stance_load": {
+          "values": {
+            "FL": 0.6113902847571189,
+            "FR": 0.6064080944350759
+          },
+          "pass": false
+        },
+        "hind_duty": {
+          "values": {
+            "HL": 0.6407835487311943,
+            "HR": 0.6312274504904746
+          },
+          "pass": false
+        },
+        "limb_phase": {
+          "values": {
+            "HL_to_FL": 0.5774076174809721,
+            "HR_to_FR": 0.5690297620457196
+          },
+          "pass": false
+        }
+      },
+      "requirements_as_recorded": {
+        "minimum_forward_m_s": 0.04,
+        "minimum_net_path": 0.5,
+        "maximum_hind_swing_load": 0.1,
+        "minimum_front_stance_load": 0.65,
+        "hind_duty_target": 0.78,
+        "hind_duty_tolerance": 0.05,
+        "limb_phase_target": 0.435,
+        "limb_phase_tolerance": 0.03
+      },
+      "contact_timing": {
+        "per_foot": {
+          "HL": {
+            "observed_contact_cycle_rate_hz": 1.1886886886882462,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.028750112661713484,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 19
+          },
+          "FL": {
+            "observed_contact_cycle_rate_hz": 1.1910433539775978,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.016712176526911236,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 20
+          },
+          "HR": {
+            "observed_contact_cycle_rate_hz": 1.1887779362810227,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.031280426294398,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 20
+          },
+          "FR": {
+            "observed_contact_cycle_rate_hz": 1.1916708479674374,
+            "commanded_frequency_hz": 1.1888,
+            "period_cv": 0.02152813903292722,
+            "rate_entrainment_pass": true,
+            "complete_contact_cycle_count": 19
+          }
+        },
+        "rate_entrainment_all_feet": true,
+        "period_cv_single_digits_all_feet": true,
+        "acquisition_at_least_200_hz": true,
+        "timing_and_acquisition_valid_recorded": true,
+        "timing_and_acquisition_valid_from_report_components": true
+      },
+      "sample_rate_hz": 250.00000000002754,
+      "observed_duration_s": 17.00000000000701
+    }
+  ],
+  "selected_confirmation_equality": {
+    "final_candidate": {
+      "six_checks_exactly_equal_to_selected19": true,
+      "comparison_source_report_sha256": "40b8bf10cfc6b1d8f79f84415c720e111f76d52cae0fad201def7ccdded86df7"
+    },
+    "verified_final": {
+      "six_checks_exactly_equal_to_selected19": true,
+      "comparison_source_report_sha256": "1124db46c55b5870a54a6cd187e7271558dedf71bfd9f4064b047a082125acb6"
+    }
+  }
+}

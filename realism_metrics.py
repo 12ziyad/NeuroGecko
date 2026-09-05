@@ -315,7 +315,7 @@ def analyze_trace(trace, settle_s=None, debounce_s=None):
                 work[kind+"_J_per_path_m"] = val/distance if distance > 1e-9 else None
     result["actuator_mechanical_work"] = work or {"status": "unavailable; requires physics-substep work logger"}
     result["deferred"]["COM_energy_recovery"] = "Not computed from trunk proxy; requires whole-model COM and a matched speed protocol."
-    result["deferred"]["strike_shake"] = "50 Hz gait trace cannot resolve strike kinematics; log >=500 Hz before filtering."
+    result["deferred"]["strike_shake"] = f"Not filtered/scored; acquired {1/dt:g} Hz. Strike protocol requires genuine >=500 Hz input plus declared filtering."
     return result
 
 
@@ -370,7 +370,7 @@ class TraceRecorder:
         self._pending_work = np.zeros(3)
         self._snapshot = mujoco.MjData(m)
         if physics_substeps is not None:
-            if physics_substeps < 1 or env.frame_skip % physics_substeps:
+            if isinstance(physics_substeps, bool) or not isinstance(physics_substeps, (int, np.integer)) or physics_substeps < 1 or env.frame_skip % physics_substeps:
                 raise ValueError("Sampling interval must be a positive divisor of frame_skip.")
             if env.physics_observer is not None:
                 raise ValueError("Environment already has a physics observer.")
@@ -613,6 +613,11 @@ def main(argv=None):
             "residual_scale": args.residual_scale, "front_stance_press": args.front_stance_press,
             "front_swing_lift": args.front_swing_lift,
             "calibration_scenario": "fixed world heading and distant goal, level floor, no prey, no randomization except declared reset noise"}
+    if env.gait_profile == "lab":
+        meta["legacy_front_cli_values_not_used"] = {"press":args.front_stance_press,"swing":args.front_swing_lift}
+        meta["front_stance_press"] = env.cpg.front_stance_press
+        meta["front_swing_lift"] = env.cpg.front_swing_lift
+        meta["effective_lab_parameters"] = dict(env.cpg.lab_parameters)
     report = {"schema_version": 1, "protocol": meta, "episodes": [],
               "claim": "Instrumented simulation diagnostics; no biological validation claimed.",
               "repeat_note": "Different seeds with reset_noise=0 repeat the same deterministic experiment, not independent animal samples."}

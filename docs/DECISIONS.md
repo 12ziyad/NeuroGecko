@@ -2,6 +2,33 @@
 
 ## Session 2 — correct the brief where measured mechanics disagree
 
+Final selection: trial19 is retained as the opt-in lab candidate because it
+exceeds the minimum forward and net/path requirements with low swing loads and
+stable contact-cycle timing. It is NOT promoted to the live legacy default and
+does NOT pass the full gate. No additional fitting followed trial21. We reran the
+selected condition and checked left/right steering inputs as verification only.
+The chosen gains and entire manual search remain ENGINEERED/INVENTED in provenance.
+
+Continuous front control disables the old discontinuous seek/relax branch; it is
+not a newly validated gecko reflex. Heading feedback comes from the existing
+target bearing without adding observation channels, changing cadence, or using a
+policy residual. Other-channel stance rotation was set to zero only after its
+separate measured trial; this is not a claim that animal joints remain rigid.
+
+The paper's primary Table1 was verified at
+https://pmc.ncbi.nlm.nih.gov/articles/PMC5589804/ : hind.78/fore.70 are original-tail
+individual-mean, speed-adjusted duty values; their SEMs are not universal gate
+tolerances. Its reported speed range begins at0.59SVL/s, so the brief's blanket
+claim that.08–.10m/s is below all published level observations is unsupported.
+No new universal speed band is imposed here; .04m/s is only this session's minimum
+engineering viability check. A single cohort's extrapolated cadence envelope is
+not an anatomical impossibility proof across all leopard geckos.
+
+Training remains closed for lab after the failed gate. The explicit CLI guard
+also prevents resuming with a checkpoint whose saved contract omits the new
+effective lab parameters. This guard must be deliberately revisited after the
+mechanical gate and serialization contract are fixed, not automatically bypassed.
+
 - No training, CMA-ES, GPU or AWS jobs. Preserve legacy defaults and recovered files.
 - Acquisition and physical entrainment are separate: real 250 Hz sampling can
   correctly show contact chatter. Gate 0's physical failure is not hidden by
