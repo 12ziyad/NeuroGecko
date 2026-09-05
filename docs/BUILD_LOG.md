@@ -552,3 +552,91 @@ The all-four configuration is retained as the better of the two (4/6 vs 3/6)
 despite its slightly worse front stance load, and both remain opt-in behind
 `--hind-stance-compensation {hind,all}`; the default is still off and legacy is
 untouched.
+
+## Session 3c — limb phase and stride length diagnosed; both hypotheses refuted
+
+### Touchdown timing (debounced 40 ms, 20 strides per foot, all-four-compensated run)
+
+| foot | commanded TD | actual TD | error |
+|---|---|---|---|
+| HL | 0.000 | 0.1234 | +0.123 |
+| HR | 0.500 | 0.6244 | +0.124 |
+| FL | 0.435 | 0.7551 | +0.320 |
+| FR | 0.935 | 0.2552 | +0.320 |
+
+Left and right are identical to three decimals, so this is systematic, not noise.
+**The limb-phase error IS the touchdown-lateness difference:** 0.320 - 0.123 =
+0.197, against a measured phase error of +0.197. Realised limb phase is late
+touchdown, nothing else. The forefoot lands a third of the way into its own
+commanded stance.
+
+### Actuator bandwidth measured, then refuted as the cause
+
+Servo dynamics at the stand pose:
+
+| joint | inertia | kp | kv | natural freq | damping ratio |
+|---|---|---|---|---|---|
+| elbow | 1.20e-3 | 0.310 | 0.0056 | **2.6 Hz** | **0.27** |
+| knee | 1.20e-3 | 0.466 | 0.0075 | **3.1 Hz** | **0.26** |
+
+The gait runs at 1.1888 Hz, so the actuators are only ~2x faster than the
+command they track and are badly underdamped. Measured tracking error at the
+elbow reaches 0.32 rad (18 deg) just before touchdown. This looked like the
+cause.
+
+Built `morphology/gecko_body_lab_v2_stiff.xml` with per-joint kp/kv solved from
+the actual inertia for 10 Hz natural frequency (8.4x gait) and zeta = 0.90 — a
+~15x kp increase. Peak torque for a 0.3 rad error stays inside forcerange for
+all limb joints except the ankle, which is noted.
+
+| check | soft | stiff |
+|---|---|---|
+| 1 forward | 0.0416 PASS | 0.0409 PASS |
+| 2 net/path | 0.7427 PASS | 0.8004 PASS |
+| 3 hind swing load | 0.0806 PASS | 0.1467 FAIL |
+| 4 front stance load | 0.5841 fail | 0.5755 fail |
+| 5 hind duty | 0.7334 PASS | 0.7543 PASS |
+| 6 limb phase | 0.6347 fail | **0.6396 fail** |
+| stride length SVL | 0.3242 | 0.3192 |
+| **gates** | **4/6** | **3/6** |
+
+**Limb phase did not move (0.635 -> 0.640) under a 15x stiffer, near-critically
+damped plant.** Actuator tracking is therefore NOT the cause of late touchdown.
+Three hypotheses have now been tested and refuted for limb phase: hind stance
+height, fore stance height, and actuator bandwidth. The stiff variant is
+retained as evidence but is NOT adopted — it costs the hind-swing-load gate.
+
+This also reverses the Session 4 plan as previously written: it proposed *adding*
+activation lag and *cutting* force ceilings. On a plant already at 2.6 Hz and
+zeta 0.27, both would move the wrong way. Do not do that without re-deriving it.
+
+### Stride length cannot be fixed by the legs — arithmetic
+
+| quantity | value |
+|---|---|
+| hip_proret ctrlrange half | 45.0 deg |
+| lab `hind_fa_amplitude` | 0.98 (of 1.0) |
+| resulting hip sweep | **88.2 deg peak-to-peak** |
+| published femur retraction excursion | 82.57 deg |
+| measured stride length | 0.324 SVL |
+| target | 0.62-0.82 SVL |
+
+**The hip already sweeps MORE than the published femur excursion, at 98% of
+available amplitude, and still delivers less than half the stride length.**
+
+Measured foot-x relative to trunk during HL stance spans -50.3 to -14.1 mm, a
+36.3 mm excursion. With an 88.2 deg sweep that implies an effective hip-to-foot
+radius of 36.3 / (2 sin 44.1) = 26.1 mm. Reaching 0.72 SVL (76.3 mm) by sweep
+alone would require a radius of 54.9 mm — **longer than the entire hind limb
+(0.417 SVL = 44.2 mm)**. It is geometrically impossible.
+
+So the missing stride length is not in the limbs at all. In real lizards the
+remainder comes from lateral spine bending and pectoral/pelvic girdle rotation,
+which is exactly what the standing-wave spine term is for. Forelimb stride is
+worse still (0.189 SVL), consistent with the same explanation.
+
+**Conclusion for the next session:** stop tuning limb amplitude for stride
+length — it is saturated and the geometry forbids the target. The open items
+are (a) spine/girdle contribution to stride, and (b) why the forefoot lands
+0.32 cycle late when neither its stance geometry nor the plant bandwidth
+explains it. Gate 2 stands at 4/6 with the all-four soft configuration.
