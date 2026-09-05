@@ -44,7 +44,7 @@ def _support_radius(kind, size, direction):
     raise ValueError("Unsupported collision primitive; a bounding-box proxy is not used.")
 
 
-class HindStanceCompensator:
+class StanceCompensator:
     """Minimum-norm Jacobian updates to a target collision-foot height.
 
     Defaults are INVENTED engineering settings: target -0.6 mm, 129 table nodes,
@@ -61,7 +61,7 @@ class HindStanceCompensator:
     """
 
     def __init__(self, model, target_clearance_m=-.0006, table_size=129,
-                 max_offset_rad=.35):
+                 max_offset_rad=.70, feet=("HL", "HR")):
         if not math.isfinite(target_clearance_m) or not -.0012 <= target_clearance_m <= 0:
             raise ValueError("Target must lie inside the declared [-1.2 mm, 0] frozen stance band.")
         if isinstance(table_size, bool) or not isinstance(table_size, int) or table_size < 17:
@@ -72,6 +72,9 @@ class HindStanceCompensator:
         self.target_clearance_m = float(target_clearance_m)
         self.max_offset_rad = float(max_offset_rad)
         self.table_size = table_size
+        feet = tuple(feet)
+        if not feet or any(f not in ("HL", "HR", "FL", "FR") for f in feet):
+            raise ValueError("feet must be a non-empty subset of HL/HR/FL/FR.")
         self._data = mujoco.MjData(model)
         key = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_KEY, "stand")
         if key < 0:
@@ -89,11 +92,23 @@ class HindStanceCompensator:
         self._info = {}
         tables = {}
         fit_diagnostics = {}
-        for foot, side in (("HL", "L"), ("HR", "R")):
-            names = ["hip_sprawl_", "hip_proret_", "hip_rot_", "knee_", "ankle_"]
-            ids = [mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_ACTUATOR, name + side) for name in names]
+        # Per-limb spec: (posture joints..., driving joint, free compensating joints...).
+        # The driving joint is the fore-aft sweep whose command keys the table; the
+        # free joints are the ones the solver may move. The hind limb has two free
+        # joints (knee, ankle); the forelimb has one (elbow) because this MJCF has
+        # no wrist actuator, so its solve is one-dimensional. Everything downstream
+        # is written for a variable number of free joints.
+        limb_specs = {
+            "HL": (["hip_sprawl_L", "hip_proret_L", "hip_rot_L", "knee_L", "ankle_L"], 1, 3, "pes_L"),
+            "HR": (["hip_sprawl_R", "hip_proret_R", "hip_rot_R", "knee_R", "ankle_R"], 1, 3, "pes_R"),
+            "FL": (["shoulder_sprawl_L", "shoulder_proret_L", "elbow_L"], 1, 2, "manus_L"),
+            "FR": (["shoulder_sprawl_R", "shoulder_proret_R", "elbow_R"], 1, 2, "manus_R"),
+        }
+        for foot in feet:
+            names, drive_index, free_start, body_name = limb_specs[foot]
+            ids = [mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_ACTUATOR, name) for name in names]
             if min(ids) < 0:
-                raise ValueError("Expected all five named hind joint actuators.")
+                raise ValueError(f"Expected all named {foot} joint actuators: {names}.")
             for aid in ids:
                 jid = int(model.actuator_trnid[aid, 0])
                 if (model.actuator_trntype[aid] != mujoco.mjtTrn.mjTRN_JOINT
@@ -105,7 +120,7 @@ class HindStanceCompensator:
                 gain, bias = model.actuator_gainprm[aid], model.actuator_biasprm[aid]
                 if gain[0] <= 0 or not np.allclose([bias[0], bias[1]], [0., -gain[0]], atol=1e-14):
                     raise ValueError("Expected position-servo gain and bias.")
-            bid = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, "pes_" + side)
+            bid = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, body_name)
             geoms = []
             for gid in range(model.ngeom):
                 ancestor = int(model.geom_bodyid[gid])
@@ -117,11 +132,13 @@ class HindStanceCompensator:
                     geoms.append(gid)
             if not geoms:
                 raise ValueError("No floor-compatible collision foot geoms.")
-            offset_bounds = model.actuator_ctrlrange[ids[3:]] - self._neutral[ids[3:], None]
+            offset_bounds = model.actuator_ctrlrange[ids[free_start:]] - self._neutral[ids[free_start:], None]
             offset_bounds[:, 0] = np.maximum(offset_bounds[:, 0], -max_offset_rad)
             offset_bounds[:, 1] = np.minimum(offset_bounds[:, 1], max_offset_rad)
-            self._info[foot] = {"ids": ids, "geoms": geoms, "offset_bounds": offset_bounds}
-            hip_grid = np.linspace(*model.actuator_ctrlrange[ids[1]], table_size)
+            self._info[foot] = {"ids": ids, "geoms": geoms, "offset_bounds": offset_bounds,
+                                "drive_index": drive_index, "free_start": free_start,
+                                "free_count": len(ids) - free_start}
+            hip_grid = np.linspace(*model.actuator_ctrlrange[ids[drive_index]], table_size)
             solutions, errors = [], []
             for hip in hip_grid:
                 offsets, error = self._solve(foot, float(hip))
@@ -132,8 +149,11 @@ class HindStanceCompensator:
             tables[foot] = table
             fit_diagnostics[foot] = {
                 "max_abs_table_height_error_m": float(np.max(np.abs(errors))),
-                "knee_offset_range_rad": [float(np.min(table[:, 1])), float(np.max(table[:, 1]))],
-                "ankle_offset_range_rad": [float(np.min(table[:, 2])), float(np.max(table[:, 2]))],
+                "free_joints": [names[i] for i in range(free_start, len(names))],
+                "offset_ranges_rad": [[float(np.min(table[:, c])), float(np.max(table[:, c]))]
+                                      for c in range(1, table.shape[1])],
+                "offset_bound_rad": [[float(offset_bounds[c, 0]), float(offset_bounds[c, 1])]
+                                     for c in range(offset_bounds.shape[0])],
                 "max_adjacent_offset_change_rad": float(np.max(np.abs(np.diff(table[:, 1:], axis=0)))),
                 "collision_geom_count": len(geoms),
             }
@@ -145,19 +165,19 @@ class HindStanceCompensator:
                                             "zero knee/ankle base stance targets", "exact collision primitives; no force prediction"]}
         for foot in self.tables:
             grid = np.linspace(self.tables[foot][0, 0], self.tables[foot][-1, 0], 4 * (table_size-1) + 1)
-            heights = [self.clearance(foot, float(hip), *self.offsets(foot, float(hip), 0., .78)) for hip in grid]
+            heights = [self.clearance(foot, float(hip), *self.offsets(foot, float(hip), 0., .78)) for hip in grid]  # noqa: E501
             self.diagnostics["fit"][foot]["dense_interpolation_clearance_range_m"] = [float(min(heights)), float(max(heights))]
             if min(heights) < -.0012 - 1e-9 or max(heights) > 1e-9:
                 raise ValueError(f"{foot} interpolation violates frozen stance band: {min(heights)}, {max(heights)}")
 
-    def clearance(self, foot, hip_ctrl_rad, knee_offset_rad=0., ankle_offset_rad=0.):
+    def clearance(self, foot, hip_ctrl_rad, *free_offsets_rad):
         """Read-only model diagnostic; private scratch data is not thread-safe."""
         info = self._info[foot]
         ids = info["ids"]
         commands = self._neutral[ids].copy()
-        commands[1] = hip_ctrl_rad
-        commands[3] += knee_offset_rad
-        commands[4] += ankle_offset_rad
+        commands[info["drive_index"]] = hip_ctrl_rad
+        for slot, value in enumerate(free_offsets_rad):
+            commands[info["free_start"] + slot] += value
         self._data.qpos[:] = self._stand_qpos
         for aid, command in zip(ids, commands):
             jid = self.model.actuator_trnid[aid, 0]
@@ -186,14 +206,14 @@ class HindStanceCompensator:
         # either edge of the declared [-1.2 mm, 0] stance band, and is far below
         # anything the contact solver resolves. The post-build dense-interpolation
         # check against that band is unchanged and remains the real guard.
-        x = np.zeros(2)
+        x = np.zeros(self._info[foot]["free_count"])
         bounds = self._info[foot]["offset_bounds"]
         for _ in range(60):
             error = self.clearance(foot, hip, *x) - self.target_clearance_m
             if abs(error) <= 2e-6:
                 return x, error
-            gradient = np.zeros(2)
-            for axis in range(2):
+            gradient = np.zeros(x.size)
+            for axis in range(x.size):
                 plus, minus = x.copy(), x.copy()
                 plus[axis] += 1e-4
                 minus[axis] -= 1e-4
@@ -222,7 +242,7 @@ class HindStanceCompensator:
             # (0.35,0.35) -> -7.72 mm), so bisect along that direction instead.
             # Bisection needs no derivative and is unaffected by the kink.
             bounds = self._info[foot]["offset_bounds"]
-            direction = np.ones(2) / math.sqrt(2.)
+            direction = np.ones(x.size) / math.sqrt(float(x.size))
             lo_scale = float(np.min(bounds[:, 0] / direction))
             hi_scale = float(np.min(bounds[:, 1] / direction))
             at = lambda s: self.clearance(foot, hip, *np.clip(s * direction, bounds[:, 0], bounds[:, 1])) - self.target_clearance_m
@@ -251,4 +271,9 @@ class HindStanceCompensator:
         weight = swing_blend(local_phase, stance_fraction)
         table = self.tables[foot]
         # np.interp clamps to table endpoints, matching actual ctrlrange clipping.
-        return tuple(float(weight * np.interp(hip_ctrl_rad, table[:, 0], table[:, index])) for index in (1, 2))
+        return tuple(float(weight * np.interp(hip_ctrl_rad, table[:, 0], table[:, index]))
+                     for index in range(1, table.shape[1]))
+
+
+# Backwards-compatible name for the original hind-only class.
+HindStanceCompensator = StanceCompensator

@@ -482,3 +482,73 @@ large, separate defect.
 **Gate 2 remains failed. No plant change, CMA-ES or training was started.**
 The remaining bottleneck has moved from the hind limb to the forelimb and to
 stride length.
+
+## Session 3b — compensation generalised to all four limbs
+
+`HindStanceCompensator` generalised to `StanceCompensator` with a per-limb spec
+(alias kept). Hind limb has two free joints (knee, ankle); the forelimb has one
+(elbow), because this MJCF has no wrist actuator, so its solve is 1-D. The
+solver, bisection fallback, diagnostics and band guard are all now written for a
+variable free-joint count. `max_offset_rad` default raised 0.35 -> 0.70; the
+hind solution is unchanged at -0.346, so 0.35 was NOT binding after all — that
+earlier suspicion was wrong.
+
+Applied as an ABSOLUTE blended target rather than an additive offset. This
+matters for the forelimb only: its elbow already carries `front_stance_press`
+during stance, so an additive offset would stack two independent height
+commands. For the hind limb the two forms coincide (knee "lift" and ankle
+"other" with amplitude 0 are both zero-offset from neutral in stance), which is
+why the hind numbers below reproduce the additive run's direction.
+
+Built tables (lab v2): HL/HR clearance -1.098..-0.594 mm; FL/FR -0.601..-0.597 mm.
+The forelimb table is essentially flat, i.e. the forelimb's frozen-pose geometry
+was already fine and had almost nothing to correct — 1.93 um max node error and
+offsets of only +/-0.08 rad.
+
+### Gate 2, three configurations, identical protocol (V2 + lab, zero residual, seed 0, 20 s, 250 Hz)
+
+| Check | baseline | hind only | all four | target |
+|---|---|---|---|---|
+| 1 forward m/s | 0.0424 | 0.0406 | 0.0416 | >= 0.04 |
+| 2 net/path | 0.8253 | 0.7323 | 0.7427 | >= 0.50 |
+| 3 hind swing load | — | 0.0441 | 0.0806 | < 0.10 |
+| 4 front stance load | 0.6114 | 0.6159 | **0.5841** | >= 0.65 |
+| 5 hind duty | 0.6408 | 0.7001 | **0.7334 PASS** | 0.73-0.83 |
+| 6 limb phase | 0.5774 | 0.6070 | **0.6347** | 0.405-0.465 |
+| gates passed | 3/6 | 3/6 | **4/6** | |
+
+Secondary: stride period CV 0.0288 -> 0.0149; trunk pitch 3.30 -> 3.87 deg (in
+band); hip height 0.1561 -> 0.1584 SVL (in band); shoulder height 0.1161 ->
+0.1249 SVL (left its 0.103-0.123 band); stride length 0.3307 -> 0.3242 SVL
+against a published 0.62-0.82, essentially unmoved.
+
+### What this settles
+
+**Gate 5 now passes.** Holding the hind collision foot at constant commanded
+height through stance raised hind duty 0.641 -> 0.733. That is the compensator
+doing exactly and only what it was built to do.
+
+**The forelimb hypothesis is refuted.** Front duty barely moved (0.377 ->
+0.394) and front stance load went the wrong way (0.611 -> 0.584). The forelimb
+table being almost flat is the explanation: forelimb frozen-pose geometry was
+never the defect. Measured dynamically, the forefoot is unloaded for the first
+~30% and last ~10% of its commanded stance while the shoulder girdle rides
+11.3-18.0 mm (6.7 mm of vertical travel). The forefoot is losing contact
+because the front of the body is moving, not because the leg is folded, and a
+frozen-pose table cannot correct a moving reference.
+
+**Limb phase is not a touchdown-height problem at all.** It has moved
+monotonically away from target at every step: 0.577 -> 0.607 -> 0.635. Three
+independent interventions all pushed it the wrong way. Whatever sets realised
+limb phase here, it is not hind or fore stance height, and it should be
+diagnosed from first principles rather than by further stance edits.
+
+**Stride length is untouched and large.** 0.32 SVL against 0.62-0.82 published,
+unchanged across all three configurations. This is an independent defect of
+roughly a factor of two and nothing done so far addresses it.
+
+**Gate 2 remains failed at 4/6.** No plant change, CMA-ES or training started.
+The all-four configuration is retained as the better of the two (4/6 vs 3/6)
+despite its slightly worse front stance load, and both remain opt-in behind
+`--hind-stance-compensation {hind,all}`; the default is still off and legacy is
+untouched.

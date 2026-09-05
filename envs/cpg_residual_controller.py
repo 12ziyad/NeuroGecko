@@ -158,6 +158,9 @@ class CPGResidualController:
         # asserted here rather than assumed.
         self._hind_comp = None
         self._hind_comp_ids = None
+        self._swing_blend = None
+        if hind_stance_compensation not in (False, True, "all"):
+            raise ValueError("hind_stance_compensation must be False, True (hind only) or 'all'.")
         if hind_stance_compensation:
             if self.gait_profile == "legacy":
                 raise ValueError("hind_stance_compensation is an opt-in lab control; legacy must remain unchanged.")
@@ -165,15 +168,24 @@ class CPGResidualController:
                 raise ValueError(
                     "hind_stance_compensation requires other_amplitude == 0; its frozen-pose table is "
                     "solved with zero ankle/sprawl/rotation base targets and would be invalid otherwise.")
-            from common.hind_stance_geometry import HindStanceCompensator
-            self._hind_comp = HindStanceCompensator(model)
+            from common.hind_stance_geometry import StanceCompensator, swing_blend
+            feet = ("HL", "HR", "FL", "FR") if hind_stance_compensation == "all" else ("HL", "HR")
+            self._hind_comp = StanceCompensator(model, feet=feet)
+            self._swing_blend = swing_blend
+            limb_actuators = {
+                "HL": ("hip_proret_L", ("knee_L", "ankle_L")),
+                "HR": ("hip_proret_R", ("knee_R", "ankle_R")),
+                "FL": ("shoulder_proret_L", ("elbow_L",)),
+                "FR": ("shoulder_proret_R", ("elbow_R",)),
+            }
             ids = {}
-            for foot, side in (("HL", "L"), ("HR", "R")):
-                ids[foot] = tuple(
-                    mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_ACTUATOR, name + side)
-                    for name in ("hip_proret_", "knee_", "ankle_"))
-                if min(ids[foot]) < 0:
-                    raise ValueError(f"Missing hip_proret/knee/ankle actuators for {foot}.")
+            for foot in feet:
+                drive_name, free_names = limb_actuators[foot]
+                drive = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_ACTUATOR, drive_name)
+                free = tuple(mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_ACTUATOR, n) for n in free_names)
+                if drive < 0 or min(free) < 0:
+                    raise ValueError(f"Missing drive/free actuators for {foot}.")
+                ids[foot] = (drive, free)
             self._hind_comp_ids = ids
 
         nu = model.nu
@@ -305,16 +317,24 @@ class CPGResidualController:
             ctrl[aid] = self.neutral[aid] + self._sign(aid) * s * self.half[aid]
 
         if self._hind_comp is not None:
-            # Applied after the limb loop so the hip command is final, and before
-            # the shoulder/spine/tail terms, which do not move the hind foot.
-            # Offsets fade smoothly to zero at mid-swing, so the existing swing
-            # lift command is preserved unchanged.
-            for foot, (hip_aid, knee_aid, ankle_aid) in self._hind_comp_ids.items():
+            # Applied after the limb loop so the driving sweep command is final,
+            # and before the shoulder-tuck/spine/tail terms, which do not move a
+            # foot. The compensated value is an ABSOLUTE target blended against
+            # the base command by the same swing weight: full authority through
+            # stance, the untouched base command at mid-swing. Absolute rather
+            # than additive matters for the forelimb, whose elbow already carries
+            # front_stance_press in stance -- adding an offset there would stack
+            # two independent height commands. For the hind limb the two forms
+            # coincide, because knee ("lift") and ankle ("other", amplitude 0)
+            # are both zero-offset from neutral during stance.
+            for foot, (drive_aid, free_aids) in self._hind_comp_ids.items():
                 phi = self.foot_phase_fraction(foot, t)
-                knee_delta, ankle_delta = self._hind_comp.offsets(
-                    foot, float(ctrl[hip_aid]), phi, self.stance_for(foot))
-                ctrl[knee_aid] += knee_delta
-                ctrl[ankle_aid] += ankle_delta
+                stance = self.stance_for(foot)
+                weight = self._swing_blend(phi, stance)
+                raw = self._hind_comp.offsets(foot, float(ctrl[drive_aid]), 0., stance)
+                for aid, value in zip(free_aids, raw):
+                    target = self.neutral[aid] + value
+                    ctrl[aid] = weight * target + (1. - weight) * ctrl[aid]
 
         if self._ssl >= 0: ctrl[self._ssl] -= self.shoulder_sprawl_tuck
         if self._ssr >= 0: ctrl[self._ssr] += self.shoulder_sprawl_tuck

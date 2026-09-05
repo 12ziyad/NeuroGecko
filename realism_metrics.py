@@ -522,8 +522,9 @@ def main(argv=None):
     p.add_argument("--model", type=Path)
     p.add_argument("--vecnormalize", type=Path)
     p.add_argument("--zero-residual", action="store_true", help="Use the CPG base and its contact reflex with zero policy action.")
-    p.add_argument("--hind-stance-compensation", action="store_true",
-                   help="Lab-only opt-in: hold the hind collision foot at a constant commanded height through stance.")
+    p.add_argument("--hind-stance-compensation", nargs="?", const=True, default=False,
+                   choices=(True, "hind", "all"),
+                   help="Lab-only opt-in: hold the collision foot at a constant commanded height through stance. 'all' includes the forelimb.")
     p.add_argument("--zero-tail-drive", action="store_true", help="Zero tail tendon commands only; NOT mechanical restriction.")
     p.add_argument("--gait-profile", choices=("legacy", "lab"), default="legacy",
                    help="Lab opts into shared touchdown delays/stance; legacy preserves the checkpoint's original controller/reward mismatch.")
@@ -561,7 +562,7 @@ def main(argv=None):
                        contact_thresh=contact_thresh, reset_noise=args.reset_noise,
                        residual_scale=args.residual_scale, front_stance_press=args.front_stance_press,
                        front_swing_lift=args.front_swing_lift, gait_profile=args.gait_profile,
-                       hind_stance_compensation=args.hind_stance_compensation)
+                       hind_stance_compensation=(args.hind_stance_compensation if args.hind_stance_compensation != 'hind' else True))
     if not np.isclose(env.dt, 1/parameter_value("gait_acquisition_hz")):
         env.close()
         p.error("CLI protocol expects 50 Hz; XML timestep/frame_skip changed.")
