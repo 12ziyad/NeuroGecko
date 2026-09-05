@@ -59,6 +59,7 @@
           "HR": 0.62,
           "FR": 0.7
         },
+        "recorded_phase_vs_contact_reference_mismatch_count": 0,
         "note": "Desired stance is not observed support. Legacy reward target phase/clock is not treated as controller command."
       },
       "force_semantics": {
@@ -6403,6 +6404,7 @@
           "HR": 0.765,
           "FR": 0.7
         },
+        "recorded_phase_vs_contact_reference_mismatch_count": 0,
         "note": "Desired stance is not observed support. Legacy reward target phase/clock is not treated as controller command."
       },
       "force_semantics": {

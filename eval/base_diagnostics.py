@@ -7,7 +7,6 @@ imports the current controller to guess the controller that made an old trace.
 from __future__ import annotations
 
 import argparse
-from collections import Counter
 import hashlib
 import json
 from pathlib import Path
@@ -162,11 +161,15 @@ def resolve_commands(trace, command_reference=None):
     finite_commands = commands[np.isfinite(commands)]
     if not np.isin(finite_commands, [0., 1.]).all():
         raise ValueError("Commanded contacts must be binary or missing.")
+    comparable = np.isfinite(phase) & np.isfinite(commands)
+    mismatch = (int(np.sum(((phase < np.asarray([stance[f] for f in FEET])) != commands) & comparable))
+                if stance is not None else None)
     return {"time_s": command_t, "phase": phase, "contacts": commands, "frequency_hz": frequency,
             "provenance": {"frequency_hz": frequency, "frequency_source": frequency_source,
                            "command_time_source": time_source, "phase_source": phase_source,
                            "stance_source": stance_source, "historical_reference": ref or None,
                            "commanded_stance_by_foot": stance,
+                           "recorded_phase_vs_contact_reference_mismatch_count": mismatch,
                            "note": "Desired stance is not observed support. Legacy reward target phase/clock is not treated as controller command."}}
 
 
