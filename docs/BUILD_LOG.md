@@ -640,3 +640,74 @@ length — it is saturated and the geometry forbids the target. The open items
 are (a) spine/girdle contribution to stride, and (b) why the forefoot lands
 0.32 cycle late when neither its stance geometry nor the plant bandwidth
 explains it. Gate 2 stands at 4/6 with the all-four soft configuration.
+
+## Session 3d — stride length is speed; the spine does not supply it; the hind foot slips
+
+### 1. "Stride length" and "speed" are the same gate at a locked cadence
+
+    speed 0.0416 m/s / 1.1888 Hz = 35.0 mm = 0.330 SVL per stride
+    reported stride_length_svl   = 0.324    (the same number)
+
+Stride length is not an independent quantity here. At a fixed 1.1888 Hz it is
+speed divided by frequency, so the only way to reach 0.72 SVL is to reach
+**0.0907 m/s** — which is exactly the `target_speed` already sitting in the lab
+reward calibration (0.090729216 = 0.72 x 0.106 x 1.1888). Current speed is
+**46% of it**. Treating stride length and speed as two separate failures was
+double-counting one failure.
+
+### 2. The spine does not supply the missing stride — measured, not argued
+
+Direct sweep, all-four compensation, zero action, foot-x excursion relative to
+the trunk over the full cycle:
+
+| spine_amp | tail_amp | HL exc mm | FL exc mm | speed m/s |
+|---|---|---|---|---|
+| 0.00 | 0.15 | 107.16 | 54.07 | 0.0226 |
+| 0.30 | 0.15 | 109.33 | 57.23 | 0.0226 |
+| 0.60 | 0.15 | 111.63 | 71.24 | 0.0217 |
+| 0.90 | 0.15 | 114.82 | 74.11 | 0.0213 |
+| 0.90 | 0.45 | 113.87 | 77.27 | 0.0214 |
+| 1.20 | 0.45 | 116.41 | 92.34 | **0.0188** |
+
+Quadrupling spine amplitude (0.30 -> 1.20) buys **+6.5% hind foot excursion and
+costs 17% of speed.** The Session 3c inference that the missing stride "must
+come from spine and girdle rotation" is therefore **refuted for this body**. It
+was a reasonable read of the geometry but it does not survive measurement.
+
+(Speeds in this table are lower than the metrics run because this rollout issues
+no heading target; the comparison between rows is valid, the absolute value is
+not comparable to the gate runs.)
+
+### 3. What is actually lost: hind-foot slip
+
+A planted foot should have near-zero world-frame travel during stance.
+
+| foot | slip per stance | body advance per stride | slip fraction |
+|---|---|---|---|
+| HL | 14.4 mm | 35.0 mm | **41%** |
+| HR | 14.4 mm | 35.0 mm | **41%** |
+| FL | 5.0 mm | 35.0 mm | 14% |
+| FR | 5.5 mm | 35.0 mm | 16% |
+
+The hind feet slide backward through 41% of the distance the body advances.
+That is propulsion being thrown away, and it is the largest single identified
+loss between the limbs' motion and the body's motion.
+
+### 4. Contact-cycle mismatch, fore vs hind
+
+Complete strides over the same window: HL 19, HR 20, **FL 28, FR 25**. The
+forefeet are registering roughly 1.4x more touchdown-to-touchdown cycles than
+the hind at a single commanded cadence, i.e. the forefoot is making extra
+contacts within a commanded stance. This is consistent with, and probably the
+same phenomenon as, the unexplained 0.32-cycle forefoot touchdown lateness.
+
+### Status
+
+Gate 2 remains 4/6. Hypotheses refuted so far, each by measurement: hind stance
+height (for limb phase), fore stance height, actuator bandwidth, and now spine
+amplitude (for stride). Confirmed causes: hind stance height did fix hind duty;
+stride length is speed; 41% hind slip is real lost propulsion.
+
+Next open items, in order of evidence: (a) hind-foot slip during stance, which
+is quantified and large; (b) forefoot extra contacts, which is quantified and
+likely the same defect as the touchdown lateness.
