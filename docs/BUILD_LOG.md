@@ -1,5 +1,24 @@
 # NeuroGecko build log
 
+## Session 3 — touchdown hypothesis test, 2026-09-05
+
+**AWS state at session start (11:47 UTC): UNKNOWN.** The read-only SSH
+connection to the existing host timed out. Current uptime could not be read.
+Last successful check was 11:21 UTC in Session 2; it was running and idle then.
+No shutdown, cloud writes, training, CMA-ES, or paid jobs were launched here.
+The existing $60 cap remains a ceiling, not a spending target.
+
+The owner explicitly authorized the implementation while correcting the causal
+claim: the +0.863 mm frozen commanded touchdown gap is independently defective,
+but it does not establish the cause of the three dynamic failures. First verify
+and flatten the knee/ankle stance arc; then remeasure all six unchanged gates.
+Report frozen target geometry, actual physical contact, and force-threshold
+loading separately. All trials are deterministic n=1, not repeated-run SDs.
+Gate 2 must pass without sacrificing the three passing gates before any plant
+changes. No PPO in this session or the conditional subsequent work.
+
+Session 3 measurements and decisions follow here as they are completed.
+
 ## Session 2 — laptop-only controller work, 2026-09-05
 
 **AWS cost notice:** at 10:29 UTC the existing AWS host was reachable and idle;

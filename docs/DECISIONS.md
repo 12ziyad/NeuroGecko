@@ -1,5 +1,27 @@
 # Build decisions
 
+## Session 3 — test the causal claim, do not assume it
+
+- Treat the supplied late-landing explanation as a hypothesis. Frozen geometry
+  is a target-position check, not a dynamic touchdown measurement. The existing
+  +0.863 mm gap justifies its correction independently.
+- Flatten the hind stance arc with coordinated knee/ankle commands; do not
+  translate the arc downward. Require <=0 mm clearance across sampled stance
+  and penetration no worse than approximately 1.2 mm before dynamic evaluation.
+- Preserve frequency, commanded duty/limb phase, XMLs, live legacy defaults,
+  models, and force/load thresholds. No plant change before Gate 2 passes.
+- Add read-only physical foot-floor contact measurements, separate from scalar
+  touch-sensor threshold loading. The brief's 100% front contact refers to a
+  frozen geometric sweep and cannot be assumed true during motion.
+- If fronts still load only ~61% of stance despite 100% actual floor contact,
+  flag load distribution and target provenance; do not lower the 65% gate.
+  The model's audited intact CoM is 0.678112 SVL, not the source target's
+  0.659 SVL. Tail mass is 22%; neither fact alone proves a dynamic cause.
+- Numerical inverse kinematics is an engineering geometry calculation, not
+  biological fitting or CMA-ES. New choices are recorded as INVENTED proxies.
+- docs/research is read-only. All before/after evidence is retained, including
+  failed attempts. No authorization to push Git or modify recovered policies.
+
 ## Session 2 — correct the brief where measured mechanics disagree
 
 Final selection: trial19 is retained as the opt-in lab candidate because it
