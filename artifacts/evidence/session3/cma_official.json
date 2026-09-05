@@ -1,0 +1,102 @@
+{
+ "scored_via": "realism_metrics.py subprocess (identical code path to the gate)",
+ "score": 4.3794642198588125,
+ "measurements": {
+  "forward_speed": 0.0404192819717989,
+  "net_over_path": 0.6884665214611775,
+  "hind_swing_load": 0.10760869565217392,
+  "front_stance_load": 0.5490787269681742,
+  "hind_duty": 0.7209960056444807,
+  "limb_phase": 0.6674641159695667,
+  "_stride_cv": 0.0041467746816041175
+ },
+ "parameters": {
+  "hind_fa_amplitude": 0.999988368552259,
+  "fore_hind_amplitude_ratio": 0.2625900103783534,
+  "front_stance_press": 0.19827551657177012,
+  "front_stance_press_fr": -0.12120698526441726,
+  "front_swing_lift": -0.6093392649102933,
+  "hind_lift_multiplier": -2.408979692749282,
+  "spine_amp": 0.022827617887079116,
+  "tail_amp": 0.0695868440303814,
+  "tail_phase_lag": 0.0947011288797398,
+  "fl_touchdown_delay": 0.21326605626255563
+ },
+ "baseline_score": 3.491653538504475,
+ "baseline_measurements": {
+  "forward_speed": 0.04189283632471761,
+  "net_over_path": 0.7378370728361724,
+  "hind_swing_load": 0.074,
+  "front_stance_load": 0.5611464968152866,
+  "hind_duty": 0.7310611271158897,
+  "limb_phase": 0.6389578110363832,
+  "_stride_cv": 0.01822641296434711
+ },
+ "rejects": "episode not completed, terminated, or HL stride_period_cv > 0.1",
+ "space": [
+  [
+   "hind_fa_amplitude",
+   0.4,
+   1.0,
+   0.98
+  ],
+  [
+   "fore_hind_amplitude_ratio",
+   0.2,
+   1.2,
+   0.54
+  ],
+  [
+   "front_stance_press",
+   -0.4,
+   0.4,
+   0.05
+  ],
+  [
+   "front_stance_press_fr",
+   -0.4,
+   0.4,
+   0.05
+  ],
+  [
+   "front_swing_lift",
+   -0.9,
+   0.1,
+   -0.4
+  ],
+  [
+   "hind_lift_multiplier",
+   -2.5,
+   0.0,
+   -1.3333333333333333
+  ],
+  [
+   "spine_amp",
+   0.0,
+   1.0,
+   0.3
+  ],
+  [
+   "tail_amp",
+   0.0,
+   0.8,
+   0.15
+  ],
+  [
+   "tail_phase_lag",
+   0.0,
+   0.5,
+   0.15
+  ],
+  [
+   "fl_touchdown_delay",
+   0.05,
+   0.95,
+   0.435
+  ]
+ ],
+ "generations": 45,
+ "popsize": 10,
+ "fit_duration_s": 12.0,
+ "xml": "morphology/gecko_body_lab_v2.xml"
+}

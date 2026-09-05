@@ -522,6 +522,10 @@ def main(argv=None):
     p.add_argument("--model", type=Path)
     p.add_argument("--vecnormalize", type=Path)
     p.add_argument("--zero-residual", action="store_true", help="Use the CPG base and its contact reflex with zero policy action.")
+    p.add_argument("--lab-params", default=None,
+                   help="JSON object of lab_base_parameters overrides for this run only; the shared registry is not modified.")
+    p.add_argument("--fl-touchdown-delay", type=float, default=None,
+                   help="Override the FL touchdown delay for this run only (FR follows at +0.5). Lab profile only.")
     p.add_argument("--hind-stance-compensation", nargs="?", const=True, default=False,
                    choices=(True, "hind", "all"),
                    help="Lab-only opt-in: hold the collision foot at a constant commanded height through stance. 'all' includes the forelimb.")
@@ -558,11 +562,23 @@ def main(argv=None):
     contact_thresh = args.contact_thresh
     if contact_thresh is None and args.gait_profile == "legacy":
         contact_thresh = parameter_value("legacy_contact_threshold_N")
+    lab_overrides = json.loads(args.lab_params) if args.lab_params else None
+    if (lab_overrides or args.fl_touchdown_delay is not None) and args.gait_profile != "lab":
+        p.error("--lab-params and --fl-touchdown-delay are lab-profile only.")
+    if args.fl_touchdown_delay is not None:
+        import common.gait_config as _gc
+        _fl = float(args.fl_touchdown_delay)
+        _base = _gc.get_gait_profile("lab")
+        _patched = _gc.GaitProfile("lab", _base.frequency_hz,
+                                   (0.0, _fl, 0.5, (_fl+0.5) % 1.0), _base.stance_ratios)
+        _real = _gc.get_gait_profile
+        _gc.get_gait_profile = lambda prof="legacy": _patched if prof == "lab" else _real(prof)
     env = GeckoWalkEnv(xml_path=args.xml, control_mode="cpg_residual", max_steps=1,
                        contact_thresh=contact_thresh, reset_noise=args.reset_noise,
                        residual_scale=args.residual_scale, front_stance_press=args.front_stance_press,
                        front_swing_lift=args.front_swing_lift, gait_profile=args.gait_profile,
-                       hind_stance_compensation=(args.hind_stance_compensation if args.hind_stance_compensation != 'hind' else True))
+                       hind_stance_compensation=(args.hind_stance_compensation if args.hind_stance_compensation != 'hind' else True),
+                       lab_parameters=lab_overrides)
     if not np.isclose(env.dt, 1/parameter_value("gait_acquisition_hz")):
         env.close()
         p.error("CLI protocol expects 50 Hz; XML timestep/frame_skip changed.")
@@ -605,6 +621,8 @@ def main(argv=None):
             "controller": "zero residual with contact reflex" if args.zero_residual else "frozen PPO residual",
             "gait_profile": args.gait_profile,
             "hind_stance_compensation": bool(args.hind_stance_compensation),
+            "lab_params_override": lab_overrides,
+            "fl_touchdown_delay_override": args.fl_touchdown_delay,
             "reward_calibration": env.reward_calibration,
             "phase_offset_convention": "shared positive touchdown delays, local=(cycle-delay)%1" if args.gait_profile=="lab" else "legacy controller adds offsets; legacy reward subtracts offsets (preserved mismatch)",
             "reward_schedule_time_reference": "executed control interval start; observation clock remains current" if args.gait_profile=="lab" else "historical control interval end",

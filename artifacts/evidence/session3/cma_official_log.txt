@@ -1,0 +1,70 @@
+baseline score 3.4917
+  forward_speed=0.0419  net_over_path=0.7378  hind_swing_load=0.0740  front_stance_load=0.5611  hind_duty=0.7311  limb_phase=0.6390
+gen   1/45  best 3.4917  gen-best 3.8238  valid 9/10  42s
+gen   2/45  best 3.4917  gen-best 3.8461  valid 7/10  83s
+gen   3/45  best 3.4917  gen-best 3.6046  valid 10/10  124s
+gen   4/45  best 3.4917  gen-best 3.6862  valid 7/10  164s
+gen   5/45  best 1.7039  gen-best 1.7039  valid 9/10  206s
+gen   6/45  best 1.7039  gen-best 3.1441  valid 9/10  247s
+gen   7/45  best 1.7039  gen-best 3.3836  valid 8/10  289s
+gen   8/45  best 1.7039  gen-best 2.2600  valid 7/10  330s
+gen   9/45  best 1.7039  gen-best 2.3594  valid 9/10  375s
+gen  10/45  best 1.5799  gen-best 1.5799  valid 5/10  415s
+gen  11/45  best 1.5799  gen-best 1.8088  valid 9/10  457s
+gen  12/45  best 1.5799  gen-best 2.5871  valid 7/10  498s
+gen  13/45  best 1.3821  gen-best 1.3821  valid 8/10  543s
+gen  14/45  best 1.3821  gen-best 1.5028  valid 10/10  584s
+gen  15/45  best 1.3821  gen-best 1.8490  valid 10/10  625s
+gen  16/45  best 1.3821  gen-best 2.1672  valid 9/10  666s
+gen  17/45  best 1.3821  gen-best 2.2111  valid 8/10  708s
+gen  18/45  best 1.3821  gen-best 2.1155  valid 8/10  750s
+gen  19/45  best 1.3655  gen-best 1.3655  valid 10/10  795s
+gen  20/45  best 1.3655  gen-best 1.9560  valid 10/10  837s
+gen  21/45  best 1.3655  gen-best 1.6360  valid 8/10  878s
+gen  22/45  best 1.3655  gen-best 1.6030  valid 7/10  921s
+gen  23/45  best 1.3655  gen-best 1.8643  valid 10/10  962s
+gen  24/45  best 1.3655  gen-best 1.7042  valid 9/10  1006s
+gen  25/45  best 1.3655  gen-best 1.6235  valid 10/10  1047s
+gen  26/45  best 1.3655  gen-best 1.8180  valid 9/10  1090s
+gen  27/45  best 1.1089  gen-best 1.1089  valid 10/10  1133s
+gen  28/45  best 1.1089  gen-best 1.7722  valid 9/10  1179s
+gen  29/45  best 1.1089  gen-best 1.5197  valid 10/10  1220s
+gen  30/45  best 1.1089  gen-best 1.4895  valid 10/10  1261s
+gen  31/45  best 1.1089  gen-best 2.1652  valid 9/10  1302s
+gen  32/45  best 1.1089  gen-best 2.2473  valid 10/10  1343s
+gen  33/45  best 1.1089  gen-best 1.9289  valid 10/10  1392s
+gen  34/45  best 1.1089  gen-best 1.8997  valid 10/10  1434s
+gen  35/45  best 1.1089  gen-best 1.6969  valid 10/10  1476s
+gen  36/45  best 1.1089  gen-best 1.5448  valid 9/10  1522s
+gen  37/45  best 1.1089  gen-best 1.4943  valid 8/10  1563s
+gen  38/45  best 1.1089  gen-best 1.4183  valid 10/10  1604s
+gen  39/45  best 1.1089  gen-best 1.4405  valid 9/10  1620s
+gen  40/45  best 1.1089  gen-best 1.5854  valid 7/10  1637s
+gen  41/45  best 1.1089  gen-best 1.6637  valid 8/10  1653s
+gen  42/45  best 1.1089  gen-best 1.7657  valid 8/10  1669s
+gen  43/45  best 1.1089  gen-best 1.7830  valid 8/10  1685s
+gen  44/45  best 1.1089  gen-best 1.9526  valid 6/10  1701s
+gen  45/45  best 1.1089  gen-best 1.5716  valid 9/10  1717s
+
+BEST re-scored at 20 s: 4.3795
+  forward_speed           0.0404   PASS
+  net_over_path           0.6885   PASS
+  hind_swing_load         0.1076   FAIL
+  front_stance_load       0.5491   FAIL
+  hind_duty               0.7210   FAIL
+  limb_phase              0.6675   FAIL
+  stride period CV        0.0041
+
+parameters:
+  hind_fa_amplitude            +0.99999
+  fore_hind_amplitude_ratio    +0.26259
+  front_stance_press           +0.19828
+  front_stance_press_fr        -0.12121
+  front_swing_lift             -0.60934
+  hind_lift_multiplier         -2.40898
+  spine_amp                    +0.02283
+  tail_amp                     +0.06959
+  tail_phase_lag               +0.09470
+  fl_touchdown_delay           +0.21327
+
+wrote artifacts/evidence/session3/cma_official.json

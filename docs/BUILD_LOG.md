@@ -936,3 +936,67 @@ this defect recorded in its docstring; it must not be used to make a gate claim
 until it scores through the official path.
 
 Gate 2 stands at **4/6** with the Session 3b configuration.
+
+## Session 3h — a corrected fit harness, and a second fit failure with a different cause
+
+### The harness now scores through the gate's own code
+
+`tools/fit_gate2_official.py` replaces `tools/fit_gate2_cma.py`. Every candidate
+is scored by running `realism_metrics.py` as a subprocess and reading the six
+checks out of its JSON. There is no second implementation of any metric, so
+there is nothing that can diverge from the gate.
+
+Supporting change: `realism_metrics.py` gained `--lab-params` (a JSON object of
+per-run `lab_base_parameters` overrides) and `--fl-touchdown-delay`. Both are
+lab-profile only and neither touches the shared registry. `spine_amp`,
+`tail_amp` and `tail_phase_lag` were moved into `lab_base_parameters` **at their
+existing constructor defaults (0.30 / 0.15 / 0.15)**, so behaviour is unchanged;
+they are merely overridable now. The controller reads them from the registry
+when present, matching how it already handles the front-press channels.
+
+Verification that the harness is honest — baseline measured both ways:
+
+| | forward | net/path | hind swing | front stance | hind duty | limb phase |
+|---|---|---|---|---|---|---|
+| via fit harness | 0.0419 | 0.7378 | 0.0740 | 0.5611 | 0.7311 | 0.6390 |
+| via realism_metrics | 0.0416 | 0.7427 | 0.0806 | 0.5841 | 0.7334 | 0.6347 |
+
+Guards, as hard rejections rather than scored preferences: the episode must
+complete without termination, and HL stride-period CV must stay under the
+registry's own 0.10 ceiling. The CV guard directly closes the hole the previous
+harness exploited (baseline 0.0149, the bad fit 0.2713). Note that
+`entrainment_pass` could **not** be used as a hard requirement: the baseline
+itself fails it, so requiring it would reject the incumbent. Caught in a smoke
+test before the run.
+
+### The 12 s fit failed too, for an unrelated reason
+
+45 generations at a 12 s evaluation window reached score 1.11 — genuinely better
+than the flawed harness ever managed on its own inflated metric. Re-scored at
+the gate's 20 s duration it read 4.38. Measured across durations:
+
+| duration | forward | net/path | hind swing | front stance | hind duty | limb phase | gates |
+|---|---|---|---|---|---|---|---|
+| **CMA fit** 12 s | 0.0406 P | 0.6901 P | 0.0956 P | 0.5484 | 0.7176 | 0.3939 | 3/6 |
+| 16 s | 0.0400 P | 0.6889 P | 0.1036 | 0.5577 | 0.7093 | **0.3472** | 2/6 |
+| 20 s | 0.0404 P | 0.6885 P | 0.1076 | 0.5491 | 0.7210 | **0.6675** | 2/6 |
+| **baseline** 12 s | 0.0419 P | 0.7378 P | 0.0740 P | 0.5611 | 0.7311 P | 0.6390 | 4/6 |
+| 16 s | 0.0414 P | 0.7427 P | 0.0847 P | 0.5733 | 0.7340 P | 0.6374 | 4/6 |
+| 20 s | 0.0416 P | 0.7427 P | 0.0806 P | 0.5841 | 0.7334 P | 0.6309 | 4/6 |
+
+This is not simple overfitting to a short window. The fitted config's limb phase
+reads 0.3939, 0.3472 and 0.6675 at 12/16/20 s — it is bimodal. The baseline's is
+0.6390/0.6374/0.6309, stable to three decimals. Stride CV is low in both
+(0.004 vs 0.015), so the CV guard did its job; the instability is in the phase
+measurement itself on that configuration, not in gait regularity.
+
+Two things this does establish: limb-phase values inside the target band **are**
+reachable on this body (0.3939 and 0.3472 were measured, both near or inside
+0.405-0.465), and the 12 s fitting window was the wrong choice because the gate
+measures at 20 s.
+
+### Current action
+
+Refitting at **20 s**, the gate's own duration, so no window mismatch can exist.
+The baseline remains the incumbent at 4/6, stable across every duration tested,
+and is not replaced unless a candidate beats it at the gate's own duration.
