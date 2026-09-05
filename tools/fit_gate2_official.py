@@ -60,7 +60,9 @@ GATES = [
 ]
 SCALE = {"forward_speed": 0.02, "net_over_path": 0.20, "hind_swing_load": 0.05,
          "front_stance_load": 0.15, "hind_duty": 0.05, "limb_phase": 0.06}
-FAIL_SCORE = 60.0
+FAIL_SCORE = 600.0
+# A failed gate costs more than any achievable distance improvement elsewhere.
+GATE_WEIGHT = 10.0
 FEET = ("HL", "FL", "HR", "FR")
 # Stride-period CV above this rejects a candidate outright.
 CV_CEILING = 0.10
@@ -129,16 +131,27 @@ def measure(params, duration, xml, keep=None):
 
 
 def score(meas):
+    """Gates PASSED dominate; normalised distance only breaks ties.
+
+    An earlier version summed normalised distance alone, so a candidate could
+    score better while passing fewer gates -- the 20 s fit scored 2.75 against
+    the baseline's 3.49 while passing 2/6 against 4/6, because it missed forward
+    speed and hind duty by hairs. Gate count is the thing being asked for, so it
+    is the primary term and no distance improvement can buy a lost gate.
+    """
     if meas is None:
         return FAIL_SCORE
-    total = 0.0
+    failed, total = 0, 0.0
     for name, lo, hi in GATES:
         v = meas[name]
         d = max(lo - v, 0.0) if lo > -math.inf else 0.0
         if hi < math.inf:
             d = max(d, v - hi)
-        total += max(d, 0.0) / SCALE[name]
-    return total
+        d = max(d, 0.0)
+        if d > 0.0:
+            failed += 1
+        total += d / SCALE[name]
+    return GATE_WEIGHT * failed + total
 
 
 def evaluate(a):

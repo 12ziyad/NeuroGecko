@@ -1,0 +1,23 @@
+baseline score 23.2037
+  forward_speed=0.0416  net_over_path=0.7427  hind_swing_load=0.0806  front_stance_load=0.5841  hind_duty=0.7334  limb_phase=0.6309
+gen   1/50  best 23.2037  gen-best 33.8948  valid 8/10  22s
+gen   2/50  best 23.2037  gen-best 23.9209  valid 9/10  46s
+gen   3/50  best 23.2037  gen-best 23.4826  valid 8/10  69s
+gen   4/50  best 23.2037  gen-best 23.8737  valid 9/10  92s
+gen   5/50  best 23.2037  gen-best 23.5802  valid 10/10  116s
+gen   6/50  best 23.2037  gen-best 33.5070  valid 8/10  140s
+gen   7/50  best 23.2037  gen-best 33.6440  valid 10/10  163s
+gen   8/50  best 23.2037  gen-best 33.4385  valid 10/10  187s
+gen   9/50  best 23.2037  gen-best 23.2399  valid 10/10  211s
+gen  10/50  best 23.2037  gen-best 32.8829  valid 10/10  234s
+gen  11/50  best 23.2037  gen-best 24.0276  valid 10/10  257s
+gen  12/50  best 23.2037  gen-best 23.7834  valid 8/10  280s
+gen  13/50  best 22.9245  gen-best 22.9245  valid 3/10  303s
+gen  14/50  best 22.9245  gen-best 23.3530  valid 6/10  326s
+gen  15/50  best 22.9245  gen-best 32.9671  valid 7/10  349s
+gen  16/50  best 22.9245  gen-best 33.3503  valid 10/10  373s
+gen  17/50  best 22.9245  gen-best 33.1694  valid 10/10  397s
+gen  18/50  best 22.9245  gen-best 32.7314  valid 9/10  420s
+gen  19/50  best 22.8398  gen-best 22.8398  valid 10/10  448s
+gen  20/50  best 22.8398  gen-best 22.9209  valid 10/10  471s
+gen  21/50  best 22.8398  gen-best 32.7223  valid 10/10  495s

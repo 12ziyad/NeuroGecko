@@ -1,0 +1,102 @@
+{
+ "scored_via": "realism_metrics.py subprocess (identical code path to the gate)",
+ "score": 2.7502971040215884,
+ "measurements": {
+  "forward_speed": 0.03854570752093151,
+  "net_over_path": 0.7531578613013454,
+  "hind_swing_load": 0.08260869565217391,
+  "front_stance_load": 0.6093802345058627,
+  "hind_duty": 0.72739546035091,
+  "limb_phase": 0.6062815950275269,
+  "_stride_cv": 0.0031074216853486437
+ },
+ "parameters": {
+  "hind_fa_amplitude": 0.9993454902626763,
+  "fore_hind_amplitude_ratio": 0.3939377886655987,
+  "front_stance_press": 0.21347460842571686,
+  "front_stance_press_fr": 0.22947338707573983,
+  "front_swing_lift": -0.3092743338798911,
+  "hind_lift_multiplier": -1.101197627571978,
+  "spine_amp": 0.29259982954514385,
+  "tail_amp": 0.03588156190208331,
+  "tail_phase_lag": 0.07719345368052219,
+  "fl_touchdown_delay": 0.8380884859467761
+ },
+ "baseline_score": 3.2037436422323937,
+ "baseline_measurements": {
+  "forward_speed": 0.04164535457474608,
+  "net_over_path": 0.7426754102133162,
+  "hind_swing_load": 0.08064516129032258,
+  "front_stance_load": 0.5841483979763912,
+  "hind_duty": 0.7334179654915091,
+  "limb_phase": 0.6308839777245001,
+  "_stride_cv": 0.014942559136086615
+ },
+ "rejects": "episode not completed, terminated, or HL stride_period_cv > 0.1",
+ "space": [
+  [
+   "hind_fa_amplitude",
+   0.4,
+   1.0,
+   0.98
+  ],
+  [
+   "fore_hind_amplitude_ratio",
+   0.2,
+   1.2,
+   0.54
+  ],
+  [
+   "front_stance_press",
+   -0.4,
+   0.4,
+   0.05
+  ],
+  [
+   "front_stance_press_fr",
+   -0.4,
+   0.4,
+   0.05
+  ],
+  [
+   "front_swing_lift",
+   -0.9,
+   0.1,
+   -0.4
+  ],
+  [
+   "hind_lift_multiplier",
+   -2.5,
+   0.0,
+   -1.3333333333333333
+  ],
+  [
+   "spine_amp",
+   0.0,
+   1.0,
+   0.3
+  ],
+  [
+   "tail_amp",
+   0.0,
+   0.8,
+   0.15
+  ],
+  [
+   "tail_phase_lag",
+   0.0,
+   0.5,
+   0.15
+  ],
+  [
+   "fl_touchdown_delay",
+   0.05,
+   0.95,
+   0.435
+  ]
+ ],
+ "generations": 55,
+ "popsize": 10,
+ "fit_duration_s": 20.0,
+ "xml": "morphology/gecko_body_lab_v2.xml"
+}
