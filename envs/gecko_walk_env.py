@@ -74,6 +74,8 @@ class GeckoWalkEnv(gym.Env):
         super().__init__()
         self.model = mujoco.MjModel.from_xml_path(str(xml_path or DEFAULT_XML))
         self.data = mujoco.MjData(self.model)
+        # Optional read-only evaluation observer; never changes control cadence.
+        self.physics_observer = None
         self.frame_skip = int(frame_skip)
         self.dt = self.model.opt.timestep * self.frame_skip          # control dt (~0.02 s)
         self.max_steps = int(max_steps)
@@ -323,9 +325,12 @@ class GeckoWalkEnv(gym.Env):
         self._step_work[:] = 0.0
         for _ in range(self.frame_skip):
             mujoco.mj_step(self.model, self.data)
-            self._step_work += actuator_work(self.data.actuator_force,
-                                             self.data.actuator_velocity,
-                                             self.model.opt.timestep)
+            work = actuator_work(self.data.actuator_force,
+                                 self.data.actuator_velocity,
+                                 self.model.opt.timestep)
+            self._step_work += work
+            if self.physics_observer is not None:
+                self.physics_observer(work)
         self._episode_work += self._step_work
         work_xy = self.data.xpos[self._trunk, :2].copy()
         self._episode_path_m += float(np.linalg.norm(work_xy - self._work_prev_xy))

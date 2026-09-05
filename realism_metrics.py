@@ -166,12 +166,13 @@ def analyze_trace(trace, settle_s=None, debounce_s=None):
     distance = float(np.sum(np.linalg.norm(planar_delta[interval_keep], axis=1)))
     first = int(np.flatnonzero(keep)[0])
     elapsed = float(t[-1]-t[first])
-    commanded_frequency = meta.get("frequency_hz")
+    commanded_frequency = meta.get("commanded_frequency_hz", meta.get("frequency_hz"))
     if commanded_frequency is not None:
         commanded_frequency = float(commanded_frequency)
         if not np.isfinite(commanded_frequency) or commanded_frequency <= 0:
             raise ValueError("Recorded commanded frequency must be finite and positive.")
     warning_ratio = float(parameter_value("contact_cycle_warning_ratio"))
+    entrainment_tolerance = float(parameter_value("entrainment_tolerance_fraction"))
     if not np.isfinite(warning_ratio) or warning_ratio <= 1:
         raise ValueError("Contact-cycle diagnostic gross-ratio threshold must exceed 1.")
     result = {"status": "measured", "observed_duration_s": elapsed, "sample_rate_hz": 1/dt,
@@ -218,6 +219,9 @@ def analyze_trace(trace, settle_s=None, debounce_s=None):
                     "commanded_frequency_hz": commanded_frequency,
                     "observed_to_commanded_ratio": frequency_ratio,
                     "gross_frequency_mismatch_warning": gross_mismatch,
+                    "entrainment_pass": (abs(frequency_ratio-1) <= entrainment_tolerance
+                                         if frequency_ratio is not None else False),
+                    "entrainment_tolerance_fraction": entrainment_tolerance,
                     "status": "measured comparison" if frequency_ratio is not None else "unavailable: no complete cycles or no recorded commanded frequency"},
                 "stride_length_svl": numeric_summary(length),
                 "contact_time_fraction_including_censored": float(np.mean(contacts[keep, j])),
@@ -266,7 +270,10 @@ def analyze_trace(trace, settle_s=None, debounce_s=None):
         "warnings": [
             foot+": observed same-foot contact-cycle rate differs grossly from the commanded oscillator. Possible repeated impacts/contact chatter, missed contacts, or non-entrainment; cause is not identified. Raw cycles are retained and are not verified biological strides."
             for foot in FEET if result["limbs"][foot]["contact_cycle_diagnostic"]["gross_frequency_mismatch_warning"]],
-        "note": "No-cycle limbs are unmeasurable, not a valid zero-frequency gait. Sub-control-step contacts are not resolved."}
+        "entrainment_pass": all(result["limbs"][f]["contact_cycle_diagnostic"]["entrainment_pass"] for f in FEET),
+        "single_digit_period_cv_pass": all(result["limbs"][f]["stride_period_cv"] is not None and result["limbs"][f]["stride_period_cv"] < parameter_value("contact_period_cv_ceiling") for f in FEET),
+        "acquisition_at_least_200_hz": bool(dt <= .005000001),
+        "note": "Failed entrainment is retained, never repaired by oscillator-locked event selection. No-cycle limbs are unmeasurable, not valid zero-frequency gait."}
     result["touchdown_events"] = [{"time_s": float(t[i]), "feet": [f for f in FEET if i in touchdown[f]]}
                                  for i in sorted(set(int(i) for f in FEET for i in touchdown[f] if t[i]>=settle_s))]
     for key, output_key in (("hip_height_m", "hip_height_svl"), ("shoulder_height_m", "shoulder_height_svl")):
@@ -312,6 +319,13 @@ def analyze_trace(trace, settle_s=None, debounce_s=None):
     return result
 
 
+def assert_entrainment(result):
+    """Fail explicitly, but only AFTER saving a complete diagnostic scorecard."""
+    failed = [f for f in FEET if not result["limbs"][f]["contact_cycle_diagnostic"]["entrainment_pass"]]
+    if failed:
+        raise AssertionError("Observed contact cycles are not entrained: "+", ".join(failed))
+
+
 def filtered_nose_kinematics(time_s, nose_xyz, cutoff_hz=50, output_hz=500, order=4):
     """Offline evaluator only; never synthesize high-rate evidence by upsampling.
 
@@ -346,10 +360,21 @@ def filtered_nose_kinematics(time_s, nose_xyz, cutoff_hz=50, output_hz=500, orde
 
 class TraceRecorder:
     """Read state only; no changes to dynamics, sensors, or controller."""
-    def __init__(self, env, metadata=None):
+    def __init__(self, env, metadata=None, physics_substeps=None):
         import mujoco
         self.env = env
         m = env.model
+        self._record_data = env.data
+        self.physics_substeps = physics_substeps
+        self._substep_count = 0
+        self._pending_work = np.zeros(3)
+        self._snapshot = mujoco.MjData(m)
+        if physics_substeps is not None:
+            if physics_substeps < 1 or env.frame_skip % physics_substeps:
+                raise ValueError("Sampling interval must be a positive divisor of frame_skip.")
+            if env.physics_observer is not None:
+                raise ValueError("Environment already has a physics observer.")
+            env.physics_observer = self._on_physics_step
         self.site_ids = {name: mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_SITE, name)
                          for name in FOOT_SITES+("nose_tip", "vent", "tail_tip", "hip_L", "hip_R", "shoulder_L", "shoulder_R", "pelvis_center", "pectoral_center", "mid_back")}
         self.body_ids = {mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_BODY, i): i for i in range(m.nbody)}
@@ -379,15 +404,45 @@ class TraceRecorder:
                              "status": "Unvalidated against paper conventions; never compare raw hinge maxima to biological included angles"},
                          "measurement_site_fallbacks": [n for n in ("hip_L", "hip_R", "shoulder_L", "shoulder_R", "pelvis_center", "pectoral_center", "mid_back") if self.site_ids[n]<0]}
         self.metadata.update(metadata or {})
+        self.metadata.update({
+            "commanded_frequency_hz": env.cpg.freq if env.cpg else env.gait.frequency_hz,
+            "trace_sample_dt_s": m.opt.timestep*physics_substeps if physics_substeps else env.dt,
+            "acquisition": "physics substeps; mj_copyData then mj_forward on isolated snapshot" if physics_substeps else "control-step legacy sampler",
+            "sampling_physics_substeps": physics_substeps,
+            "force_semantics": "MuJoCo touch sensor scalar sum of normal contact forces, not world-vertical force",
+        })
         self.samples = {}
+
+    def _on_physics_step(self, work):
+        self._substep_count += 1
+        self._pending_work += work
+        if self._substep_count % self.physics_substeps == 0:
+            info = {"mechanical_work_"+k+"_J": float(v)
+                    for k, v in zip(("positive", "negative", "abs"), self._pending_work)}
+            self.record(info)
+            self._pending_work[:] = 0
+
+    def detach(self):
+        if self.env.physics_observer == self._on_physics_step:
+            self.env.physics_observer = None
 
     def _site(self, name, fallback_body=None):
         index = self.site_ids[name]
-        return self.env.data.site_xpos[index].copy() if index>=0 else self.env.data.xpos[self.body_ids[fallback_body]].copy()
+        return self._record_data.site_xpos[index].copy() if index>=0 else self._record_data.xpos[self.body_ids[fallback_body]].copy()
 
     def record(self, info=None):
         info = info or {}
         e, d, m = self.env, self.env.data, self.env.model
+        if self.physics_substeps is not None:
+            import mujoco
+            # mj_step integrates qpos/qvel after computing sensors. Refresh only
+            # a copied state so all timestamped channels agree without changing
+            # the live solver warmstart, observations, or next physics step.
+            mujoco.mj_copyData(self._snapshot, m, d)
+            mujoco.mj_forward(m, self._snapshot)
+            d = self._snapshot
+        self._record_data = d
+        command_t = e._last_cpg_command_time_s if e.cpg and d.time > 0 else None
         rotation = d.xmat[e._trunk].reshape(3, 3)
         forces = [float(d.sensordata[m.sensor_adr[self.sensor_ids[n]]]) for n in TOUCH_SENSORS]
         angles = []
@@ -416,11 +471,16 @@ class TraceRecorder:
                   "hip_height_m": [self._site("hip_"+side, "femur_"+side)[2] for side in ("L", "R")],
                   "shoulder_height_m": [self._site("shoulder_"+side, "humerus_"+side)[2] for side in ("L", "R")],
                   "trunk_pitch_deg": float(np.degrees(np.arctan2(rotation[2, 0], np.linalg.norm(rotation[:2, 0])))),
-                  "trunk_up_z": float(rotation[2, 2]), "forward_speed_m_s": float(e._s("vel_trunk")[0]),
+                  "trunk_up_z": float(rotation[2, 2]), "forward_speed_m_s": float(d.sensordata[m.sensor_adr[e._sid["vel_trunk"]]]),
                   "tail_floor_contact": tail_contact, "anatomical_proxy_deg": angles,
                   "gait_target_time_s": info.get("gait_target_time_s"),
                   "gait_target_contacts": info.get("target_contacts"),
-                  "fallen": bool(info.get("fallen", False))}
+                  "command_time_s": command_t,
+                  "commanded_phase_fraction": [e.cpg.foot_phase_fraction(f, command_t) for f in FEET] if command_t is not None else [None]*4,
+                  "commanded_contacts": e.cpg.commanded_contact_array(command_t).tolist() if command_t is not None else [None]*4,
+                  "actuator_force": d.actuator_force.copy(), "actuator_velocity": d.actuator_velocity.copy(),
+                  "actuator_control": d.ctrl.copy(),
+                  "fallen": bool(rotation[2, 2] < .3)}
         for kind in ("positive", "negative", "abs"):
             key = "mechanical_work_"+kind+"_J"
             sample[key] = info.get(key, 0 if not self.samples else None)
@@ -466,7 +526,8 @@ def main(argv=None):
     p.add_argument("--gait-profile", choices=("legacy", "lab"), default="legacy",
                    help="Lab opts into shared touchdown delays/stance; legacy preserves the checkpoint's original controller/reward mismatch.")
     p.add_argument("--xml", type=Path, default=REPO/"morphology/gecko_body_r.xml")
-    p.add_argument("--episodes", type=int, default=20)
+    p.add_argument("--episodes", type=int, default=1)
+    p.add_argument("--sample-substeps", type=int, default=5, help="Real physics sampling every N substeps; default 250 Hz, control remains 50 Hz.")
     p.add_argument("--duration", type=float, default=parameter_value("evaluation_duration_s"))
     p.add_argument("--settle", type=float, default=parameter_value("evaluation_settle_s"))
     p.add_argument("--debounce", type=float, default=parameter_value("contact_debounce_s"))
@@ -506,6 +567,8 @@ def main(argv=None):
         env.close()
         p.error("Duration must be an integer number of control steps.")
     env.max_steps = steps
+    if args.sample_substeps < 1 or env.frame_skip % args.sample_substeps or env.model.opt.timestep*args.sample_substeps > .005000001:
+        p.error("Trace sampling must be >=200 Hz at an integer divisor of frame_skip.")
     floor = mujoco.mj_name2id(env.model, mujoco.mjtObj.mjOBJ_GEOM, "floor")
     if floor < 0 or not np.isclose(env.model.geom_friction[floor, 0], parameter_value("calibration_friction")):
         env.close()
@@ -565,12 +628,16 @@ def main(argv=None):
         "anatomical landmark conventions still require validation.")
     writer = None
     try:
-        for episode in range(args.episodes):
+        # Frozen policy, fixed goal and zero reset noise imply identical runs.
+        effective_episodes = 1 if args.reset_noise == 0 else args.episodes
+        report["effective_independent_runs"] = effective_episodes
+        report["requested_episodes"] = args.episodes
+        for episode in range(effective_episodes):
             obs, _ = env.reset(seed=args.seed+episode)
             env.target = env.data.xpos[env._trunk][:2].copy()+np.array([meta["goal_distance_m"], 0.])
             _, env._prev_dist, _ = env._target_egocentric()
             obs = env._obs()
-            recorder = TraceRecorder(env, {**meta, "episode": episode, "seed": args.seed+episode})
+            recorder = TraceRecorder(env, {**meta, "episode": episode, "seed": args.seed+episode}, physics_substeps=args.sample_substeps)
             recorder.record()
             if episode == 0 and args.video:
                 import imageio.v2 as imageio
@@ -586,7 +653,6 @@ def main(argv=None):
                     action, _ = policy.predict(normalizer.normalize_obs(obs[None, :]), deterministic=True)
                     action = action[0]
                 obs, reward, terminated, truncated, info = env.step(action)
-                recorder.record(info)
                 reward_sum += reward
                 if writer and (step+1)%args.video_every==0:
                     writer.append_data(env.render())
@@ -596,6 +662,7 @@ def main(argv=None):
                 writer.close()
                 writer = None
             trace = recorder.as_dict()
+            recorder.detach()
             status = {"episode": episode, "seed": args.seed+episode, "terminated": terminated,
                       "truncated": truncated, "simulated_seconds": float(env.data.time),
                       "completed_requested_duration": bool(not terminated and np.isclose(env.data.time, args.duration)),

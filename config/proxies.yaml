@@ -814,6 +814,26 @@
         "confidence": "uncertain", "recording_temp_C": null,
         "notes": "Lab reward speed target=0.72*neutralSVL*lockedfrequency. Does not add independent cadence/speed validation."
       },
+      "lab_total_power_effort_alpha": {
+        "value": 0.01, "units": "reward per watt", "species": "INVENTED", "sample_size": null,
+        "source": "Session 2 opt-in lab mechanical-power penalty", "confidence": "uncertain", "recording_temp_C": null,
+        "notes": "Engineering starting coefficient only. No training performed; no causal correlation claim. Legacy remains zero."
+      },
+      "diagnostic_phase_bins": {
+        "value": 20, "units": "bins per commanded cycle", "species": "INVENTED", "sample_size": null,
+        "source": "Session 2 display aggregation", "confidence": "uncertain", "recording_temp_C": null,
+        "notes": "Display resolution, not an event detector or biological property."
+      },
+      "contact_period_cv_ceiling": {
+        "value": 0.1, "units": "fraction", "species": "INVENTED", "sample_size": null,
+        "source": "Session 2 single-digit-percent CV engineering requirement", "confidence": "uncertain", "recording_temp_C": null,
+        "notes": "Strictly less than this value; never used to edit raw contacts or merge measured cycles."
+      },
+      "entrainment_tolerance_fraction": {
+        "value": 0.1, "units": "relative frequency error", "species": "INVENTED", "sample_size": null,
+        "source": "Session 2 engineering instrument check", "confidence": "uncertain", "recording_temp_C": null,
+        "notes": "Observed same-foot complete-cycle rate must lie within 10 percent of commanded cadence. Does not merge or select cycles to make a controller pass."
+      },
       "contact_cycle_warning_ratio": {
         "value": 2.0, "units": "observed / commanded frequency ratio", "species": "INVENTED", "sample_size": null,
         "source": "NeuroGecko measurement-quality diagnostic engineering choice",

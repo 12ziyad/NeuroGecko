@@ -1,5 +1,44 @@
 # NeuroGecko build log
 
+## Session 2 — laptop-only controller work, 2026-09-05
+
+**AWS cost notice:** at 10:29 UTC the existing AWS host was reachable and idle;
+only OS Python services were running. EC2 remained on and billing. This session
+does not require AWS and launches no training, PPO learning, CMA-ES or GPU job.
+The owner's existing $60 ceiling is not a spending target.
+
+Starting code: `3efa2f6`. Research documents remain read-only. Candidate work is
+explicitly V2 + lab; the live default stays legacy body + legacy controller.
+
+Instrument repair: true 250 Hz samples every five 1250 Hz physics steps; the
+controller still runs at 50 Hz. Each sample copies `MjData` and runs `mj_forward`
+on the copy, aligning sensor/geometry timestamps without touching the live
+solver. Raw forces and forty-millisecond debounce are retained. Entrainment uses
+an explicitly engineered +/-10% rate tolerance, never phase-locked event picking.
+An honest instrument can report a controller's failed entrainment: reducing real
+chatter by changing a detector until CV passes would invalidate the experiment.
+Deterministic zero-noise requests are executed once and reported as n=1, SD=null.
+
+Source for snapshot timing: https://mujoco.readthedocs.io/en/stable/programming/simulation.html
+(mj_step computes forward dynamics then integrates; derived values otherwise lag).
+
+Instrument verification: 43 tests run, 42 pass and one optional SciPy filter test
+skipped. The 80-control-step observer-on/off test is bitwise identical for live
+qpos, qvel, observation and reward; integrated work is counted once per substep.
+Full 20-second CPU-only scorecards with seed 0 completed without falling:
+
+| Condition | Signed forward m/s | net/path | HL/FL/HR/FR contact Hz | HL/FL/HR/FR period CV % |
+|---|---:|---:|---|---|
+| Legacy + frozen policy | .049339 | .460905 | 4.811 / 2.998 / 2.741 / 3.027 | 33.47 / 65.10 / 50.37 / 37.98 |
+| V2 lab base alone | .011807 | .205647 | 3.984 / 3.817 / 3.088 / 2.723 | 28.50 / 25.44 / 31.91 / 37.05 |
+
+Gate 0 acquisition and complete-scorecard requirements PASS; its requested
+physical entrainment/CV outcome FAILS. Raising acquisition does not remove real
+repeated contact. We proceed to mechanical diagnosis with the failure visible,
+not by treating these events as verified animal strides. High-rate path distance
+also captures small within-control-step excursions missed by the old sampler;
+old and new sampling estimates are not identical protocols.
+
 ## Brain recovery completed — 2026-09-04 UTC / 2026-09-05 India
 
 Before code changes, connected to the existing instance with the user's supplied
