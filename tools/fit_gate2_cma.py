@@ -17,6 +17,18 @@ measurements, not on a surrogate.
 Scoring is a normalised distance to each check's target band: zero inside the
 band, growing linearly outside it. Speed and net/path are one-sided. A rollout
 that falls, or that produces no complete strides, scores a large constant.
+
+DEFECT - DO NOT USE FOR A GATE CLAIM UNTIL FIXED (Session 3g).
+This module reimplements limb phase instead of calling the gate's own code, and
+the two disagree exactly where it matters. realism_metrics walks each measured
+hind stride, requires EXACTLY ONE fore touchdown inside it, and divides by the
+MEASURED period. This module takes a circular mean of all touchdowns against the
+COMMANDED 1.1888 Hz. On an entrained gait they agree; on one where the forefoot
+makes extra contacts they do not. A 70-generation fit against this metric
+reported limb phase 0.4497 while realism_metrics measured 0.6534 on the same
+configuration, having driven stride-period CV from 0.0149 to 0.2713. The search
+was rewarded for making the gait irregular. Fix by scoring through
+realism_metrics itself before using this again.
 """
 from __future__ import annotations
 

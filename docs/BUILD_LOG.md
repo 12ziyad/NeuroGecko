@@ -868,3 +868,71 @@ remain opt-in; the default is unchanged and legacy is untouched.
 
 Gate 2 stands at 4/6 with the two failures documented and their cause
 characterised as a parameter-space limit rather than an unfound bug.
+
+## Session 3g — CORRECTION: the CMA-ES limb-phase result was a measurement artefact
+
+The Session 3f claim that CMA-ES solved the limb-phase gate is **withdrawn**. It
+did not. The fit optimised a quantity my search harness computed differently
+from `realism_metrics`, and the difference is exactly the one that matters on a
+non-entrained gait.
+
+### The two definitions
+
+`realism_metrics.py:240-252` walks each hind stride (measured touchdown to
+touchdown), finds fore touchdowns falling inside it, and **keeps a stride only
+if exactly one fore touchdown lies within it**, scoring
+`(t_fore - t_hind_start) / measured_period`.
+
+`tools/fit_gate2_cma.py` took a circular mean of every fore touchdown and every
+hind touchdown against the **commanded** 1.1888 Hz, then subtracted.
+
+On an entrained gait these agree. On a gait where the forefoot makes extra
+contacts they do not: the official measure discards those strides, mine folds
+the extra events into a circular mean, and mine also assumes a period the gait
+is not actually holding.
+
+### What the official measure says about the fitted config
+
+| check | reverted (Session 3b) | CMA-adopted | target |
+|---|---|---|---|
+| forward speed | 0.0416 P | 0.0639 P | >= 0.04 |
+| net/path | 0.7427 P | 0.5716 P | >= 0.50 |
+| hind swing load | 0.0806 P | 0.0315 P | < 0.10 |
+| front stance load | 0.5841 F | 0.5775 F | >= 0.65 |
+| hind duty | 0.7334 P | 0.6829 F | 0.73-0.83 |
+| limb phase | 0.6347 F | **0.6534 F** | 0.405-0.465 |
+| **gates** | **4/6** | **3/6** | |
+| stride period CV | 0.0149 | **0.2713** | |
+| entrainment | False | False | |
+
+My harness reported limb phase 0.4497 for this config; the official measure
+reports 0.6534. The fit had driven the gait into a far less regular state —
+stride CV rose 0.0149 -> 0.2713, an 18x increase — which is precisely the regime
+where the two definitions diverge. The search was rewarded for making the gait
+irregular, because irregularity moved my metric and not the real one.
+
+**The `config/proxies.yaml` change adopting the fitted values has been reverted.**
+The Session 3b configuration stands at 4/6 and remains the best measured result.
+
+### What this does and does not change
+
+Still standing, unaffected: the hind stance compensator and the hind-duty fix
+(0.641 -> 0.733); the eight refuted hypotheses; that realised limb phase equals
+the fore/hind touchdown-lateness difference; the 41% hind slip; that stride
+length is speed at a locked cadence.
+
+Withdrawn: "CMA-ES solved the limb-phase gate", and with it the inference that
+hind duty and limb phase trade against each other — that conclusion rested on
+the same bad metric. The three searches' 2.1-2.3 plateau measured a quantity
+that was not the gate, so it says nothing about the gate.
+
+### Lesson for the next fit
+
+Any future search must call the same code path as the gate, not a
+reimplementation. The correct move is to import the scoring from
+`realism_metrics` (or run it as a subprocess and read its JSON) rather than
+re-derive it in the search harness. `tools/fit_gate2_cma.py` is retained with
+this defect recorded in its docstring; it must not be used to make a gate claim
+until it scores through the official path.
+
+Gate 2 stands at **4/6** with the Session 3b configuration.

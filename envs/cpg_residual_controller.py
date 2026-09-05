@@ -147,6 +147,12 @@ class CPGResidualController:
             for name in ("front_stance_press", "front_stance_press_fr", "front_swing_lift",
                          "front_stance_seek", "front_seek_relax", "shoulder_sprawl_tuck"):
                 setattr(self, name, float(values[name]))
+            # Session 3f: the axial channels are part of the fitted lab set, so
+            # they come from the registry too rather than from constructor
+            # defaults. Legacy still uses its constructor values untouched.
+            for name in ("spine_amp", "tail_amp", "tail_phase_lag"):
+                if name in values:
+                    setattr(self, name, float(values[name]))
 
         # Opt-in hind knee/ankle stance compensation (Session 3). The frozen-pose
         # table holds the hind collision foot at a constant commanded height
