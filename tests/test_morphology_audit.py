@@ -8,6 +8,8 @@ Run these tests with:
 
 import copy
 import json
+from pathlib import Path
+import tempfile
 import unittest
 import xml.etree.ElementTree as ET
 
@@ -20,7 +22,44 @@ from common.morphology_audit import (
     format_table, sphere_surface_gap, weighted_com,
 )
 from common.provenance import load_registry, parameter_value
-from utils.build_lab_morphology import DEFAULT_OUTPUT, V2_OUTPUT, bounded_entropy_fit, extreme_masses, make_candidate
+from utils.build_lab_morphology import (DEFAULT_OUTPUT, V2_OUTPUT, bounded_entropy_fit,
+                                      canonical_source_sha256, canonical_source_text,
+                                      extreme_masses, make_candidate)
+
+
+def assert_generated_model_equivalent(testcase, generated, recorded):
+    """Compare all model structure/attributes without requiring last-bit text.
+
+    Geometric/dynamic numeric attributes get only serialization-scale tolerance
+    (1e-14 absolute, 2e-13 relative). The settled stand qpos alone gets 1e-9
+    absolute tolerance: one nanometre for translation / nanoradian for hinges.
+    This tolerance applies ONLY to reproducibility tests, never research gates.
+    """
+    source_marker = f"canonical-LF SHA256 {canonical_source_sha256(DEFAULT_XML)}."
+    testcase.assertIn(source_marker, generated)
+    testcase.assertIn(source_marker, recorded)
+    left, right = list(ET.fromstring(generated).iter()), list(ET.fromstring(recorded).iter())
+    testcase.assertEqual(len(left), len(right), "XML element count changed")
+    for index, (actual, expected) in enumerate(zip(left, right)):
+        where = f"element {index}: {actual.tag} {actual.get('name', '')}"
+        testcase.assertEqual(actual.tag, expected.tag, where)
+        testcase.assertEqual(set(actual.attrib), set(expected.attrib), where)
+        for attribute in actual.attrib:
+            current_value, saved_value = actual.get(attribute), expected.get(attribute)
+            if current_value == saved_value:
+                continue
+            try:
+                current_numbers = np.array([float(x) for x in current_value.split()])
+                saved_numbers = np.array([float(x) for x in saved_value.split()])
+            except ValueError:
+                testcase.assertEqual(current_value, saved_value, f"{where} attribute {attribute}")
+                continue
+            testcase.assertEqual(current_numbers.shape, saved_numbers.shape, f"{where} attribute {attribute}")
+            settled_state = actual.tag == "key" and actual.get("name") == "stand" and attribute == "qpos"
+            np.testing.assert_allclose(current_numbers, saved_numbers,
+                                       atol=1e-9 if settled_state else 1e-14,
+                                       rtol=0 if settled_state else 2e-13,
+                                       err_msg=f"{where} attribute {attribute}")
 
 
 class MeasurementMathTests(unittest.TestCase):
@@ -121,7 +160,7 @@ class LabCandidateTests(unittest.TestCase):
     def test_generator_is_reproducible_and_does_not_change_legacy(self):
         before = DEFAULT_XML.read_bytes()
         generated, derivations = make_candidate()
-        self.assertEqual(generated.strip(), DEFAULT_OUTPUT.read_text(encoding="utf-8").strip())
+        assert_generated_model_equivalent(self, generated, DEFAULT_OUTPUT.read_text(encoding="utf-8"))
         self.assertEqual(before, DEFAULT_XML.read_bytes())
         self.assertAlmostEqual(derivations["actuator_scale"], .038 / .0612)
 
@@ -185,12 +224,57 @@ class InverseMassCalibrationTests(unittest.TestCase):
 
     def test_v2_reproducible_and_exact_mean_limit_explicit(self):
         generated, derivations = make_candidate(fit_com=True)
-        self.assertEqual(generated.strip(), V2_OUTPUT.read_text(encoding="utf-8").strip())
+        assert_generated_model_equivalent(self, generated, V2_OUTPUT.read_text(encoding="utf-8"))
         fitted = derivations["inverse_mass_calibration"]
         self.assertTrue(fitted["body_fit"]["target_feasible"])
         self.assertFalse(fitted["tail_fit"]["target_feasible"])
         self.assertGreater(fitted["geometry_lower_bound"]["minimum_first_segment_density_kg_m3"],
                            fitted["tail_fit"]["guard_density_kg_m3"])
+
+
+class CrossPlatformReproducibilityTests(unittest.TestCase):
+    def test_lf_and_crlf_sources_generate_identical_model_text(self):
+        canonical = canonical_source_text(DEFAULT_XML)
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            sources = []
+            for name, newline in (("lf", "\n"), ("crlf", "\r\n")):
+                folder = root / name
+                folder.mkdir()
+                source = folder / DEFAULT_XML.name
+                source.write_bytes(canonical.replace("\n", newline).encode("utf-8"))
+                sources.append(source)
+            self.assertEqual(canonical_source_sha256(sources[0]), canonical_source_sha256(sources[1]))
+            first, first_evidence = make_candidate(source=sources[0])
+            second, second_evidence = make_candidate(source=sources[1])
+            self.assertEqual(first, second)
+            self.assertEqual(first_evidence["source_canonical_lf_sha256"], second_evidence["source_canonical_lf_sha256"])
+            self.assertNotEqual(first_evidence["source_raw_file_sha256"], second_evidence["source_raw_file_sha256"])
+
+    def test_model_comparison_rejects_geometry_changes(self):
+        recorded = DEFAULT_OUTPUT.read_text(encoding="utf-8")
+        changed = ET.fromstring(recorded)
+        geom = next(g for g in changed.iter("geom") if g.get("mass") and float(g.get("mass")) > 0)
+        geom.set("mass", str(float(geom.get("mass")) * 1.01))
+        # Preserve the hash marker when serializing without comments; the test
+        # must fail on the changed physical attribute, not missing provenance.
+        marker = f"<!-- canonical-LF SHA256 {canonical_source_sha256(DEFAULT_XML)}. -->\n"
+        with self.assertRaises(AssertionError):
+            assert_generated_model_equivalent(self, marker + ET.tostring(changed, encoding="unicode"), recorded)
+
+    def test_model_comparison_tolerates_only_tiny_stand_roundoff(self):
+        recorded = DEFAULT_OUTPUT.read_text(encoding="utf-8")
+        changed = ET.fromstring(recorded)
+        key = changed.find(".//key[@name='stand']")
+        state = np.fromstring(key.get("qpos"), sep=" ")
+        state[0] += 1e-11
+        key.set("qpos", " ".join(map(str, state)))
+        marker = f"<!-- canonical-LF SHA256 {canonical_source_sha256(DEFAULT_XML)}. -->\n"
+        assert_generated_model_equivalent(self, marker + ET.tostring(changed, encoding="unicode"), recorded)
+        state[0] += 1e-5
+        key.set("qpos", " ".join(map(str, state)))
+        with self.assertRaises(AssertionError):
+            assert_generated_model_equivalent(self, marker + ET.tostring(changed, encoding="unicode"), recorded)
 
 
 if __name__ == "__main__":

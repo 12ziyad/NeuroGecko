@@ -1,0 +1,27 @@
+{
+  "caption": "NEW BODY - UNTUNED GAIT | recorded simulation",
+  "complete": true,
+  "controller_recorded": "zero residual with contact reflex",
+  "duration_s": 20.00000000000681,
+  "elapsed_wall_seconds": 7.546999999998661,
+  "fps": 25,
+  "gait_profile_recorded": "lab",
+  "human_render": {
+    "body_visible": true,
+    "collision_geoms": false,
+    "reflections": false,
+    "shadows": false,
+    "sites": false
+  },
+  "kind": "recorded_qpos_human_replay",
+  "physics_steps_executed": 0,
+  "planned_frames": 500,
+  "rendered_frames": 500,
+  "sampling": "nearest existing recorded qpos; no interpolation/controller/optimization",
+  "source_files_unchanged": true,
+  "trace_path": "C:\\Users\\ziyad\\GeckoBrain\\artifacts\\evidence\\lab_zero_residual\\traces\\episode_000.json",
+  "trace_sha256": "a475108fa29482f23868eb08a3927e73db30e30a13d26d14bad64ff8aba40e63",
+  "video_sha256": "5d9e95868ceed7d601adb17ff383cbac88593457bad81ab983b2ebae90495213",
+  "xml_path": "C:\\Users\\ziyad\\GeckoBrain\\build_sessions\\replay_source\\morphology\\gecko_body_lab_v2.xml",
+  "xml_sha256": "cfc485e6fab752dc4ab25d25beebf549fded5fb241b3da6c828df55156b9c22d"
+}

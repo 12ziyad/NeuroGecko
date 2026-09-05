@@ -35,6 +35,19 @@ def numbers(values) -> str:
     return " ".join(f"{float(v):.17g}" for v in values)
 
 
+def canonical_source_text(source: Path) -> str:
+    """Canonical UTF-8 text with LF line endings, independent of Git checkout.
+
+    Only newline encoding is normalized. Content and trailing newlines remain
+    significant. The raw byte hash is separately retained in build evidence.
+    """
+    return source.read_bytes().decode("utf-8").replace("\r\n", "\n").replace("\r", "\n")
+
+
+def canonical_source_sha256(source: Path) -> str:
+    return hashlib.sha256(canonical_source_text(source).encode("utf-8")).hexdigest()
+
+
 def find(root: ET.Element, tag: str, name: str) -> ET.Element:
     result = root.find(f".//{tag}[@name='{name}']")
     if result is None:
@@ -269,7 +282,7 @@ def make_candidate(source: Path = DEFAULT_XML, registry_path: Path = DEFAULT_REG
     entries = load_registry(registry_path)["entries"]
     val = lambda name: entries[name]["value"]
     parser = ET.XMLParser(target=ET.TreeBuilder(insert_comments=True))
-    root = ET.fromstring(source.read_text(encoding="utf-8"), parser=parser)
+    root = ET.fromstring(canonical_source_text(source), parser=parser)
     original = mujoco.MjModel.from_xml_path(str(source))
     neutral = mujoco.MjData(original)
     mujoco.mj_resetDataKeyframe(original, neutral, original.key("neutral").id)
@@ -281,7 +294,7 @@ def make_candidate(source: Path = DEFAULT_XML, registry_path: Path = DEFAULT_REG
     root.set("model", "gecko_body_lab_candidate_v2" if fit_com else "gecko_body_lab_candidate_v1")
     root.insert(0, ET.Comment(
         f" LAB COHORT CANDIDATE v{2 if fit_com else 1}, opt-in only. Legacy GeckoBody-R physics remains unchanged.\n"
-        " Source body: " + source.name + " SHA256 " + hashlib.sha256(source.read_bytes()).hexdigest() + ".\n"
+        " Source body: " + source.name + " canonical-LF SHA256 " + canonical_source_sha256(source) + ".\n"
         " 38 g / ~106 mm SVL population choice; segment masses, neutral inclinations and gains are proxies.\n"
         " Femur depression target convention: Jagnandan & Higham 2017 (doi:10.1038/s41598-017-11484-7).\n"
         " Raw hip_sprawl is a local hinge angle, NOT the paper's reconstructed 3-D anatomical angle.\n"
@@ -406,8 +419,9 @@ def make_candidate(source: Path = DEFAULT_XML, registry_path: Path = DEFAULT_REG
     checked = mujoco.MjModel.from_xml_string(result)
     if (checked.nq, checked.nv, checked.nu) != (original.nq, original.nv, original.nu):
         raise RuntimeError("Candidate unexpectedly changed checkpoint dimensions")
-    return result, {"source_sha256": hashlib.sha256(source.read_bytes()).hexdigest(),
-                    "registry_sha256": hashlib.sha256(registry_path.read_bytes()).hexdigest(),
+    return result, {"source_canonical_lf_sha256": canonical_source_sha256(source),
+                    "source_raw_file_sha256": hashlib.sha256(source.read_bytes()).hexdigest(),
+                    "registry_raw_file_sha256": hashlib.sha256(registry_path.read_bytes()).hexdigest(),
                     "tail_length_scale": tail_scale, "hind_foot_scale": hind_foot_scale,
                     "fore_chain_scale": fore_scale, "actuator_scale": actuator_scale,
                     "mass_partition": ("bounded relative-entropy non-tail fit + closest density-guarded tail fit"

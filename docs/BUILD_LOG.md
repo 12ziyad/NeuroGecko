@@ -160,3 +160,56 @@ skipping SciPy did not skip checkpoint recovery, rendering or gait tests.
 Long retraining, CMA-ES gait tuning, commanded stop/rest and gaze reassignment
 have not been completed. Dynamic candidate tests and final verification are
 recorded below when finished; passing static bands alone is insufficient.
+
+## Dynamic candidate checks
+
+Source snapshot `9960117` was transferred into isolated `lab-9960117`; archive
+SHA256 matched `5e0afecca1289e24fffc0e5b75e7a0584a197b87f204f0301f735f37e483ab69`.
+The recorded v2 XML SHA256 was
+`cfc485e6fab752dc4ab25d25beebf549fded5fb241b3da6c828df55156b9c22d`.
+Each condition below used one deterministic 20 s run, discarding the first 3 s.
+All completed with zero falls. They are diagnostics, not broad validation.
+
+| Condition | Path speed (m/s) | Signed body-forward speed (m/s) | Nose-up pitch (degrees) |
+|---|---:|---:|---:|
+| Original body + saved walker | 0.128484 | 0.049517 | 7.818 |
+| V2 body + saved walker, legacy timing | 0.105698 | 0.033660 | 9.543 |
+| V2 body + saved walker, lab timing/calibration | 0.064364 | 0.019909 | 9.407 |
+| V2 body + lab rhythm, zero residual with contact reflex | 0.046894 | 0.011736 | 11.334 |
+
+The lab zero-residual contact-cycle duty factors HL/FL/HR/FR were
+0.443/0.464/0.549/0.414, despite commanded ratios 0.765/0.700/0.765/0.700.
+Its hip height averaged 0.167555 SVL. Its total absolute actuator work was
+29.738381 J per path metre. The target gait is **not achieved**. In particular,
+static neutral posture passing does not make the dynamic pitch acceptable.
+
+The first AWS integration test caught source-file line endings in generated
+XML provenance fingerprints. Corrected using explicitly labeled canonical-LF
+text hashes; exact original byte hashes remain in the evidence. The correction
+changes candidate comments only. Generated structure and numerical attributes
+are still compared tightly; no research tolerance was widened.
+
+## Final verification and handoff
+
+- **Windows: 127 tests; 126 passed, one optional SciPy skip, zero failures.**
+- **AWS Linux: 127 tests; 126 passed, the same skip, zero failures.**
+- AWS independently reran the strict v2 morphology audit: **14/14 bands pass**.
+- Exact source and portability notes remain in
+  `morphology_reproducibility_line_endings_20260905.md`. The uploaded portability
+  patch archive matched SHA256
+  `7b83ccc229030843b4134b8e1af0a36dadca38f92978015e3e75c37f27449f98`.
+- Created a clean 20 s human replay of the actual recorded lab-v2 qpos samples,
+  500 frames at 25 fps. No physics steps, interpolation or controller execution;
+  shadows/reflections/debug sites disabled for this presentation renderer only.
+  Source trace and exact XML hashes matched and were unchanged. Policy images
+  and original before/after measurements were not modified.
+- Final AWS process check found no compute processes and no project Python jobs;
+  only the two pre-existing system Python services remained. No training is left
+  running. **EC2 itself remains on and billing**, pending the separate stop choice.
+- No new cloud resource, production replacement, system-driver change or GitHub
+  push was performed. The $60 direct authorization remains the ceiling, not a
+  target to spend; the exact account bill was not read.
+
+This is a completed recovery/instrumentation/body-calibration build increment,
+not completion of the full research program. The gait remains untuned; see
+`docs/BLOCKED.md` for the actual remaining implementation work.

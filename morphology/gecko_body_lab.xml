@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mujoco model="gecko_body_lab_candidate_v1">
   <!-- LAB COHORT CANDIDATE v1, opt-in only. Legacy GeckoBody-R physics remains unchanged.
- Source body: gecko_body_r.xml SHA256 c4293da9a0e86ed3e43d23c561b55fec32ccc9b32ec99699737c4294345c3c73.
+ Source body: gecko_body_r.xml canonical-LF SHA256 c4293da9a0e86ed3e43d23c561b55fec32ccc9b32ec99699737c4294345c3c73.
  38 g / ~106 mm SVL population choice; segment masses, neutral inclinations and gains are proxies.
  Femur depression target convention: Jagnandan & Higham 2017 (doi:10.1038/s41598-017-11484-7).
  Raw hip_sprawl is a local hinge angle, NOT the paper's reconstructed 3-D anatomical angle.

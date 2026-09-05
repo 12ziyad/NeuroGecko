@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "completed_utc": "2026-09-05 00:37:14 UTC",
+  "software_tests": {
+    "windows": {
+      "total": 127,
+      "passed": 126,
+      "skipped": 1,
+      "failed": 0
+    },
+    "aws_linux": {
+      "total": 127,
+      "passed": 126,
+      "skipped": 1,
+      "failed": 0
+    },
+    "skip_reason": "Optional SciPy genuinely high-rate strike-filter success test; SciPy is not installed"
+  },
+  "static_morphology": {
+    "candidate": "gecko_body_lab_v2.xml",
+    "passed": 14,
+    "total": 14,
+    "verified_on_aws": true,
+    "claim": "engineering tolerance bands; calibrated, not biological or dynamic validation"
+  },
+  "dynamic_gait_target_achieved": false,
+  "recovered_model_files_verified": 55,
+  "aws_safety_training_aggregate_steps": 256,
+  "offhost_resume_timesteps_before": 256,
+  "offhost_resume_timesteps_after": 320,
+  "aws_compute_processes_at_completion": [],
+  "aws_python_processes_at_completion": [
+    "system networkd-dispatcher",
+    "system unattended-upgrades shutdown waiter"
+  ],
+  "new_cloud_resources_created": false,
+  "aws_instance_stopped": false,
+  "authorized_additional_aws_usd": 60,
+  "actual_account_bill_read": false,
+  "ongoing_charge_warning": "Existing EC2 is still on; short process timeouts do not stop instance charges.",
+  "original_models_replaced": false,
+  "github_push_performed": false
+}
