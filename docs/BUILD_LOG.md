@@ -711,3 +711,82 @@ stride length is speed; 41% hind slip is real lost propulsion.
 Next open items, in order of evidence: (a) hind-foot slip during stance, which
 is quantified and large; (b) forefoot extra contacts, which is quantified and
 likely the same defect as the touchdown lateness.
+
+## Session 3e — three more refutations, and a correction to my own framing
+
+### Refuted: fore/hind gearing mismatch
+
+The body is rigid, so both girdles' feet must sweep backward at the same rate or
+they fight. They do not: hind demands 55.3 mm/s of body speed, fore demands
+34.1 mm/s, and the body settles at 41.6 mm/s between them. The predicted slip
+from that mismatch matches the measurement well (hind predicted +9.0 mm against
+14.4 measured; fore -4.4 against -5.0). The mechanism is real.
+
+The fix is not. Sweeping `fore_hind_amplitude_ratio` to equalise foot travel:
+
+| ratio | speed m/s | stride SVL | slip HL | exc FL mm |
+|---|---|---|---|---|
+| 0.54 (current) | 0.0226 | 0.179 | 13.47 | 57.2 |
+| 0.70 | 0.0217 | 0.173 | 13.72 | 77.8 |
+| 0.85 | 0.0194 | 0.154 | 12.65 | 87.1 |
+| 0.97 | 0.0189 | 0.150 | 12.13 | 89.3 |
+| 1.10 | 0.0187 | 0.148 | 11.99 | 88.2 |
+
+Front excursion rises 57 -> 89 mm as intended, and speed falls monotonically.
+Equalising the gearing makes it slower. Refuted.
+
+### Refuted: contact softness
+
+Floor friction is 0.9 and the tangential force a foot needs is ~0.01 of normal,
+so this was never Coulomb sliding. `impratio = 1.0` makes MuJoCo's frictional
+constraints as soft as normal ones, which is the documented cause of tangential
+creep. Sweeping it 1 -> 100 moves hind slip 13.5 -> ~12 mm and leaves speed flat.
+Refuted.
+
+### My framing error: stride length is not a Gate 2 check, and it is inside the
+### triangle the research explicitly warned about
+
+`docs/research/beyond_statistics_realism.md` states plainly: *"Encode at most one
+member of the {stride length, cadence, speed} triangle at a time - they are
+mutually unsatisfiable in the source itself."*
+
+The cadence lock at 1.1888 Hz already spends one member. The published pair
+(0.129 m/s voluntary, 0.62-0.82 SVL stride) implies a cadence of **1.69 Hz**. At
+the locked 1.1888 Hz a 0.72 SVL stride forces 0.0907 m/s, which is 70% of the
+published voluntary speed. The three cannot hold together, which is the
+documented reason the gate list contains speed but not stride length.
+
+**Stride length is not one of the six Gate 2 checks.** I added it as an extra
+column in Session 3b and then treated it as a failure for three sessions,
+including inferring a spine contribution (Session 3c) and a gearing fix
+(Session 3e) to chase it. Both inferences were wrong and both are now refuted by
+measurement. The correct handling is the documented one: report stride length,
+do not gate it while the cadence is locked.
+
+### Actual Gate 2 status: 4/6, two real failures
+
+| # | check | value | target | |
+|---|---|---|---|---|
+| 1 | forward speed | 0.0416 | >= 0.04 | PASS |
+| 2 | net/path | 0.7427 | >= 0.50 | PASS |
+| 3 | hind swing load | 0.0806 | < 0.10 | PASS |
+| 4 | front stance load | 0.5841 | >= 0.65 | **FAIL** |
+| 5 | hind duty | 0.7334 | 0.73-0.83 | PASS |
+| 6 | limb phase | 0.6347 | 0.405-0.465 | **FAIL** |
+
+Both remaining failures are the same limb. The forefoot lands 0.320 cycle late
+(hind lands 0.123 late) and registers 25-28 contact cycles against the hind's
+19-20 at one commanded cadence, i.e. it bounces within its own stance. Limb
+phase error equals the fore/hind touchdown-lateness difference exactly.
+
+### Refutation ledger
+
+Tested and refuted by measurement: hind stance height as the cause of limb phase;
+fore stance height; actuator bandwidth (15x stiffer plant, near-critical damping);
+spine amplitude as the source of stride; fore/hind gearing; contact softness.
+Confirmed: hind stance height fixed hind duty (0.641 -> 0.733); limb-phase error
+is fore/hind touchdown-lateness difference; hind slip is 41% of body advance.
+
+The single unexplained mechanism is the forefoot: late touchdown and extra
+contact cycles, with stance geometry, plant bandwidth, gearing and friction all
+eliminated.
