@@ -267,6 +267,16 @@ def make_env(seed, control_mode="raw", residual_scale=0.25,
 
 COMPENSATION_BY_FLAG = {"off": False, "hind": True, "all": "all"}
 
+# Lab controller channels added after some evidence reports were written, with
+# the value at which each contributes nothing. Listing them explicitly keeps
+# "this older report ran the same controller" a proof rather than an assumption.
+NO_OP_WHEN = {
+    "hind_sprawl_amplitude": 0.0,
+    "fore_sprawl_amplitude": 0.0,
+    "sprawl_phase": 0.0,
+    "tail_hindlimb_coupling": 0.0,
+}
+
 # Four of the six Gate 2 checks are recoverable from a realism_metrics report
 # alone; front/hind contact LOADS need the trace and are not re-derived here.
 EVIDENCE_GATES = (
@@ -354,10 +364,16 @@ def require_lab_training_readiness(args):
         defaults = inspect.signature(CPGResidualController.__init__).parameters
         for key in missing:
             default = defaults[key].default if key in defaults else inspect.Parameter.empty
-            if default is inspect.Parameter.empty or default != expected[key]:
-                raise ValueError("Lab base evidence omits " + key + " and the registry value does "
-                                 "not match the controller default it would have run with; "
-                                 "re-measure the base.")
+            if default is not inspect.Parameter.empty and default == expected[key]:
+                continue
+            # Keys introduced after the evidence was measured are acceptable only
+            # at the value that reproduces the behaviour the older run actually
+            # had. Session 4 added the sprawl and tail-coupling channels; each is
+            # additive and contributes exactly nothing at 0.0.
+            if key in NO_OP_WHEN and expected[key] == NO_OP_WHEN[key]:
+                continue
+            raise ValueError("Lab base evidence omits " + key + " and the registry value is not "
+                             "the no-op that the older run actually executed; re-measure the base.")
     duration = float(parameter_value("evaluation_duration_s"))
     if protocol.get("requested_duration_s") != duration:
         raise ValueError("Lab base evidence must be measured at the gate's own %g s duration; "

@@ -1,0 +1,86 @@
+{
+ "schema_version": 1,
+ "test": "A3 tail-restriction perturbation, no retraining",
+ "source": "Jagnandan & Higham 2017, Sci Rep 7:10865; scorecard row 28",
+ "mechanism": "tail_amp driven to zero through the lab controller; tail mass and tail_lift untouched. This is zero commanded lateral tail drive, NOT mechanical immobilisation (DECISIONS.md 8).",
+ "coupling": 0.36,
+ "protocol": {
+  "xml": "morphology/gecko_body_lab_v2.xml",
+  "gait_profile": "lab",
+  "zero_residual": true,
+  "hind_stance_compensation": "all",
+  "duration_s": 20,
+  "settle_s": 3,
+  "seed": 0,
+  "episodes": 1
+ },
+ "joints": [
+  {
+   "joint": "femur_retraction",
+   "intact_deg": 96.04669451780592,
+   "restricted_deg": 76.2001159510456,
+   "change_pct": -20.663468603889324,
+   "published_change_pct": -21.0,
+   "within_5_points": true
+  },
+  {
+   "joint": "ankle",
+   "intact_deg": 31.662023912386324,
+   "restricted_deg": 26.444110271542407,
+   "change_pct": -16.480038216390348,
+   "published_change_pct": -17.0,
+   "within_5_points": true
+  },
+  {
+   "joint": "knee",
+   "intact_deg": 22.025427908117493,
+   "restricted_deg": 22.858410265811102,
+   "change_pct": 3.7819122569083565,
+   "published_change_pct": -11.0,
+   "within_5_points": false
+  },
+  {
+   "joint": "femur_depression",
+   "intact_deg": 0.9784020163678697,
+   "restricted_deg": 1.2349385189551416,
+   "change_pct": 26.219948272348677,
+   "published_change_pct": -42.0,
+   "within_5_points": false
+  },
+  {
+   "joint": "humerus_retraction",
+   "intact_deg": 53.61373110758229,
+   "restricted_deg": 52.37696721535484,
+   "change_pct": -2.3068043702195205,
+   "published_change_pct": 0.0,
+   "within_5_points": true
+  },
+  {
+   "joint": "humerus_depression",
+   "intact_deg": 1.1426350392717,
+   "restricted_deg": 1.3364992634080597,
+   "change_pct": 16.966416876199258,
+   "published_change_pct": 0.0,
+   "within_5_points": false
+  },
+  {
+   "joint": "elbow",
+   "intact_deg": 9.777970472973067,
+   "restricted_deg": 9.78722658936455,
+   "change_pct": 0.0946629611642642,
+   "published_change_pct": 0.0,
+   "within_5_points": true
+  }
+ ],
+ "hind_duty": {
+  "intact": 0.7334179654915091,
+  "restricted": 0.7260027080485875,
+  "published": "unchanged"
+ },
+ "gates": {
+  "intact": "4/6 PPP.P.  fwd 0.0416  front 0.5841  hduty 0.7334  CV 0.0149",
+  "restricted": "1/6 .P....  fwd 0.0364  front 0.5767  hduty 0.7260  CV 0.0036"
+ },
+ "claim": "Instrumented simulation diagnostics; n=1 deterministic rollout per condition, not an animal sample. The anatomical proxy convention is unvalidated against the paper's own convention, so percentage change is the comparable quantity, not absolute degrees.",
+ "verdict": "5 of 7 predictions matched within 5 percentage points; knee moves the wrong way and femur depression is not testable while sprawl is commanded flat."
+}

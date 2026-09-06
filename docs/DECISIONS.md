@@ -195,3 +195,19 @@ normalizer, with stop-command and gaze-ownership changes tested explicitly.
     to github.com/12ziyad/NeuroGecko, superseding the earlier local-only default
     in this file. That authorization covers the repository as it stands; it is not
     standing permission for future pushes.
+20. **Sprawl drive ships off (0.0).** It reaches the published femur depression
+    excursion but costs the planted foot, and the sprawl-aware stance table can
+    only solve half the band it would need — at a frozen target that is itself
+    worse than the shipped base. The channels exist, the trade is measured, and
+    the default is the configuration that was actually validated.
+21. **A moving sprawl must not run on a sprawl-blind stance table.** 0.42 mm of
+    foot height per degree; the controller raises rather than silently stopping
+    compensating.
+22. **The tail coupling is on by default at 0.36, and that changes nothing about
+    the intact animal.** Its gain is exactly 1.0 at the reference tail amplitude,
+    proven by an evidence file that reproduces the Session 3 base to twelve
+    decimal places. Only the ablation response changes — which is the point.
+23. **A published prediction the model misses stays in the table.** The knee
+    moves +3.8% where Jagnandan & Higham report −11%. One gain on femur
+    retraction cannot produce a per-joint pattern, and adding per-joint gains
+    until the table goes green would be fitting the harness to the answer.

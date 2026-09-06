@@ -1271,3 +1271,119 @@ justification, and not as a fix smuggled in to pass a gate.
 | 18 | The forelimb is under-actuated for it | **Confirmed** | 1 free joint vs the hindlimb's 2, read from `limb_specs` |
 
 227 tests pass, one SciPy skip.
+
+# Session 4b — the body's own motion, measured against the published table
+
+Session 4 closed the walking gates and, in doing so, measured something nobody
+had checked: the joint excursions themselves. They are wrong, and not slightly.
+
+| joint (anatomical proxy) | measured | published | ratio | source |
+|---|---|---|---|---|
+| femur depression | **0.98°** | 52.42 ± 3.25 | **0.02** | scorecard 18 |
+| femur retraction | 96.05° | 82.57 ± 2.29 | 1.16 | scorecard 17 |
+| knee | 22.03° | 98.83 ± 1.39 | 0.22 | scorecard 19 |
+| ankle | 31.66° | 85.19 ± 2.38 | 0.37 | scorecard 20 |
+| humerus depression | **1.14°** | 101.38 ± 15.88 | 0.01 | scorecard 21 |
+| humerus retraction | 53.61° | 44.41 ± 1.80 | 1.21 | scorecard 21 |
+| elbow | 9.78° | 92.49 ± 2.27 | 0.11 | scorecard 21 |
+| wrist | 0.16° | 71.93 ± 3.09 | 0.00 | no wrist actuator exists |
+
+The proxy convention is recorded in every trace as unvalidated against the
+paper's own convention, so these ratios are a direction of travel and not a
+claim of anatomical equivalence. A 0.02 ratio, though, is not a convention
+disagreement: **the sprawl degrees of freedom are commanded flat.** The animal
+walks by sweeping fore-aft with barely articulated limbs.
+
+`tools/measure_excursions.py` is that table, re-runnable.
+
+## Sprawl: implemented, measured, and left off
+
+`hind_sprawl_amplitude`, `fore_sprawl_amplitude` and `sprawl_phase` drive the
+sprawl actuators with their own sinusoid, added to whatever `other_amplitude`
+already contributed so that zero is bit-identical to the previous behaviour.
+
+Amplitude maps to excursion almost linearly, and reaches the published value:
+
+| amplitude | femur depression | humerus depression | gates |
+|---|---|---|---|
+| 0.00 | 0.78° | 1.14° | 3/6 |
+| 0.40 | 22.94° | 28.52° | 1/6 |
+| 0.80 | 45.47° | 57.27° | 2/6 |
+| 1.00 | **55.25°** | 64.30° | 1/6 |
+| *published* | *52.42* | *101.38* | |
+
+**But hind duty factor collapses from 0.631 to 0.094 across that sweep.** Without
+compensation the sprawl lifts the foot off the ground during commanded stance.
+
+The stance compensator cannot absorb it. Measured on this body, sprawl moves the
+collision foot **0.42 mm per degree** — ±8.5 mm across the actuator range — so
+the existing table, solved at neutral sprawl, stops compensating the moment
+sprawl leaves neutral. A sprawl axis was therefore added to the table
+(`sprawl_nodes`, `sprawl_limit_rad`), and it does not rescue the result:
+
+- The widest solvable band is about **±15°**, and only with the frozen target
+  driven to −3 mm, because at negative sprawl the foot drops further than the
+  knee and ankle can lift it back. Raising the offset cap to the knee's full
+  range does not widen it; the dense-interpolation band check fails instead.
+- ±15° is roughly **half** the sprawl needed for the published excursion.
+- At that deep target the compensation itself costs more than the sprawl gains:
+  amplitude 0.00 measures **2/6**, against 4/6 for the shipped base.
+
+So the sprawl channels are committed **defaulting to 0.0**, with the trade-off
+recorded rather than a number tuned green. The controller refuses a moving
+sprawl on a sprawl-blind stance table rather than silently mis-compensating.
+
+This is the same shape as the forelimb finding: the distal joints cannot absorb
+the girdle motion the published animal shows. It is a body limit, and the fix —
+if it is worth taking — is anatomical, not a parameter.
+
+## The tail is no longer a passive pendulum
+
+Session 4's Tier A3 test found blocking the tail changed every hindlimb
+excursion by under 1%, against a published collapse. The scorecard's own verdict
+for that outcome: "the tail is a passive pendulum and the coupling is missing".
+
+`tail_hindlimb_coupling` supplies it. The caudofemoralis retracts the femur and
+originates on the proximal caudal vertebrae, so the coupling scales **hind
+fore-aft amplitude only** by the realised tail amplitude. Fitted to 0.36.
+
+**At the reference tail amplitude the gain is exactly 1.0**, so the intact gait
+is bit-identical to the pre-Session-4 base — verified, not asserted:
+`artifacts/evidence/session4/gate2_lab_base_session4.json` reproduces
+`session3/gate2_all_limbs.json` to twelve decimal places on forward speed, net
+displacement, path length and both hind duty factors, and is pinned by
+`test_the_session4_base_reproduces_the_session3_measurements_exactly`.
+
+### Tier A3 re-run — `artifacts/evidence/session4/tierA3_tail_restriction.json`
+
+| joint | intact | restricted | change | published | match |
+|---|---|---|---|---|---|
+| femur retraction | 96.05° | 76.20° | **−20.7%** | −21% | **yes** |
+| ankle | 31.66° | 26.44° | **−16.5%** | −17% | **yes** |
+| knee | 22.03° | 22.86° | +3.8% | −11% | no |
+| humerus retraction | 53.61° | 52.38° | −2.3% | unchanged | **yes** |
+| elbow | 9.78° | 9.79° | +0.1% | unchanged | **yes** |
+| hind duty | 0.7334 | 0.7260 | −1.0% | unchanged | **yes** |
+
+Five of the six testable predictions match. The knee moves the wrong way, and
+that is recorded rather than tuned away — a single gain on femur retraction
+cannot reproduce a per-joint pattern, and pretending otherwise would be fitting
+the harness to the answer. The two depression rows are **not testable** while
+sprawl is commanded flat: a ±17% swing on a 1.1° channel is noise, not evidence.
+
+The ablation remains zero commanded lateral tail drive, not mechanical
+immobilisation, exactly as `DECISIONS.md` item 8 requires.
+
+## Session 4b ledger
+
+| # | Hypothesis | Verdict | Evidence |
+|---|---|---|---|
+| 19 | The limbs are barely articulated | **Confirmed** | 6 of 8 excursions at 0.00-0.37 of published |
+| 20 | Sprawl amplitude can reach the published excursion | **Confirmed** | 55.25° at amplitude 1.0 against 52.42 |
+| 21 | ...without losing the planted foot | **Refuted** | hind duty 0.631 → 0.094 across the sweep |
+| 22 | A sprawl-aware stance table rescues it | **Refuted** | ±15° solvable, half what is needed, and 2/6 at amplitude zero |
+| 23 | The tail was a passive pendulum | **Confirmed** | every hindlimb excursion moved <1% when tail drive was removed |
+| 24 | A caudofemoralis-shaped coupling reproduces the ablation | **Confirmed** | −20.7% / −16.5% against −21% / −17%, forelimb and duty unchanged |
+| 25 | One gain reproduces the whole per-joint pattern | **Refuted** | knee +3.8% against a published −11% |
+
+237 tests pass, one SciPy skip.

@@ -20,6 +20,7 @@ from collections import Counter
 from fractions import Fraction
 import hashlib
 import json
+import math
 from pathlib import Path
 import platform
 import os
@@ -529,6 +530,10 @@ def main(argv=None):
     p.add_argument("--hind-stance-compensation", nargs="?", const=True, default=False,
                    choices=(True, "hind", "all"),
                    help="Lab-only opt-in: hold the collision foot at a constant commanded height through stance. 'all' includes the forelimb.")
+    p.add_argument("--stance-sprawl-nodes", type=int, default=None,
+                   help="build a sprawl axis into the stance table; required once sprawl moves")
+    p.add_argument("--stance-sprawl-limit-deg", type=float, default=None,
+                   help="sprawl band the stance table is solved over, degrees either side")
     p.add_argument("--front-stance-clearance-m", type=float, default=None,
                    help="frozen-pose target depth for the FRONT feet only; hind keeps its own")
     p.add_argument("--stance-target-clearance-m", type=float, default=None,
@@ -584,6 +589,9 @@ def main(argv=None):
                        residual_scale=args.residual_scale, front_stance_press=args.front_stance_press,
                        front_swing_lift=args.front_swing_lift, gait_profile=args.gait_profile,
                        hind_stance_compensation=(args.hind_stance_compensation if args.hind_stance_compensation != 'hind' else True),
+                       stance_sprawl_nodes=args.stance_sprawl_nodes,
+                       stance_sprawl_limit_rad=(None if args.stance_sprawl_limit_deg is None
+                                                else math.radians(args.stance_sprawl_limit_deg)),
                        stance_target_clearance_m=(
                            {"HL": args.stance_target_clearance_m or -.0006,
                             "HR": args.stance_target_clearance_m or -.0006,

@@ -72,7 +72,8 @@ class GeckoWalkEnv(gym.Env):
                  front_stance_press=0.40, front_swing_lift=0.40,
                  render_mode=None, seed=None, gait_profile="legacy", lab_parameters=None,
                  hind_stance_compensation=False, front_lift_residual_scale=None,
-                 stance_target_clearance_m=None):
+                 stance_target_clearance_m=None, stance_sprawl_nodes=None,
+                 stance_sprawl_limit_rad=None):
         super().__init__()
         self.model = mujoco.MjModel.from_xml_path(str(xml_path or DEFAULT_XML))
         self.data = mujoco.MjData(self.model)
@@ -146,6 +147,10 @@ class GeckoWalkEnv(gym.Env):
         self.hind_stance_compensation = hind_stance_compensation
         if self.control_mode == "cpg_residual":
             cpg_kwargs = {}
+            if stance_sprawl_nodes is not None:
+                cpg_kwargs["stance_sprawl_nodes"] = int(stance_sprawl_nodes)
+            if stance_sprawl_limit_rad is not None:
+                cpg_kwargs["stance_sprawl_limit_rad"] = float(stance_sprawl_limit_rad)
             if stance_target_clearance_m is not None:
                 cpg_kwargs["stance_target_clearance_m"] = (
                     dict(stance_target_clearance_m) if isinstance(stance_target_clearance_m, dict)

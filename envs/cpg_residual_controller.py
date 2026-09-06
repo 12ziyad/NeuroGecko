@@ -90,7 +90,8 @@ class CPGResidualController:
                  tail_amp=0.15, tail_phase_lag=0.15,
                  residual_overrides=None,            # V4.2.4: per-joint caps
                  verbose=True, gait_profile="legacy", lab_parameters=None,
-                 hind_stance_compensation=False, stance_target_clearance_m=None):
+                 hind_stance_compensation=False, stance_target_clearance_m=None,
+                 stance_sprawl_nodes=None, stance_sprawl_limit_rad=None):
         self.model = model
         self.profile = get_gait_profile(gait_profile)
         self.gait_profile = self.profile.name
@@ -142,6 +143,11 @@ class CPGResidualController:
                 if values[name] < 0:
                     raise ValueError(f"{name} must be nonnegative.")
             self.lab_parameters = MappingProxyType(values)
+            # The registry's own tail amplitude is the "tail moving normally"
+            # reference the coupling is measured against, so a run that lowers
+            # tail_amp is compared to the committed default rather than to
+            # itself.
+            self._tail_reference_amp = float(parameter_value("lab_base_parameters")["tail_amp"])
             # Lab dictionaries are authoritative for these channels. Legacy
             # constructor defaults/overrides continue through their original path.
             for name in ("front_stance_press", "front_stance_press_fr", "front_swing_lift",
@@ -174,28 +180,41 @@ class CPGResidualController:
                 raise ValueError(
                     "hind_stance_compensation requires other_amplitude == 0; its frozen-pose table is "
                     "solved with zero ankle/sprawl/rotation base targets and would be invalid otherwise.")
+            moving_sprawl = (float(self.lab_parameters["hind_sprawl_amplitude"]) != 0.
+                             or float(self.lab_parameters["fore_sprawl_amplitude"]) != 0.)
+            if moving_sprawl and stance_sprawl_nodes is None:
+                raise ValueError(
+                    "A moving sprawl needs a sprawl-aware stance table: measured 0.42 mm of foot "
+                    "height per degree of sprawl on this body, so the one-dimensional table stops "
+                    "compensating the moment sprawl leaves neutral. Pass stance_sprawl_nodes, or "
+                    "turn the compensation off.")
             from common.hind_stance_geometry import StanceCompensator, swing_blend
             feet = ("HL", "HR", "FL", "FR") if hind_stance_compensation == "all" else ("HL", "HR")
             depth = {} if stance_target_clearance_m is None else {
                 "target_clearance_m": (dict(stance_target_clearance_m)
                                        if isinstance(stance_target_clearance_m, dict)
                                        else float(stance_target_clearance_m))}
+            if stance_sprawl_nodes is not None:
+                depth["sprawl_nodes"] = int(stance_sprawl_nodes)
+            if stance_sprawl_limit_rad is not None:
+                depth["sprawl_limit_rad"] = float(stance_sprawl_limit_rad)
             self._hind_comp = StanceCompensator(model, feet=feet, **depth)
             self._swing_blend = swing_blend
             limb_actuators = {
-                "HL": ("hip_proret_L", ("knee_L", "ankle_L")),
-                "HR": ("hip_proret_R", ("knee_R", "ankle_R")),
-                "FL": ("shoulder_proret_L", ("elbow_L",)),
-                "FR": ("shoulder_proret_R", ("elbow_R",)),
+                "HL": ("hip_proret_L", ("knee_L", "ankle_L"), "hip_sprawl_L"),
+                "HR": ("hip_proret_R", ("knee_R", "ankle_R"), "hip_sprawl_R"),
+                "FL": ("shoulder_proret_L", ("elbow_L",), "shoulder_sprawl_L"),
+                "FR": ("shoulder_proret_R", ("elbow_R",), "shoulder_sprawl_R"),
             }
             ids = {}
             for foot in feet:
-                drive_name, free_names = limb_actuators[foot]
+                drive_name, free_names, sprawl_name = limb_actuators[foot]
                 drive = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_ACTUATOR, drive_name)
                 free = tuple(mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_ACTUATOR, n) for n in free_names)
+                sprawl = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_ACTUATOR, sprawl_name)
                 if drive < 0 or min(free) < 0:
                     raise ValueError(f"Missing drive/free actuators for {foot}.")
-                ids[foot] = (drive, free)
+                ids[foot] = (drive, free, sprawl)
             self._hind_comp_ids = ids
 
         nu = model.nu
@@ -238,6 +257,17 @@ class CPGResidualController:
         def _id(n):
             return mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_ACTUATOR, n)
         self._ssl = _id("shoulder_sprawl_L"); self._ssr = _id("shoulder_sprawl_R")
+        # Femur/humerus depression is the sprawl DOF. It is mapped as "other"
+        # alongside rotation and ankle, but the published excursions are for
+        # sprawl specifically (52.42 +/- 3.25 deg femur, 101.38 +/- 15.88 deg
+        # humerus; scorecard 18 and 21), so it gets its own amplitude rather
+        # than sharing other_amplitude with two joints that have their own.
+        self._sprawl_ids = {}
+        for limb, name in (("HL", "hip_sprawl_L"), ("HR", "hip_sprawl_R"),
+                           ("FL", "shoulder_sprawl_L"), ("FR", "shoulder_sprawl_R")):
+            aid = _id(name)
+            if aid >= 0:
+                self._sprawl_ids[aid] = limb
         self._spine = _id("spine_bend"); self._tail_l = _id("tail_bend_L"); self._tail_r = _id("tail_bend_R")
 
         self.front_lift_ids = [aid for (aid, limb, role) in self.entries
@@ -304,6 +334,10 @@ class CPGResidualController:
             fa, lift = sig[limb]
             if self.gait_profile == "lab":
                 s = self._lab_limb_signal(limb, role, fa, lift, front_contact, steer)
+                if aid in self._sprawl_ids:
+                    # Additive, so a zero sprawl amplitude reproduces the
+                    # historical other_amplitude behaviour exactly.
+                    s += self.sprawl_signal(limb, t)
             elif role == "fa":
                 s = self.amp["fa"] * fa
             elif role == "lift":
@@ -337,11 +371,14 @@ class CPGResidualController:
             # two independent height commands. For the hind limb the two forms
             # coincide, because knee ("lift") and ankle ("other", amplitude 0)
             # are both zero-offset from neutral during stance.
-            for foot, (drive_aid, free_aids) in self._hind_comp_ids.items():
+            for foot, (drive_aid, free_aids, sprawl_aid) in self._hind_comp_ids.items():
                 phi = self.foot_phase_fraction(foot, t)
                 stance = self.stance_for(foot)
                 weight = self._swing_blend(phi, stance)
-                raw = self._hind_comp.offsets(foot, float(ctrl[drive_aid]), 0., stance)
+                sprawl_offset = (float(ctrl[sprawl_aid] - self.neutral[sprawl_aid])
+                                 if sprawl_aid >= 0 else 0.)
+                raw = self._hind_comp.offsets(foot, float(ctrl[drive_aid]), 0., stance,
+                                              sprawl_offset)
                 for aid, value in zip(free_aids, raw):
                     target = self.neutral[aid] + value
                     ctrl[aid] = weight * target + (1. - weight) * ctrl[aid]
@@ -369,10 +406,48 @@ class CPGResidualController:
     __call__ = compute
 
     # ----------------------------------------------------------- internals
+    def tail_coupling_scale(self):
+        """Hind fore-aft gain as a function of how much the tail is moving.
+
+        The caudofemoralis retracts the femur and originates on the proximal
+        caudal vertebrae, which is why blocking tail movement -- with no mass
+        removed -- collapsed hindlimb excursions in Jagnandan & Higham 2017
+        while leaving the forelimb and the duty factor untouched. Without this
+        the tail is a passive pendulum: Session 4 measured every hindlimb
+        excursion moving less than 1% when tail drive was removed.
+
+        Returns 1.0 when the tail moves at its reference amplitude and
+        1 - coupling when it does not move at all. Only the endpoints are
+        anchored to the paper; the shape between them is INVENTED and linear.
+        """
+        coupling = float(self.lab_parameters["tail_hindlimb_coupling"])
+        if coupling == 0.:
+            return 1.
+        reference = float(self._tail_reference_amp)
+        activity = 1. if reference <= 0. else min(1., abs(self.tail_amp) / reference)
+        return 1. - coupling * (1. - activity)
+
+    def sprawl_signal(self, limb, time_s):
+        """Sprawl command as a fraction of half-range, at this limb's phase.
+
+        A sinusoid over the limb's own cycle, so depression leads or lags
+        touchdown by `sprawl_phase`. The waveform shape is INVENTED; only the
+        peak-to-peak excursion it is tuned to is published.
+        """
+        params = self.lab_parameters
+        amplitude = (params["hind_sprawl_amplitude"] if limb.startswith("H")
+                     else params["fore_sprawl_amplitude"])
+        if amplitude == 0.:
+            return 0.
+        phi = self.foot_phase_fraction(limb, time_s)
+        return float(amplitude * math.sin(2. * math.pi * (phi + params["sprawl_phase"])))
+
     def _lab_limb_signal(self, limb, role, fa, lift, front_contact, steer):
         params = self.lab_parameters
         if role == "fa":
             signal = self._lab_fa_amplitude[limb] * fa
+            if limb.startswith("H"):
+                signal *= self.tail_coupling_scale()
             if params["mirror_left_fa"] and limb.endswith("L"):
                 signal = -signal
             if steer != 0.:

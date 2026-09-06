@@ -122,6 +122,78 @@ class LabParameterTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             controller.base_ctrl(.1, heading_error=float("nan"))
 
+    # ---- Session 4: sprawl drive and tail-hindlimb coupling ----------------
+
+    def test_zero_sprawl_amplitude_changes_no_command_at_all(self):
+        """The channel is additive, so off must be bit-identical to absent."""
+        old = self.controller()
+        new = self.controller(hind_sprawl_amplitude=0., fore_sprawl_amplitude=0.)
+        for time in np.arange(40) * .013:
+            np.testing.assert_array_equal(old.base_ctrl(time), new.base_ctrl(time))
+
+    def test_sprawl_amplitude_moves_only_the_sprawl_actuators(self):
+        old = self.controller()
+        new = self.controller(hind_sprawl_amplitude=.5, fore_sprawl_amplitude=.5)
+        sprawl = {self.model.actuator(n).id for n in
+                  ("hip_sprawl_L", "hip_sprawl_R", "shoulder_sprawl_L", "shoulder_sprawl_R")}
+        moved = set()
+        for time in np.arange(40) * .013:
+            for i, (a, b) in enumerate(zip(old.base_ctrl(time), new.base_ctrl(time))):
+                if a != b:
+                    moved.add(i)
+        self.assertTrue(moved, "a nonzero sprawl amplitude must change something")
+        self.assertEqual(moved - sprawl, set())
+
+    def test_sprawl_is_a_bounded_sinusoid_of_the_limb_phase(self):
+        controller = self.controller(hind_sprawl_amplitude=.5)
+        values = [controller.sprawl_signal("HL", t / 200.) for t in range(200)]
+        self.assertLessEqual(max(abs(v) for v in values), .5 + 1e-12)
+        self.assertGreater(max(values), .45)
+        self.assertLess(min(values), -.45)
+
+    def test_tail_coupling_is_exactly_neutral_at_the_reference_amplitude(self):
+        """Enabling the coupling must not touch the intact animal."""
+        from common.provenance import parameter_value
+        reference = float(parameter_value("lab_base_parameters")["tail_amp"])
+        controller = self.controller(tail_hindlimb_coupling=.36, tail_amp=reference)
+        self.assertEqual(controller.tail_coupling_scale(), 1.)
+        plain = self.controller(tail_hindlimb_coupling=0., tail_amp=reference)
+        for time in np.arange(40) * .013:
+            np.testing.assert_array_equal(plain.base_ctrl(time), controller.base_ctrl(time))
+
+    def test_removing_tail_drive_weakens_only_hind_protraction(self):
+        """Caudofemoralis retracts the femur; the forelimb has no such muscle."""
+        intact = self.controller(tail_hindlimb_coupling=.36)
+        restricted = self.controller(tail_hindlimb_coupling=.36, tail_amp=0.)
+        self.assertAlmostEqual(restricted.tail_coupling_scale(), .64)
+        hind = {self.model.actuator(n).id for n in ("hip_proret_L", "hip_proret_R")}
+        fore = {self.model.actuator(n).id for n in ("shoulder_proret_L", "shoulder_proret_R")}
+        hind_moved = fore_moved = False
+        for time in np.arange(40) * .013:
+            a, b = intact.base_ctrl(time), restricted.base_ctrl(time)
+            for i in hind:
+                hind_moved |= a[i] != b[i]
+            for i in fore:
+                fore_moved |= a[i] != b[i]
+        self.assertTrue(hind_moved, "hind protraction must weaken")
+        self.assertFalse(fore_moved, "the forelimb must be untouched")
+
+    def test_zero_coupling_leaves_the_tail_a_passive_pendulum(self):
+        intact = self.controller(tail_hindlimb_coupling=0.)
+        restricted = self.controller(tail_hindlimb_coupling=0., tail_amp=0.)
+        self.assertEqual(restricted.tail_coupling_scale(), 1.)
+        for time in np.arange(20) * .013:
+            for i in (self.model.actuator("hip_proret_L").id,):
+                self.assertEqual(intact.base_ctrl(time)[i], restricted.base_ctrl(time)[i])
+
+    def test_a_moving_sprawl_refuses_a_sprawl_blind_stance_table(self):
+        """0.42 mm of foot height per degree; a blind table stops compensating."""
+        with self.assertRaisesRegex(ValueError, "sprawl-aware"):
+            CPGResidualController(self.model, gait_profile=BASELINE_PROFILE, verbose=False,
+                                  lab_parameters={**BASELINE_PARAMETERS, "other_amplitude": 0.,
+                                                  "hind_sprawl_amplitude": .3},
+                                  hind_stance_compensation="all")
+
     def test_legacy_rejects_lab_dictionary_and_ignores_new_heading_channel(self):
         model = mujoco.MjModel.from_xml_path(str(LEGACY_XML))
         with self.assertRaises(ValueError):

@@ -14,6 +14,10 @@ import mujoco
 import numpy as np
 
 
+# Every limb spec below lists its sprawl actuator first.
+SPRAWL_INDEX = 0
+
+
 def swing_blend(local_phase, stance_fraction):
     """One through stance, smooth zero at mid-swing, one again at touchdown.
 
@@ -61,7 +65,8 @@ class StanceCompensator:
     """
 
     def __init__(self, model, target_clearance_m=-.0006, table_size=129,
-                 max_offset_rad=.70, feet=("HL", "HR")):
+                 max_offset_rad=.70, feet=("HL", "HR"), sprawl_nodes=None,
+                 sprawl_limit_rad=None):
         # The frozen band is twice the target, floored at the original -1.2 mm so
         # the default is bit-for-bit unchanged. A deeper target is an explicit
         # experiment: the table is solved against the STAND root pose, and a
@@ -93,6 +98,24 @@ class StanceCompensator:
         self._per_foot_target = per_foot
         self.max_offset_rad = float(max_offset_rad)
         self.table_size = table_size
+        # Sprawl moves the collision foot a long way -- measured 0.42 mm per
+        # degree on this body, i.e. +/-8.5 mm across the actuator range -- so a
+        # table keyed on the fore-aft drive alone is only valid while the sprawl
+        # command sits at neutral. sprawl_nodes=None keeps exactly that original
+        # one-dimensional table; an integer builds a second table axis over the
+        # sprawl actuator's own range so a moving sprawl stays compensated.
+        if sprawl_nodes is not None:
+            if isinstance(sprawl_nodes, bool) or not isinstance(sprawl_nodes, int) or sprawl_nodes < 3:
+                raise ValueError("sprawl_nodes must be an integer of at least 3, or None.")
+        self.sprawl_nodes = sprawl_nodes
+        # The knee/ankle can only buy back so much height: at large sprawl the
+        # foot leaves the reachable band entirely and the solve has no answer.
+        # The caller therefore declares the sprawl band it intends to command,
+        # and the controller must clamp its amplitude to it rather than relying
+        # on table-edge clamping, which would silently stop compensating.
+        if sprawl_limit_rad is not None and (not math.isfinite(sprawl_limit_rad) or sprawl_limit_rad <= 0):
+            raise ValueError("sprawl_limit_rad must be finite and positive, or None.")
+        self.sprawl_limit_rad = None if sprawl_limit_rad is None else float(sprawl_limit_rad)
         feet = tuple(feet)
         if not feet or any(f not in ("HL", "HR", "FL", "FR") for f in feet):
             raise ValueError("feet must be a non-empty subset of HL/HR/FL/FR.")
@@ -162,34 +185,65 @@ class StanceCompensator:
                                 "drive_index": drive_index, "free_start": free_start,
                                 "free_count": len(ids) - free_start}
             hip_grid = np.linspace(*model.actuator_ctrlrange[ids[drive_index]], table_size)
+            if sprawl_nodes is None:
+                sprawl_grid = np.zeros(1)
+            else:
+                low, high = model.actuator_ctrlrange[ids[SPRAWL_INDEX]] - self._neutral[ids[SPRAWL_INDEX]]
+                if self.sprawl_limit_rad is not None:
+                    low = max(low, -self.sprawl_limit_rad)
+                    high = min(high, self.sprawl_limit_rad)
+                sprawl_grid = np.linspace(low, high, sprawl_nodes)
             solutions, errors = [], []
-            for hip in hip_grid:
-                offsets, error = self._solve(foot, float(hip))
-                solutions.append(offsets)
-                errors.append(error)
-            table = np.column_stack((hip_grid, np.asarray(solutions)))
+            for sprawl in sprawl_grid:
+                column = []
+                for hip in hip_grid:
+                    offsets, error = self._solve(foot, float(hip), float(sprawl))
+                    column.append(offsets)
+                    errors.append(error)
+                solutions.append(np.asarray(column))
+            # (n_drive, n_sprawl, n_free); the one-node case is the original table.
+            table = np.stack(solutions, axis=1)
             table.setflags(write=False)
+            hip_grid.setflags(write=False)
+            sprawl_grid.setflags(write=False)
             tables[foot] = table
+            self._info[foot]["hip_grid"] = hip_grid
+            self._info[foot]["sprawl_grid"] = sprawl_grid
             fit_diagnostics[foot] = {
                 "max_abs_table_height_error_m": float(np.max(np.abs(errors))),
                 "free_joints": [names[i] for i in range(free_start, len(names))],
-                "offset_ranges_rad": [[float(np.min(table[:, c])), float(np.max(table[:, c]))]
-                                      for c in range(1, table.shape[1])],
+                "offset_ranges_rad": [[float(np.min(table[:, :, c])), float(np.max(table[:, :, c]))]
+                                      for c in range(table.shape[2])],
                 "offset_bound_rad": [[float(offset_bounds[c, 0]), float(offset_bounds[c, 1])]
                                      for c in range(offset_bounds.shape[0])],
-                "max_adjacent_offset_change_rad": float(np.max(np.abs(np.diff(table[:, 1:], axis=0)))),
+                "max_adjacent_offset_change_rad": float(np.max(np.abs(np.diff(table, axis=0)))),
+                "sprawl_nodes": 1 if sprawl_nodes is None else sprawl_nodes,
+                "sprawl_grid_rad": [float(v) for v in sprawl_grid],
                 "collision_geom_count": len(geoms),
             }
         self.tables = MappingProxyType(tables)
         self.diagnostics = {"method": "bounded minimum-norm Jacobian updates; no SciPy or stochastic search",
                             "target_clearance_m": self.target_clearance_m,
                             "frozen_band_low_m": self._band_low, "table_size": table_size,
+                            "sprawl_limit_rad": self.sprawl_limit_rad,
                             "max_offset_rad": self.max_offset_rad, "fit": fit_diagnostics,
                             "assumptions": ["saved stand root/spine/passive joints", "other-amplitude zero",
                                             "zero knee/ankle base stance targets", "exact collision primitives; no force prediction"]}
         for foot in self.tables:
-            grid = np.linspace(self.tables[foot][0, 0], self.tables[foot][-1, 0], 4 * (table_size-1) + 1)
-            heights = [self.clearance(foot, float(hip), *self.offsets(foot, float(hip), 0., .78)) for hip in grid]  # noqa: E501
+            hip_grid = self._info[foot]["hip_grid"]
+            sprawl_grid = self._info[foot]["sprawl_grid"]
+            grid = np.linspace(hip_grid[0], hip_grid[-1], 4 * (table_size-1) + 1)
+            # Check between sprawl nodes too, not only on them; interpolation
+            # error is largest halfway between rows.
+            if sprawl_grid.size > 1:
+                mid = .5 * (sprawl_grid[:-1] + sprawl_grid[1:])
+                sprawl_check = np.concatenate((sprawl_grid, mid))
+            else:
+                sprawl_check = sprawl_grid
+            heights = [self.clearance(foot, float(hip),
+                                      *self.offsets(foot, float(hip), 0., .78, float(sprawl)),
+                                      sprawl_ctrl_rad=float(sprawl))
+                       for sprawl in sprawl_check for hip in grid]
             self.diagnostics["fit"][foot]["dense_interpolation_clearance_range_m"] = [float(min(heights)), float(max(heights))]
             if min(heights) < self._band_low - 1e-9 or max(heights) > 1e-9:
                 raise ValueError(f"{foot} interpolation violates frozen stance band: {min(heights)}, {max(heights)}")
@@ -200,12 +254,13 @@ class StanceCompensator:
             return self.target_clearance_m
         return self._per_foot_target.get(foot, -.0006)
 
-    def clearance(self, foot, hip_ctrl_rad, *free_offsets_rad):
+    def clearance(self, foot, hip_ctrl_rad, *free_offsets_rad, sprawl_ctrl_rad=0.):
         """Read-only model diagnostic; private scratch data is not thread-safe."""
         info = self._info[foot]
         ids = info["ids"]
         commands = self._neutral[ids].copy()
         commands[info["drive_index"]] = hip_ctrl_rad
+        commands[SPRAWL_INDEX] += sprawl_ctrl_rad
         for slot, value in enumerate(free_offsets_rad):
             commands[info["free_start"] + slot] += value
         self._data.qpos[:] = self._stand_qpos
@@ -222,7 +277,7 @@ class StanceCompensator:
             result = min(result, height)
         return result
 
-    def _solve(self, foot, hip):
+    def _solve(self, foot, hip, sprawl=0.):
         # Numerical controls: 100 microradian differences, 2 um target residual,
         # bounded 0.05-rad updates, at most 60 iterations and 12 backtrack trials.
         # These are deterministic solver tolerances, not biological parameters.
@@ -239,7 +294,7 @@ class StanceCompensator:
         x = np.zeros(self._info[foot]["free_count"])
         bounds = self._info[foot]["offset_bounds"]
         for _ in range(60):
-            error = self.clearance(foot, hip, *x) - self.target_for(foot)
+            error = self.clearance(foot, hip, *x, sprawl_ctrl_rad=sprawl) - self.target_for(foot)
             if abs(error) <= 2e-6:
                 return x, error
             gradient = np.zeros(x.size)
@@ -247,7 +302,7 @@ class StanceCompensator:
                 plus, minus = x.copy(), x.copy()
                 plus[axis] += 1e-4
                 minus[axis] -= 1e-4
-                gradient[axis] = (self.clearance(foot, hip, *plus) - self.clearance(foot, hip, *minus)) / 2e-4
+                gradient[axis] = (self.clearance(foot, hip, *plus, sprawl_ctrl_rad=sprawl) - self.clearance(foot, hip, *minus, sprawl_ctrl_rad=sprawl)) / 2e-4
             denominator = float(gradient @ gradient)
             if denominator < 1e-14:
                 break
@@ -256,13 +311,13 @@ class StanceCompensator:
             improved = False
             for backtrack in range(12):
                 candidate = np.clip(x + step * 2.**(-backtrack), bounds[:, 0], bounds[:, 1])
-                candidate_error = self.clearance(foot, hip, *candidate) - self.target_for(foot)
+                candidate_error = self.clearance(foot, hip, *candidate, sprawl_ctrl_rad=sprawl) - self.target_for(foot)
                 if abs(candidate_error) < abs(error):
                     x, improved = candidate, True
                     break
             if not improved:
                 break
-        error = self.clearance(foot, hip, *x) - self.target_for(foot)
+        error = self.clearance(foot, hip, *x, sprawl_ctrl_rad=sprawl) - self.target_for(foot)
         if abs(error) > 2e-6:
             # The Newton loop stalls where clearance() switches which collision
             # geom is lowest: that min() is continuous but not differentiable, so
@@ -275,7 +330,7 @@ class StanceCompensator:
             direction = np.ones(x.size) / math.sqrt(float(x.size))
             lo_scale = float(np.min(bounds[:, 0] / direction))
             hi_scale = float(np.min(bounds[:, 1] / direction))
-            at = lambda s: self.clearance(foot, hip, *np.clip(s * direction, bounds[:, 0], bounds[:, 1])) - self.target_for(foot)
+            at = lambda s: self.clearance(foot, hip, *np.clip(s * direction, bounds[:, 0], bounds[:, 1]), sprawl_ctrl_rad=sprawl) - self.target_for(foot)
             lo_error, hi_error = at(lo_scale), at(hi_scale)
             if lo_error * hi_error <= 0.:
                 for _ in range(200):
@@ -291,18 +346,53 @@ class StanceCompensator:
                 if abs(mid_error) < abs(error):
                     x, error = candidate, mid_error
         if abs(error) > 1e-5:
-            raise ValueError(f"Unreachable frozen height for {foot}, hip={hip}: residual={error} m")
+            if self.sprawl_nodes is None:
+                raise ValueError(f"Unreachable frozen height for {foot}, hip={hip}: residual={error} m")
+            # With a sprawl axis the target is genuinely out of reach in the
+            # corners: sprawling the limb under the body drops the foot further
+            # than the knee and ankle can lift it back. That is not an error --
+            # the foot simply presses deeper into the floor, which is what a
+            # loaded foot does. Take the closest reachable pose and record the
+            # residual; the dense band check below is still the real guard.
+            x = np.clip(np.full(x.size, min(hi_scale, max(lo_scale, 0.)) / math.sqrt(float(x.size))
+                                if False else 0.), bounds[:, 0], bounds[:, 1])
+            best, best_error = None, math.inf
+            for scale in np.linspace(lo_scale, hi_scale, 65):
+                candidate = np.clip(scale * direction, bounds[:, 0], bounds[:, 1])
+                candidate_error = self.clearance(foot, hip, *candidate, sprawl_ctrl_rad=sprawl) - self.target_for(foot)
+                if abs(candidate_error) < abs(best_error):
+                    best, best_error = candidate, candidate_error
+            x, error = best, best_error
         return x, error
 
-    def offsets(self, foot, hip_ctrl_rad, local_phase, stance_fraction):
-        """Return knee/ankle deltas in actuator radians, with smooth swing fade."""
+    def offsets(self, foot, hip_ctrl_rad, local_phase, stance_fraction, sprawl_ctrl_rad=0.):
+        """Return knee/ankle deltas in actuator radians, with smooth swing fade.
+
+        `sprawl_ctrl_rad` is the sprawl command as an offset from neutral. It is
+        ignored unless the compensator was built with a sprawl axis, so a caller
+        that does not move sprawl gets the original one-dimensional answer.
+        """
         if foot not in self.tables or not math.isfinite(hip_ctrl_rad):
-            raise ValueError("Expected HL/HR and a finite actual hip command.")
+            raise ValueError("Expected a compensated foot and a finite actual hip command.")
+        if not math.isfinite(sprawl_ctrl_rad):
+            raise ValueError("Sprawl command must be finite.")
         weight = swing_blend(local_phase, stance_fraction)
         table = self.tables[foot]
-        # np.interp clamps to table endpoints, matching actual ctrlrange clipping.
-        return tuple(float(weight * np.interp(hip_ctrl_rad, table[:, 0], table[:, index]))
-                     for index in range(1, table.shape[1]))
+        hip_grid = self._info[foot]["hip_grid"]
+        sprawl_grid = self._info[foot]["sprawl_grid"]
+        if sprawl_grid.size == 1:
+            plane = table[:, 0, :]
+        else:
+            # Linear blend between the two bracketing sprawl rows; np.interp
+            # clamps at the ends, matching real ctrlrange clipping.
+            position = float(np.interp(sprawl_ctrl_rad, sprawl_grid,
+                                       np.arange(sprawl_grid.size, dtype=float)))
+            low = int(math.floor(position))
+            high = min(low + 1, sprawl_grid.size - 1)
+            blend = position - low
+            plane = (1. - blend) * table[:, low, :] + blend * table[:, high, :]
+        return tuple(float(weight * np.interp(hip_ctrl_rad, hip_grid, plane[:, index]))
+                     for index in range(plane.shape[1]))
 
 
 # Backwards-compatible name for the original hind-only class.
