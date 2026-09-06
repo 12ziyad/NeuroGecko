@@ -529,6 +529,12 @@ def main(argv=None):
     p.add_argument("--hind-stance-compensation", nargs="?", const=True, default=False,
                    choices=(True, "hind", "all"),
                    help="Lab-only opt-in: hold the collision foot at a constant commanded height through stance. 'all' includes the forelimb.")
+    p.add_argument("--front-stance-clearance-m", type=float, default=None,
+                   help="frozen-pose target depth for the FRONT feet only; hind keeps its own")
+    p.add_argument("--stance-target-clearance-m", type=float, default=None,
+                   help="frozen-pose foot target depth for the stance compensator; the default "
+                        "-0.0006 solves against the STAND root pose, which sits lower than a "
+                        "walking one (Session 4)")
     p.add_argument("--zero-tail-drive", action="store_true", help="Zero tail tendon commands only; NOT mechanical restriction.")
     p.add_argument("--gait-profile", choices=("legacy", "lab"), default="legacy",
                    help="Lab opts into shared touchdown delays/stance; legacy preserves the checkpoint's original controller/reward mismatch.")
@@ -578,6 +584,13 @@ def main(argv=None):
                        residual_scale=args.residual_scale, front_stance_press=args.front_stance_press,
                        front_swing_lift=args.front_swing_lift, gait_profile=args.gait_profile,
                        hind_stance_compensation=(args.hind_stance_compensation if args.hind_stance_compensation != 'hind' else True),
+                       stance_target_clearance_m=(
+                           {"HL": args.stance_target_clearance_m or -.0006,
+                            "HR": args.stance_target_clearance_m or -.0006,
+                            "FL": args.front_stance_clearance_m,
+                            "FR": args.front_stance_clearance_m}
+                           if args.front_stance_clearance_m is not None
+                           else args.stance_target_clearance_m),
                        lab_parameters=lab_overrides)
     if not np.isclose(env.dt, 1/parameter_value("gait_acquisition_hz")):
         env.close()
@@ -621,6 +634,8 @@ def main(argv=None):
             "controller": "zero residual with contact reflex" if args.zero_residual else "frozen PPO residual",
             "gait_profile": args.gait_profile,
             "hind_stance_compensation": bool(args.hind_stance_compensation),
+            "stance_target_clearance_m": args.stance_target_clearance_m,
+            "front_stance_clearance_m": args.front_stance_clearance_m,
             "lab_params_override": lab_overrides,
             "fl_touchdown_delay_override": args.fl_touchdown_delay,
             "reward_calibration": env.reward_calibration,

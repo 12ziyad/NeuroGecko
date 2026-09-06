@@ -132,12 +132,27 @@ class BundleTests(unittest.TestCase):
         defaults = dict(resume_from=None, resume_vec=None, reset_timesteps=False,
                         run="safe", envs=1, steps=32, n_steps=8, batch=8,
                         eval_freq=1000, checkpoint_freq=8, max_wall_seconds=None,
-                        backup_ack_timeout=1.0, xml_path=None, gait_profile="legacy")
+                        backup_ack_timeout=1.0, xml_path=None, gait_profile="legacy",
+                        target_kl=None, hind_stance_compensation="off",
+                        front_lift_residual_scale=None, control_mode="cpg_residual")
         validate_training_args(argparse.Namespace(**defaults))
         for change in ({"resume_from": "unpaired.zip"}, {"checkpoint_freq": 0},
-                       {"max_wall_seconds": float("nan")}, {"run": "../escape"}):
+                       {"max_wall_seconds": float("nan")}, {"run": "../escape"},
+                       {"target_kl": 0.}, {"target_kl": float("nan")},
+                       {"front_lift_residual_scale": -.1},
+                       # Both are opt-in lab controls; legacy must stay untouched.
+                       {"hind_stance_compensation": "all"},
+                       {"front_lift_residual_scale": .08}):
             with self.assertRaises(ValueError):
                 validate_training_args(argparse.Namespace(**(defaults | change)))
+        # The same two are accepted once the profile is lab.
+        validate_training_args(argparse.Namespace(**(defaults | {
+            "gait_profile": "lab", "hind_stance_compensation": "all",
+            "front_lift_residual_scale": .08, "target_kl": .03})))
+        # Lab timing with no CPG would score a gait nothing generates.
+        with self.assertRaisesRegex(ValueError, "cpg_residual"):
+            validate_training_args(argparse.Namespace(**(defaults | {
+                "gait_profile": "lab", "control_mode": "raw"})))
 
     def resume_args(self, model_path, normalizer_path, gait_profile):
         return argparse.Namespace(
@@ -145,7 +160,9 @@ class BundleTests(unittest.TestCase):
             reset_timesteps=False, run="resume-test", envs=1, steps=32,
             n_steps=8, batch=8, eval_freq=1000, checkpoint_freq=8,
             max_wall_seconds=None, backup_ack_timeout=1.0, xml_path=None,
-            gait_profile=gait_profile,
+            gait_profile=gait_profile, target_kl=None,
+            hind_stance_compensation="off", front_lift_residual_scale=None,
+            control_mode="cpg_residual",
         )
 
     def test_old_resume_explicitly_infers_legacy_and_rejects_lab(self):
@@ -187,6 +204,21 @@ class BundleTests(unittest.TestCase):
             self.assertEqual(constructor.call_args.kwargs["xml_path"], "candidate.xml")
             self.assertIsNone(constructor.call_args.kwargs["contact_thresh"])
 
+    def test_make_env_forwards_the_base_controller_controls(self):
+        # Without this the trainer silently builds the UNcompensated base, which
+        # measures 0.641 hind duty instead of 0.733 -- a different experiment.
+        with patch("train.train_walk_ppo.GeckoWalkEnv") as constructor:
+            make_env(17, gait_profile="lab", xml_path="candidate.xml",
+                     hind_stance_compensation="all", front_lift_residual_scale=.08)()
+            self.assertEqual(constructor.call_args.kwargs["hind_stance_compensation"], "all")
+            self.assertEqual(constructor.call_args.kwargs["front_lift_residual_scale"], .08)
+
+    def test_make_env_defaults_leave_the_base_controls_off(self):
+        with patch("train.train_walk_ppo.GeckoWalkEnv") as constructor:
+            make_env(17)()
+            self.assertFalse(constructor.call_args.kwargs["hind_stance_compensation"])
+            self.assertIsNone(constructor.call_args.kwargs["front_lift_residual_scale"])
+
     def test_contact_threshold_default_is_profile_aware(self):
         self.assertEqual(resolve_training_contact_threshold("legacy", None), .0564)
         self.assertIsNone(resolve_training_contact_threshold("lab", None))
@@ -194,11 +226,17 @@ class BundleTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             resolve_training_contact_threshold("legacy", float("nan"))
 
-    def test_actual_worker_calibration_is_recorded(self):
+    def worker_data(self):
         calibration = {"profile": "lab", "effective_contact_threshold_N": .03}
-        data = {"reward_calibration": [calibration, dict(calibration)],
+        controller = {"effective_lab_parameters": {"front_stance_press": .05},
+                      "hind_stance_compensation": "all", "frequency_hz": 1.1888}
+        return {"reward_calibration": [calibration, dict(calibration)],
                 "contact_threshold": [.03, .03],
+                "lab_controller_snapshot": [controller, dict(controller)],
                 "reward_fn": [SimpleNamespace(w={"slow_penalty": 0.}), SimpleNamespace(w={"slow_penalty": 0.})]}
+
+    def test_actual_worker_calibration_is_recorded(self):
+        data = self.worker_data()
         snapshot = environment_calibration_snapshot(SimpleNamespace(get_attr=lambda name: data[name]))
         self.assertEqual(snapshot["effective_contact_threshold_N"], .03)
         self.assertEqual(snapshot["effective_reward_cfg"], {"slow_penalty": 0.})
@@ -206,11 +244,56 @@ class BundleTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             environment_calibration_snapshot(SimpleNamespace(get_attr=lambda name: data[name]))
 
-    def test_lab_resume_calibration_guard(self):
+    def test_effective_lab_controller_is_recorded_from_the_live_workers(self):
+        # BLOCKED.md: the exact effective cpg.lab_parameters must be persisted,
+        # not merely the timing the older contract covered.
+        data = self.worker_data()
+        snapshot = environment_calibration_snapshot(SimpleNamespace(get_attr=lambda name: data[name]))
+        self.assertEqual(snapshot["effective_lab_controller"]["hind_stance_compensation"], "all")
+        self.assertEqual(snapshot["effective_lab_controller"]["frequency_hz"], 1.1888)
+
+    def test_workers_disagreeing_on_the_controller_is_an_error(self):
+        data = self.worker_data()
+        data["lab_controller_snapshot"][1]["hind_stance_compensation"] = True
+        with self.assertRaisesRegex(ValueError, "different lab controllers"):
+            environment_calibration_snapshot(SimpleNamespace(get_attr=lambda name: data[name]))
+
+    def test_lab_resume_rejects_a_changed_effective_controller(self):
+        calibration = {"model_inputs": {"mass_kg": .038}, "reward_overrides": {"slow_penalty": 0.}}
+        controller = {"effective_lab_parameters": {"front_stance_press": .05},
+                      "hind_stance_compensation": "all"}
+        source = {"gait_profile": "lab", "reward_calibration": calibration,
+                  "effective_contact_threshold_N": .03, "xml_sha256": "test_xml_hash",
+                  "effective_reward_cfg": {"slow_penalty": 0.},
+                  "effective_lab_controller": controller}
+        self.run.mkdir(parents=True)
+        atomic_json(self.run / "train_config.json", source)
+        args = argparse.Namespace(resume_from=str(self.run / "model.zip"), gait_profile="lab")
+        current = json.loads(json.dumps(source))
+        current["effective_lab_controller"]["hind_stance_compensation"] = True
+        with self.assertRaisesRegex(ValueError, "effective controller changed"):
+            validate_resume_calibration(args, current)
+
+    def test_lab_resume_refuses_a_checkpoint_with_no_recorded_controller(self):
         calibration = {"model_inputs": {"mass_kg": .038}, "reward_overrides": {"slow_penalty": 0.}}
         source = {"gait_profile": "lab", "reward_calibration": calibration,
                   "effective_contact_threshold_N": .03, "xml_sha256": "test_xml_hash",
-                  "effective_reward_cfg": {"slow_penalty": 0., "progress": 7.}}
+                  "effective_reward_cfg": {"slow_penalty": 0.}}
+        self.run.mkdir(parents=True)
+        atomic_json(self.run / "train_config.json", source)
+        args = argparse.Namespace(resume_from=str(self.run / "model.zip"), gait_profile="lab")
+        current = json.loads(json.dumps(source))
+        current["effective_lab_controller"] = {"effective_lab_parameters": {}}
+        with self.assertRaisesRegex(ValueError, "saved effective_lab_controller"):
+            validate_resume_calibration(args, current)
+
+    def test_lab_resume_calibration_guard(self):
+        calibration = {"model_inputs": {"mass_kg": .038}, "reward_overrides": {"slow_penalty": 0.}}
+        controller = {"effective_lab_parameters": {"front_stance_press": .05}}
+        source = {"gait_profile": "lab", "reward_calibration": calibration,
+                  "effective_contact_threshold_N": .03, "xml_sha256": "test_xml_hash",
+                  "effective_reward_cfg": {"slow_penalty": 0., "progress": 7.},
+                  "effective_lab_controller": controller}
         self.run.mkdir(parents=True)
         atomic_json(self.run / "train_config.json", source)
         args = argparse.Namespace(resume_from=str(self.run / "model.zip"), gait_profile="lab")

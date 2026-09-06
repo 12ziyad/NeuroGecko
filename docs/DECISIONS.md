@@ -152,3 +152,46 @@ Keep the legacy frequency at 1.1888 Hz. Do not add a shoulder joint. Do not muta
 the recovered weight files or normalize them with newly fitted statistics. Any
 new walker after morphology changes needs a distinctly named run and a fresh
 normalizer, with stop-command and gaze-ownership changes tested explicitly.
+
+## Session 4 — training judged by gates, not reward
+
+12. **The laptop is the training machine, not the instance.** Measured 894 fps at
+    16 subproc envs against the g5.xlarge's recorded 853 fps on its own 10 M run:
+    12 cores beat 4 vCPU on a CPU-bound MuJoCo env, and a 185,907-parameter MLP
+    has no use for an A10G. The instance was never started this session. It is
+    needed only for concurrent runs, and runs are currently sequential.
+13. **Checkpoints are selected by gates passed, never by reward.** Run 1's eval
+    reward doubled (1,490 -> 3,120) while hind duty, front stance load and limb
+    phase all degraded. `tools/gate_checkpoints.py` therefore has no reward
+    column, and ranks by gate count with a normalised-distance tie-break that is
+    a sort key and never a claim.
+14. **The scoreboard calls the official gate; it does not reimplement it.**
+    Every row runs `realism_metrics.py` and scores the resulting trace with
+    `eval.session2_controller.gate2`. Session 3g is the precedent: a harness that
+    reimplemented limb phase optimised a quantity that diverged from the gate.
+    Evaluation flags are read from the run's own `train_config.json` so a
+    checkpoint cannot be scored under a different body or controller than it
+    trained under.
+15. **Gate 2 is a base gate, not a training gate.** It measures the controller
+    with the policy switched off. Requiring all six before training would forbid
+    training on exactly the two failures a learned residual exists to attack.
+    Lab training therefore requires *evidence of the correct base*, with the
+    unmet checks recorded in `train_config.json`, not a six-of-six pass.
+16. **The front-lift lock stays structural.** `--front-lift-residual-scale`
+    changes the scale of the FL/FR lift cap; `lock_front_lift` remains on, so the
+    locked channels stay explicitly enumerated. Unlocking is an experiment with a
+    recorded prediction, not a default.
+17. **A step-0 checkpoint is a setup check, not a result.** Every run publishes
+    one and it must reproduce the zero-residual base to 4/6. If it does not, the
+    run's configuration is wrong and no later row from it may be cited.
+18. **4/6 is the walker; the forefoot gate is closed as unreachable on this body.**
+    Front stance load and limb phase need a forelimb that can set foot height and
+    foot position independently, and this body's forelimb has one free joint where
+    the hindlimb has two. Both unmet checks are `species: INVENTED` engineering
+    targets, not published thresholds. Reopening means adding a wrist actuator:
+    a morphology change with its own anatomical justification, a fresh normalizer
+    and a full retrain, taken deliberately and never to make a gate go green.
+19. **Publication authorized (Session 4).** The user directly authorized pushing
+    to github.com/12ziyad/NeuroGecko, superseding the earlier local-only default
+    in this file. That authorization covers the repository as it stands; it is not
+    standing permission for future pushes.

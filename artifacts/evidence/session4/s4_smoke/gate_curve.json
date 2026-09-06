@@ -1,0 +1,170 @@
+{
+  "schema_version": 1,
+  "run": "C:\\Users\\ziyad\\GeckoBrain\\models\\s4_smoke",
+  "protocol": {
+    "duration_s": 20.0,
+    "settle_s": 3.0,
+    "realism_metrics_flags": [
+      "--xml",
+      "C:\\Users\\ziyad\\GeckoBrain\\morphology\\gecko_body_lab_v2.xml",
+      "--gait-profile",
+      "lab",
+      "--episodes",
+      "1",
+      "--seed",
+      "0",
+      "--duration",
+      "20.0",
+      "--settle",
+      "3.0",
+      "--hind-stance-compensation",
+      "all",
+      "--residual-scale",
+      "0.25"
+    ],
+    "scored_by": "eval.session2_controller.gate2 on the rollout trace",
+    "train_config_sha256": "3d6075230a98cc59fa8c84482db32886b5a865db007da4dc7bdaa88df7b67d48"
+  },
+  "rows": [
+    {
+      "step": -1,
+      "values": {
+        "signed_forward": 0.04164718933366114,
+        "net_path": 0.7426754102133162,
+        "hind_swing_load": 0.08064516129032258,
+        "front_stance_load": 0.5841483979763912,
+        "hind_duty": 0.7334179654915091,
+        "limb_phase": 0.6347406758288687
+      },
+      "passed": {
+        "signed_forward": true,
+        "net_path": true,
+        "hind_swing_load": true,
+        "front_stance_load": false,
+        "hind_duty": true,
+        "limb_phase": false
+      },
+      "gates_passed": 4,
+      "stride_period_cv": 0.014942559136086615,
+      "completed_without_fall": true,
+      "timing_and_acquisition_valid": false,
+      "all_six_pass": false,
+      "tiebreak_distance": 3.268021943971871,
+      "note": "stride CV over ceiling; not entrained (base is too)",
+      "model_sha256": null
+    },
+    {
+      "step": 0,
+      "values": {
+        "signed_forward": 0.041516480825059335,
+        "net_path": 0.743274437326682,
+        "hind_swing_load": 0.06774193548387097,
+        "front_stance_load": 0.5811129848229343,
+        "hind_duty": 0.734211330756443,
+        "limb_phase": 0.6411777095788844
+      },
+      "passed": {
+        "signed_forward": true,
+        "net_path": true,
+        "hind_swing_load": true,
+        "front_stance_load": false,
+        "hind_duty": true,
+        "limb_phase": false
+      },
+      "gates_passed": 4,
+      "stride_period_cv": 0.008688566317617823,
+      "completed_without_fall": true,
+      "timing_and_acquisition_valid": false,
+      "all_six_pass": false,
+      "tiebreak_distance": 3.395541927495178,
+      "note": "stride CV over ceiling; not entrained (base is too)",
+      "model_sha256": "7b244cdf2049fc4304bd9a2ae3fd7a033f817ee8531ac04e6f0224f027c72e14"
+    },
+    {
+      "step": 10000,
+      "values": {
+        "signed_forward": 0.041565565877647606,
+        "net_path": 0.7370085138723999,
+        "hind_swing_load": 0.1532608695652174,
+        "front_stance_load": 0.5534569983136594,
+        "hind_duty": 0.7078749391676828,
+        "limb_phase": 0.6451460901672282
+      },
+      "passed": {
+        "signed_forward": true,
+        "net_path": true,
+        "hind_swing_load": false,
+        "front_stance_load": false,
+        "hind_duty": false,
+        "limb_phase": false
+      },
+      "gates_passed": 2,
+      "stride_period_cv": 0.00310742168535035,
+      "completed_without_fall": true,
+      "timing_and_acquisition_valid": false,
+      "all_six_pass": false,
+      "tiebreak_distance": 5.153773455313434,
+      "note": "stride CV over ceiling; not entrained (base is too)",
+      "model_sha256": "9ed536f27484172242d5e6b6822f1844869adae0383ed72f9dc3e2403aef6eb8"
+    },
+    {
+      "step": 20000,
+      "values": {
+        "signed_forward": 0.040964417597983034,
+        "net_path": 0.7286786483641915,
+        "hind_swing_load": 0.03333333333333333,
+        "front_stance_load": 0.5814502529510961,
+        "hind_duty": 0.6926166126215955,
+        "limb_phase": 0.6161952992399868
+      },
+      "passed": {
+        "signed_forward": true,
+        "net_path": true,
+        "hind_swing_load": true,
+        "front_stance_load": false,
+        "hind_duty": false,
+        "limb_phase": false
+      },
+      "gates_passed": 3,
+      "stride_period_cv": 0.0021516557293468877,
+      "completed_without_fall": true,
+      "timing_and_acquisition_valid": false,
+      "all_six_pass": false,
+      "tiebreak_distance": 3.72458771522723,
+      "note": "stride CV over ceiling; not entrained (base is too)",
+      "model_sha256": "c473306b679d5ce32348a2b71fc45aa23ebee0b618b3597eda31fce2684e5d56"
+    },
+    {
+      "step": 20480,
+      "values": {
+        "signed_forward": 0.04095201554304253,
+        "net_path": 0.7363388328315814,
+        "hind_swing_load": 0.04838709677419355,
+        "front_stance_load": 0.5854974704890388,
+        "hind_duty": 0.6927435888298793,
+        "limb_phase": 0.6285997824016484
+      },
+      "passed": {
+        "signed_forward": true,
+        "net_path": true,
+        "hind_swing_load": true,
+        "front_stance_load": false,
+        "hind_duty": false,
+        "limb_phase": false
+      },
+      "gates_passed": 3,
+      "stride_period_cv": 0.002672610325898927,
+      "completed_without_fall": true,
+      "timing_and_acquisition_valid": true,
+      "all_six_pass": false,
+      "tiebreak_distance": 3.9018081268362965,
+      "note": "",
+      "model_sha256": "d83ecc27fd0d8e325fd71cbeaa0a54346e6b4c7aa13ee2278a53d55fc8b87442"
+    }
+  ],
+  "baseline_gates_passed": 4,
+  "best_step": 0,
+  "best_gates_passed": 4,
+  "beats_baseline": false,
+  "claim": "Instrumented simulation diagnostics; gates measured, reward not used for selection. n=1 deterministic rollout per checkpoint; repeats of a frozen policy at zero reset noise are the same experiment, not independent samples."
+}

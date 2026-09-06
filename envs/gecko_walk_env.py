@@ -71,7 +71,8 @@ class GeckoWalkEnv(gym.Env):
                  control_mode="raw", residual_scale=0.2, contact_thresh=None,
                  front_stance_press=0.40, front_swing_lift=0.40,
                  render_mode=None, seed=None, gait_profile="legacy", lab_parameters=None,
-                 hind_stance_compensation=False):
+                 hind_stance_compensation=False, front_lift_residual_scale=None,
+                 stance_target_clearance_m=None):
         super().__init__()
         self.model = mujoco.MjModel.from_xml_path(str(xml_path or DEFAULT_XML))
         self.data = mujoco.MjData(self.model)
@@ -140,7 +141,19 @@ class GeckoWalkEnv(gym.Env):
         self._cpg_t = 0.0
         self._last_cpg_command_time_s = 0.0
         self.cpg = None
+        # Retained for the training checkpoint contract: a resumed lab policy must
+        # be able to prove it meets the same base controller it was trained on.
+        self.hind_stance_compensation = hind_stance_compensation
         if self.control_mode == "cpg_residual":
+            cpg_kwargs = {}
+            if stance_target_clearance_m is not None:
+                cpg_kwargs["stance_target_clearance_m"] = (
+                    dict(stance_target_clearance_m) if isinstance(stance_target_clearance_m, dict)
+                    else float(stance_target_clearance_m))
+            if front_lift_residual_scale is not None:
+                # The lock itself stays on; only its scale is caller-selected, so
+                # the front-lift channels remain explicitly enumerated and capped.
+                cpg_kwargs["front_lift_residual_scale"] = float(front_lift_residual_scale)
             self.cpg = CPGResidualController(
                 self.model,
                 residual_scale=self.residual_scale,
@@ -150,6 +163,7 @@ class GeckoWalkEnv(gym.Env):
                 gait_profile=self.gait.profile,
                 lab_parameters=lab_parameters,
                 hind_stance_compensation=hind_stance_compensation,
+                **cpg_kwargs,
             )
 
         # build one obs to size the space
@@ -173,6 +187,36 @@ class GeckoWalkEnv(gym.Env):
 
         self.reward_fn = WalkReward(resolved_reward_cfg)
         self._renderer = None
+
+    @property
+    def lab_controller_snapshot(self):
+        """Plain picklable record of the effective lab base controller.
+
+        BLOCKED.md requires the exact effective `cpg.lab_parameters` to be
+        persisted in checkpoint contracts before lab training or resume; the
+        older timing-only contract does not cover the mechanical controls.
+        This is that record, read from the live controller rather than from
+        caller intent, so a vectorised worker cannot silently disagree with the
+        config. Returns None for legacy, leaving historical runs unchanged.
+        """
+        if self.gait_profile != "lab" or self.cpg is None:
+            return None
+        names = [mujoco.mj_id2name(self.model, mujoco.mjtObj.mjOBJ_ACTUATOR, i)
+                 for i in range(self.model.nu)]
+        compensation = self.hind_stance_compensation
+        return {
+            "effective_lab_parameters": dict(self.cpg.lab_parameters),
+            "hind_stance_compensation": (compensation if isinstance(compensation, str)
+                                         else bool(compensation)),
+            "phase_offsets_cycle": dict(self.cpg.phase),
+            "commanded_stance_by_foot": {foot: self.cpg.stance_for(foot)
+                                         for foot in _GAIT_FEET},
+            "frequency_hz": float(self.cpg.freq),
+            "stance_target_clearance_m": (None if self.cpg._hind_comp is None
+                                          else self.cpg._hind_comp.target_clearance_m),
+            "residual_scale_by_actuator": {name: float(scale) for name, scale
+                                           in zip(names, self.cpg.res_scale_vec)},
+        }
 
     # ---- sensor access ----------------------------------------------------
     def _s(self, name):

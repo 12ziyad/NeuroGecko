@@ -1,0 +1,953 @@
+{
+  "schema_version": 1,
+  "run": "C:\\Users\\ziyad\\GeckoBrain\\models\\s4_run1_seed0",
+  "protocol": {
+    "duration_s": 20.0,
+    "settle_s": 3.0,
+    "realism_metrics_flags": [
+      "--xml",
+      "C:\\Users\\ziyad\\GeckoBrain\\morphology\\gecko_body_lab_v2.xml",
+      "--gait-profile",
+      "lab",
+      "--episodes",
+      "1",
+      "--seed",
+      "0",
+      "--duration",
+      "20.0",
+      "--settle",
+      "3.0",
+      "--hind-stance-compensation",
+      "all",
+      "--residual-scale",
+      "0.25"
+    ],
+    "scored_by": "eval.session2_controller.gate2 on the rollout trace",
+    "train_config_sha256": "2f1890511678f62fbdfc945761d77351acc16d53c595e6433b7ee0b70957ab84"
+  },
+  "stride_period_cv_ceiling": 0.1,
+  "rows_rejected_for_irregular_gait": [
+    600000,
+    900000,
+    1000000,
+    1100000,
+    1200000,
+    1300000,
+    1400000,
+    1500000,
+    1600000,
+    1700000,
+    1800000,
+    1900000,
+    2000000,
+    2100000,
+    2200000,
+    2300000,
+    2400000,
+    2500000,
+    2600000,
+    2700000,
+    2800000,
+    2900000,
+    3000000,
+    3014656
+  ],
+  "rows": [
+    {
+      "step": -1,
+      "values": {
+        "signed_forward": 0.04164718933366114,
+        "net_path": 0.7426754102133162,
+        "hind_swing_load": 0.08064516129032258,
+        "front_stance_load": 0.5841483979763912,
+        "hind_duty": 0.7334179654915091,
+        "limb_phase": 0.6347406758288687
+      },
+      "passed": {
+        "signed_forward": true,
+        "net_path": true,
+        "hind_swing_load": true,
+        "front_stance_load": false,
+        "hind_duty": true,
+        "limb_phase": false
+      },
+      "gates_passed": 4,
+      "stride_period_cv": 0.014942559136086615,
+      "completed_without_fall": true,
+      "timing_and_acquisition_valid": false,
+      "all_six_pass": false,
+      "tiebreak_distance": 3.268021943971871,
+      "note": "registry CV check failed; not entrained (base is too)",
+      "model_sha256": null
+    },
+    {
+      "step": 0,
+      "values": {
+        "signed_forward": 0.041516480825059335,
+        "net_path": 0.743274437326682,
+        "hind_swing_load": 0.06774193548387097,
+        "front_stance_load": 0.5811129848229343,
+        "hind_duty": 0.734211330756443,
+        "limb_phase": 0.6411777095788844
+      },
+      "passed": {
+        "signed_forward": true,
+        "net_path": true,
+        "hind_swing_load": true,
+        "front_stance_load": false,
+        "hind_duty": true,
+        "limb_phase": false
+      },
+      "gates_passed": 4,
+      "stride_period_cv": 0.008688566317617823,
+      "completed_without_fall": true,
+      "timing_and_acquisition_valid": false,
+      "all_six_pass": false,
+      "tiebreak_distance": 3.395541927495178,
+      "note": "registry CV check failed; not entrained (base is too)",
+      "model_sha256": "2a66d6df4f463bd58dcb75ba7cbde3da8d7de2eaea771741a9448095892d6c75"
+    },
+    {
+      "step": 100000,
+      "values": {
+        "signed_forward": 0.040605889228353,
+        "net_path": 0.7505944726879709,
+        "hind_swing_load": 0.06129032258064516,
+        "front_stance_load": 0.5915682967959528,
+        "hind_duty": 0.712572197764465,
+        "limb_phase": 0.6216482726640464
+      },
+      "passed": {
+        "signed_forward": true,
+        "net_path": true,
+        "hind_swing_load": true,
+        "front_stance_load": false,
+        "hind_duty": false,
+        "limb_phase": false
+      },
+      "gates_passed": 3,
+      "stride_period_cv": 0.005843288621022555,
+      "completed_without_fall": true,
+      "timing_and_acquisition_valid": false,
+      "all_six_pass": false,
+      "tiebreak_distance": 3.3489052771384547,
+      "note": "registry CV check failed; not entrained (base is too)",
+      "model_sha256": "293a4da82c9c83970ec123b42fd80e91cde77b3b13970db6967c7f3d022a89c5"
+    },
+    {
+      "step": 200000,
+      "values": {
+        "signed_forward": 0.04163046308198472,
+        "net_path": 0.7514229666493011,
+        "hind_swing_load": 0.05268817204301075,
+        "front_stance_load": 0.583249581239531,
+        "hind_duty": 0.702383915855402,
+        "limb_phase": 0.6319783981640775
+      },
+      "passed": {
+        "signed_forward": true,
+        "net_path": true,
+        "hind_swing_load": true,
+        "front_stance_load": false,
+        "hind_duty": false,
+        "limb_phase": false
+      },
+      "gates_passed": 3,
+      "stride_period_cv": 0.007061702822557885,
+      "completed_without_fall": true,
+      "timing_and_acquisition_valid": false,
+      "all_six_pass": false,
+      "tiebreak_distance": 3.780297777363046,
+      "note": "registry CV check failed; not entrained (base is too)",
+      "model_sha256": "a6bf9b232485988dc1914ba21c9543187847d2e8336ac94109c04e08d18426f3"
+    },
+    {
+      "step": 300000,
+      "values": {
+        "signed_forward": 0.04250014729974531,
+        "net_path": 0.7626830285576651,
+        "hind_swing_load": 0.110752688172043,
+        "front_stance_load": 0.5865996649916247,
+        "hind_duty": 0.7227272244194648,
+        "limb_phase": 0.6113654526661327
+      },
+      "passed": {
+        "signed_forward": true,
+        "net_path": true,
+        "hind_swing_load": false,
+        "front_stance_load": false,
+        "hind_duty": false,
+        "limb_phase": false
+      },
+      "gates_passed": 2,
+      "stride_period_cv": 0.003190622539155195,
+      "completed_without_fall": true,
+      "timing_and_acquisition_valid": false,
+      "all_six_pass": false,
+      "tiebreak_distance": 3.222602386209611,
+      "note": "registry CV check failed; not entrained (base is too)",
+      "model_sha256": "3299c58df7f7c52a090c36a7856c9acac69501e2aafdfc977a2b3827411961e9"
+    },
+    {
+      "step": 400000,
+      "values": {
+        "signed_forward": 0.04299243681048741,
+        "net_path": 0.7578854872974784,
+        "hind_swing_load": 0.0967741935483871,
+        "front_stance_load": 0.6016750418760469,
+        "hind_duty": 0.7106454524937784,
+        "limb_phase": 0.6112158386700395
+      },
+      "passed": {
+        "signed_forward": true,
+        "net_path": true,
+        "hind_swing_load": true,
+        "front_stance_load": false,
+        "hind_duty": false,
+        "limb_phase": false
+      },
+      "gates_passed": 3,
+      "stride_period_cv": 0.01087173419226148,
+      "completed_without_fall": true,
+      "timing_and_acquisition_valid": false,
+      "all_six_pass": false,
+      "tiebreak_distance": 3.14618798211811,
+      "note": "registry CV check failed",
+      "model_sha256": "2ff955fa98f562c1d33247d3ac2af185d99ff62a9c232342ec85756ee6a0a789"
+    },
+    {
+      "step": 500000,
+      "values": {
+        "signed_forward": 0.044209668975371694,
+        "net_path": 0.7515266132761592,
+        "hind_swing_load": 0.110752688172043,
+        "front_stance_load": 0.5876046901172529,
+        "hind_duty": 0.6892420571031067,
+        "limb_phase": 0.6194245904983958
+      },
+      "passed": {
+        "signed_forward": true,
+        "net_path": true,
+        "hind_swing_load": false,
+        "front_stance_load": false,
+        "hind_duty": false,
+        "limb_phase": false
+      },
+      "gates_passed": 2,
+      "stride_period_cv": 0.008688566317620423,
+      "completed_without_fall": true,
+      "timing_and_acquisition_valid": true,
+      "all_six_pass": false,
+      "tiebreak_distance": 4.019924528903638,
+      "note": "",
+      "model_sha256": "921d5567b77c82190589c39450fde743e69108320445986571cc34bdff29bf36"
+    },
+    {
+      "step": 600000,
+      "values": {
+        "signed_forward": 0.04522901371235802,
+        "net_path": 0.758427475397665,
+        "hind_swing_load": 0.14838709677419354,
+        "front_stance_load": 0.5939698492462312,
+        "hind_duty": 0.6468246513059128,
+        "limb_phase": 0.6268301578405506
+      },
+      "passed": {
+        "signed_forward": true,
+        "net_path": true,
+        "hind_swing_load": false,
+        "front_stance_load": false,
+        "hind_duty": false,
+        "limb_phase": false
+      },
+      "gates_passed": 2,
+      "stride_period_cv": 0.1674648678741888,
+      "completed_without_fall": true,
+      "timing_and_acquisition_valid": false,
+      "all_six_pass": false,
+      "tiebreak_distance": 5.7019525450665824,
+      "note": "REJECTED: stride CV 0.1674648678741888 > 0.1; registry CV check failed; not entrained (base is too)",
+      "model_sha256": "8c9bbda1753f0f0bc087d3d13e1904e7e59ad03e7986ee5e16b1fe2658c836a0"
+    },
+    {
+      "step": 700000,
+      "values": {
+        "signed_forward": 0.0464791186303599,
+        "net_path": 0.7629274582436486,
+        "hind_swing_load": 0.16666666666666666,
+        "front_stance_load": 0.5936348408710218,
+        "hind_duty": 0.7041728357608676,
+        "limb_phase": 0.6157287651226566
+      },
+      "passed": {
+        "signed_forward": true,
+        "net_path": true,
+        "hind_swing_load": false,
+        "front_stance_load": false,
+        "hind_duty": false,
+        "limb_phase": false
+      },
+      "gates_passed": 2,
+      "stride_period_cv": 0.015141892086011764,
+      "completed_without_fall": true,
+      "timing_and_acquisition_valid": false,
+      "all_six_pass": false,
+      "tiebreak_distance": 4.737790431020111,
+      "note": "registry CV check failed; not entrained (base is too)",
+      "model_sha256": "3dc0abc1dfaf250257f8b77f9ecb0b2d1ed9a2be391deadf1b98f58a12f13612"
+    },
+    {
+      "step": 800000,
+      "values": {
+        "signed_forward": 0.04852138995668208,
+        "net_path": 0.7533796280676438,
+        "hind_swing_load": 0.16774193548387098,
+        "front_stance_load": 0.5835845896147404,
+        "hind_duty": 0.7574683834489015,
+        "limb_phase": 0.6021829226467412
+      },
+      "passed": {
+        "signed_forward": true,
+        "net_path": true,
+        "hind_swing_load": false,
+        "front_stance_load": false,
+        "hind_duty": true,
+        "limb_phase": false
+      },
+      "gates_passed": 3,
+      "stride_period_cv": 0.02114135690646008,
+      "completed_without_fall": true,
+      "timing_and_acquisition_valid": false,
+      "all_six_pass": false,
+      "tiebreak_distance": 4.083990156358171,
+      "note": "registry CV check failed",
+      "model_sha256": "0d7b644afcb53e3d86fc74330cbf6964669af630986dbcaafebc49f4e9523f96"
+    },
+    {
+      "step": 900000,
+      "values": {
+        "signed_forward": 0.05009941635971341,
+        "net_path": 0.7597629022153155,
+        "hind_swing_load": 0.15913978494623657,
+        "front_stance_load": 0.5798994974874372,
+        "hind_duty": 0.7404499477542986,
+        "limb_phase": 0.6196536028803719
+      },
+      "passed": {
+        "signed_forward": true,
+        "net_path": true,
+        "hind_swing_load": false,
+        "front_stance_load": false,
+        "hind_duty": true,
+        "limb_phase": false
+      },
+      "gates_passed": 3,
+      "stride_period_cv": 0.227220020015802,
+      "completed_without_fall": true,
+      "timing_and_acquisition_valid": false,
+      "all_six_pass": false,
+      "tiebreak_distance": 4.227692430348014,
+      "note": "REJECTED: stride CV 0.227220020015802 > 0.1; registry CV check failed; not entrained (base is too)",
+      "model_sha256": "e41ba8351d99dfb3fefb6c7ef920cfdac9aff5db7b3cf4990458ce797357b3b5"
+    },
+    {
+      "step": 1000000,
+      "values": {
+        "signed_forward": 0.050821876119589486,
+        "net_path": 0.7626453801631085,
+        "hind_swing_load": 0.15591397849462366,
+        "front_stance_load": 0.5745393634840871,
+        "hind_duty": 0.7259865052325347,
+        "limb_phase": 0.6489256420569713
+      },
+      "passed": {
+        "signed_forward": true,
+        "net_path": true,
+        "hind_swing_load": false,
+        "front_stance_load": false,
+        "hind_duty": false,
+        "limb_phase": false
+      },
+      "gates_passed": 2,
+      "stride_period_cv": 0.30789381048884634,
+      "completed_without_fall": true,
+      "timing_and_acquisition_valid": false,
+      "all_six_pass": false,
+      "tiebreak_distance": 4.767047742964054,
+      "note": "REJECTED: stride CV 0.30789381048884634 > 0.1; registry CV check failed; not entrained (base is too)",
+      "model_sha256": "f745071ac5dff6e91110eb14ccde351e0720855b7ee9c9eedd86ab95be31eb58"
+    },
+    {
+      "step": 1100000,
+      "values": {
+        "signed_forward": 0.05240134048363181,
+        "net_path": 0.7722719198348905,
+        "hind_swing_load": 0.15760869565217392,
+        "front_stance_load": 0.5792294807370184,
+        "hind_duty": 0.7256668355301622,
+        "limb_phase": 0.6480802822090798
+      },
+      "passed": {
+        "signed_forward": true,
+        "net_path": true,
+        "hind_swing_load": false,
+        "front_stance_load": false,
+        "hind_duty": false,
+        "limb_phase": false
+      },
+      "gates_passed": 2,
+      "stride_period_cv": 0.3043708976042615,
+      "completed_without_fall": true,
+      "timing_and_acquisition_valid": false,
+      "all_six_pass": false,
+      "tiebreak_distance": 4.761978701011442,
+      "note": "REJECTED: stride CV 0.3043708976042615 > 0.1; registry CV check failed; not entrained (base is too)",
+      "model_sha256": "31d5629c87d7d42b7d1aab72290eb940c1518fdd6267d4df0b7f3919faa660ce"
+    },
+    {
+      "step": 1200000,
+      "values": {
+        "signed_forward": 0.053442236779531437,
+        "net_path": 0.7682235676020439,
+        "hind_swing_load": 0.15217391304347827,
+        "front_stance_load": 0.5775544388609716,
+        "hind_duty": 0.7279293204631283,
+        "limb_phase": 0.6864803092386048
+      },
+      "passed": {
+        "signed_forward": true,
+        "net_path": true,
+        "hind_swing_load": false,
+        "front_stance_load": false,
+        "hind_duty": false,
+        "limb_phase": false
+      },
+      "gates_passed": 2,
+      "stride_period_cv": 0.3493520790156129,
+      "completed_without_fall": true,
+      "timing_and_acquisition_valid": false,
+      "all_six_pass": false,
+      "tiebreak_distance": 5.259200746510603,
+      "note": "REJECTED: stride CV 0.3493520790156129 > 0.1; registry CV check failed; not entrained (base is too)",
+      "model_sha256": "e72399eda5929538930004ba74b80ea6d4a457a7673b2c39a84e7c8887c9a2b5"
+    },
+    {
+      "step": 1300000,
+      "values": {
+        "signed_forward": 0.05348993602330641,
+        "net_path": 0.7659334741513918,
+        "hind_swing_load": 0.14021739130434782,
+        "front_stance_load": 0.5520938023450587,
+        "hind_duty": 0.7313044862278751,
+        "limb_phase": 0.6493537944966232
+      },
+      "passed": {
+        "signed_forward": true,
+        "net_path": true,
+        "hind_swing_load": false,
+        "front_stance_load": false,
+        "hind_duty": true,
+        "limb_phase": false
+      },
+      "gates_passed": 3,
+      "stride_period_cv": 0.27567784777081517,
+      "completed_without_fall": true,
+      "timing_and_acquisition_valid": false,
+      "all_six_pass": false,
+      "tiebreak_distance": 4.5296190520636195,
+      "note": "REJECTED: stride CV 0.27567784777081517 > 0.1; registry CV check failed; not entrained (base is too)",
+      "model_sha256": "fb85f429386e30b3d7ab74a7ce370bf4e84e72fed860081d8bd42ebd4f5a9805"
+    },
+    {
+      "step": 1400000,
+      "values": {
+        "signed_forward": 0.05298522787233013,
+        "net_path": 0.7613875639092949,
+        "hind_swing_load": 0.13118279569892474,
+        "front_stance_load": 0.5353433835845897,
+        "hind_duty": 0.7023381647660034,
+        "limb_phase": 0.818751149798089
+      },
+      "passed": {
+        "signed_forward": true,
+        "net_path": true,
+        "hind_swing_load": false,
+        "front_stance_load": false,
+        "hind_duty": false,
+        "limb_phase": false
+      },
+      "gates_passed": 2,
+      "stride_period_cv": 0.37570522932864275,
+      "completed_without_fall": true,
+      "timing_and_acquisition_valid": false,
+      "all_six_pass": false,
+      "tiebreak_distance": 7.837122558062646,
+      "note": "REJECTED: stride CV 0.37570522932864275 > 0.1; registry CV check failed; not entrained (base is too)",
+      "model_sha256": "365de98e277bd07fa4724b3c286082620dac3e15d0a2a1ad1d7c5639c1098fe2"
+    },
+    {
+      "step": 1500000,
+      "values": {
+        "signed_forward": 0.053244700947035664,
+        "net_path": 0.7610986999285327,
+        "hind_swing_load": 0.10967741935483871,
+        "front_stance_load": 0.5303182579564489,
+        "hind_duty": 0.7032213948467595,
+        "limb_phase": 0.767383037507759
+      },
+      "passed": {
+        "signed_forward": true,
+        "net_path": true,
+        "hind_swing_load": false,
+        "front_stance_load": false,
+        "hind_duty": false,
+        "limb_phase": false
+      },
+      "gates_passed": 2,
+      "stride_period_cv": 0.33994021675682784,
+      "completed_without_fall": true,
+      "timing_and_acquisition_valid": false,
+      "all_six_pass": false,
+      "tiebreak_distance": 6.566716062247909,
+      "note": "REJECTED: stride CV 0.33994021675682784 > 0.1; registry CV check failed; not entrained (base is too)",
+      "model_sha256": "53a2ff048a91c39ba3b3821441a6d3eb449bdb4b64758c79e8794dbd6aefcd8c"
+    },
+    {
+      "step": 1600000,
+      "values": {
+        "signed_forward": 0.05427767240677215,
+        "net_path": 0.7698108134886475,
+        "hind_swing_load": 0.11290322580645161,
+        "front_stance_load": 0.5125628140703518,
+        "hind_duty": 0.698537265818751,
+        "limb_phase": 0.6799298145674246
+      },
+      "passed": {
+        "signed_forward": true,
+        "net_path": true,
+        "hind_swing_load": false,
+        "front_stance_load": false,
+        "hind_duty": false,
+        "limb_phase": false
+      },
+      "gates_passed": 2,
+      "stride_period_cv": 0.41150149403352776,
+      "completed_without_fall": true,
+      "timing_and_acquisition_valid": false,
+      "all_six_pass": false,
+      "tiebreak_distance": 5.385730682075411,
+      "note": "REJECTED: stride CV 0.41150149403352776 > 0.1; registry CV check failed; not entrained (base is too)",
+      "model_sha256": "f2be1a24d7aefe5aa3944d8c54d37c330be0ff14c6ae24293216f71354ea822a"
+    },
+    {
+      "step": 1700000,
+      "values": {
+        "signed_forward": 0.054534429492200484,
+        "net_path": 0.7671135587537335,
+        "hind_swing_load": 0.1043010752688172,
+        "front_stance_load": 0.5149078726968174,
+        "hind_duty": 0.7088929392823493,
+        "limb_phase": 0.7097479704447791
+      },
+      "passed": {
+        "signed_forward": true,
+        "net_path": true,
+        "hind_swing_load": false,
+        "front_stance_load": false,
+        "hind_duty": false,
+        "limb_phase": false
+      },
+      "gates_passed": 2,
+      "stride_period_cv": 0.30149443860546493,
+      "completed_without_fall": true,
+      "timing_and_acquisition_valid": false,
+      "all_six_pass": false,
+      "tiebreak_distance": 5.4879097424968935,
+      "note": "REJECTED: stride CV 0.30149443860546493 > 0.1; registry CV check failed; not entrained (base is too)",
+      "model_sha256": "cb7bad0462edf4b9b046f11eff762d943b1c1acc7bca2fd2d7bb0824824b4eee"
+    },
+    {
+      "step": 1800000,
+      "values": {
+        "signed_forward": 0.05502769075641653,
+        "net_path": 0.7657688412510524,
+        "hind_swing_load": 0.11290322580645161,
+        "front_stance_load": 0.5065326633165829,
+        "hind_duty": 0.7027297144137705,
+        "limb_phase": 0.6845258059765328
+      },
+      "passed": {
+        "signed_forward": true,
+        "net_path": true,
+        "hind_swing_load": false,
+        "front_stance_load": false,
+        "hind_duty": false,
+        "limb_phase": false
+      },
+      "gates_passed": 2,
+      "stride_period_cv": 0.33803967903234694,
+      "completed_without_fall": true,
+      "timing_and_acquisition_valid": false,
+      "all_six_pass": false,
+      "tiebreak_distance": 5.418682572018617,
+      "note": "REJECTED: stride CV 0.33803967903234694 > 0.1; registry CV check failed; not entrained (base is too)",
+      "model_sha256": "37fb1461a97eb6e5bf96e6b257c9ebf75468596f3335aa75eeb08d8408f7d0ea"
+    },
+    {
+      "step": 1900000,
+      "values": {
+        "signed_forward": 0.05512866105664124,
+        "net_path": 0.7762262071468329,
+        "hind_swing_load": 0.1064516129032258,
+        "front_stance_load": 0.5102177554438861,
+        "hind_duty": 0.6859426999378581,
+        "limb_phase": 0.6577051986797053
+      },
+      "passed": {
+        "signed_forward": true,
+        "net_path": true,
+        "hind_swing_load": false,
+        "front_stance_load": false,
+        "hind_duty": false,
+        "limb_phase": false
+      },
+      "gates_passed": 2,
+      "stride_period_cv": 0.3361962795506125,
+      "completed_without_fall": true,
+      "timing_and_acquisition_valid": false,
+      "all_six_pass": false,
+      "tiebreak_distance": 5.153813201009869,
+      "note": "REJECTED: stride CV 0.3361962795506125 > 0.1; registry CV check failed; not entrained (base is too)",
+      "model_sha256": "d1928bda90429dc0ed64b89ab916bba7410e9f68209c62b67c8c22d34bbffc40"
+    },
+    {
+      "step": 2000000,
+      "values": {
+        "signed_forward": 0.05673576035029488,
+        "net_path": 0.7697060083239702,
+        "hind_swing_load": 0.1010752688172043,
+        "front_stance_load": 0.4984924623115578,
+        "hind_duty": 0.6472687331186607,
+        "limb_phase": 0.9577203707543934
+      },
+      "passed": {
+        "signed_forward": true,
+        "net_path": true,
+        "hind_swing_load": false,
+        "front_stance_load": false,
+        "hind_duty": false,
+        "limb_phase": false
+      },
+      "gates_passed": 2,
+      "stride_period_cv": 0.4085623461754522,
+      "completed_without_fall": true,
+      "timing_and_acquisition_valid": false,
+      "all_six_pass": false,
+      "tiebreak_distance": 10.140841452653929,
+      "note": "REJECTED: stride CV 0.4085623461754522 > 0.1; registry CV check failed; not entrained (base is too)",
+      "model_sha256": "f97f7fa145dbd73b57c7092a060048eb81af0ebc24e10744c05b660442dfa4b1"
+    },
+    {
+      "step": 2100000,
+      "values": {
+        "signed_forward": 0.05844121299349962,
+        "net_path": 0.7669334043661572,
+        "hind_swing_load": 0.10434782608695652,
+        "front_stance_load": 0.5011725293132329,
+        "hind_duty": 0.6850113753607167,
+        "limb_phase": 0.7809650708252568
+      },
+      "passed": {
+        "signed_forward": true,
+        "net_path": true,
+        "hind_swing_load": false,
+        "front_stance_load": false,
+        "hind_duty": false,
+        "limb_phase": false
+      },
+      "gates_passed": 2,
+      "stride_period_cv": 0.3634901036974103,
+      "completed_without_fall": true,
+      "timing_and_acquisition_valid": false,
+      "all_six_pass": false,
+      "tiebreak_distance": 7.244996666190859,
+      "note": "REJECTED: stride CV 0.3634901036974103 > 0.1; registry CV check failed; not entrained (base is too)",
+      "model_sha256": "61074b5952a396c84991390ab63cc97927033afc3df54f4fc634d5152001b0a9"
+    },
+    {
+      "step": 2200000,
+      "values": {
+        "signed_forward": 0.05762860391477965,
+        "net_path": 0.7630279168219287,
+        "hind_swing_load": 0.08279569892473118,
+        "front_stance_load": 0.49413735343383586,
+        "hind_duty": 0.6750127570499833,
+        "limb_phase": 0.7381584947046245
+      },
+      "passed": {
+        "signed_forward": true,
+        "net_path": true,
+        "hind_swing_load": true,
+        "front_stance_load": false,
+        "hind_duty": false,
+        "limb_phase": false
+      },
+      "gates_passed": 3,
+      "stride_period_cv": 0.3322019633629199,
+      "completed_without_fall": true,
+      "timing_and_acquisition_valid": false,
+      "all_six_pass": false,
+      "tiebreak_distance": 6.691470747851836,
+      "note": "REJECTED: stride CV 0.3322019633629199 > 0.1; registry CV check failed; not entrained (base is too)",
+      "model_sha256": "a28a85803183d1547a9ff1f8f0c8d205ceec3f23c2ad84b93d3dbdd4df46d234"
+    },
+    {
+      "step": 2300000,
+      "values": {
+        "signed_forward": 0.058526756301220395,
+        "net_path": 0.7675728760903132,
+        "hind_swing_load": 0.06129032258064516,
+        "front_stance_load": 0.48911222780569513,
+        "hind_duty": 0.6964885333271914,
+        "limb_phase": 0.6863493889244794
+      },
+      "passed": {
+        "signed_forward": true,
+        "net_path": true,
+        "hind_swing_load": true,
+        "front_stance_load": false,
+        "hind_duty": false,
+        "limb_phase": false
+      },
+      "gates_passed": 3,
+      "stride_period_cv": 0.3118068770597868,
+      "completed_without_fall": true,
+      "timing_and_acquisition_valid": false,
+      "all_six_pass": false,
+      "tiebreak_distance": 5.43197096349286,
+      "note": "REJECTED: stride CV 0.3118068770597868 > 0.1; registry CV check failed; not entrained (base is too)",
+      "model_sha256": "0e8de91b0ca814824f922dac5afdce07a22fd08dd064ca6ff88f657bc55c708a"
+    },
+    {
+      "step": 2400000,
+      "values": {
+        "signed_forward": 0.05911099852136447,
+        "net_path": 0.769680415771651,
+        "hind_swing_load": 0.08172043010752689,
+        "front_stance_load": 0.49514237855946397,
+        "hind_duty": 0.6897949006660283,
+        "limb_phase": 0.7520468280413402
+      },
+      "passed": {
+        "signed_forward": true,
+        "net_path": true,
+        "hind_swing_load": true,
+        "front_stance_load": false,
+        "hind_duty": false,
+        "limb_phase": false
+      },
+      "gates_passed": 3,
+      "stride_period_cv": 0.31208376470195587,
+      "completed_without_fall": true,
+      "timing_and_acquisition_valid": false,
+      "all_six_pass": false,
+      "tiebreak_distance": 6.620599930305342,
+      "note": "REJECTED: stride CV 0.31208376470195587 > 0.1; registry CV check failed; not entrained (base is too)",
+      "model_sha256": "c133cfb7a22889bdeaee4c4826d2f53260cfacf61b568549820054c43411e046"
+    },
+    {
+      "step": 2500000,
+      "values": {
+        "signed_forward": 0.05931002330598088,
+        "net_path": 0.777203381566003,
+        "hind_swing_load": 0.10869565217391304,
+        "front_stance_load": 0.5061976549413736,
+        "hind_duty": 0.6394229699062831,
+        "limb_phase": 0.7164880720477951
+      },
+      "passed": {
+        "signed_forward": true,
+        "net_path": true,
+        "hind_swing_load": false,
+        "front_stance_load": false,
+        "hind_duty": false,
+        "limb_phase": false
+      },
+      "gates_passed": 2,
+      "stride_period_cv": 0.3836635484251544,
+      "completed_without_fall": true,
+      "timing_and_acquisition_valid": false,
+      "all_six_pass": false,
+      "tiebreak_distance": 7.135603813206692,
+      "note": "REJECTED: stride CV 0.3836635484251544 > 0.1; registry CV check failed; not entrained (base is too)",
+      "model_sha256": "4acb9243e677e55ae57e16d3c3679ee400c280d1cd56fafece511a307c40220f"
+    },
+    {
+      "step": 2600000,
+      "values": {
+        "signed_forward": 0.059546542397762324,
+        "net_path": 0.7757721950408001,
+        "hind_swing_load": 0.07849462365591398,
+        "front_stance_load": 0.5078726968174204,
+        "hind_duty": 0.6791101970046447,
+        "limb_phase": 0.7083376761823121
+      },
+      "passed": {
+        "signed_forward": true,
+        "net_path": true,
+        "hind_swing_load": true,
+        "front_stance_load": false,
+        "hind_duty": false,
+        "limb_phase": false
+      },
+      "gates_passed": 3,
+      "stride_period_cv": 0.2644870221421507,
+      "completed_without_fall": true,
+      "timing_and_acquisition_valid": false,
+      "all_six_pass": false,
+      "tiebreak_distance": 6.020939350829504,
+      "note": "REJECTED: stride CV 0.2644870221421507 > 0.1; registry CV check failed; not entrained (base is too)",
+      "model_sha256": "2c35fe3316abfb1db03b44488265ddb20a9c78366e75f0d569cd463573d36d72"
+    },
+    {
+      "step": 2700000,
+      "values": {
+        "signed_forward": 0.05799426122936733,
+        "net_path": 0.7861900116360716,
+        "hind_swing_load": 0.10217391304347827,
+        "front_stance_load": 0.5145728643216081,
+        "hind_duty": 0.6383541637431263,
+        "limb_phase": 0.6854519783090175
+      },
+      "passed": {
+        "signed_forward": true,
+        "net_path": true,
+        "hind_swing_load": false,
+        "front_stance_load": false,
+        "hind_duty": false,
+        "limb_phase": false
+      },
+      "gates_passed": 2,
+      "stride_period_cv": 0.33010278247515135,
+      "completed_without_fall": true,
+      "timing_and_acquisition_valid": false,
+      "all_six_pass": false,
+      "tiebreak_distance": 6.453442195679946,
+      "note": "REJECTED: stride CV 0.33010278247515135 > 0.1; registry CV check failed; not entrained (base is too)",
+      "model_sha256": "86bf9de2acb580efc99fb8aefd9ca15e5210cb76eb996c83d76f10aa777b72d0"
+    },
+    {
+      "step": 2800000,
+      "values": {
+        "signed_forward": 0.05960917261426709,
+        "net_path": 0.7857723442936914,
+        "hind_swing_load": 0.07204301075268817,
+        "front_stance_load": 0.5132328308207705,
+        "hind_duty": 0.642170589109842,
+        "limb_phase": 0.7015106405133005
+      },
+      "passed": {
+        "signed_forward": true,
+        "net_path": true,
+        "hind_swing_load": true,
+        "front_stance_load": false,
+        "hind_duty": false,
+        "limb_phase": false
+      },
+      "gates_passed": 3,
+      "stride_period_cv": 0.32960450051385204,
+      "completed_without_fall": true,
+      "timing_and_acquisition_valid": false,
+      "all_six_pass": false,
+      "tiebreak_distance": 6.610213354219697,
+      "note": "REJECTED: stride CV 0.32960450051385204 > 0.1; registry CV check failed; not entrained (base is too)",
+      "model_sha256": "6549ddc104db3ae43157664659f8c3ac1f4a7182b6352f26ec6dddadba0c00b2"
+    },
+    {
+      "step": 2900000,
+      "values": {
+        "signed_forward": 0.05975801801609218,
+        "net_path": 0.7882407229404644,
+        "hind_swing_load": 0.05913978494623656,
+        "front_stance_load": 0.5185929648241207,
+        "hind_duty": 0.6410302339127619,
+        "limb_phase": 0.6948250472578397
+      },
+      "passed": {
+        "signed_forward": true,
+        "net_path": true,
+        "hind_swing_load": true,
+        "front_stance_load": false,
+        "hind_duty": false,
+        "limb_phase": false
+      },
+      "gates_passed": 3,
+      "stride_period_cv": 0.34729562315469265,
+      "completed_without_fall": true,
+      "timing_and_acquisition_valid": false,
+      "all_six_pass": false,
+      "tiebreak_distance": 6.485859677214618,
+      "note": "REJECTED: stride CV 0.34729562315469265 > 0.1; registry CV check failed; not entrained (base is too)",
+      "model_sha256": "40b047608b3581950ffd3c1e1a8a1f62305ba511c27066273d738d4c3930dd6a"
+    },
+    {
+      "step": 3000000,
+      "values": {
+        "signed_forward": 0.06050566036995617,
+        "net_path": 0.7979472984214753,
+        "hind_swing_load": 0.11521739130434783,
+        "front_stance_load": 0.5283082077051926,
+        "hind_duty": 0.5896956120994615,
+        "limb_phase": 0.6632978490284043
+      },
+      "passed": {
+        "signed_forward": true,
+        "net_path": true,
+        "hind_swing_load": false,
+        "front_stance_load": false,
+        "hind_duty": false,
+        "limb_phase": false
+      },
+      "gates_passed": 2,
+      "stride_period_cv": 0.40310814999979927,
+      "completed_without_fall": true,
+      "timing_and_acquisition_valid": false,
+      "all_six_pass": false,
+      "tiebreak_distance": 7.226678349869847,
+      "note": "REJECTED: stride CV 0.40310814999979927 > 0.1; registry CV check failed; not entrained (base is too)",
+      "model_sha256": "122b1d929370c8eb034b53d394fea69089edd1b4a7dadc2c74964c284f051417"
+    },
+    {
+      "step": 3014656,
+      "values": {
+        "signed_forward": 0.0606549423763595,
+        "net_path": 0.7942619101830773,
+        "hind_swing_load": 0.054838709677419356,
+        "front_stance_load": 0.5313232830820771,
+        "hind_duty": 0.5985582467536898,
+        "limb_phase": 0.8847956224479996
+      },
+      "passed": {
+        "signed_forward": true,
+        "net_path": true,
+        "hind_swing_load": true,
+        "front_stance_load": false,
+        "hind_duty": false,
+        "limb_phase": false
+      },
+      "gates_passed": 3,
+      "stride_period_cv": 0.3973079042496892,
+      "completed_without_fall": true,
+      "timing_and_acquisition_valid": false,
+      "all_six_pass": false,
+      "tiebreak_distance": 10.416606885179014,
+      "note": "REJECTED: stride CV 0.3973079042496892 > 0.1; registry CV check failed; not entrained (base is too)",
+      "model_sha256": "de016c86ca131e50177c47bed7493e3f85203b4159fbab91b7b6a74a62bbd2c3"
+    }
+  ],
+  "baseline_gates_passed": 4,
+  "best_step": 400000,
+  "best_gates_passed": 3,
+  "beats_baseline": false,
+  "claim": "Instrumented simulation diagnostics; gates measured, reward not used for selection. n=1 deterministic rollout per checkpoint; repeats of a frozen policy at zero reset noise are the same experiment, not independent samples."
+}

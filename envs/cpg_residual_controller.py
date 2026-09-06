@@ -90,7 +90,7 @@ class CPGResidualController:
                  tail_amp=0.15, tail_phase_lag=0.15,
                  residual_overrides=None,            # V4.2.4: per-joint caps
                  verbose=True, gait_profile="legacy", lab_parameters=None,
-                 hind_stance_compensation=False):
+                 hind_stance_compensation=False, stance_target_clearance_m=None):
         self.model = model
         self.profile = get_gait_profile(gait_profile)
         self.gait_profile = self.profile.name
@@ -176,7 +176,11 @@ class CPGResidualController:
                     "solved with zero ankle/sprawl/rotation base targets and would be invalid otherwise.")
             from common.hind_stance_geometry import StanceCompensator, swing_blend
             feet = ("HL", "HR", "FL", "FR") if hind_stance_compensation == "all" else ("HL", "HR")
-            self._hind_comp = StanceCompensator(model, feet=feet)
+            depth = {} if stance_target_clearance_m is None else {
+                "target_clearance_m": (dict(stance_target_clearance_m)
+                                       if isinstance(stance_target_clearance_m, dict)
+                                       else float(stance_target_clearance_m))}
+            self._hind_comp = StanceCompensator(model, feet=feet, **depth)
             self._swing_blend = swing_blend
             limb_actuators = {
                 "HL": ("hip_proret_L", ("knee_L", "ankle_L")),

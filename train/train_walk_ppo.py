@@ -29,6 +29,7 @@ Examples (run from the repo root C:\\Users\\ziyad\\GeckoBrain):
 from __future__ import annotations
 import argparse, sys
 from dataclasses import asdict
+import inspect
 import json
 import math
 import platform
@@ -37,7 +38,9 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO))
 from envs.gecko_walk_env import GeckoWalkEnv
+from envs.cpg_residual_controller import CPGResidualController
 from common.gait_config import get_gait_profile
+from common.provenance import parameter_value
 from common.checkpoints import (
     CheckpointBundleCallback, atomic_json, export_legacy_final,
     sha256_file, verify_checkpoint_bundle,
@@ -85,16 +88,22 @@ def environment_calibration_snapshot(vector) -> dict:
     calibrations = vector.get_attr("reward_calibration")
     thresholds = vector.get_attr("contact_threshold")
     rewards = [reward.w for reward in vector.get_attr("reward_fn")]
+    # BLOCKED.md: the effective lab controller, not just its timing, must be
+    # recorded before lab training or resume. Read from the live workers.
+    controllers = vector.get_attr("lab_controller_snapshot")
     if not calibrations:
         raise ValueError("Cannot record calibration for an empty vector environment")
     if any(c != calibrations[0] for c in calibrations) or any(w != rewards[0] for w in rewards):
         raise ValueError("Vector workers resolved different reward calibrations")
     if any(value != thresholds[0] for value in thresholds):
         raise ValueError("Vector workers resolved different contact thresholds")
+    if any(c != controllers[0] for c in controllers):
+        raise ValueError("Vector workers resolved different lab controllers")
     return json.loads(json.dumps({
         "reward_calibration": calibrations[0],
         "effective_contact_threshold_N": float(thresholds[0]),
         "effective_reward_cfg": rewards[0],
+        "effective_lab_controller": controllers[0],
     }, allow_nan=False))
 
 
@@ -122,6 +131,13 @@ def validate_resume_calibration(args, run_config: dict) -> dict:
                 raise ValueError(f"Lab resume calibration changed ({key}); restore its configuration or start fresh")
         if old_contact is None or old_contact != run_config["effective_contact_threshold_N"]:
             raise ValueError("Lab resume contact threshold changed; restore its threshold or start fresh")
+        old_controller = source.get("effective_lab_controller")
+        if old_controller is None:
+            raise ValueError("Lab resume requires its saved effective_lab_controller; start fresh "
+                             "instead of guessing the base controller it learned against")
+        if old_controller != run_config["effective_lab_controller"]:
+            raise ValueError("Lab resume effective controller changed (base parameters, stance "
+                             "compensation or residual authority); restore it or start fresh")
     changes = {}
     if old_contact is not None and old_contact != run_config["effective_contact_threshold_N"]:
         changes["contact_threshold_N"] = {"saved": old_contact, "requested_effective": run_config["effective_contact_threshold_N"]}
@@ -149,10 +165,23 @@ def validate_training_args(args) -> None:
         raise ValueError("PPO requires batch and rollout sizes greater than one")
     requested_gait = gait_profile_parameters(args.gait_profile)
     resolve_training_contact_threshold(args.gait_profile, getattr(args, "contact_thresh", None))
-    for name in ("max_wall_seconds", "backup_ack_timeout"):
+    for name in ("max_wall_seconds", "backup_ack_timeout", "target_kl"):
         value = getattr(args, name)
         if value is not None and (not math.isfinite(value) or value <= 0):
             raise ValueError(f"--{name.replace('_', '-')} must be finite and positive")
+    scale = args.front_lift_residual_scale
+    if scale is not None and (not math.isfinite(scale) or scale < 0):
+        raise ValueError("--front-lift-residual-scale must be finite and nonnegative")
+    if args.gait_profile == "lab" and args.control_mode != "cpg_residual":
+        # Raw mode builds no CPG at all, so the lab timing targets would score a
+        # gait nothing is generating. Refuse rather than run a different study.
+        raise ValueError("--gait-profile lab requires --control-mode cpg_residual")
+    if args.gait_profile != "lab":
+        # Both are opt-in lab controls; the controller refuses them for legacy.
+        if args.hind_stance_compensation != "off":
+            raise ValueError("--hind-stance-compensation is a lab-profile control")
+        if scale is not None:
+            raise ValueError("--front-lift-residual-scale is a lab-profile control")
     if args.resume_from:
         model_path, vec_path = Path(args.resume_from), Path(args.resume_vec)
         if not model_path.is_file() or not vec_path.is_file():
@@ -210,13 +239,15 @@ def training_config(args, reward_cfg) -> dict:
     xml_path = Path(args.xml_path) if args.xml_path else REPO / "morphology" / "gecko_body_r.xml"
     config["xml_path_resolved"] = str(xml_path.resolve())
     config["xml_sha256"] = sha256_file(xml_path)
+    config["requested_hind_stance_compensation"] = COMPENSATION_BY_FLAG[args.hind_stance_compensation]
     return config
 
 
 def make_env(seed, control_mode="raw", residual_scale=0.25,
              contact_thresh=None, front_stance_press=0.40,
              front_swing_lift=0.40, reward_cfg=None, xml_path=None,
-             gait_profile="legacy"):
+             gait_profile="legacy", hind_stance_compensation=False,
+             front_lift_residual_scale=None):
     def _f():
         return GeckoWalkEnv(
             xml_path=xml_path,
@@ -228,21 +259,136 @@ def make_env(seed, control_mode="raw", residual_scale=0.25,
             front_swing_lift=front_swing_lift,
             reward_cfg=reward_cfg,
             gait_profile=gait_profile,
+            hind_stance_compensation=hind_stance_compensation,
+            front_lift_residual_scale=front_lift_residual_scale,
         )
     return _f
 
 
-def require_lab_training_readiness(gait_profile):
-    """Session 2 deliberately leaves lab learning closed after failed Gate 2.
+COMPENSATION_BY_FLAG = {"off": False, "hind": True, "all": "all"}
 
-    Reopening requires validated gait evidence AND recording/comparing effective
-    lab controller parameters in checkpoint resume contracts. See BLOCKED.md.
-    Legacy training behavior is not changed by this experimental-candidate gate.
+# Four of the six Gate 2 checks are recoverable from a realism_metrics report
+# alone; front/hind contact LOADS need the trace and are not re-derived here.
+EVIDENCE_GATES = (
+    ("forward_speed", 0.04, math.inf),
+    ("net_over_path", 0.50, math.inf),
+    ("hind_duty", 0.73, 0.83),
+    ("limb_phase", 0.405, 0.465),
+)
+
+
+def evidence_measurements(report):
+    """The report-derivable Gate 2 values, by the gate's own definitions."""
+    episode = report["episodes"][0]
+    gait = episode["gait"]
+    if gait.get("status") != "measured":
+        raise ValueError("Lab base evidence episode was not scorable.")
+    if episode.get("terminated") or not episode.get("completed_requested_duration"):
+        raise ValueError("Lab base evidence episode fell or did not complete its duration.")
+    number = lambda v: v["mean"] if isinstance(v, dict) else v
+    phases = [gait["limb_phase"][k]["mean_cycle"] for k in ("HL_to_FL", "HR_to_FR")]
+    if any(p is None for p in phases):
+        raise ValueError("Lab base evidence has no measured limb phase.")
+    return {
+        "forward_speed": number(gait["forward_speed_m_s"]),
+        "net_over_path": gait["net_displacement_m"] / gait["distance_path_m"],
+        "hind_duty": min(number(gait["limbs"]["HL"]["duty_factor"]),
+                         number(gait["limbs"]["HR"]["duty_factor"])),
+        "limb_phase": float(sum(phases) / len(phases)),
+    }
+
+
+def require_lab_training_readiness(args):
+    """Session 2 closed lab learning after Gate 2 failed; this is its resolution.
+
+    BLOCKED.md asks for two things before lab training or resume: the failed
+    gait gate deliberately resolved, and the exact effective lab controller
+    parameters persisted and compared in checkpoint contracts. Both are met here
+    by requiring a measured zero-policy base report for this exact body and
+    controller, and recording it in train_config.json.
+
+    Gate 2 measures the base controller with the policy switched OFF. It is a
+    sanity check that the foundation is not broken, never a finished walker, so
+    the requirement is that the base is the known-good one -- not that it
+    already passes all six checks. Two checks (front stance load, limb phase)
+    are exactly what a learned residual exists to attack, and they are recorded
+    as unmet rather than waived silently.
+
+    Legacy training behavior is unchanged: legacy needs no evidence file.
     """
-    if gait_profile == "lab":
-        raise ValueError("Lab training/resume is blocked: Session 2 Gate 2 failed. "
-                         "Fix contact support/timing and persist the effective lab controller "
-                         "parameter resume contract before reopening training; see docs/BLOCKED.md.")
+    if args.gait_profile != "lab":
+        return None
+    if not args.lab_base_evidence:
+        raise ValueError("Lab training requires --lab-base-evidence: a realism_metrics report "
+                         "measuring this body and base controller with a zero policy. "
+                         "See docs/BLOCKED.md.")
+    if args.xml_path is None:
+        raise ValueError("Lab training requires an explicit --xml-path; the default body is the "
+                         "61 g legacy morphology, not the measured lab body.")
+    path = Path(args.lab_base_evidence)
+    report = json.loads(path.read_text(encoding="utf-8"))
+    protocol = report["protocol"]
+    if protocol.get("gait_profile") != "lab":
+        raise ValueError("Lab base evidence must be a lab-profile report.")
+    if protocol.get("controller") != "zero residual with contact reflex":
+        raise ValueError("Lab base evidence must measure the base with the policy switched off.")
+    body_sha = sha256_file(args.xml_path)
+    if protocol.get("xml_sha256") != body_sha:
+        raise ValueError("Lab base evidence measured a different body than --xml-path.")
+    recorded = protocol.get("effective_lab_parameters")
+    if not isinstance(recorded, dict):
+        raise ValueError("Lab base evidence records no effective lab controller parameters.")
+    expected = dict(parameter_value("lab_base_parameters"))
+    differing = sorted(k for k in recorded if k not in expected or recorded[k] != expected[k])
+    if differing:
+        raise ValueError("Lab base evidence used different effective lab controller parameters "
+                         "than the current registry " + str(differing) +
+                         "; re-measure the base or restore the registry.")
+    # A report predating Session 3g records a SUBSET: spine_amp, tail_amp and
+    # tail_phase_lag were moved into the registry at the controller's existing
+    # constructor defaults, so behaviour was unchanged but the record is older.
+    # Accept that only by proving each missing key still equals the default the
+    # older run actually executed -- never by assuming it.
+    missing = sorted(set(expected) - set(recorded))
+    if missing:
+        defaults = inspect.signature(CPGResidualController.__init__).parameters
+        for key in missing:
+            default = defaults[key].default if key in defaults else inspect.Parameter.empty
+            if default is inspect.Parameter.empty or default != expected[key]:
+                raise ValueError("Lab base evidence omits " + key + " and the registry value does "
+                                 "not match the controller default it would have run with; "
+                                 "re-measure the base.")
+    duration = float(parameter_value("evaluation_duration_s"))
+    if protocol.get("requested_duration_s") != duration:
+        raise ValueError("Lab base evidence must be measured at the gate's own %g s duration; "
+                         "Session 3h found a 12 s window reads limb phase bimodally." % duration)
+    if protocol.get("reset_noise") != 0:
+        raise ValueError("Lab base evidence must use the deterministic zero-reset-noise protocol.")
+    wanted = COMPENSATION_BY_FLAG[args.hind_stance_compensation]
+    if bool(protocol.get("hind_stance_compensation")) != bool(wanted):
+        raise ValueError("Lab base evidence stance compensation does not match "
+                         "--hind-stance-compensation " + args.hind_stance_compensation + ".")
+    measurements = evidence_measurements(report)
+    unmet = [name for name, low, high in EVIDENCE_GATES
+             if not (low <= measurements[name] <= high)]
+    # The SCOPE of compensation (hind-only vs all four limbs) is not recorded by
+    # realism_metrics, which stores only a boolean. Hind duty is what separates
+    # them on this body, so it is required rather than merely reported.
+    if "hind_duty" in unmet:
+        raise ValueError("Lab base evidence fails the hind duty-factor check "
+                         "(%.4f); this is not the corrected base." % measurements["hind_duty"])
+    return {
+        "evidence_path": str(path.resolve()),
+        "evidence_sha256": sha256_file(path),
+        "xml_sha256": body_sha,
+        "hind_stance_compensation": args.hind_stance_compensation,
+        "parameters_defaulted_in_older_evidence": missing,
+        "report_derivable_gate_values": measurements,
+        "report_derivable_gates_unmet": unmet,
+        "loads_not_rederived": "front/hind contact loads need the trace and are not re-checked here",
+        "reason": "Gate 2 measures the base with the policy off; it gates the foundation, "
+                  "not the trained walker. See docs/BLOCKED.md and docs/BUILD_LOG.md Session 4.",
+    }
 
 
 def main():
@@ -254,6 +400,17 @@ def main():
                    help="optional candidate MJCF; default keeps the established body path")
     p.add_argument("--gait-profile", choices=["legacy", "lab"], default="legacy",
                    help="lab uses shared measured timing targets; incompatible with legacy-checkpoint resume")
+    p.add_argument("--lab-base-evidence", default=None,
+                   help="realism_metrics report measuring this body and base controller with a "
+                        "zero policy; required for --gait-profile lab (see docs/BLOCKED.md)")
+    p.add_argument("--hind-stance-compensation", choices=["off", "hind", "all"], default="off",
+                   help="opt-in lab stance compensation; 'all' is the Session 3 corrected base")
+    p.add_argument("--front-lift-residual-scale", type=float, default=None,
+                   help="residual authority on the FL/FR lift actuators; omitted keeps the "
+                        "structural lock at 0.0 (see the controller docstring)")
+    p.add_argument("--target-kl", type=float, default=None,
+                   help="stop each PPO epoch loop when approximate KL exceeds this; the 10 M-step "
+                        "precedent diverged to approx_kl 67 and lost 63%% of eval return")
     p.add_argument("--vec", choices=["subproc", "dummy"], default="subproc")
     p.add_argument("--n-steps", type=int, default=2048)
     p.add_argument("--batch", type=int, default=4096)
@@ -289,9 +446,9 @@ def main():
                         "existing commands are unchanged.")
     args = p.parse_args()
     try:
-        require_lab_training_readiness(args.gait_profile)
+        lab_readiness = require_lab_training_readiness(args)
         validate_training_args(args)
-    except (ValueError, FileNotFoundError) as exc:
+    except (ValueError, FileNotFoundError, KeyError, OSError, json.JSONDecodeError) as exc:
         p.error(str(exc))
 
     # V4.2.8 curriculum reward configs. --phase none -> reward_cfg=None -> the
@@ -336,15 +493,20 @@ def main():
 
     out = reserve_run_directory(REPO / "models", args.run)
     run_config = training_config(args, reward_cfg)
+    if lab_readiness is not None:
+        run_config["lab_base_evidence"] = lab_readiness
     atomic_json(out / "train_config.json", run_config)
     if run_config.get("resume_gait_contract", {}).get("legacy_inferred_from_missing_metadata"):
         print("[resume] no saved gait-profile metadata; explicitly using historical legacy profile", flush=True)
     tb = REPO / "renders" / "tb"; tb.mkdir(parents=True, exist_ok=True)
 
+    compensation = COMPENSATION_BY_FLAG[args.hind_stance_compensation]
     env_fns = [
         make_env(args.seed + i, args.control_mode, args.residual_scale,
                  args.contact_thresh, args.front_stance_press, args.front_swing_lift,
-                 reward_cfg=reward_cfg, xml_path=args.xml_path, gait_profile=args.gait_profile)
+                 reward_cfg=reward_cfg, xml_path=args.xml_path, gait_profile=args.gait_profile,
+                 hind_stance_compensation=compensation,
+                 front_lift_residual_scale=args.front_lift_residual_scale)
         for i in range(args.envs)
     ]
     venv = VecCls(env_fns)
@@ -370,7 +532,9 @@ def main():
     eval_env = DummyVecEnv([
         make_env(10_000, args.control_mode, args.residual_scale,
                  args.contact_thresh, args.front_stance_press, args.front_swing_lift,
-                 reward_cfg=reward_cfg, xml_path=args.xml_path, gait_profile=args.gait_profile)
+                 reward_cfg=reward_cfg, xml_path=args.xml_path, gait_profile=args.gait_profile,
+                 hind_stance_compensation=compensation,
+                 front_lift_residual_scale=args.front_lift_residual_scale)
     ])
     eval_env = VecMonitor(eval_env)
     eval_env = VecNormalize(eval_env, norm_obs=True, norm_reward=False, training=False, clip_obs=10.0)
@@ -380,7 +544,7 @@ def main():
     common = dict(verbose=1, seed=args.seed, device=args.device, n_steps=args.n_steps,
                   batch_size=args.batch, n_epochs=10, gamma=0.99, gae_lambda=0.95,
                   learning_rate=args.lr, clip_range=0.2, ent_coef=args.ent_coef, vf_coef=0.5,
-                  max_grad_norm=0.5, tensorboard_log=str(tb))
+                  max_grad_norm=0.5, target_kl=args.target_kl, tensorboard_log=str(tb))
     if args.resume_from:
         if args.recurrent:
             from sb3_contrib import RecurrentPPO as ResumeAlgorithm
@@ -392,6 +556,8 @@ def main():
         model.learning_rate = args.lr
         model.lr_schedule = get_schedule_fn(args.lr)
         model.ent_coef = args.ent_coef
+        # A resumed model keeps the saved value; the CLI is authoritative here.
+        model.target_kl = args.target_kl
     elif args.recurrent:
         from sb3_contrib import RecurrentPPO
         model = RecurrentPPO("MlpLstmPolicy", venv,
@@ -404,6 +570,7 @@ def main():
     # values as well as the requested CLI, without silently changing the run.
     run_config["effective_training"] = {
         "algorithm": type(model).__name__, "device": str(model.device),
+        "target_kl": model.target_kl,
         "n_steps": model.n_steps, "batch_size": model.batch_size,
         "n_epochs": model.n_epochs, "num_envs": venv.num_envs,
         "observation_shape": list(model.observation_space.shape),

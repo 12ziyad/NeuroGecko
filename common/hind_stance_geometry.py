@@ -62,19 +62,42 @@ class StanceCompensator:
 
     def __init__(self, model, target_clearance_m=-.0006, table_size=129,
                  max_offset_rad=.70, feet=("HL", "HR")):
-        if not math.isfinite(target_clearance_m) or not -.0012 <= target_clearance_m <= 0:
-            raise ValueError("Target must lie inside the declared [-1.2 mm, 0] frozen stance band.")
+        # The frozen band is twice the target, floored at the original -1.2 mm so
+        # the default is bit-for-bit unchanged. A deeper target is an explicit
+        # experiment: the table is solved against the STAND root pose, and a
+        # walking gecko rides higher than a standing one, so the solved foot
+        # lands short of the floor by whatever that height difference is.
+        # Session 4 measured the shoulder at 0.125 SVL against a published
+        # 0.11 SVL, with the forefoot sitting ~3.1 mm high when commanded down.
+        # A scalar applies to every foot; a mapping sets each foot separately, so
+        # the forelimb can be aimed deeper than the hindlimb. Session 4 measured
+        # the two girdles missing their published heights by different amounts
+        # (shoulder 0.125 vs 0.11 SVL, hip 0.158 vs 0.15), so one number for all
+        # four feet is the wrong shape for this correction.
+        if isinstance(target_clearance_m, dict):
+            per_foot = {f: float(v) for f, v in target_clearance_m.items()}
+        else:
+            per_foot = None
+        scalar = -.0006 if per_foot is not None else target_clearance_m
+        for value in ([scalar] if per_foot is None else list(per_foot.values())):
+            if not math.isfinite(value) or not -.008 <= value <= 0:
+                raise ValueError("Every target must lie inside the [-8 mm, 0] frozen stance band.")
         if isinstance(table_size, bool) or not isinstance(table_size, int) or table_size < 17:
             raise ValueError("table_size must be an integer of at least 17.")
         if not math.isfinite(max_offset_rad) or not 0 < max_offset_rad <= math.pi:
             raise ValueError("max_offset_rad must be finite, positive, and at most pi.")
         self.model = model
-        self.target_clearance_m = float(target_clearance_m)
+        self.target_clearance_m = per_foot if per_foot is not None else float(scalar)
+        deepest = min(per_foot.values()) if per_foot is not None else float(scalar)
+        self._band_low = min(-.0012, 2. * deepest)
+        self._per_foot_target = per_foot
         self.max_offset_rad = float(max_offset_rad)
         self.table_size = table_size
         feet = tuple(feet)
         if not feet or any(f not in ("HL", "HR", "FL", "FR") for f in feet):
             raise ValueError("feet must be a non-empty subset of HL/HR/FL/FR.")
+        if per_foot is not None and set(per_foot) - set(feet):
+            raise ValueError("Per-foot stance targets name a foot that is not compensated.")
         self._data = mujoco.MjData(model)
         key = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_KEY, "stand")
         if key < 0:
@@ -159,7 +182,8 @@ class StanceCompensator:
             }
         self.tables = MappingProxyType(tables)
         self.diagnostics = {"method": "bounded minimum-norm Jacobian updates; no SciPy or stochastic search",
-                            "target_clearance_m": self.target_clearance_m, "table_size": table_size,
+                            "target_clearance_m": self.target_clearance_m,
+                            "frozen_band_low_m": self._band_low, "table_size": table_size,
                             "max_offset_rad": self.max_offset_rad, "fit": fit_diagnostics,
                             "assumptions": ["saved stand root/spine/passive joints", "other-amplitude zero",
                                             "zero knee/ankle base stance targets", "exact collision primitives; no force prediction"]}
@@ -167,8 +191,14 @@ class StanceCompensator:
             grid = np.linspace(self.tables[foot][0, 0], self.tables[foot][-1, 0], 4 * (table_size-1) + 1)
             heights = [self.clearance(foot, float(hip), *self.offsets(foot, float(hip), 0., .78)) for hip in grid]  # noqa: E501
             self.diagnostics["fit"][foot]["dense_interpolation_clearance_range_m"] = [float(min(heights)), float(max(heights))]
-            if min(heights) < -.0012 - 1e-9 or max(heights) > 1e-9:
+            if min(heights) < self._band_low - 1e-9 or max(heights) > 1e-9:
                 raise ValueError(f"{foot} interpolation violates frozen stance band: {min(heights)}, {max(heights)}")
+
+    def target_for(self, foot):
+        """This foot's frozen-pose target depth, scalar or per-foot."""
+        if self._per_foot_target is None:
+            return self.target_clearance_m
+        return self._per_foot_target.get(foot, -.0006)
 
     def clearance(self, foot, hip_ctrl_rad, *free_offsets_rad):
         """Read-only model diagnostic; private scratch data is not thread-safe."""
@@ -209,7 +239,7 @@ class StanceCompensator:
         x = np.zeros(self._info[foot]["free_count"])
         bounds = self._info[foot]["offset_bounds"]
         for _ in range(60):
-            error = self.clearance(foot, hip, *x) - self.target_clearance_m
+            error = self.clearance(foot, hip, *x) - self.target_for(foot)
             if abs(error) <= 2e-6:
                 return x, error
             gradient = np.zeros(x.size)
@@ -226,13 +256,13 @@ class StanceCompensator:
             improved = False
             for backtrack in range(12):
                 candidate = np.clip(x + step * 2.**(-backtrack), bounds[:, 0], bounds[:, 1])
-                candidate_error = self.clearance(foot, hip, *candidate) - self.target_clearance_m
+                candidate_error = self.clearance(foot, hip, *candidate) - self.target_for(foot)
                 if abs(candidate_error) < abs(error):
                     x, improved = candidate, True
                     break
             if not improved:
                 break
-        error = self.clearance(foot, hip, *x) - self.target_clearance_m
+        error = self.clearance(foot, hip, *x) - self.target_for(foot)
         if abs(error) > 2e-6:
             # The Newton loop stalls where clearance() switches which collision
             # geom is lowest: that min() is continuous but not differentiable, so
@@ -245,7 +275,7 @@ class StanceCompensator:
             direction = np.ones(x.size) / math.sqrt(float(x.size))
             lo_scale = float(np.min(bounds[:, 0] / direction))
             hi_scale = float(np.min(bounds[:, 1] / direction))
-            at = lambda s: self.clearance(foot, hip, *np.clip(s * direction, bounds[:, 0], bounds[:, 1])) - self.target_clearance_m
+            at = lambda s: self.clearance(foot, hip, *np.clip(s * direction, bounds[:, 0], bounds[:, 1])) - self.target_for(foot)
             lo_error, hi_error = at(lo_scale), at(hi_scale)
             if lo_error * hi_error <= 0.:
                 for _ in range(200):

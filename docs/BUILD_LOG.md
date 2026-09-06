@@ -1000,3 +1000,274 @@ measures at 20 s.
 Refitting at **20 s**, the gate's own duration, so no window mismatch can exist.
 The baseline remains the incumbent at 4/6, stable across every duration tested,
 and is not replaced unless a candidate beats it at the gate's own duration.
+
+# Session 4 — the walker is trained, and training does not fix the forefoot
+
+Laptop only. 12 cores, torch 2.12.0+cpu, no AWS, no dollars spent. Measured
+throughput 894 fps at 16 subproc envs with `--n-steps 2048`; the 3.01 M-step run
+took 4,882 s wall clock at a run-average 617 fps (eval and checkpointing
+included). The instance was not started and is not needed: it has 4 vCPU against
+this laptop's 12, its own 10 M-step run logged 853 fps, and the policy is a
+185,907-parameter MLP that never touched a GPU.
+
+## What was built
+
+**The lab training block is replaced by an evidence contract.** `BLOCKED.md`
+asked for two things before any lab training or resume: the failed gait gate
+deliberately resolved, and the exact effective lab controller persisted and
+compared in checkpoint contracts. `require_lab_training_readiness(args)` now
+requires `--lab-base-evidence`, a `realism_metrics` report measuring this body
+and base controller with a **zero policy**, and checks that its XML hash matches
+`--xml-path`, its `effective_lab_parameters` match the registry, its stance
+compensation matches the flag, its duration is the gate's own 20 s, and its
+reset noise is zero. The whole contract is written into `train_config.json`.
+
+The reason it is an evidence check and not a pass requirement: **Gate 2 scores
+the base with the policy switched off.** It gates the foundation, not the
+trained walker. Two of its six checks — front stance load and limb phase — are
+precisely what a learned residual exists to attack. They are recorded as unmet,
+not waived.
+
+Verified rejections, all against real reports already in the repo:
+
+| Evidence offered | Outcome |
+|---|---|
+| `gate2_all_limbs.json` (registry params, comp `all`, 20 s) | **accepted** |
+| `gate2_with_compensation.json` (hind-only, duty .700) | rejected on hind duty |
+| `gate2_baseline.json` (no compensation) | rejected on compensation flag |
+| `gate2_ADOPTED.json` (withdrawn CMA fit) | rejected on controller parameters |
+| `gate2_baseline12.json` (same base, 12 s window) | rejected on duration |
+| `gecko_body_r.xml` (61 g body) | rejected on XML hash |
+
+A pre-Session-3g report records a subset of `lab_base_parameters`, because
+`spine_amp`/`tail_amp`/`tail_phase_lag` entered the registry at the controller's
+existing constructor defaults. That is accepted only by reading those defaults
+back off `CPGResidualController.__init__` and proving each missing key equals
+the value the older run actually executed — never by assuming it.
+
+**A defect that would have silently run the wrong experiment.** `make_env` did
+not forward `hind_stance_compensation`, so every lab run would have trained on
+the **uncompensated** base — hind duty 0.641, a 2/6 foundation — while the
+config claimed otherwise. Fixed and pinned by `test_make_env_forwards_the_base_controller_controls`.
+
+**`--target-kl`.** The documented 10 M-step collapse (eval reward 1128.76 at
+1.5 M to 422.97 at 10 M) ran `approx_kl` to 67.26. SB3 will stop an epoch loop
+on KL if asked; the script never asked. It fired once in the 20 k smoke and not
+once in the 3 M run, which is the correct behaviour for a stable run.
+
+**`--front-lift-residual-scale`.** The FL/FR lift lock stays structurally on;
+only its scale becomes caller-selected, so the locked channels stay enumerated.
+
+**`envs/gecko_walk_env.py::lab_controller_snapshot`** — a plain picklable record
+of the *live* controller in every vector worker: effective lab parameters,
+compensation scope, phase offsets, commanded stance, frequency, and the residual
+scale of all 25 actuators. `environment_calibration_snapshot` collects it,
+requires every worker to agree, and stores it; lab resume refuses a changed one.
+Returns `None` for legacy, so no historical run changes.
+
+**`tools/gate_checkpoints.py`** — scores every checkpoint of a run through
+`realism_metrics.py` and then `eval.session2_controller.gate2`, the same function
+`tests/test_session2_gate.py` pins and this log tabulates. Nothing is re-derived:
+Session 3g is the standing warning about a harness that reimplemented limb phase
+and optimised a quantity that diverged from the gate. Evaluation flags are read
+from the run's own `train_config.json`, so the body and controller a checkpoint
+is scored under cannot drift from the ones it was trained under. Reward is
+deliberately not a column.
+
+Its zero-residual row reproduces `gate2_all_limbs.json` exactly — 0.0416 /
+0.7427 / 0.0806 / 0.5841 / 0.7334 / 0.6347, stride CV 0.0149, 4/6.
+
+224 tests pass, one SciPy skip.
+
+## Run 1 — 3.01 M steps, seed 0, elbow locked at 0.00
+
+`artifacts/evidence/session4/s4_run1_seed0/gate_curve.{json,md}`, 32 rows.
+
+**No trained checkpoint reached 4/6.** The best of 31 is 3/6; the base is 4/6.
+Step 0 scores 4/6, which is the setup check passing — an untrained policy must
+reproduce the base — and is not a trained result.
+
+| | base | 3.01 M | |
+|---|---|---|---|
+| signed forward m/s | 0.0416 | **0.0607** | +46 % |
+| net / path | 0.7427 | **0.7943** | better |
+| hind swing load | 0.0806 | 0.0548 | better |
+| front stance load | 0.5841 | **0.5313** | **worse**, target ≥ 0.65 |
+| hind duty | 0.7334 | **0.5986** | **lost**, band 0.73–0.83 |
+| limb phase | 0.6347 | **0.8848** | **worse**, band 0.405–0.465 |
+
+Eval reward over the same run went 1,490 → 3,120 and was still setting new bests
+at 2.5 M. **The reward more than doubled while three gates degraded.** Had this
+run been judged by `ep_rew_mean` it would have been recorded as a success.
+
+What it learned is a faster, less gecko-like gait: it buys speed by shortening
+hind stance. It also unloaded the fronts, which is the exact escape the
+controller's own docstring documents from V4.2.3 — "PPO learned to unload the
+fronts because progress rewards the faster front-light crawl". The V4.2.4
+per-actuator caps were introduced to close that escape structurally. **They did
+not: it re-emerged through the uncapped channels** (hips 0.25, ankle 0.25,
+spine_pitch 0.10).
+
+## Why the fronts fail, measured
+
+Final checkpoint, 20 s, first 3 s discarded, contact threshold 0.03502 N,
+bodyweight 0.3728 N:
+
+| foot | loaded in commanded stance | contact overall | contact during swing |
+|---|---|---|---|
+| HL | 0.7723 | 0.6153 | 0.0548 |
+| FL | **0.5313** | 0.3732 | **0.0000** |
+| HR | 0.8441 | 0.6814 | 0.0924 |
+| FR | **0.6145** | 0.4287 | **0.0000** |
+
+Mean front force through commanded stance: FL 0.1123 N, FR 0.1191 N — about
+**30 % of bodyweight**. The front feet never touch during swing, so this is not
+mistimed contact being scored as absence.
+
+The forefeet are not pressing too weakly. **They are not reaching the ground for
+roughly 40 % of the stance they are commanded to hold.** That is geometry, and
+it matches the standing hypothesis carried from Session 3: trunk pitch lifting
+the shoulder puts the commanded pose above the floor.
+
+And the policy has **no lever on it**. `res_scale_vec[elbow_L] = res_scale_vec[elbow_R] = 0.00`.
+Three million steps were spent attacking a forefoot-height problem with hips and
+spine because those were the only channels open.
+
+## Next
+
+Run 2b: identical, with `--front-lift-residual-scale 0.08`. The elbow is the only
+actuator that sets front foot height directly. This is the plan's fallback
+branch, now motivated by measurement rather than by expectation.
+
+The risk is explicit and is the reason the gate table exists: elbow authority can
+press the foot down or lift it further, and lifting is the documented escape.
+`front_track`/`front_miss` penalise it and `front_factor` throttles progress
+(measured front duty score 0.533, so the throttle was active all run and did not
+prevent the degradation). Whichever way it goes will be read off the gates.
+
+## Run 2b — elbow authority unlocked to 0.08
+
+`artifacts/evidence/session4/s4_run2b_elbow008/`. 3.01 M steps, seed 0, otherwise
+identical to run 1.
+
+**The hypothesis was right and the result is still a failure.** Front stance load
+passed its gate for the first time in the project's history — 0.6653 at 700 k,
+0.6593 at 1.0 M, **0.6740 at 1.1 M**, 0.6613 at 1.2 M, against a 0.65 target.
+Run 1, elbow locked, never exceeded 0.6017. The elbow is the lever.
+
+But every checkpoint that passed it has a wrecked stride rhythm:
+
+| | stride-period CV |
+|---|---|
+| base | **0.0149** |
+| rows that passed front stance load | **0.16 – 0.38** |
+| ceiling | **0.10** |
+
+Only 5 of 31 trained checkpoints stayed inside the CV ceiling, and the best of
+those is 3/6. The policy raises front load by walking irregularly, not by walking
+better — the same shape of exploit as Session 3g, where a harness was rewarded
+for driving CV 0.0149 → 0.2713.
+
+### A defect in the scoreboard, found by that result
+
+`tools/gate_checkpoints.py` ranked by gate count and applied **no** CV rejection,
+so it selected step 1.1 M — CV 0.3752 — as "best". `tools/fit_gate2_official.py`
+rejects CV > 0.10 outright; the new tool did not. That is the Session 3g hole
+rebuilt. Fixed: `CV_CEILING` is now imported from the fitter so there is one
+definition, irregular rows are hard-rejected from selection and labelled
+`REJECTED` in the table, `rows_rejected_for_irregular_gait` is recorded, and two
+tests pin it. Both runs were re-scored under the corrected rule:
+
+| run | baseline | best trained | beats base |
+|---|---|---|---|
+| run 1 (elbow locked) | 4/6 | step 400 k, **3/6** | no |
+| run 2b (elbow 0.08) | 4/6 | step 200 k, **3/6** | no |
+| | | rejected for irregular gait | 24 and 26 rows |
+
+**No trained checkpoint beats the base in either run.**
+
+## The standing hypothesis is refuted by direct measurement
+
+Carried since the handoff: *trunk pitch rides nose-up, lifting the shoulder, so
+the forefoot cannot reach the floor*. It had never been tested directly.
+
+Base controller, 20 s, first 3 s discarded:
+
+| quantity | measured | published | verdict |
+|---|---|---|---|
+| trunk pitch | **3.87°** | 3.72 ± 0.61° nose-up | **inside the range — correct** |
+| shoulder height | **0.125 SVL** | 0.11 SVL | **13.6 % too high** |
+| hip height | 0.158 SVL | 0.15 SVL | 5.3 % too high |
+
+**Trunk pitch is not the fault.** The whole body rides too high while walking,
+and the shoulder proportionally more than the hip. The forefeet sit **3.14 mm
+(FL) and 3.25 mm (FR)** above the floor on the samples where they are commanded
+down but carry no load, peaking at 7.7 mm. Front feet touch during commanded
+swing **0.0000** of the time, so this is not mistimed contact scored as absence.
+
+Note the static morphology audit passes 14/14 including hip height at the stand
+keyframe. **The static pose is right and the walking pose is not**; those are
+different measurements and only the first was ever checked.
+
+## Two more refutations
+
+**Pressing the front foot harder does almost nothing, and the reason matters.**
+Sweeping `front_stance_press` 0.05 → 0.36 moved front stance load 0.5841 → 0.6253
+with the stride staying clean (CV 0.0132), then everything collapsed at 0.44
+(0/6, CV 0.46). The weak effect is explained by `base_ctrl`: when compensation is
+active the compensator writes an **absolute** elbow target blended by swing
+weight, so through stance — the part that is scored — `front_stance_press` is
+overwritten entirely. It was a knob disconnected from the thing being measured.
+
+**Aiming the frozen pose deeper fails, both ways.** `StanceCompensator` solves
+each foot's pose against `self._stand_qpos`, i.e. with the body at its standing
+height; a walking gecko rides higher, so the solved foot lands short. Aiming
+deeper is the obvious correction and it does not work:
+
+| target depth | front stance load (uniform) | front stance load (front only) |
+|---|---|---|
+| −0.60 mm (default) | 0.5841 | 0.5841 |
+| −1.50 mm | 0.5801 | 0.5752 |
+| −2.50 mm | 0.5231 | 0.5680 |
+| −3.50 mm | 0.5028 | 0.5656 |
+| −7.00 mm | 0.5339 | 0.5863 |
+
+Uniform depth is confounded — it jams the hind feet down too, hind swing load
+0.0806 → 0.2710 — so the front-only column is the clean test. It is flat.
+
+## Why: the forelimb is under-actuated for this correction
+
+Read from `common/hind_stance_geometry.py` `limb_specs` and confirmed on the
+built compensator:
+
+| limb | free joints available to the solve |
+|---|---|
+| HL / HR | **2** — `knee`, `ankle` |
+| FL / FR | **1** — `elbow` (this MJCF has no wrist actuator) |
+
+A limb with two free joints can set foot **height** and foot **fore-aft position**
+independently. A limb with one cannot: changing the elbow to lower the foot also
+swings it fore-aft, so the correction moves where the foot lands instead of
+pressing it down. That is why the same compensator fixed hind duty in Session 3
+(0.641 → 0.733) and cannot fix front stance load now.
+
+This is a structural limit of the body, not a tuning failure, and it bounds what
+any base-controller correction can achieve. `docs/DECISIONS.md` forbids adding a
+shoulder joint and requires preserving nq=39/nv=38/nu=25, so adding a wrist is a
+morphology decision to be taken deliberately, with its own published
+justification, and not as a fix smuggled in to pass a gate.
+
+## Session 4 evidence ledger
+
+| # | Hypothesis | Verdict | Evidence |
+|---|---|---|---|
+| 11 | A learned residual can fix the forefoot | **Refuted** | 2 runs × 3.01 M steps; best trained 3/6 vs base 4/6 |
+| 12 | Trunk pitch lifts the shoulder | **Refuted** | pitch 3.87° vs published 3.72 ± 0.61 |
+| 13 | Elbow authority is the missing lever | **Confirmed** | front load 0.5841 → 0.6740, unreachable with it locked |
+| 14 | ...and it can be had without cost | **Refuted** | every passing row had CV 0.16–0.38 vs 0.10 ceiling |
+| 15 | Pressing harder in the base fixes it | **Refuted** | 0.5841 → 0.6253 then collapse; press is overwritten in stance |
+| 16 | Aiming the frozen pose deeper fixes it | **Refuted** | flat front-only, worse uniform, across −0.6 to −7.0 mm |
+| 17 | The walking posture rides too high | **Confirmed** | shoulder 0.125 vs 0.11 SVL; forefoot 3.1 mm high in stance |
+| 18 | The forelimb is under-actuated for it | **Confirmed** | 1 free joint vs the hindlimb's 2, read from `limb_specs` |
+
+227 tests pass, one SciPy skip.
