@@ -1,0 +1,126 @@
+{
+ "schema_version": 1,
+ "test": "optokinetic drum, Masseck Roll & Hoffmann 2008",
+ "generated_by": "tools/okr_sweep.py",
+ "published_source": "Masseck, Roll & Hoffmann 2008, Vision Research 48:765-772, Eublepharis macularius, n = 4, head gain. The only quantitative sensorimotor measurement published for this species' vision.",
+ "protocol": {
+  "frame_rate_hz": 50.0,
+  "stripe_period_deg": 20.0,
+  "stripe_period_provenance": "INVENTED -- the source's spatial frequency was not recovered, and a flow estimator's gain depends on it. One more reason the absolute gains here are not evidence.",
+  "velocities_deg_s": [
+   20.0,
+   30.0,
+   40.0
+  ],
+  "extrapolation": "refused -- only the three published velocities"
+ },
+ "rows": [
+  {
+   "condition": "binocular",
+   "velocity_deg_s": 20.0,
+   "measured_gain": 0.7983,
+   "signed_command_deg_s": 15.9657,
+   "published_gain": 0.9
+  },
+  {
+   "condition": "binocular",
+   "velocity_deg_s": 30.0,
+   "measured_gain": 0.7283,
+   "signed_command_deg_s": 21.8481,
+   "published_gain": 0.8
+  },
+  {
+   "condition": "binocular",
+   "velocity_deg_s": 40.0,
+   "measured_gain": 0.6749,
+   "signed_command_deg_s": 26.9975,
+   "published_gain": 0.75
+  },
+  {
+   "condition": "temporo_nasal",
+   "velocity_deg_s": 20.0,
+   "measured_gain": 0.7983,
+   "signed_command_deg_s": 15.9657,
+   "published_gain": 0.7
+  },
+  {
+   "condition": "temporo_nasal",
+   "velocity_deg_s": 30.0,
+   "measured_gain": 0.7283,
+   "signed_command_deg_s": 21.8481,
+   "published_gain": 0.6
+  },
+  {
+   "condition": "temporo_nasal",
+   "velocity_deg_s": 40.0,
+   "measured_gain": 0.6749,
+   "signed_command_deg_s": 26.9975,
+   "published_gain": 0.4
+  },
+  {
+   "condition": "naso_temporal",
+   "velocity_deg_s": 20.0,
+   "measured_gain": 0.0,
+   "signed_command_deg_s": 0.0,
+   "published_gain": 0.0
+  },
+  {
+   "condition": "naso_temporal",
+   "velocity_deg_s": 30.0,
+   "measured_gain": 0.0,
+   "signed_command_deg_s": 0.0,
+   "published_gain": 0.0
+  },
+  {
+   "condition": "naso_temporal",
+   "velocity_deg_s": 40.0,
+   "measured_gain": 0.0,
+   "signed_command_deg_s": 0.0,
+   "published_gain": 0.0
+  }
+ ],
+ "predicted_checks": {
+  "naso_temporal_is_silent": {
+   "predicted": "exactly zero at every velocity",
+   "measured": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "pass": true
+  },
+  "binocular_beats_monocular": {
+   "predicted": "binocular gain exceeds temporo-nasal at every velocity",
+   "measured": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "pass": null,
+   "untestable": "THE BODY HAS ONE CAMERA. morphology/gecko_world_v1.xml:89 defines a single central head_cam; there is no second eye to cover, so binocular and monocular are the same condition here and the measured difference is identically zero. The published comparison needs two eyes. Adding one is a body change and the body is validated 14/14, so it does not happen as a side effect of a vision module."
+  },
+  "gain_falls_with_velocity": {
+   "predicted": "gain decreases as stimulus velocity rises",
+   "measured": [
+    0.7983,
+    0.7283,
+    0.6749
+   ],
+   "pass": true
+  },
+  "gain_never_reaches_one": {
+   "predicted": "a perfectly stabilising loop has over-reproduced the animal",
+   "measured": 0.7983,
+   "pass": true
+  }
+ },
+ "fitted_not_evidence": [
+  "peak_gain",
+  "half_velocity_deg_s",
+  "stripe_period_deg"
+ ],
+ "blocked": {
+  "binocular_versus_monocular": "needs two eyes; the body has one central camera"
+ },
+ "verdict": "EVERY TESTABLE PREDICTED PROPERTY REPRODUCES, including the discriminating one: monocular naso-temporal gain is exactly zero at every velocity, which a symmetric flow estimator cannot produce. The binocular-versus-monocular comparison is UNTESTABLE on a one-eyed body and is recorded as blocked, not as passed."
+}

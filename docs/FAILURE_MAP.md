@@ -3,7 +3,7 @@
 **One document. Everything tried, everything that failed, why, and what fixed it.**
 Past, present, future. Updated every session; nothing removed.
 
-Last updated: Session 8.
+Last updated: Session 8b.
 
 ---
 
@@ -34,7 +34,8 @@ later turned out to be right gets a second row, not an edit.
 | **Brain 2/8 — basal ganglia** (action selection) | ✅ reproduces the published table, mean error 0.10 pp |
 | **Brain 3a/8 — spinal rhythm** (the leg oscillators) | ✅ drives the walker, every gate unchanged |
 | **Brain 3b/8 — brainstem** (decision → command) | ✅ built; thinnest evidence in the project, declared |
-| Brains 4–8 — retina, tectum, sleep, memory | ❌ |
+| **Brain 4a/8 — retina + pretectum** (seeing, gaze) | 🟡 built; the published optokinetic asymmetry reproduces |
+| Brain 4b–8 — tectum, sleep, memory | ❌ |
 | **Proof** — 15-test battery | 🟡 1 run (A3, failed then fixed) |
 
 **Roughly 50 % done.** The irreversible parts — the research and the body — are
@@ -141,16 +142,17 @@ Where the work went, in order, and where it stopped each time. **71 commits.**
 
 ### ← Where we are paused, right now
 
-- **Done and pushed:** everything above, 433 tests green.
+- **Done and pushed:** everything above, 449 tests green.
 - **Running in the background:** a hunt for why our dopamine curve sits +0.10
   high. Not a blocker; nothing depends on it.
 - **Brain 3 is finished.** The cord drives the walker with every gate
   unchanged, and the brainstem turns a decision into a stride frequency and a
   turn.
-- **Next up, scouted but not built:** the retina and tectum. The specification
-  is in hand and so are three findings that have to be fixed with it: the eye
-  cannot resolve what the animal is measured to track, it samples the periphery
-  finer than the centre, and the policy never receives a spatial image at all.
+- **Half done:** the retina keeps position and the pretectum reproduces the
+  published optokinetic asymmetry. Neither is wired into the environment yet.
+- **Next up, not started:** the tectum — turning the retinotopic map into a
+  bearing and a prey salience, and replacing the colour-matching placeholder
+  that stands in for it.
 
 ---
 
@@ -653,6 +655,53 @@ no published field of view exists for this species, and the tapetum everyone
 
 ---
 
+## Ledger — the retina and the optokinetic reflex (Session 8b)
+
+The eye now keeps position, and it is gated against the only quantitative
+behavioural measurement that exists for this species' vision.
+
+| # | Hypothesis | Verdict | Evidence |
+|---|---|---|---|
+| 121 | A gradient flow estimator on the cell grid is accurate | **Refuted** | **2.07x too large** at every velocity — the drum's stripes span four cells, where a central difference underestimates the gradient by a third |
+| 122 | Estimating at pixel resolution fixes it | **Partly** | 2.07x to **1.15x**. The residual is the inverse fovea: pixels are not uniform in angle |
+| 123 | Differencing against **azimuth** removes the bias | **Confirmed** | ratio **1.02** against truth across 10-40 deg/s |
+| 124 | The published monocular asymmetry can be reproduced | **Confirmed** | naso-temporal gain **exactly 0.000** at all three velocities — a symmetric estimator cannot do this |
+| 125 | The binocular-versus-monocular comparison can be run | **Refuted** | **the body has ONE camera.** There is no second eye to cover. Recorded as blocked, not as passed |
+| 126 | The optokinetic gain should approach 1 | **Refuted** | published gain is 0.9 and **falls** to 0.7-0.8 by 40 deg/s. Perfect stabilisation would be over-reproduction |
+
+### #121 to #123 — three attempts at one measurement
+
+The flow estimator was wrong twice before it was right, and each error had a
+different cause. Binning first destroyed the spatial sampling. Differencing
+against the pixel index then inherited the camera's own non-uniformity — **the
+inverse fovea showing up as a measurement error rather than as a picture**.
+Only differencing against the actual angle of each column is unbiased.
+
+### #124 — the discriminating result
+
+Published: monocular naso-temporal stimulation elicits **no optokinetic
+response at any velocity**, n = 4. Any front end that simply measures full-field
+motion predicts a non-zero gain there, because the flow is present and just as
+strong.
+
+Here the silence is **predicted**, not written in: each hemifield is half-wave
+rectified in its temporo-nasal direction, so backward flow contributes nothing
+rather than contributing negatively. Measured: **0.000, 0.000, 0.000**.
+
+The absolute gains are **fitted** and are therefore not evidence — the module
+and the evidence file both say so, and the test gates only on the predicted
+properties.
+
+### #125 — a test the body cannot take
+
+The published experiment covers one of two eyes. This body has a single central
+camera, so binocular and monocular are the same condition and the difference is
+identically zero. Recorded as **untestable**, not as passed. Adding a second eye
+is a body change, and the body is validated 14/14, so it does not happen as a
+side effect of a vision module.
+
+---
+
 ## My own errors — the meta-ledger
 
 Failures of method, not of hypothesis. These are the ones worth re-reading.
@@ -751,12 +800,12 @@ shortfall.
 
 | | |
 |---|---|
-| Hypotheses tested | **120** |
-| Refuted | **91** |
-| Confirmed | **22** |
-| Partly | **6** |
+| Hypotheses tested | **126** |
+| Refuted | **94** |
+| Confirmed | **24** |
+| Partly | **7** |
 | My own method errors | **24** |
-| Tests passing | **433**, no expected failures |
+| Tests passing | **449**, no expected failures |
 
 **Seventy-three per cent of everything tried was wrong.** That is what the map
 is made of.
