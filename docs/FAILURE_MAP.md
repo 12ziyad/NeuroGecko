@@ -40,6 +40,112 @@ behind us.
 
 ---
 
+## What works — the successes
+
+The ledger below is mostly failures, because that is what a map of where not to
+look is made of. This is the other half: what is standing, and what it is
+checked against.
+
+| What | Checked against | Status |
+|---|---|---|
+| **Research corpus** — 276 published measurements, 167 agents, fact-checked | the literature | standing |
+| **Provenance registry** — every number tagged published / derived / invented, with species and source | itself, by test | standing |
+| **Body** — 38 g lab morphology | 14 of 14 static anatomical checks | standing |
+| **Walker** — hand-written CPG + stance compensator | 4 of 6 published gait gates | accepted |
+| **Tail coupling** — blocking the tail collapses the hind legs | published ablation **−21% / −17%**; ours **−20.7% / −16.5%** | reproduced |
+| **Limb phase = late touchdown** | 0.320 − 0.123 = **0.197**, exactly the measured error | confirmed |
+| **No-cheat world** — no privileged channels, real textured floor, fleeing prey | the animal's own senses | standing |
+| **Hunger** — from the animal's own metabolism | **70%** hungry at the published 2.33-day feeding interval, unfitted | reproduced |
+| **Energy budget** — metabolism and feeding schedule agree | 79 h per meal against a 56 h interval, from **separate papers** | reproduced |
+| **Fatigue** — from the published endurance curve | >60 min at the published speed | reproduced |
+| **Selection** — Gurney 2001b selection sequence | published output values to **four decimal places** | reproduced |
+| **Dopamine** — the published disembodied sweep | akinesia **exact**; peak clean selection **79.9 vs 78.6** | reproduced |
+| **The gecko decides** — six behaviours, sigma-pi salience | behaviour, by test | standing |
+| **Brains 1 + 2 running together** in the live simulation | the seam, by test | standing |
+| **385 tests**, no expected failures | themselves | green |
+
+**The single best result** is the energy budget. Metabolism and the feeding
+schedule were measured by different scientists, decades apart, for unrelated
+reasons. One meal covers 79 hours; geckos are fed every 56. Nobody arranged
+that agreement — it is the model's own physiology coming out right.
+
+---
+
+## The flow — every session, start to now
+
+Where the work went, in order, and where it stopped each time. **71 commits.**
+
+### Phase 1 — locomotion, before the ledger existed
+
+| | What was done | Outcome |
+|---|---|---|
+| V4.2.2–4.2.9 | front-foot correction, front-load controller, escape-proof gate, knee residual cap, duty reward gate, contact reflex curriculum | iterative, no accepted base |
+| V4.3–4.6 | velocity tracking, matched stance cadence, front de-stick | each refuted as the fix |
+| V4.5B | — | **accepted as the locomotion champion** |
+
+### Phase 2 — the first brain, since superseded
+
+| | What was done | Outcome |
+|---|---|---|
+| AGWM | brain environment wiring, trainable visual policy, curriculum, privileged food taper, mouth-distance reward, oracle eval, recurrent PPO, behaviour cloning, DAgger, visual distillation, drive-based controller | produced the recovered brains; the drive module here is the one `hypothalamus.py` later replaced |
+
+### Phase 3 — rebuilding on evidence
+
+| Session | What was done | Where it stopped |
+|---|---|---|
+| recovery | verified the cloud model lineage before touching anything | lineage confirmed |
+| baselines | measured baselines, camera isolation, verified checkpoint recovery | — |
+| morphology | constrained lab morphology, shared gait calibration | — |
+| step 0 | recorded true 250 Hz physics | **reported failed entrainment honestly** rather than hiding it |
+| step 1–2 | charge effort on actuator work; force and collision diagnosis | 19 force-only tests |
+| step 3 | improve the lab base | **stopped training on failed gates** |
+| **3** | hind stance compensation, implemented and tested | Gate 2 still failed |
+| **3b** | generalised compensation to all four limbs | **Gate 2 reaches 4/6** |
+| **3c** | limb phase identified as late touchdown | stride length judged geometrically unreachable |
+| **3d** | stride length is speed; spine refuted as its source | 41% hind foot slip found |
+| **3e** | gearing and contact softness refuted | corrected my own framing of stride length |
+| **3f** | CMA-ES appears to solve the limb-phase gate | 6/6 declared unreachable |
+| **3g** | **the 3f claim WITHDRAWN** — it had optimised the wrong metric | a success retracted, not buried |
+| **3h** | fit harness rescored through `realism_metrics` | a 12 s fit rejected as unstable |
+| **3i** | gate-count objective, 20 s fit evidence | **searches stopped** — the space was exhausted |
+| handoff | `docs/HANDOFF.md`, the full record of research and build | — |
+
+### Phase 4 — training, body, and the world
+
+| Session | What was done | Where it stopped |
+|---|---|---|
+| **4** | trained the walker, 6M steps over two runs | **the forefoot gate is unreachable on this body** — it needs a wrist joint the animal lacks |
+| **4b** | drove the sprawl degrees of freedom; coupled the tail to the hindlimb | the tail ablation **reproduces published values** |
+| **4c** | the no-cheat world; prey that flees | the walker **cannot catch it, and is not meant to** — real geckos strike |
+| **4d** | finished the no-cheat work in the environment that has eyes | a privileged channel had survived in the other environment |
+
+### Phase 5 — the first brain module
+
+| Session | What was done | Where it stopped |
+|---|---|---|
+| **5** | hypothalamus: hunger from the animal's own metabolism | reproduces the scorecard four ways |
+| **5b** | fatigue from the published endurance curve | **fear is wired to the wrong sense** — still blocked |
+
+### Phase 6 — the second brain module
+
+| Session | What was done | Where it stopped |
+|---|---|---|
+| **6** | basal ganglia built from the equations | **shipped NOT ACCEPTED** — the sweep failed and the commit said so |
+| **6b** | found the parameter table; two of three errors were structural | 5 of 7 properties |
+| **6c** | **this document created**; 6b's parameters turned out to be a variant's | the oscillation fixed — it had three causes |
+| **6d** | scouted module 3 with six agents | **the reported failure was not a failure** — the comparison had no published counterpart |
+| **6e** | found the authors' own source on disk | **the whole model was the wrong one**; reimplemented and reproduced |
+| **6f** | migrated the gecko onto the validated model | brains 1 and 2 **running together in the simulation** |
+
+### ← Where we are paused, right now
+
+- **Done and pushed:** everything above, commit `427a845`, 385 tests green.
+- **Running in the background:** a hunt for why our dopamine curve sits +0.10
+  high. Not a blocker; nothing depends on it.
+- **Next up, not started:** brain 3 — the leg rhythm first, then the brainstem.
+
+---
+
 ## The five rules this project runs on
 
 Each was learned by getting it wrong. They are the real output of the ledger.

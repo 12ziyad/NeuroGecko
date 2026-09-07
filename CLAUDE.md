@@ -7,6 +7,13 @@ every session, before touching anything. Update it before every commit that
 tests a hypothesis — confirmed or refuted. It carries past, present and future:
 project state, every failure with its cause and its fix, every current blocker.
 
+It carries four things, and all four must stay current:
+  1. **What works** — the successes, with what each is checked against.
+  2. **The flow** — every session in order, what was done, where it stopped,
+     and a marker for where the work is paused right now.
+  3. **The ledger** — every hypothesis, numbered, with verdict and evidence.
+  4. **What is open** — blockers, what is deliberately not modelled, and next.
+
 **Nothing is ever deleted from it.** A hypothesis refuted and later found true
 gets a second row, not an edit. The refuted entries are the map of where not to
 look; they are the most valuable thing in this repository.
