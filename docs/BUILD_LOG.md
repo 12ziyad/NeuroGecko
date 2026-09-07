@@ -1,5 +1,11 @@
 # NeuroGecko build log
 
+> **The consolidated ledger lives in [FAILURE_MAP.md](FAILURE_MAP.md)** — every
+> hypothesis from session 1 to now with its verdict and evidence, plus the
+> current blockers and what is deliberately not modelled. This file is the
+> chronological narrative; the map is the index. Update both.
+
+
 ## Session 3 — touchdown hypothesis test, 2026-09-05
 
 **AWS state at session start (11:47 UTC): UNKNOWN.** The read-only SSH

@@ -1,105 +1,109 @@
 {
- "schema_version": 2,
+ "schema_version": 3,
  "test": "Prescott et al. 2024 tonic-dopamine sweep against the extended GPR",
+ "generated_by": "tools/dopamine_sweep.py",
+ "seed": 20260907,
  "parameter_source": {
-  "weights_and_thresholds": "Girard et al., 'Integration of navigation and action selection functionalities in a computational model of cortico-basal ganglia-thalamo-cortical loops', arXiv cs/0601004, Table 5 and Equations 5-14",
+  "weights_and_thresholds": "Fox et al. 2009, Front. Neuroinform. 3:6, doi:10.3389/neuro.11.006.2009 (attribution-only open access), equations 1-12. SECONDARY: Gurney, Prescott & Redgrave 2001 (Biol. Cybern. 84:401-410, 84:411-423) is the origin and both parts are paywalled; no value here is quoted from them directly.",
   "gating_constant_c": "0.169, Prescott et al. 2024, Biomimetics 9(3):139 section 3.1.2 (CC BY)",
-  "note": "docs/research/ names the model and the sweep but restates neither the weights nor the thresholds. They were located by search after a first reimplementation from recalled equations failed this sweep."
+  "thalamocortical_extension": "Girard et al. 2005, arXiv cs/0601004 Table 5 -- NOT GPR 2001, and one of two incompatible lineages in the literature. This file follows Girard's throughout and does not mix them.",
+  "superseded": "Session 6b used Girard's BG core weights (STN->output 0.8, GPe->output 0.4). That was a regression: it rests at 0.1429 where the published gating constant requires 0.169, leaving every channel 14.3% released with nothing salient.",
+  "note": "docs/research/ names the model and the sweep but restates neither the weights nor the thresholds."
  },
  "protocol": {
-  "trial_s": 120,
+  "trial_s": 120.0,
   "dt_s": 0.02,
   "channels": 6,
   "salience_gap": 0.05,
-  "noise": "Ornstein-Uhlenbeck, sigma 0.10, tau 2 s -- salience fluctuating on a BEHAVIOURAL timescale. An earlier run used 50 Hz white noise and produced 825 switches in 120 s, about 7 per second, which measured the noise rather than the model.",
-  "caveat": "DISEMBODIED. The published counts come from a robot foraging task; the corpus itself notes clean selection is lower disembodied (73-81%) than embodied (89-95%). Absolute switching counts are therefore not directly comparable -- the task differs."
+  "solver": "step() sub-divides internally to 5 ms. The STN-GPe loop is negative feedback with gain 0.9 * n_channels, so integrating at the caller's 50 Hz against tau = 40 ms is unstable: the resting output oscillates over 0.143-0.205 instead of settling at 0.16953.",
+  "noise": "Ornstein-Uhlenbeck, sigma 0.1, tau 2.0 s -- salience fluctuating on a BEHAVIOURAL timescale. An earlier run used 50 Hz white noise and produced 825 switches in 120 s, about 7 per second, which measured the noise rather than the model.",
+  "caveat": "DISEMBODIED. The published counts come from a robot foraging task; the corpus itself notes clean selection is lower disembodied (73-81%) than embodied (89-95%). Absolute switching counts are therefore not directly comparable -- the task differs. tau is also unresolved (40 ms Fox, 25 ms Girard) and tau sets the absolute scale of switch counts."
  },
  "rows": [
   {
-   "switches": 8,
-   "immobile_s": 93.0,
-   "distortion_amount": 0.001,
+   "switches": 0,
+   "immobile_s": 119.2,
+   "distortion_amount": 0.0,
    "dopamine": 0.03,
    "published": "38 s immobile"
   },
   {
-   "switches": 31,
-   "immobile_s": 59.4,
-   "distortion_amount": 0.001,
+   "switches": 6,
+   "immobile_s": 109.3,
+   "distortion_amount": 0.0,
    "dopamine": 0.06,
    "published": "14 s immobile"
   },
   {
-   "switches": 129,
-   "immobile_s": 0.8,
-   "distortion_amount": 0.126,
+   "switches": 25,
+   "immobile_s": 57.2,
+   "distortion_amount": 0.0,
    "dopamine": 0.12,
    "published": "below 75% vigour"
   },
   {
-   "switches": 134,
+   "switches": 91,
    "immobile_s": 0.1,
-   "distortion_amount": 0.408,
+   "distortion_amount": 0.13,
    "dopamine": 0.2,
    "published": "89-95% clean; ~7 switching bouts"
   },
   {
-   "switches": 148,
+   "switches": 89,
    "immobile_s": 0.1,
-   "distortion_amount": 0.728,
+   "distortion_amount": 0.415,
    "dopamine": 0.29,
    "published": "clean"
   },
   {
-   "switches": 110,
+   "switches": 89,
    "immobile_s": 0.1,
-   "distortion_amount": 0.801,
+   "distortion_amount": 0.486,
    "dopamine": 0.31,
    "published": "distortion appears"
   },
   {
-   "switches": 54,
+   "switches": 82,
    "immobile_s": 0.1,
-   "distortion_amount": 0.964,
+   "distortion_amount": 0.747,
    "dopamine": 0.37,
    "published": "clean"
   },
   {
-   "switches": 41,
+   "switches": 50,
    "immobile_s": 0.1,
-   "distortion_amount": 1.069,
+   "distortion_amount": 0.978,
    "dopamine": 0.43,
    "published": "most fail; ~21.3 switches"
   },
   {
-   "switches": 37,
+   "switches": 44,
    "immobile_s": 0.1,
-   "distortion_amount": 1.11,
+   "distortion_amount": 1.066,
    "dopamine": 0.46,
    "published": "every trial fails"
   }
  ],
- "winner_take_all_at_0.43": {
-  "switches": 146,
-  "immobile_s": 0.0,
-  "distortion_amount": 0.0
- },
- "verdict": "PARTIALLY REPRODUCES",
- "reproduced": [
-  "the immobility gradient: 93 s at lambda 0.03, 59 s at 0.06, 0.8 s at 0.12, 0.1 s from 0.20 -- monotonic and in the published direction",
-  "distortion deepening monotonically with dopamine",
-  "clean selection at baseline dopamine with separated saliences",
-  "stability at zero salience (the earlier implementation oscillated)",
-  "GPR and winner-take-all differ"
+ "errors_found_and_corrected": [
+  "Round 1 drove the striatum from cortex. Equation 14 is I_cortex = y_VL: cortex is driven by the thalamic return ALONE, and salience enters striatum and STN directly. Driving the striatum from cortex saturated it at 1.0 on every competitive channel and destroyed all downstream discrimination. No parameter would have fixed it.",
+  "Round 1 assumed every output slope was 1. The thalamocortical slopes are not: TRN runs at 0.5 and the ventrolateral thalamus at 0.62, and that 0.62 is what holds the cortico-thalamic loop gain below one. Assuming 1 put the loop exactly at the boundary of positive-feedback instability.",
+  "Round 2 replaced the basal-ganglia core weights with Girard 2005's re-tuned robotic variant (STN->output 0.8, GPe->output 0.4). That was a REGRESSION. Prescott defines the gating constant c as the model's own resting output, so c is an independent check on the weights: the canonical 0.9 / 0.3 set rests at 0.16953 and closes the gate exactly, while the variant rests at 0.1429 and leaves every channel 14.3 percent released with nothing salient.",
+  "Round 2 summed the diffuse reticular drive over ALL channels. The cited equation excludes the channel's own output, so this added a self-inhibition the model does not have.",
+  "The caller's control rate was the solver's rate. The STN-GPe loop is negative feedback with gain 0.9 * n_channels, so at 50 Hz against tau = 40 ms the discrete map is unstable and the resting output oscillates over 0.143-0.205. step() now sub-divides internally to 5 ms. This was the last of the three causes of the oscillation-at-zero-salience defect, which is now fixed and its test promoted from expectedFailure to a requirement.",
+  "An earlier sweep drove salience with fresh 50 Hz white noise and counted 825 switches in 120 s, about seven per second. The test was measuring its own noise. Salience is now Ornstein-Uhlenbeck with a 2 s time constant, a behavioural timescale.",
+  "An earlier test asserted zero distortion at EVERY dopamine level with separated saliences. The published finding is that excess dopamine distorts selection even then, so the test forbade the correct behaviour."
  ],
  "not_reproduced": [
-  "the switching ratio is inverted: 0.3x from baseline to lambda 0.43 against a published ~3x",
-  "GPR dithers LESS than the winner-take-all here (41 against 146); the published result is the opposite (21.3 against 9.2). This is the counterintuitive published finding and it does not come out. The task differs from the published robot foraging task, which may be sufficient explanation, but it is not demonstrated to be."
+  "The switching-rate comparison. Published: roughly 3x more switching bouts at excess dopamine than at baseline (21.3 against ~7). Measured: 0.55x -- still inverted, though improved from 0.3x. GPR also dithers LESS than a winner-take-all here, where the published result is the opposite; that is the counterintuitive published finding and it does not come out.",
+  "Absolute switch counts and immobility durations. The published figures are from an embodied robot foraging task and tau, which sets their scale, is unresolved across sources (40 ms Fox, 25 ms Girard)."
  ],
- "errors_found_and_corrected": [
-  "the striatum was driven by cortex rather than by salience directly. Equation 14 gives the cortex input as the thalamic return ALONE, with salience entering the striatum and STN directly (Eq 5, 6, 8). Driving the striatum from cortex saturated it at 1.0 for every competitive channel and destroyed all downstream discrimination.",
-  "the output-function slopes are not all 1: TRN is 0.5 and the ventrolateral thalamus 0.62, and that 0.62 is what holds the cortico-thalamic loop gain below one. Assuming m=1 put the loop exactly at the boundary of instability and the module oscillated at zero input.",
-  "tau 40 ms -> 25 ms; STN->EP/SNr 0.9 -> 0.8; GP->EP/SNr 0.3 -> 0.4; TRN->VL 0.4 -> 0.13; gating constant c 0.2 -> 0.169"
- ],
- "claim": "Instrumented simulation diagnostics with published parameters. The selection mechanism and its dopamine dependence reproduce in direction; the switching-rate comparison does not, and the module should not be treated as validated until it does or until the discrepancy is shown to be the task."
+ "claim": "This module should not be treated as validated. Six of seven published properties reproduce and the Gurney 2001b Fig. 2a selection sequence reproduces to four decimal places, but the switching-rate comparison does not, and the disembodied-task explanation for that is plausible and NOT demonstrated.",
+ "reproduces": {
+  "resting_gate_closes_exactly": true,
+  "immobility_gradient_monotonic": true,
+  "distortion_deepens_monotonically": true,
+  "switching_ratio_baseline_to_excess": 0.549,
+  "switching_ratio_published": "~3x (21.3 against ~7)"
+ },
+ "verdict": "PARTLY REPRODUCES, NOT VALIDATED. The selection mechanism REPRODUCES the published Gurney 2001b Fig. 2a output values to four decimal places and the gate closes exactly at the published resting constant, but the switching-rate comparison against the robot foraging task does not reproduce and is not demonstrated to be a task difference. The module is not wired into any environment and must not be until it is."
 }

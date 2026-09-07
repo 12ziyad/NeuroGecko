@@ -67,29 +67,54 @@ def piecewise_linear(activation, threshold, slope=1.0):
 class GPRParameters:
     """Connection weights and thresholds of the GPR loop.
 
-    PUBLISHED values, from Girard et al., "Integration of navigation and action
-    selection functionalities in a computational model of cortico-basal
-    ganglia-thalamo-cortical loops", arXiv cs/0601004 -- Table 5 (thresholds and
-    slopes) and Equations 5-14 (weights) -- with the gating constant c = 0.169
-    from Prescott et al. 2024, Biomimetics 9(3):139, which is CC BY.
+    SECONDARY-SOURCED values. The origin is Gurney, Prescott & Redgrave 2001
+    (Biol. Cybern. 84:401-410 and 84:411-423), but BOTH parts are paywalled and
+    not one number here is quoted from them directly. The values come from:
 
-    `docs/research/` names the GPR model and gives the dopamine sweep but does
-    NOT restate these, so they were first reimplemented from recalled equations
-    and the sweep failed. Four of them were wrong, and one wrongly: **the slopes
-    are not all 1**. TRN runs at 0.5 and the ventrolateral thalamus at 0.62, and
-    that 0.62 is what holds the cortico-thalamic loop gain below one. Assuming
-    m = 1 everywhere put the loop exactly at the boundary of instability, which
-    is why the module oscillated at zero input. The failure had a cause, and the
-    cause was a number.
+      * Fox et al. 2009, Front. Neuroinform. 3:6, doi:10.3389/neuro.11.006.2009
+        -- attribution-only open access -- equations 1-12: the five thresholds,
+        unity slopes, the six weights, the (1 +/- lambda) dopamine entry, and
+        tau. Six independent reimplementations agree with it, including the
+        Sheffield group's own SpineML release.
+      * Prescott et al. 2024, Biomimetics 9(3):139, CC BY, section 3.1.2: the
+        gating constant c = 0.169 in e_i = L(1 - y_SNr / c).
 
-    Corrected against the published table:
+    No code is vendored from anywhere. Every available implementation is either
+    unlicensed (all rights reserved) or GPL/CeCILL, both incompatible with this
+    repository. The numeric values are facts and safe to retype; the expression
+    is not. This is a clean-room reimplementation from the published equations.
 
-        tau            40 ms -> 25 ms
-        STN -> EP/SNr  0.9   -> 0.8
-        GP  -> EP/SNr  0.3   -> 0.4
-        TRN -> VL      0.4   -> 0.13
-        gate c         0.2   -> 0.169
-        slopes         all 1 -> TRN 0.5, VL 0.62
+    TWO ROUNDS OF WRONG CONSTANTS ARE RECORDED HERE SO THEY ARE NOT RETRIED.
+
+    Round 1 recalled the equations without any parameter table; the dopamine
+    sweep failed. Round 2 took Girard et al. 2005 (arXiv cs/0601004) Table 5,
+    which moved STN->output 0.9 -> 0.8 and GPe->output 0.3 -> 0.4. That was a
+    REGRESSION: Girard's is a re-tuned robotic variant that also adds striatal
+    lateral inhibition and changes GPe->STN, and mixing his weights with
+    Prescott's c broke the gate. The arithmetic is decisive, because Prescott
+    defines c as the resting output of the model:
+
+        resting y_GPi, 0.9 / 0.3 weights, 5-6 channels  ->  0.1686 - 0.1695
+        resting y_GPi, 0.8 / 0.4 weights, any channels  ->  0.1429 - 0.1460
+
+    c = 0.169 IS the resting output of the canonical weight set, reproduced to
+    three decimals. It cannot be produced by the Girard set at any channel
+    count. The published gating constant and the published weights are the same
+    fact seen twice. With the Girard weights every channel sat permanently
+    14.3% released at zero salience and selection returned a winner when
+    nothing was salient.
+
+    What round 2 got RIGHT and is kept: the striatum is driven by salience
+    DIRECTLY, not via cortex (Eq 5, 6, 8), with cortex fed by the thalamic
+    return alone; and the thalamocortical output slopes are not all 1 -- the
+    0.62 on the ventrolateral thalamus is what holds the cortico-thalamic loop
+    gain below one.
+
+    LINEAGE WARNING. The five-nucleus core above is GPR 2001 via Fox. The
+    thalamocortical extension (TRN, VL, cortex) is NOT GPR 2001 and there are
+    two incompatible versions of it in the literature; this file follows
+    Girard 2005 (TRN->VL 0.13, VL threshold -0.8, slopes 0.5 / 0.62) and says
+    so. Do not mix in the other lineage's 0.4 / 0.125.
 
     Rat parameters, transplanted on the lamprey-to-mammal conservation argument
     section 3.3 makes (Stephenson-Jones 2011; Grillner 2013).
@@ -101,13 +126,17 @@ class GPRParameters:
     # subthalamic nucleus: S_i - y_GP                    [Eq 8]
     stn_from_salience: float = 1.0
     stn_from_gpe: float = 1.0
-    # globus pallidus: -y_D2 + 0.8 * sum(y_STN)          [Eq 11]
-    gpe_from_stn: float = 0.8
+    # globus pallidus externa: -y_D2 + 0.9 * sum(y_STN)
+    # [Fox et al. 2009, Front. Neuroinform. 3:6, eq. 9]
+    gpe_from_stn: float = 0.9
     gpe_from_d2: float = 1.0
-    # output nucleus: -y_D1 - 0.4 y_GP + 0.8 sum(y_STN)  [Eq 9]
-    gpi_from_stn: float = 0.8
+    # output nucleus: -y_D1 - 0.3 y_GPe + 0.9 * sum(y_STN)
+    # [Fox et al. 2009 eq. 11]. The non-unity 0.9 and 0.3 are not free: Fox
+    # states they "were set to be within analytically-derived bounds for stable
+    # operation of the model (Gurney et al., 2001a)".
+    gpi_from_stn: float = 0.9
     gpi_from_d1: float = 1.0
-    gpi_from_gpe: float = 0.4
+    gpi_from_gpe: float = 0.3
     # output-function thresholds                          [Table 5]
     threshold_striatum: float = 0.2
     threshold_stn: float = -0.25
@@ -145,8 +174,13 @@ class GPRParameters:
     threshold_cortex: float = 0.0
     threshold_thalamus: float = -0.8
     threshold_reticular: float = 0.0
-    # leaky-integrator time constant, seconds              [Table 5: tau = 25 ms]
-    tau_s: float = 0.025
+    # Leaky-integrator time constant, seconds. UNRESOLVED across sources:
+    # Fox et al. 2009 states 40 ms explicitly and two independent
+    # reimplementations encode 40 ms; Girard 2005 says 25 ms. tau does not move
+    # the fixed point, only the trajectory -- but bout durations and switch
+    # counts are exactly what the Prescott sweep scores, so absolute agreement
+    # with published counts should not be expected from it.
+    tau_s: float = 0.040
     # gating constant c in e_i = L(1 - y_SNr/c)
     # [Prescott et al. 2024, Biomimetics 9(3):139, section 3.1.2, CC BY]
     gate_scale: float = 0.169
@@ -218,8 +252,27 @@ class BasalGanglia:
         state += alpha * (target - state)
         return state
 
+    #: Largest internal integration step, seconds. The STN->GPe->STN loop is
+    #: negative feedback with gain 0.9 * n_channels -- 5.4 for a six-behaviour
+    #: animal -- so the discrete map goes unstable if the step is a large
+    #: fraction of tau. At the 50 Hz control rate (dt = 20 ms, tau = 40 ms) the
+    #: resting output oscillates over 0.143-0.205 instead of settling at
+    #: 0.16953, and the gate flickers open with nothing salient. At 5 ms it is
+    #: exact to the analytic fixed point. Fox et al. 2009 integrate at 1 ms.
+    #:
+    #: This is why the caller's rate must not set the solver's rate: step()
+    #: sub-divides internally, so a 50 Hz environment gets the same trajectory
+    #: as a 1 kHz one.
+    MAX_INTERNAL_DT_S = 0.005
+
     def step(self, salience, dt_s):
-        """Advance one control interval. Returns the disinhibition gates."""
+        """Advance one control interval. Returns the disinhibition gates.
+
+        `dt_s` is the CALLER's interval and may be as coarse as it likes; the
+        integration is sub-divided to MAX_INTERNAL_DT_S. Salience is held
+        constant across the sub-steps, which is what a zero-order-hold control
+        signal actually does.
+        """
         salience = np.asarray(salience, dtype=float)
         if salience.shape != (self.n,):
             raise ValueError(f"salience must have shape ({self.n},)")
@@ -227,7 +280,13 @@ class BasalGanglia:
             raise ValueError("salience must be finite.")
         if not math.isfinite(dt_s) or dt_s <= 0:
             raise ValueError("dt_s must be finite and positive.")
-        return self._advance(salience, dt_s)
+
+        substeps = int(math.ceil(dt_s / self.MAX_INTERNAL_DT_S))
+        inner = dt_s / substeps
+        gates = None
+        for _ in range(substeps):
+            gates = self._advance(salience, inner)
+        return gates
 
     def _advance(self, salience, dt_s):
         salience = np.asarray(salience, dtype=float)
@@ -300,7 +359,10 @@ class BasalGanglia:
         # driven by salience plus its own thalamic return. A disinhibited channel
         # therefore feeds itself, and a losing one is held down twice over.
         y_gpi_previous = piecewise_linear(self._gpi, p.threshold_gpi, p.slope_gpi)
-        reticular_total = float(np.sum(y_reticular))
+        # The reticular drive is diffuse but EXCLUDES the channel's own output:
+        # the cited equation is -0.13 * sum_{j != i} y_TRN. Including self added
+        # a per-channel self-inhibition that is not in the model.
+        reticular_total = float(np.sum(y_reticular)) - y_reticular
         thalamus_input = (p.thalamus_from_cortex * y_cortex
                           - p.thalamus_from_gpi * y_gpi_previous
                           - p.thalamus_from_reticular * reticular_total)

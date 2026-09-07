@@ -22,6 +22,7 @@ import unittest
 import numpy as np
 
 from brain.basal_ganglia import (
+    piecewise_linear,
     CHANNELS, BasalGanglia, GPRParameters, salience_from_drives,
 )
 
@@ -66,24 +67,78 @@ class SelectionWorks(unittest.TestCase):
         self.assertGreater(np.max(losers), 0.0,
                            "a maximum would leave every loser at exactly zero")
 
-    @unittest.expectedFailure
     def test_nothing_is_selected_when_nothing_is_salient(self):
-        """KNOWN DEFECT, recorded rather than deleted.
+        """Was a KNOWN DEFECT for two sessions. Now a requirement, and met.
 
-        With no salience anywhere the module oscillates instead of settling,
-        cycling every gate together between 0 and about 0.34, so `selected`
-        returns whichever channel the tie-break happens to reach. The
-        thalamocortical loop gain was one cause and is fixed; the remaining one
-        is the diffuse STN-GPe loop, whose effective gain grows with channel
-        count. Averaging that drive instead of summing it cures the oscillation
-        and destroys the discrimination, so it is not a fix.
+        The module used to oscillate here instead of settling, cycling every
+        gate together between 0 and about 0.34, so `selected` returned whichever
+        channel the tie-break happened to reach. It had THREE causes and each
+        was found separately:
 
-        The requirement is right and the module does not meet it. Deleting the
-        test would hide that; asserting the oscillation would enshrine it.
+          1. The cortico-thalamic loop gain sat at exactly 1.0, the boundary of
+             positive-feedback instability. Cause: the output slopes are not all
+             1; the published 0.62 on the ventrolateral thalamus supplies the
+             margin.
+          2. The weights were a re-tuned robotic variant (STN->output 0.8,
+             GPe->output 0.4). With the canonical 0.9 / 0.3 the resting output
+             is 0.16953, which IS the published gating constant c = 0.169 -- so
+             the gate closes exactly. The variant rests at 0.1429 and leaves
+             every channel 14.3% released forever.
+          3. The caller's control rate was the solver's rate. The STN-GPe loop
+             is negative feedback with gain 0.9 * n, so at dt = 20 ms against
+             tau = 40 ms the discrete map is unstable and the resting output
+             oscillates over 0.143-0.205. step() now sub-divides internally.
+
+        Only the third was the diffuse STN drive, and it was never the drive
+        itself -- summing over channels is published and deliberate. Averaging
+        it was tried, cured the symptom, and destroyed discrimination.
         """
         bg = BasalGanglia()
         gates = settle(bg, np.zeros(6))
         self.assertIsNone(bg.selected(gates))
+        # The gate closes EXACTLY, because c is defined as the resting output.
+        np.testing.assert_allclose(gates, 0.0, atol=1e-12)
+
+    def test_the_resting_output_is_the_published_gating_constant(self):
+        """c = 0.169 is not a free constant: Prescott 2024 defines it as the
+        model's own resting output. That makes it an independent check on the
+        weights, and the canonical set passes it to three decimals."""
+        bg = BasalGanglia()
+        settle(bg, np.zeros(6))
+        resting = piecewise_linear(bg._gpi, bg.parameters.threshold_gpi,
+                                   bg.parameters.slope_gpi)
+        np.testing.assert_allclose(resting, 0.16953125, atol=1e-9)
+        self.assertAlmostEqual(bg.parameters.gate_scale, 0.169, places=3)
+
+    def test_the_solver_is_independent_of_the_callers_rate(self):
+        """A 50 Hz environment must get the same answer as a 1 kHz one."""
+        rest = {}
+        for dt in (0.02, 0.01, 0.002, 0.001):
+            bg = BasalGanglia()
+            for _ in range(int(8.0 / dt)):
+                bg.step(np.zeros(6), dt_s=dt)
+            rest[dt] = float(piecewise_linear(
+                bg._gpi, bg.parameters.threshold_gpi,
+                bg.parameters.slope_gpi)[0])
+        for dt, value in rest.items():
+            self.assertAlmostEqual(value, 0.16953125, places=6,
+                                   msg=f"dt={dt} settled at {value}")
+
+    def test_the_published_selection_sequence_reproduces(self):
+        """Gurney 2001b Fig. 2a, as reproduced by an independent integration of
+        the same equations. Absolute output values, not directions."""
+        cases = (
+            ((0.4, 0.0, 0.0, 0.0, 0.0, 0.0), (0.0850, 0.3290, 0.3290)),
+            ((0.4, 0.6, 0.0, 0.0, 0.0, 0.0), (0.2335, 0.0415, 0.4775)),
+            ((0.6, 0.6, 0.0, 0.0, 0.0, 0.0), (0.1225, 0.1225, 0.5585)),
+        )
+        for salience, expected in cases:
+            bg = BasalGanglia()
+            settle(bg, np.array(salience), seconds=8.0)
+            got = piecewise_linear(bg._gpi, bg.parameters.threshold_gpi,
+                                   bg.parameters.slope_gpi)[:3]
+            np.testing.assert_allclose(got, expected, atol=1e-3,
+                                       err_msg=f"salience {salience}")
 
     def test_channel_count_and_names_are_the_six_the_spec_lists(self):
         self.assertEqual(CHANNELS, ("hunt", "flee", "explore", "bask", "rest", "groom"))
@@ -234,10 +289,21 @@ class TheSweepEvidenceStaysHonest(unittest.TestCase):
                         "a sweep with nothing unreproduced would need explaining")
 
     def test_every_parameter_has_a_named_source(self):
+        """A source must be NAMED and citable. Which source is allowed to
+        change -- it did, when the first citation turned out to be a re-tuned
+        variant -- so this asserts a citation exists, not who wrote it. An
+        earlier version pinned the literal string "arXiv" and would have had to
+        be relaxed to accept a correction, which is the wrong way round."""
         source = self.payload["parameter_source"]
-        self.assertIn("arXiv", source["weights_and_thresholds"])
+        weights = source["weights_and_thresholds"]
+        self.assertTrue(
+            "doi:" in weights or "arXiv" in weights,
+            f"weights need a citable source, got: {weights[:120]}")
         self.assertIn("0.169", source["gating_constant_c"])
         self.assertIn("CC BY", source["gating_constant_c"])
+        # The values are secondary-sourced and the file must say so, because
+        # the origin papers are paywalled and nobody in this project read them.
+        self.assertIn("secondary", weights.lower())
 
     def test_the_corrections_are_recorded_not_quietly_applied(self):
         corrections = " ".join(self.payload["errors_found_and_corrected"]).lower()

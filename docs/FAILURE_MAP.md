@@ -1,0 +1,389 @@
+# NeuroGecko — the map
+
+**One document. Everything tried, everything that failed, why, and what fixed it.**
+Past, present, future. Updated every session; nothing removed.
+
+Last updated: Session 6c.
+
+---
+
+## Why this document exists
+
+A model that only records its successes is a sales pitch. This project's own
+research corpus calls the evidence ledger *"the most valuable part of the
+record — it is the map of where **not** to look."*
+
+Every entry below is a claim that was **measured**, not argued. A refuted entry
+is not a mistake to be embarrassed by; it is a piece of the map that is now
+drawn. The expensive thing is not being wrong — it is being wrong twice.
+
+**Rule: nothing is deleted from this file.** A hypothesis that was refuted and
+later turned out to be right gets a second row, not an edit.
+
+---
+
+## Where the project is
+
+| Stage | State |
+|---|---|
+| **Research** — 167 agents, 276 published measurements, fact-checked | ✅ done |
+| **Body** — 38 g lab morphology, 14/14 static checks | ✅ done |
+| **Walking** — base controller, 4/6 gates, accepted | ✅ done |
+| **World** — no cheat, textured floor, narrowed camera, fleeing prey | ✅ done |
+| **Brain 1/8 — hypothalamus** (hunger, energy, fatigue, thermostat) | ✅ done |
+| **Brain 2/8 — basal ganglia** (action selection) | 🟡 6 of 7 properties; selection exact; not wired in |
+| Brain 3–8 — brainstem, spine, retina, tectum, sleep, memory | ❌ |
+| **Proof** — 15-test battery | 🟡 1 run (A3, failed then fixed) |
+
+**Roughly 45 % done.** The irreversible parts — the research and the body — are
+behind us.
+
+---
+
+## The five rules this project runs on
+
+Each was learned by getting it wrong. They are the real output of the ledger.
+
+1. **Every number is published, derived, or INVENTED — and says which.**
+   A plausible number wearing a published number's clothes is the worst defect
+   available, because nothing downstream can detect it.
+2. **Never tune until the answer matches.** If a model needs its constants
+   adjusted to reproduce a published result, the constants must come from
+   somewhere else — a paper, not a search.
+3. **The reward is what the model is told to want. The gates are what the
+   animal does.** They diverge. Only the second counts.
+4. **A failed prediction stays in the table.** Adding a knob per failing joint
+   until the table goes green is fitting the harness to the answer.
+5. **Measure before claiming, including your own tests.** Four entries below are
+   failures of the *test*, not the model.
+
+---
+
+## Ledger — the walking phase (Sessions 1–3)
+
+The forefoot problem: the front feet land late and carry too little weight. Ten
+hypotheses, eight refuted.
+
+| # | Hypothesis | Verdict | Evidence |
+|---|---|---|---|
+| 1 | Hind stance height causes the duty failure | **Confirmed** | compensator: 0.641 → 0.733 |
+| 2 | Limb phase = fore/hind touchdown-lateness difference | **Confirmed** | 0.320 − 0.123 = 0.197, exactly the measured error |
+| 3 | Hind stance height causes the *phase* failure | **Refuted** | fixing it moved phase the wrong way, 0.577 → 0.607 |
+| 4 | Fore stance height causes it | **Refuted** | forelimb table nearly flat; front load fell 0.611 → 0.584 |
+| 5 | Actuator bandwidth is the cause | **Refuted** | stiffening cut elbow lag 17.0° → 2.9°; phase moved 0.6347 → 0.6283 |
+| 6 | Spine bending supplies the missing stride | **Refuted** | 4× amplitude: +6.5 % excursion, **−17 % speed** |
+| 7 | Fore/hind gearing mismatch | **Refuted** | real, predicts the slip, but equalising it is slower at every step |
+| 8 | Contact softness lets the feet creep | **Refuted** | impratio 1 → 100: slip 13.5 → 12 mm. Required μ ≈ 0.01 against a floor of 0.9 |
+| 9 | Commanding an earlier touchdown fixes phase | **Refuted** | commanding 0.197 earlier gave 0.688 — worse |
+| 10 | Parameter search can reach 6/6 | **Refuted** | ~200 generations, four searches; 23.20 → 22.92, tiebreaker only |
+
+---
+
+## Ledger — training (Session 4)
+
+**6 million steps. Two runs. Neither beat the hand-written base.**
+
+| # | Hypothesis | Verdict | Evidence |
+|---|---|---|---|
+| 11 | A learned residual can fix the forefoot | **Refuted** | 2 × 3.01 M steps; best trained 3/6 against base 4/6 |
+| 12 | Trunk pitch lifts the shoulder | **Refuted** | measured **3.87°** against a published 3.72 ± 0.61 — it was correct all along |
+| 13 | Elbow authority is the missing lever | **Confirmed** | front load 0.584 → **0.674**, unreachable with the elbow locked |
+| 14 | …and it can be had without cost | **Refuted** | every passing row had stride CV 0.16–0.38 against a 0.10 ceiling |
+| 15 | Pressing harder in the base fixes it | **Refuted** | 0.584 → 0.625 then collapse; the press is *overwritten* during stance |
+| 16 | Aiming the frozen pose deeper fixes it | **Refuted** | flat front-only, worse uniform, across −0.6 to −7.0 mm |
+| 17 | The walking posture rides too high | **Confirmed** | shoulder 0.125 SVL against a published 0.11; forefoot 3.1 mm airborne |
+| 18 | **The forelimb is under-actuated** | **Confirmed** | **1 free joint against the hindlimb's 2** |
+
+**#12 is the expensive one.** That hypothesis had been carried for three sessions
+and steered the work. Nobody had measured it. One measurement killed it.
+
+**#18 is the answer.** One joint cannot set foot height *and* foot position
+independently. It is a body limit, not a tuning failure — which is why 6 M steps
+of training could never have found it.
+
+**Decision: 4/6 accepted as the walker.** Both unmet checks are engineering
+targets tagged `species: INVENTED`, not published biology.
+
+---
+
+## Ledger — body motion (Session 4b)
+
+| # | Hypothesis | Verdict | Evidence |
+|---|---|---|---|
+| 19 | The limbs are barely articulated | **Confirmed** | 6 of 8 excursions at 0.00–0.37 of published |
+| 20 | Sprawl can reach the published excursion | **Confirmed** | 55.25° against a published 52.42 |
+| 21 | …without losing the planted foot | **Refuted** | hind duty **0.631 → 0.094** across the sweep |
+| 22 | A sprawl-aware stance table rescues it | **Refuted** | ±15° solvable — half what is needed — and 2/6 at zero amplitude |
+| 23 | The tail was a passive pendulum | **Confirmed** | every hindlimb excursion moved **< 1 %** when tail drive was removed |
+| 24 | A caudofemoralis coupling reproduces the ablation | **Confirmed** | **−20.7 % / −16.5 %** against a published −21 % / −17 % |
+| 25 | One gain reproduces the whole per-joint pattern | **Refuted** | knee +3.8 % against a published −11 % |
+
+**#24 is the best result in the project.** Blocking the tail now collapses the
+hind legs the way it does in a real gecko — and the intact animal is *bit-identical*
+to before, proven to twelve decimal places.
+
+**#25 stayed in the table.** Per-joint gains would have made it green. That is rule 4.
+
+---
+
+## Ledger — the world (Sessions 4c–4d)
+
+| # | Hypothesis | Verdict | Evidence |
+|---|---|---|---|
+| 26 | The food vector is the only privileged channel | **Refuted** | the controller was steered by the same bearing; both had to go |
+| 27 | The floor needed a texture | **Refuted** | it had one — at 0.64 squares per body length. The **scale** was the fault |
+| 28 | ~70° camera is a guess | **Refuted** | it makes the 1.6° tracked dot span 1.46 px where 120° gives 0.85 |
+| 29 | The corpus specifies the camera | **Refuted** | five incompatible recommendations, all INVENTED |
+| 30 | Cricket escape speed is published | **Refuted** | absent — only dash length and duration, never divided |
+| 31 | A walking gecko can catch fleeing prey | **Refuted** | 0.055 m/s against 0.118 m/s; never captured in 40 s |
+| 32 | A strike can be scored at the control rate | **Refuted** | a 16–20 ms strike is **under one 50 Hz step**; 500 Hz needed |
+| 33 | The no-cheat work landed where it mattered | **Refuted** | the vision env had its own privileged channel, untouched |
+| 34 | The eat radius was roughly right | **Refuted** | 0.10 m against a published **4.07 cm** strike distance |
+| 35 | Scaling the cheat to zero removes it | **Refuted** | five slots remain in the observation |
+| 36 | The camera saw a real food object | **Refuted** | a green sphere **painted on after rendering** |
+| 37 | The brain evidence files are reproducible | **Refuted** | both pin a body hash no file in the repo has |
+
+**#31 is a design constraint, not a bug.** Real geckos catch 82.9 % of crickets by
+**striking at 0.851 m/s from 2 cm** — not by chasing. No hunting gate means
+anything until a strike exists.
+
+**#33 was my own claim of completion, caught by an audit.** I said the cheat was
+gone. It was gone from the *walking* environment, not the one with eyes.
+
+---
+
+## Ledger — hypothalamus (Sessions 5–5b)
+
+| # | Hypothesis | Verdict | Evidence |
+|---|---|---|---|
+| 38 | The old drives were roughly right | **Refuted** | hunger saturated in **67 s** where the animal takes days |
+| 39 | Anchoring the allometry at 40 g is fine | **Refuted** | inflates metabolism 17 %; measured mass is **19.5 g** |
+| 40 | Hunger measured against the energy reserve | **Refuted** | 1.7 % per inter-meal interval — the animal would never eat |
+| 41 | Hunger measured in **meals** matches the animal | **Confirmed** | **70 %** at the published 2.33-day interval, unfitted |
+| 42 | The metabolism and the feeding schedule agree | **Confirmed** | 79 h per meal against a 56 h interval, from separate papers |
+| 43 | A clipped drive is harmless | **Refuted** | zero reward for eating when several meals in debt |
+| 44 | n = m is an acceptable drive exponent | **Refuted** | drive goes linear; a meal worth the same at any hunger |
+| 45 | The thermostat can be built now | **Refuted** | no temperature field exists anywhere |
+| 46 | Session 5's module was complete | **Refuted** | fatigue absent; the second channel carried no information |
+| 47 | The endurance velocity is in m/s | **Refuted** | gives 15 h at 0.050 m/s against a published **>60 min** |
+| 48 | A walking gecko accumulates fatigue | **Refuted** | 0.055 m/s is under the aerobic ceiling — sustainable indefinitely |
+| 49 | The danger channel drives fear correctly | **Refuted** | it is **mechanosensory**, and mechanosensory-alone defence is **0** |
+| 50 | `curiosity` had no published basis | **Refuted** | tongue-flick 3.60×, ceiling 0.146/s — right to delete, wrong about why |
+
+**#42 is the finest moment in the project.** Metabolism and the feeding schedule
+were measured by different scientists, decades apart, for unrelated reasons. One
+meal covers 79 hours; geckos are fed every 56. Nobody arranged that.
+
+**#40 → #41 is the most instructive pair.** Two hungers exist. Between meals a
+gecko burns **1.7 % of its tail reserve** but **71 % of a meal**. Measured against
+the tail, the animal is never hungry. Measured in meals, it gets hungry exactly on
+schedule. Same physiology, one wrong denominator.
+
+**#49 is unresolved and serious.** The gecko is frightened by the one sense that
+provably does nothing to it.
+
+---
+
+## Ledger — basal ganglia (Sessions 6–6b)
+
+| # | Hypothesis | Verdict | Evidence |
+|---|---|---|---|
+| 51 | The architecture can be built from the corpus alone | **Refuted** | the weights are not in it |
+| 52 | Loop gain 1.0 is acceptable in positive feedback | **Refuted** | oscillated at zero input, gates cycling 0 → 0.34 |
+| 53 | Diffuse drive can be summed regardless of channel count | **Refuted** | effective gain scales with N |
+| 54 | Averaging the diffuse drive fixes it | **Refuted** | cures oscillation, **destroys discrimination** |
+| 55 | Self-calibrating the gate is safe | **Refuted** | collapsed the range; every dopamine level identical |
+| 56 | Selection is disinhibition, not a maximum | **Confirmed** | losers are *partially* released; a WTA cannot do that |
+| 57 | Sigma-pi salience gates hunting on hunger AND prey | **Confirmed** | a sated gecko ignores visible prey |
+| 58 | The GPR parameters are unobtainable | **Refuted** | Table 5 of arXiv cs/0601004, plus c = 0.169 from a CC BY paper |
+| 59 | The oscillation was an unfixable structural flaw | **Refuted** | it was the **slopes**: VL 0.62 keeps the loop gain under one |
+| 60 | The striatum is driven by cortex | **Refuted** | Eq 14 drives cortex from thalamus *alone*; salience goes direct |
+| 61 | 825 switches per 120 s was a model failure | **Refuted** | 50 Hz white-noise salience — the test measured its own noise |
+| 62 | Distortion can be counted | **Refuted** | the count saturates; deepening needs a continuous measure |
+| 63 | Published parameters make the sweep reproduce | **Partly** | 5 of 7 properties; the switching ratio stays inverted |
+
+**#51 → #58 is the lesson of the session.** I declared a wall, wrote it up
+honestly, and the wall was not there — the parameters were in an open-access
+paper. **Recording a blocker is not the same as verifying one.**
+
+**#59 is the sharpest finding.** The oscillation I could not fix, and had called
+structural, was one number: the output slopes are not all 1, and the 0.62 on the
+thalamus is exactly what holds the loop below instability.
+
+**#60 was worse than any constant.** I had the wiring backwards. No parameter
+would have fixed it.
+
+**#63 was superseded within the session** — see below. The parameters it
+called published were a re-tuned variant's.
+
+---
+
+## Ledger — basal ganglia, second correction (Session 6c)
+
+A background search finished after Session 6b was committed and showed that
+6b's "fix" was **half a regression**. It had found a real bug and introduced a
+new one.
+
+| # | Hypothesis | Verdict | Evidence |
+|---|---|---|---|
+| 64 | Girard 2005 Table 5 holds the GPR parameters | **Refuted** | it is a re-tuned *robotic variant*; six independent sources give 0.9 / 0.3, not 0.8 / 0.4 |
+| 65 | The oscillation at zero salience had one cause | **Refuted** | it had **three**, and each hid the next |
+| 66 | The caller's control rate can be the solver's rate | **Refuted** | at 50 Hz the resting output oscillates over **0.143–0.205**; at 200 Hz it is exact |
+| 67 | The diffuse STN drive caused the instability | **Refuted** | the drive is published and deliberate; the **integration step** was the fault |
+| 68 | A guard pinned to one publisher's name is a good guard | **Refuted** | it failed when the citation was *corrected*, which is backwards |
+| 69 | The sweep evidence was reproducible | **Refuted** | generated by a throwaway script; could not be re-run when parameters changed |
+| 70 | Canonical parameters make the sweep reproduce | **Partly** | 6 of 7; switching ratio improved 0.3× → 0.55×, still inverted |
+
+### #64 — the arithmetic that settled it
+
+Prescott 2024 does not merely *state* the gating constant c = 0.169. It
+**defines** c as the model's own resting output. That makes c an independent
+test of the weights, and the two candidate sets are not close:
+
+| weight set | resting output | matches published c = 0.169? |
+|---|---|---|
+| **0.9 / 0.3** (canonical) | **0.16953** | **yes, to three decimals** |
+| 0.8 / 0.4 (Girard variant) | 0.14286 | no, at any channel count |
+
+The published gating constant and the published weights are **the same fact
+seen twice**. With Session 6b's weights every channel sat permanently 14.3 %
+released at zero salience, and the module named a winner when nothing at all
+was salient.
+
+### #65 — three causes, found one at a time
+
+The oscillation-at-zero-salience defect had been carried as an
+`expectedFailure` test for two sessions. It is now fixed and the test is a
+requirement. All three had to go:
+
+1. **The loop gain sat at exactly 1.0** — the boundary of positive-feedback
+   instability. Cause: the output slopes are not all 1; the published 0.62 on
+   the thalamus supplies the margin. *(Found in 6b.)*
+2. **The weights were a variant's** — resting output 0.143 where the published
+   gate needs 0.169, so the gate could never close. *(Found in 6c.)*
+3. **The solver ran at the caller's rate.** The STN–GPe loop is negative
+   feedback with gain 0.9 × channels — 5.4 for six behaviours — so a 20 ms step
+   against a 40 ms time constant is an unstable discrete map. *(Found in 6c.)*
+
+Each one masked the next. Fixing any single one would not have closed the gate.
+
+### What the module now reproduces exactly
+
+Independent integration of the published equations, matched to four decimals —
+the five steps of Gurney 2001b Fig. 2a:
+
+| salience | published output | ours |
+|---|---|---|
+| rest | gate closes | **0.16953 → gate exactly 0** |
+| ch1 = 0.4 | 0.0850, 0.3290 | **0.0850, 0.3290** |
+| ch1 0.4, ch2 0.6 | 0.2335, 0.0415, 0.4775 | **0.2335, 0.0415, 0.4775** |
+| both 0.6 | 0.1225, 0.1225, 0.5585 | **0.1225, 0.1225, 0.5585** |
+
+**Still not reproducing:** the switching-rate comparison. Published ≈ 3× more
+switching at excess dopamine than at baseline; measured 0.55×. Improved from
+0.3× and still inverted. The published counts are from an embodied robot
+foraging task and this is a disembodied competition — plausible, **not
+demonstrated**, and the module stays unwired until it is.
+
+---
+
+## My own errors — the meta-ledger
+
+Failures of method, not of hypothesis. These are the ones worth re-reading.
+
+| What I did | Cost | Rule it produced |
+|---|---|---|
+| Estimated training speed instead of measuring | quoted 45 min for a 96 min run | measure before quoting |
+| Built a scoreboard with no stride-regularity rejection | crowned a checkpoint with CV 0.375 — rebuilt the exact Session 3g trap | reuse the official gate, never re-derive |
+| Ranked step-0 as "best trained" | credited training with the base controller's own score | a setup check is not a result |
+| Adjusted GPR constants three times by "does it look right" | two of three made it worse | rule 2 |
+| Declared a blocker without verifying it | a day's delay; the parameters were freely available | search before declaring a wall |
+| Took the **first** parameter table I found and called it published | shipped a regression that opened every gate at rest | one source is not a citation; check it against something it must independently predict |
+| Let the environment's control rate set the solver's rate | a numerical instability I spent two sessions attributing to the model | a model and its integration are different things |
+| Wrote a guard that pinned one publisher's name | it failed when the citation was **corrected** | guard the property, not the particular |
+| Generated evidence from a throwaway script | it could not be regenerated when the parameters changed | evidence that cannot be re-run is an assertion |
+| Wrote a test asserting zero distortion at every dopamine level | the test **forbade the correct published behaviour** | tests encode expectations, and expectations can be wrong |
+| Used 50 Hz white noise as fluctuating salience | measured seven behaviour switches per *second* | check the test before blaming the model |
+| Claimed the cheat was removed | it was removed from the wrong environment | verify the claim where it matters |
+| Shipped a video labelled "best checkpoint" | it was the *untrained* snapshot | name artifacts for what they are |
+
+---
+
+## Currently blocked
+
+| What | Blocked on | Why it cannot be worked around |
+|---|---|---|
+| **Fear** | a chemosensory channel | Defence is **chemically gated**: smell 0.20, sight 0, touch 0. There is no odour field, and MuJoCo has no scent primitive. Any fear response now fires on the wrong sense. |
+| **Thermostat** | a temperature field | Built, wired to the published 29.5–31.9 °C band, reports `thermostat_inert: True`. Zero mentions of temperature anywhere in the world. |
+| **Hunting gates** | a strike behaviour | The walker cannot outrun prey and is not meant to. A 16–20 ms strike is shorter than one control step; scoring needs 500 Hz. |
+| **Basal ganglia** | the switching comparison | 6 of 7 reproduce and the selection sequence is exact to four decimals. The switching ratio stays inverted (0.55× against a published ~3×). The published counts come from a robot foraging task; this is disembodied. Plausible, **not demonstrated**. |
+| **Forefoot gate** | a wrist joint | Closed by decision, not failure. Both unmet checks are INVENTED targets. |
+| **Two evidence files** | a body that no longer exists | `brain_legacy.json` and `brain_sealed.json` pin a hash **no file in the repo has**. Predates this work. |
+| **Walking posture** | unassigned | Shoulder rides 0.125 SVL against a published 0.11. Static audit passes 14/14; the *walking* pose was never checked. Open. |
+
+---
+
+## What is not modelled, and is recorded rather than omitted
+
+- **Digestion costs nothing.** Postprandial metabolism peaks at 3.7–7.3× resting
+  for 62–170 h in another lizard genus.
+- **Metabolism has no thermal dependence.** No metabolic Q₁₀ is published for this
+  species. The corpus's 2.3 is a *sleep-period* Q₁₀ — transplanting it between
+  unrelated processes would be inventing physiology.
+- **The cold half of the thermostat has no anchor.** CTmax is published at
+  41.07 °C. **CTmin is NOT IN CORPUS** for this species or any proxy.
+- **Fatigue recovery is INVENTED.** The literature says how fast a lizard tires
+  and nothing at all about how fast it recovers.
+- **Cricket escape speed is DERIVED**, never cited as measured — a quotient of two
+  published quantities the corpus never divides.
+- Hydration, nutrient composition, gut passage time, field metabolic rate.
+- **The GPR origin papers were never read.** Gurney, Prescott & Redgrave 2001
+  parts I and II are paywalled. Every constant in the basal ganglia is
+  **secondary-sourced** via Fox et al. 2009 and tagged as such in the module and
+  in the evidence file. Six independent reimplementations agree with it,
+  including the original group's own release — but that is corroboration, not
+  the source.
+- **The time constant τ is unresolved.** 40 ms (Fox), 25 ms (Girard), 10 ms
+  (SpineML). It does not move the fixed point, so selection is unaffected — but
+  it sets the absolute scale of switch counts, which is exactly the quantity
+  that does not reproduce.
+- **The thalamocortical extension is not GPR 2001** and has two incompatible
+  versions in the literature. This project follows Girard's throughout and says
+  so; mixing the lineages is how #64 happened.
+
+---
+
+## Next
+
+1. **Brainstem + spinal CPG** — turning a chosen behaviour into locomotion.
+2. **Close the basal ganglia** — reproduce the foraging task, or obtain the
+   switching-bout definition, or demonstrate the task difference.
+3. **Retina + tectum** — actually seeing prey. The recovered 29/30 vision brain
+   reattaches here.
+4. **Sleep, memory.**
+5. **The 15-test battery, then publish** — with the not-real list at the front.
+
+**Ceiling: R2-by-proxy.** Not a limit of effort or budget — no gecko connectome
+and no gecko neural recordings exist for anyone. That is the frontier, not a
+shortfall.
+
+---
+
+## Scoreboard
+
+| | |
+|---|---|
+| Hypotheses tested | **70** |
+| Refuted | **50** |
+| Confirmed | **18** |
+| Partly | **2** |
+| My own method errors | **13** |
+| Tests passing | **341**, no expected failures |
+
+**Seventy per cent of everything tried was wrong.** That is what the map is
+made of.
+
+The one number worth watching: the count of *my own* method errors grew faster
+this session than the hypothesis count. That is the healthier direction — a
+method error found is a whole class of future failures closed, and four of the
+thirteen were found by something other than me.
