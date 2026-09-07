@@ -1,0 +1,117 @@
+{
+ "schema_version": 1,
+ "test": "Prescott et al. 2024 tonic-dopamine sweep against a reimplemented extended GPR",
+ "source": "best_achievable_brain.md section 3.3: 18 lambda levels, 5 x 120 s robot trials",
+ "protocol": {
+  "trial_s": 120,
+  "dt_s": 0.02,
+  "channels": 6,
+  "salience_gap": 0.05,
+  "noise_sd": 0.06,
+  "seed": 0,
+  "note": "disembodied; the corpus notes clean-selection rates are lower disembodied (73-81%) than on the robot (89-95%)"
+ },
+ "rows": [
+  {
+   "switches": 1,
+   "immobile_s": 119.94,
+   "mean_distortion": 0.0,
+   "dopamine": 0.03,
+   "published": "38 s immobile"
+  },
+  {
+   "switches": 1,
+   "immobile_s": 119.92,
+   "mean_distortion": 0.001,
+   "dopamine": 0.06,
+   "published": "14 s immobile"
+  },
+  {
+   "switches": 63,
+   "immobile_s": 15.64,
+   "mean_distortion": 0.002,
+   "dopamine": 0.12,
+   "published": "below 75% vigour"
+  },
+  {
+   "switches": 131,
+   "immobile_s": 0.14,
+   "mean_distortion": 0.434,
+   "dopamine": 0.2,
+   "published": "89-95% clean; ~7 switching bouts"
+  },
+  {
+   "switches": 121,
+   "immobile_s": 0.08,
+   "mean_distortion": 0.944,
+   "dopamine": 0.29,
+   "published": "clean"
+  },
+  {
+   "switches": 119,
+   "immobile_s": 0.08,
+   "mean_distortion": 0.99,
+   "dopamine": 0.31,
+   "published": "distortion appears"
+  },
+  {
+   "switches": 11,
+   "immobile_s": 0.08,
+   "mean_distortion": 0.999,
+   "dopamine": 0.37,
+   "published": "clean"
+  },
+  {
+   "switches": 1,
+   "immobile_s": 0.08,
+   "mean_distortion": 0.999,
+   "dopamine": 0.43,
+   "published": "most fail; ~21.3 switches"
+  },
+  {
+   "switches": 1,
+   "immobile_s": 0.08,
+   "mean_distortion": 0.999,
+   "dopamine": 0.46,
+   "published": "every trial fails"
+  }
+ ],
+ "winner_take_all_at_0.43": {
+  "switches": 751,
+  "immobile_s": 0.0,
+  "mean_distortion": 0.0
+ },
+ "well_separated_at_baseline": {
+  "switches": 1,
+  "immobile_s": 0.08,
+  "mean_distortion": 0.0
+ },
+ "verdict": "DOES NOT REPRODUCE -- module NOT ACCEPTED",
+ "reproduced": [
+  "immobility at lambda <= 0.06",
+  "distortion rises with lambda",
+  "nothing is selected when nothing is salient",
+  "GPR and winner-take-all behave differently"
+ ],
+ "not_reproduced": [
+  "switching pattern is inverted against the published sweep",
+  "a clearly losing channel (salience 0.30 against 0.55) is fully released, so the model does not discriminate; GPi separation is insufficient",
+  "the published result that GPR dithers MORE than a winner-take-all at high dopamine"
+ ],
+ "structural_defects_found_and_fixed": [
+  "thalamocortical loop gain was exactly 1.0, the boundary of positive-feedback instability: the module oscillated at zero input, cycling gates between 0 and 0.34. Fixed by requiring the loop gain below 1, which is now asserted in the constructor."
+ ],
+ "root_cause": "The corpus names the GPR model and gives the behavioural sweep but does NOT state the connection weights or thresholds. Those were reimplemented from the equations without the primary parameter table. Three structural defects were found by reasoning about stability rather than by fitting, and fixed. The remaining discrimination failure is a parameter problem, and further adjustment would be fitting the model to the answer.",
+ "to_finish": [
+  "obtain the Gurney, Prescott & Redgrave 2001 parameter table from the primary paper, or email Girard for the ModelDB 124111 licence, then re-run this sweep unchanged"
+ ],
+ "claim": "Instrumented simulation diagnostics. A recorded negative result, not a validated action-selection model. No behaviour in this repository should depend on it yet.",
+ "structural_defects_found_and_NOT_fixed": [
+  "the diffuse STN-GPe loop still oscillates at zero salience: its effective gain grows with channel count, so a six-behaviour animal is less stable than a three-behaviour one purely for having more behaviours. Averaging the diffuse drive cures the oscillation and destroys the discrimination, so it is not a fix. Recorded as an expectedFailure test.",
+  "a clearly losing channel is not cleanly suppressed at high dopamine: GPi separation is insufficient, which is the parameter problem below."
+ ],
+ "also_tried_and_reverted": [
+  "averaging the diffuse STN drive instead of summing it: cured the zero-input oscillation, destroyed discrimination entirely",
+  "calibrating the gate scale to the model's own tonic output, to remove an invented constant: collapsed the dynamic range so every dopamine level behaved identically"
+ ]
+}

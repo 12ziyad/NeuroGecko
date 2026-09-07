@@ -1880,3 +1880,113 @@ the sensing channel, and the numbers are recorded here for whoever builds it.
 | 50 | `curiosity` had no published basis | **Refuted** | tongue-flick rate 3.60x, ceiling 0.146/s — right to delete, wrong about why |
 
 308 tests pass, one SciPy skip.
+
+# Session 6 — basal ganglia: architecture built, parameters missing, NOT ACCEPTED
+
+The environment arbitrates behaviour with an if/else on a hand-made
+`target_interest` scalar. That is a preference ordering, not a mechanism, and it
+has the failure mode every preference ordering has: when two options are close it
+flips between them every step.
+
+`brain/basal_ganglia.py` implements the GPR model (Gurney, Prescott & Redgrave
+2001) in the extended form section 3.3 specifies, with the Humphries & Gurney
+2002 thalamocortical loop. **It does not work, and this entry says how.**
+
+## What is right
+
+The architecture. Selection is **disinhibition**: the output nucleus is tonically
+on and selecting means switching it off for one channel — which is why a losing
+channel can be *partially* released, a failure mode ("distortion") a winner-take-all
+cannot have because its losers are exactly zero by construction.
+
+Salience is **sigma-pi** — sums of products. Hunting is not driven by hunger but
+by hunger AND visible prey, so a sated gecko ignores a cricket and a starving one
+in an empty arena explores instead of hunting. That much is verified by test.
+
+No code was taken from ModelDB 124111: it carries **no licence anywhere** —
+ModelDB tree, GitHub mirror, or the author's own repository — so it is
+all-rights-reserved by default and cannot enter an Apache-2.0 repo. This is a
+reimplementation from equations, as section 3.3 instructs.
+
+## What is wrong
+
+The published acceptance test is the Prescott 2024 tonic-dopamine sweep, and
+**it does not reproduce**. `artifacts/evidence/session6/dopamine_sweep.json`.
+
+| lambda | published | measured |
+|---|---|---|
+| 0.03–0.06 | prolonged immobility | **immobile 119.9 s** ✓ |
+| 0.20 | ~7 switching bouts, 89–95 % clean | **131 switches** ✗ |
+| 0.43 | ~21.3 switching bouts, most trials fail | **1 switch** ✗ |
+| 0.46 | every trial fails | 1 switch ✗ |
+
+The immobility direction reproduces. **The switching pattern is inverted**: the
+model dithers most at the healthy baseline and least where the paper reports
+breakdown. The published finding that GPR dithers *more* than a winner-take-all
+under excess dopamine — the counterintuitive result, and the one worth
+reproducing — comes out backwards.
+
+## Two structural defects found by reasoning, not by fitting
+
+**The thalamocortical loop gain was exactly 1.0.** Cortex → thalamus → cortex is
+positive feedback, so a loop gain of one is the boundary of instability, and the
+module oscillated at zero input — every gate cycling together between 0 and 0.34
+forever. The constraint is arithmetic, not empirical, and the constructor now
+asserts it.
+
+**The diffuse STN drive is summed over channels**, so its effective gain grows
+with channel count: a six-behaviour animal is less stable than a three-behaviour
+one purely for having more behaviours. This one is **not fixed**. Averaging the
+diffuse drive cures the oscillation and destroys the discrimination entirely, so
+it is not a fix. It is recorded as an `expectedFailure` test — the requirement is
+right, the module does not meet it, and deleting the test would hide that while
+asserting the oscillation would enshrine it.
+
+## Two things tried and reverted, recorded so they are not retried
+
+**Averaging the diffuse drive.** Cured the zero-input oscillation. A clearly
+losing channel (salience 0.30 against 0.55) became *fully* released. Net worse.
+
+**Calibrating the gate scale to the model's own tonic output**, to remove an
+invented constant. Principled in intent — "nothing selected" should be the
+resting state by definition — and it collapsed the dynamic range so that every
+dopamine level from 0.03 to 0.46 behaved identically. Net worse.
+
+## The root cause, and why I stopped
+
+`docs/research/` names the GPR model and gives the behavioural sweep in detail.
+It does **not** state the connection weights or thresholds. Those were
+reimplemented from the equations without the primary paper's parameter table.
+
+The architecture selects, and the dopamine extremes move in the right directions,
+so the structure is probably right and the constants are probably wrong. Three
+further parameter adjustments were made and two of them made things worse.
+
+**Continuing would be fitting the model to the answer** — adjusting constants
+until a published curve is matched, with nothing but "does it look right" as a
+constraint. That is the failure this project exists to avoid, and it was flagged
+twice earlier in this same session against other people's work. Stopping is the
+consistent choice.
+
+## To finish
+
+Obtain the Gurney, Prescott & Redgrave 2001 parameter table from the primary
+paper, or email Girard for a licence on ModelDB 124111, then **re-run this sweep
+unchanged**. The test harness is built and the evidence file is the before.
+
+**Nothing in the repository depends on this module.** It is not wired into any
+environment, and it must not be until the sweep reproduces.
+
+## Session 6 ledger
+
+| # | Hypothesis | Verdict | Evidence |
+|---|---|---|---|
+| 51 | The GPR architecture can be reimplemented from the corpus alone | **Refuted** | the weights are not in it; the sweep does not reproduce |
+| 52 | A loop gain of 1.0 is acceptable in a positive-feedback loop | **Refuted** | oscillated at zero input, gates cycling 0 to 0.34 |
+| 53 | Diffuse drive can be summed regardless of channel count | **Refuted** | effective gain scales with N; six behaviours destabilise it |
+| 54 | Averaging the diffuse drive fixes it | **Refuted** | cures oscillation, destroys discrimination |
+| 55 | Self-calibrating the gate removes an invented constant safely | **Refuted** | collapsed the dynamic range; every dopamine level identical |
+| 56 | Selection is disinhibition, not a maximum | **Confirmed** | losing channels are partially released; a WTA cannot do that |
+| 57 | Sigma-pi salience gates hunting on hunger AND prey | **Confirmed** | a sated gecko ignores visible prey; a hungry one with none explores |
+
+334 tests pass, one SciPy skip, **one expected failure**.

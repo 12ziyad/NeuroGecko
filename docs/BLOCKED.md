@@ -220,3 +220,38 @@ Teratoscincus/Coleonyx. How fast a lizard RECOVERS from fatigue appears nowhere 
 the corpus for any species. `fatigue_recovery_time_constant_s` is 600 s by
 engineering choice and is tagged INVENTED. Any behaviour that depends on recovery
 rate -- pacing, rest bouts, whether the animal can sprint twice -- rests on it.
+
+## Basal ganglia: built, not accepted, blocked on a parameter table (Session 6)
+
+`brain/basal_ganglia.py` implements the extended GPR architecture and does NOT
+reproduce the Prescott 2024 tonic-dopamine sweep, which is its published
+acceptance test. Evidence: `artifacts/evidence/session6/dopamine_sweep.json`.
+
+Reproduced: immobility at lambda <= 0.06; distortion rising with lambda;
+disinhibition rather than maximum selection; sigma-pi salience gating.
+
+Not reproduced: the switching pattern is INVERTED. 131 switching bouts at the
+0.20 baseline against a published ~7, and 1 at lambda 0.43 against a published
+21.3. The published result that GPR dithers MORE than a winner-take-all under
+excess dopamine comes out backwards.
+
+Root cause: docs/research/ names the GPR model and gives the behavioural sweep
+but does not state the connection weights or thresholds. They were reimplemented
+from the equations. Three parameter adjustments were tried; two made things worse
+and were reverted, with what was tried recorded in the evidence file so it is not
+retried. Further adjustment would be fitting the model to the answer.
+
+Blocked on: the Gurney, Prescott & Redgrave 2001 parameter table from the primary
+paper, or a licence for ModelDB 124111 (Girard et al. 2008), which carries none
+anywhere and so cannot be vendored into this Apache-2.0 repository. With either,
+re-run the sweep unchanged; the harness and the "before" are committed.
+
+Also open, and recorded as an expectedFailure test rather than hidden: the module
+oscillates at zero salience. The thalamocortical loop gain was one cause and is
+fixed (it was exactly 1.0, the boundary of positive-feedback instability). The
+remaining cause is the diffuse STN-GPe loop, whose effective gain grows with
+channel count, so the module is less stable the more behaviours the animal has.
+
+NOTHING IN THE REPOSITORY DEPENDS ON THIS MODULE. It is not wired into any
+environment and must not be until the sweep reproduces. The if/else arbiter on
+`target_interest` remains the live path.
