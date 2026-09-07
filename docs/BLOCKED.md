@@ -295,7 +295,34 @@ selection statistics at 61 dopamine levels: percentage of competitions ending in
 no / partial / clean / distorted / multiple selection, plus mean efficiency and
 mean distortion. Two channels, a salience grid, no robot, no task, no bouts.
 
-Against that test the module has ONE fault with ONE signature: the winner does
+*** UPDATE, Session 6e: THAT FAULT IS EXPLAINED AND FIXED. It was not a defect
+in our arithmetic. We had built the Gurney, Prescott & Redgrave 2001 model and
+were scoring it against a 2024 paper that uses a DIFFERENT DOPAMINE MECHANISM:
+the 2024 model modulates the striatal output SLOPE about a pivot, where the 2001
+model scales the input by (1 +/- lambda). The striatal threshold is also 0.1 or
+0.15, not 0.2, and salience reaches the striatum through a leaky cortical relay
+rather than directly. The comparison could not have succeeded however well
+either model worked.
+
+The paper's supplementary archive -- the authors' own C++ and the data behind
+Figure 5 -- was obtained and read. brain/prescott_bg.py is the published model,
+reimplemented clean-room from those equations, and it reproduces: akinesia at
+zero dopamine exactly (100.0% against 100.0%), peak clean selection 79.9%
+against 78.6%, mean winner efficiency 0.996 against 0.999.
+
+ONE RESIDUAL, OPEN: the whole curve sits about +0.10 higher along the dopamine
+axis than published. The axis fit has slope 1.08, so it is a constant shift and
+not a scaling or a deformation. Every constant has been checked against the
+authors' source and matches, so this is NOT closable by adjusting one. Also
+unrecoverable from the archive: the exact sampling behind Figure 5. The
+published percentages are exact to 1e-5, implying 100000 competitions per level,
+while the shipped harness sweeps 202 ramp points -- so the figure came from a
+program that is not in the archive.
+
+The gecko's own module remains the 2001 lineage and must now be migrated onto
+the validated one. That is a migration, not a research question.
+
+For the record, the fault as it stood before that was: the winner does
 not saturate. Every ordering reproduces and the onset of distortion lands on the
 published step, but published clean selection at baseline is 78.6% against our
 47.4%, with the whole difference sitting in "partial". A competition the paper

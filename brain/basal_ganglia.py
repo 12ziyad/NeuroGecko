@@ -447,9 +447,20 @@ class BasalGanglia:
         return float((np.sum(gates) - best) / best)
 
     def distortion_dw(self, gates=None):
-        """The PUBLISHED distortion measure, d_w = 2 * (sum(e) - e_w) / sum(e).
+        """The PUBLISHED distortion measure, d_w = (sum(e) - e_w) / sum(e).
 
-        [Prescott et al. 2024, Biomimetics 9(3):139, Equation 3, CC BY.]
+        [Prescott et al. 2024, Biomimetics 9(3):139, CC BY -- taken from the
+        authors' own source, which is what produced the published table:
+
+            aDistortion = (sum_g==0.0)? 0.0: (sum_g - max_g)/sum_g;
+
+        The paper's Equation 3 as read carries a FACTOR OF TWO that the code
+        does not. This was implemented with the factor first and corrected
+        after reading the source. The published means top out at 0.217, which
+        sits inside the [0, 0.5] range of the unfactored form and only halfway
+        up the factored one, so the table agrees with the code. Recorded rather
+        than resolved silently: one of the two is wrong and it is not possible
+        to tell which from here.]
 
         This is NOT what `distortion_amount` computes. That one divides the
         losers by the WINNER; this divides them by the TOTAL and doubles it.
@@ -463,7 +474,7 @@ class BasalGanglia:
         total = float(np.sum(gates))
         if total <= 1e-12:
             return 0.0
-        return float(2.0 * (total - float(np.max(gates))) / total)
+        return float((total - float(np.max(gates))) / total)
 
     def selection_class(self, gates=None,
                         full_threshold=0.95, present_threshold=0.05):

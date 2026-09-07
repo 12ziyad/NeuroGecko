@@ -3,7 +3,7 @@
 **One document. Everything tried, everything that failed, why, and what fixed it.**
 Past, present, future. Updated every session; nothing removed.
 
-Last updated: Session 6d.
+Last updated: Session 6e.
 
 ---
 
@@ -31,7 +31,7 @@ later turned out to be right gets a second row, not an edit.
 | **Walking** — base controller, 4/6 gates, accepted | ✅ done |
 | **World** — no cheat, textured floor, narrowed camera, fleeing prey | ✅ done |
 | **Brain 1/8 — hypothalamus** (hunger, energy, fatigue, thermostat) | ✅ done |
-| **Brain 2/8 — basal ganglia** (action selection) | 🟡 6 of 7 properties; selection exact; not wired in |
+| **Brain 2/8 — basal ganglia** (action selection) | 🟡 published model reproduced; one dopamine offset open |
 | Brain 3–8 — brainstem, spine, retina, tectum, sleep, memory | ❌ |
 | **Proof** — 15-test battery | 🟡 1 run (A3, failed then fixed) |
 
@@ -344,6 +344,46 @@ That is a diagnosis, not a tuning target. Rule 2 applies.
 
 ---
 
+## Ledger — the saturation fault explained (Session 6e)
+
+The fault was **not in our arithmetic**. We had built the Gurney, Prescott &
+Redgrave 2001 model and were scoring it against a 2024 paper that uses a
+**different dopamine mechanism**. The comparison could not have succeeded
+however well either model worked.
+
+The paper's own supplementary archive — its C++ source and the data behind
+Figure 5 — was obtained and read.
+
+| # | Hypothesis | Verdict | Evidence |
+|---|---|---|---|
+| 84 | The winner failing to saturate was a defect in our model | **Refuted** | it was a **model mismatch**; every constant we had was right for a different model |
+| 85 | The 2024 paper uses the 2001 (1±λ) dopamine mechanism | **Refuted** | dopamine modulates the striatal output **slope** about a pivot, not the input gain. The authors call it "new DA" in their own source |
+| 86 | The striatal threshold is 0.2 | **Refuted** | **0.1** in the basic variant, **0.15** in the extended |
+| 87 | Salience reaches the striatum directly | **Refuted** | through a leaky cortical relay — and the extended model splits it **0.5/0.5** with the thalamic return |
+| 88 | The supplementary materials were unobtainable | **Refuted** | on disk: the authors' **C++ source** and the **Figure 5 data workbook** |
+| 89 | Figure 5 came from the basic variant | **Refuted** | the shipped harness sets `EXTENDED 0`, but the basic variant peaks at **8%** clean selection where the extended reaches **79%** |
+| 90 | The published distortion carries the paper's factor of two | **Refuted** | the authors' code has **no factor of two**, and the published range 0–0.217 fits the unfactored form |
+| 91 | A faithful implementation reproduces the published table | **Partly** | akinesia **exact**, peak clean **79.9 against 78.6**, efficiency **0.996 against 0.999** — but the curve sits **+0.10 higher in dopamine** |
+| 92 | The residual disagreement is a shape error | **Refuted** | axis fit slope **1.08** — a constant shift, not a scaling or a deformation |
+| 93 | The sampling behind Figure 5 is recoverable | **Refuted** | percentages exact to 1e-5 imply **100,000 competitions per level**; the shipped harness sweeps 202 ramp points |
+| 94 | The winner-take-all comparison arm reported its own result | **Refuted** | `gates()` returned all zeros one line after `step()` named a winner |
+
+### What changed, and what it bought
+
+| | before | after |
+|---|---|---|
+| Winner efficiency | tops out ~0.40 | **0.996** (published 0.999) |
+| Peak clean selection | 47.4% | **79.9%** (published 78.6%) |
+| Akinesia at zero dopamine | not tested | **100.0%** — exact |
+| Mean error across the table | — | 10.3 points, down from 20.4 |
+
+**The one thing still open** is a constant offset of about **+0.10** along the
+dopamine axis: our curve looks like the published one shifted. Every constant
+has been checked against the authors' source and matches, so this is **not**
+closed by adjusting one. Recorded, not tuned.
+
+---
+
 ## My own errors — the meta-ledger
 
 Failures of method, not of hypothesis. These are the ones worth re-reading.
@@ -363,6 +403,9 @@ Failures of method, not of hypothesis. These are the ones worth re-reading.
 | Compared against a published number without checking what it counted | three sessions spent on a ratio with no published counterpart | read the definition before reproducing the value |
 | Implemented a published quantity from its name | our distortion divides by the winner; the paper's divides by the total | a formula is not a word |
 | Stored gate-space values in a pre-activation state variable | the comparison arm's accessor returned "nothing selected" one line after naming a winner | a round trip is not a round trip until you run it both ways |
+| Scored one model against another model's published data | three sessions chasing a fault that was a category error | check the model matches before comparing its numbers |
+| Twice took a published formula from its prose | the distortion factor of two contradicts the code that made the table | when source code exists, it outranks the paper's own equation |
+| Never opened the supplementary archive | the C++ AND the data were sitting there | look in the box before declaring it empty |
 | Wrote a test asserting zero distortion at every dopamine level | the test **forbade the correct published behaviour** | tests encode expectations, and expectations can be wrong |
 | Used 50 Hz white noise as fluctuating salience | measured seven behaviour switches per *second* | check the test before blaming the model |
 | Claimed the cheat was removed | it was removed from the wrong environment | verify the claim where it matters |
@@ -377,7 +420,8 @@ Failures of method, not of hypothesis. These are the ones worth re-reading.
 | **Fear** | a chemosensory channel | Defence is **chemically gated**: smell 0.20, sight 0, touch 0. There is no odour field, and MuJoCo has no scent primitive. Any fear response now fires on the wrong sense. |
 | **Thermostat** | a temperature field | Built, wired to the published 29.5–31.9 °C band, reports `thermostat_inert: True`. Zero mentions of temperature anywhere in the world. |
 | **Hunting gates** | a strike behaviour | The walker cannot outrun prey and is not meant to. A 16–20 ms strike is shorter than one control step; scoring needs 500 Hz. |
-| **Basal ganglia** | *(the old blocker is void — see #73, #74)* | The switching comparison is **retired**: it had no published counterpart. Replaced by the published disembodied Figure 5 test, against which the module now has one clean unexplained fault — **the winner does not saturate**. Clean selection 47.4% against a published 78.6%, the difference sitting in "partial". Diagnosis, not a tuning target. |
+| **Basal ganglia** | a constant dopamine offset | The saturation fault is **explained and fixed** — it was a model mismatch, not an error. `brain/prescott_bg.py` is the published model and reproduces akinesia exactly, peak clean selection to within 1.3 points, and winner efficiency to within 0.003. One residual: the whole curve sits **+0.10 higher in dopamine**. Every constant matches the authors' source, so it cannot be closed by tuning. |
+| **Wiring the gecko in** | migrating onto the validated model | The gecko's own module is still the 2001 lineage. Now that a validated reference exists, the animal should be moved onto it — that is the next basal-ganglia step, and it is a migration rather than a research question. |
 | **Brainstem** | a cord that can be driven | The spinal generator is a closed-form clock — `(t·freq + offset) % 1.0` — with no phase state and no drive input, so three of the brainstem's four declared output channels have nowhere to land. **The cord must be rewritten as integrated oscillators first.** |
 | **Gait selection** | the animal itself | This species does not change footfall pattern with speed. The channel can be built but **has no acceptance test that is not invented**, and must be recorded as present-but-unvalidatable. |
 | **Forefoot gate** | a wrist joint | Closed by decision, not failure. Both unmet checks are INVENTED targets. |
@@ -436,12 +480,12 @@ shortfall.
 
 | | |
 |---|---|
-| Hypotheses tested | **83** |
-| Refuted | **61** |
+| Hypotheses tested | **94** |
+| Refuted | **70** |
 | Confirmed | **19** |
-| Partly | **3** |
-| My own method errors | **18** |
-| Tests passing | **341**, no expected failures |
+| Partly | **4** |
+| My own method errors | **21** |
+| Tests passing | **361**, no expected failures |
 
 **Seventy-three per cent of everything tried was wrong.** That is what the map
 is made of.
