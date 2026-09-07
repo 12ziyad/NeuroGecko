@@ -84,12 +84,58 @@ def _add_scene_capsule(
         return
 
 
-def _food_visible_frac(image: np.ndarray) -> float:
-    """Fraction of pixels matching the green food marker in a uint8 HxWx3 image."""
-    r = image[:, :, 0].astype(np.int32)
-    g = image[:, :, 1].astype(np.int32)
-    b = image[:, :, 2].astype(np.int32)
-    mask = (g > 120) & (g > r + 30) & (g > b + 30)
+#: The colour the legacy marker was painted. Kept ONLY so the legacy path
+#: reproduces bit for bit; nothing new should key on it.
+LEGACY_MARKER_RGB = (0.10, 0.80, 0.15)
+
+
+#: Chromatic tolerance for the placeholder food detector. DERIVED, not chosen:
+#: it is half the chromatic distance from the prey to the nearest confusable
+#: surface in the world. That nearest confuser is the GECKO'S OWN SPOTS at
+#: 0.145 -- a brown cricket on sand really is camouflaged, which is why the
+#: margin is thin and why a colour detector is the wrong instrument. Measured
+#: distances: gecko spot 0.145, gecko skin 0.180, floor mat 0.219, sand texture
+#: 0.243, belly 0.311.
+FOOD_CHROMA_TOLERANCE = 0.07
+
+
+def _food_visible_frac(image: np.ndarray, target_rgb=None,
+                       tolerance: float = FOOD_CHROMA_TOLERANCE) -> float:
+    """Fraction of pixels that look like the food, in a uint8 HxWx3 image.
+
+    THIS IS A PLACEHOLDER FOR A RETINA and is labelled as one. A real eye does
+    not find prey by matching a colour; brain module 4 replaces it.
+
+    `target_rgb` is READ FROM THE MODEL by the caller rather than written here.
+    That is the whole point of the argument. The previous version hard-coded a
+    green test -- `g > 120 and g > r + 30 and g > b + 30` -- which was correct
+    for the painted marker it was written against and returns EXACTLY 0.0 for
+    the brown prey that replaced it, at every illumination from 0.4x to 3.0x.
+    So the no-cheat world shipped with an animal that could not see its own
+    food, and the detector and the world could disagree silently because each
+    stated the colour separately. Deriving it from the model removes the class
+    of bug rather than moving it to a new colour.
+
+    Matching is on CHROMATICITY -- the pixel normalised by its own brightness
+    -- so a shadowed cricket and a lit one are the same object. The old test
+    was on absolute channel values and failed under illumination change even
+    for its own marker: at gain 0.4 the painted sphere also scored 0.0.
+    """
+    if target_rgb is None:
+        target_rgb = LEGACY_MARKER_RGB
+    pixels = image.astype(np.float64)
+    brightness = pixels.sum(axis=2, keepdims=True)
+    target = np.asarray(target_rgb, dtype=np.float64)
+    target_sum = float(target.sum())
+    if target_sum <= 0:
+        return 0.0
+    # Unlit pixels carry no colour information; excluding them stops black from
+    # matching everything once it is normalised.
+    lit = brightness[:, :, 0] > 24.0
+    with np.errstate(invalid="ignore", divide="ignore"):
+        chroma = np.where(brightness > 0, pixels / brightness, 0.0)
+    distance = np.abs(chroma - (target / target_sum)).sum(axis=2)
+    mask = lit & (distance < tolerance)
     return float(mask.sum()) / float(mask.size)
 
 
@@ -193,6 +239,10 @@ class GeckoBrainEnv(gym.Env):
         # rather than a sphere drawn onto the scene after rendering.
         self.prey = None
         self._prey_mocap = -1
+        #: What the food actually looks like, read from the model so the
+        #: detector cannot disagree with the world. None until a prey geom is
+        #: found, in which case the legacy marker colour is used.
+        self._food_rgb = None
         if prey_parameters is not None:
             from envs.prey import FleeingPrey
             body = mujoco.mj_name2id(self.walk_env.model, mujoco.mjtObj.mjOBJ_BODY, "prey")
@@ -206,6 +256,18 @@ class GeckoBrainEnv(gym.Env):
                                     rng=self._rng)
             self.food_radius = float(prey_parameters.radius_m)
             self.eat_radius = float(prey_parameters.capture_distance_m)
+            # Read the prey's actual colour out of the model. One source of
+            # truth: if the world is regenerated in a different colour the
+            # detector follows it without anyone remembering to.
+            geom = mujoco.mj_name2id(self.walk_env.model,
+                                     mujoco.mjtObj.mjOBJ_GEOM, "prey_geom")
+            if geom < 0:
+                raise ValueError(
+                    "The prey body has no geom named 'prey_geom', so its "
+                    "appearance cannot be read and the food detector would "
+                    "silently key on the wrong colour.")
+            self._food_rgb = tuple(
+                float(x) for x in self.walk_env.model.geom_rgba[geom][:3])
         self._nose_sid = mujoco.mj_name2id(
             self.walk_env.model,
             mujoco.mjtObj.mjOBJ_SITE,
@@ -600,7 +662,7 @@ class GeckoBrainEnv(gym.Env):
         truncated = bool((self._step >= self.max_steps or walker_truncated) and not terminated)
 
         obs = self._obs()
-        food_visible_frac = _food_visible_frac(obs["image"])
+        food_visible_frac = _food_visible_frac(obs["image"], self._food_rgb)
         food_visible_signal = min(food_visible_frac / 0.012, 1.0)
 
         # Brain 1 -> brain 2, on live data. Threat is the same danger signal the

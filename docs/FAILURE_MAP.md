@@ -3,7 +3,7 @@
 **One document. Everything tried, everything that failed, why, and what fixed it.**
 Past, present, future. Updated every session; nothing removed.
 
-Last updated: Session 7c.
+Last updated: Session 8.
 
 ---
 
@@ -141,14 +141,16 @@ Where the work went, in order, and where it stopped each time. **71 commits.**
 
 ### ← Where we are paused, right now
 
-- **Done and pushed:** everything above, 424 tests green.
+- **Done and pushed:** everything above, 433 tests green.
 - **Running in the background:** a hunt for why our dopamine curve sits +0.10
   high. Not a blocker; nothing depends on it.
 - **Brain 3 is finished.** The cord drives the walker with every gate
   unchanged, and the brainstem turns a decision into a stride frequency and a
   turn.
-- **Next up, not started:** the retina and tectum — actually seeing prey. The
-  recovered 29/30 vision brain reattaches there.
+- **Next up, scouted but not built:** the retina and tectum. The specification
+  is in hand and so are three findings that have to be fixed with it: the eye
+  cannot resolve what the animal is measured to track, it samples the periphery
+  finer than the centre, and the policy never receives a spatial image at all.
 
 ---
 
@@ -604,6 +606,53 @@ species does not change footfall pattern with speed.
 
 ---
 
+## Ledger — scouting the eye (Session 8)
+
+Five angles on what a leopard gecko's eye actually is, every load-bearing
+number adversarially checked. The scouting found a **live defect** in work that
+had been declared finished.
+
+| # | Hypothesis | Verdict | Evidence |
+|---|---|---|---|
+| 112 | The food detector can see the food | **Refuted** | it tested for **green**; the prey that replaced the painted marker is **brown**. Returns exactly **0.000** at every illumination from 0.4× to 3.0× |
+| 113 | The no-cheat world is in use | **Refuted** | referenced only by its own test and its generator. **No training or evidence run has ever loaded it** |
+| 114 | The old detector at least worked for its own marker | **Refuted** | absolute channel thresholds, so the painted sphere also scored **0.0 at gain 0.4** — it failed on illumination change too |
+| 115 | A colour detector can find the prey in this world | **Partly** | it can, but the margin is thin: the nearest confuser is **the gecko's own spots** at 0.145. A brown cricket on sand is genuinely camouflaged |
+| 116 | The policy receives an image | **Refuted** | the encoder average-pools to **128 numbers over the whole visual field** — "how much", never "where". There is no retinotopic map at all |
+| 117 | A rectilinear camera samples uniformly, as the animal does | **Refuted** | corners sample **4× finer than the centre** at 120° — an **inverse fovea**, worst exactly where the animal aims |
+| 118 | The default build can resolve what the animal tracks | **Refuted** | the published 1.6° tracked dot spans **0.516 px** at fovy 120 — not resolvable |
+| 119 | The eye's field of view is sourceable | **Refuted** | still NOT_IN_CORPUS for this species; the five corpus recommendations remain invented |
+| 120 | Leopard geckos have a tapetum | **Refuted** | unverifiable from any primary source — every confident claim traced to a pet-care site. **Do not build one** |
+
+### #112 — a detector that could not see its own food
+
+Session 4c replaced a green sphere painted on after rendering with a real brown
+prey geom. The detector that reads it kept looking for green. Prey visibility
+was therefore **identically zero**, which means the gecko in the no-cheat world
+could never have hunted.
+
+It never ran, which is #113 and is its own finding: the world was declared
+finished and then never adopted.
+
+The fix removes the **class** of bug rather than the colour. The detector now
+reads the prey's appearance **out of the model**, so the world and the detector
+cannot state it separately and drift apart. Matching is on chromaticity rather
+than absolute channel values, which also fixes #114.
+
+### #116 → #118 — the eye is not where the effort went
+
+The three findings compound. The camera cannot resolve the smallest feature the
+animal is *measured* to track; it samples the periphery finer than the centre,
+which is backwards; and whatever it does capture is averaged into a single
+global number before the policy sees it. **There is currently no sense in which
+the gecko knows where anything is.**
+
+That is what brain 4 is for, and #119 and #120 mark where it must stay honest:
+no published field of view exists for this species, and the tapetum everyone
+"knows" geckos have could not be traced to a primary source at all.
+
+---
+
 ## My own errors — the meta-ledger
 
 Failures of method, not of hypothesis. These are the ones worth re-reading.
@@ -702,12 +751,12 @@ shortfall.
 
 | | |
 |---|---|
-| Hypotheses tested | **111** |
-| Refuted | **83** |
+| Hypotheses tested | **120** |
+| Refuted | **91** |
 | Confirmed | **22** |
-| Partly | **5** |
+| Partly | **6** |
 | My own method errors | **24** |
-| Tests passing | **424**, no expected failures |
+| Tests passing | **433**, no expected failures |
 
 **Seventy-three per cent of everything tried was wrong.** That is what the map
 is made of.
