@@ -3,7 +3,7 @@
 **One document. Everything tried, everything that failed, why, and what fixed it.**
 Past, present, future. Updated every session; nothing removed.
 
-Last updated: Session 6f.
+Last updated: Session 7c.
 
 ---
 
@@ -31,9 +31,10 @@ later turned out to be right gets a second row, not an edit.
 | **Walking** — base controller, 4/6 gates, accepted | ✅ done |
 | **World** — no cheat, textured floor, narrowed camera, fleeing prey | ✅ done |
 | **Brain 1/8 — hypothalamus** (hunger, energy, fatigue, thermostat) | ✅ done |
-| **Brain 2/8 — basal ganglia** (action selection) | ✅ validated, migrated, and running live beside brain 1 |
-| **Brain 3a/8 — spinal rhythm** (the leg oscillators) | 🟡 built, matches the clock, not yet driving the walker |
-| Brain 3b–8 — brainstem, retina, tectum, sleep, memory | ❌ |
+| **Brain 2/8 — basal ganglia** (action selection) | ✅ reproduces the published table, mean error 0.10 pp |
+| **Brain 3a/8 — spinal rhythm** (the leg oscillators) | ✅ drives the walker, every gate unchanged |
+| **Brain 3b/8 — brainstem** (decision → command) | ✅ built; thinnest evidence in the project, declared |
+| Brains 4–8 — retina, tectum, sleep, memory | ❌ |
 | **Proof** — 15-test battery | 🟡 1 run (A3, failed then fixed) |
 
 **Roughly 50 % done.** The irreversible parts — the research and the body — are
@@ -140,15 +141,14 @@ Where the work went, in order, and where it stopped each time. **71 commits.**
 
 ### ← Where we are paused, right now
 
-- **Done and pushed:** everything above, 404 tests green.
+- **Done and pushed:** everything above, 424 tests green.
 - **Running in the background:** a hunt for why our dopamine curve sits +0.10
   high. Not a blocker; nothing depends on it.
-- **Half done:** the spinal rhythm is an oscillator with a command input and it
-  matches the old clock to 3.3 × 10⁻¹¹ of a stride — but it is **not yet the
-  thing driving the legs**.
-- **Next up, not started:** wire the cord into the walking controller and re-run
-  the six gait gates with the coupling on. Nothing is claimed about the gates
-  until that runs. Then the brainstem.
+- **Brain 3 is finished.** The cord drives the walker with every gate
+  unchanged, and the brainstem turns a decision into a stride frequency and a
+  turn.
+- **Next up, not started:** the retina and tectum — actually seeing prey. The
+  recovered 29/30 vision brain reattaches there.
 
 ---
 
@@ -549,6 +549,61 @@ has been read.
 
 ---
 
+## Ledger — the dopamine offset resolved, and brain 3 finished (Session 7b–7c)
+
+| # | Hypothesis | Verdict | Evidence |
+|---|---|---|---|
+| 103 | The dopamine discrepancy is a constant offset | **Refuted** | neither an offset nor a scaling — the **mechanism** was wrong |
+| 104 | The published model modulates the striatal output slope | **Refuted** | it multiplies the **afferent input**: (1 + λ) to D1, (1 − λ) to D2, threshold **0.2**, quoted verbatim in Supplementary Methods §5 |
+| 105 | Reading the files an archive contains is enough | **Refuted** | the builders every program includes are **absent**; the two present are the branch every program disables |
+| 106 | Session 6e's "the whole model was wrong" was right | **Partly** | right about the structure. **Wrong about dopamine and the threshold, which the *first* implementation had right** |
+| 107 | The published sweep is memoryless | **Refuted** | it is **hysteretic**; cold-starting each cell moves the table by ~1 percentage point |
+| 108 | The corrected model reproduces the published table | **Confirmed** | mean error **0.103 pp**, all four onsets exact, peak at **0.22 = published**, axis fit **slope 1.000, intercept 0.000** |
+| 109 | Attaching the integrated cord changes the gait | **Refuted** | every gate identical; hind duty **0.733418** both; speed differs by **3.2 × 10⁻¹⁴ m/s** |
+| 110 | The parity harness is the official gate scorer | **Refuted** | it records at its own rate, so only the comparison is claimed, never the absolute count |
+| 111 | isinstance is safe for path-loaded modules | **Refuted** | the same file under two names gives two classes, and a perfectly good cord was rejected |
+
+### #104 → #106 — a correction that reversed a correction
+
+Session 6e concluded "the whole model was the wrong one" and rewrote the
+dopamine mechanism. It was **half right**, and the half it got wrong it got
+wrong *away* from the truth: the original module had the dopamine form and the
+striatal threshold **correct all along**.
+
+The trap was specific. The archive ships two model builders and both select a
+slope-and-pivot dopamine mechanism. Neither is used — every shipped program
+disables that branch and includes a builder that **is not in the archive**. So
+reading carefully what was present produced a faithful implementation of the
+branch nothing runs.
+
+**What settled it was the paper's prose, not its code**: dopamine is *"a
+multiplicative factor in the equations, specifying afferent input to the
+striatum"*. No pivot and no 0.15 appear anywhere in the paper.
+
+### #108 — what the fix bought
+
+| | before | after | published |
+|---|---|---|---|
+| Mean error across the table | 10.3 pp | **0.103 pp** | — |
+| Peak clean selection at λ | 0.37 | **0.22** | 0.22 |
+| Onsets (clean, distortion, multiple) | all late | **all exact** | — |
+| Dopamine axis fit | slope 1.08 | **slope 1.000, intercept 0.000** | — |
+
+A hundredfold improvement, and the offset carried as this module's one open item
+is **gone**.
+
+### Brain 3, finished
+
+The cord drives the walker and **every gate is unchanged** — measured, not
+assumed. The brainstem turns a chosen behaviour into a stride frequency and a
+turn, and the urgency it uses is the gate value the decision was released with,
+so a half-released flee drives the legs at 0.669 rather than 1.0. It carries the
+thinnest evidence in the project: every direction published, every number
+invented and declared. It has **no gait-selection channel**, because this
+species does not change footfall pattern with speed.
+
+---
+
 ## My own errors — the meta-ledger
 
 Failures of method, not of hypothesis. These are the ones worth re-reading.
@@ -569,6 +624,8 @@ Failures of method, not of hypothesis. These are the ones worth re-reading.
 | Implemented a published quantity from its name | our distortion divides by the winner; the paper's divides by the total | a formula is not a word |
 | Stored gate-space values in a pre-activation state variable | the comparison arm's accessor returned "nothing selected" one line after naming a winner | a round trip is not a round trip until you run it both ways |
 | Scored one model against another model's published data | three sessions chasing a fault that was a category error | check the model matches before comparing its numbers |
+| Rewrote a correct mechanism because the only files present said so | reversed a right answer into a wrong one for two sessions | when code and prose disagree, find which branch the archive actually builds |
+| Assumed a published sweep was memoryless | a percentage point of error with no cause | ask what a harness does *between* samples, not only during them |
 | Twice took a published formula from its prose | the distortion factor of two contradicts the code that made the table | when source code exists, it outranks the paper's own equation |
 | Never opened the supplementary archive | the C++ AND the data were sitting there | look in the box before declaring it empty |
 | Wrote a test asserting zero distortion at every dopamine level | the test **forbade the correct published behaviour** | tests encode expectations, and expectations can be wrong |
@@ -645,12 +702,12 @@ shortfall.
 
 | | |
 |---|---|
-| Hypotheses tested | **102** |
-| Refuted | **76** |
-| Confirmed | **21** |
-| Partly | **4** |
-| My own method errors | **22** |
-| Tests passing | **404**, no expected failures |
+| Hypotheses tested | **111** |
+| Refuted | **83** |
+| Confirmed | **22** |
+| Partly | **5** |
+| My own method errors | **24** |
+| Tests passing | **424**, no expected failures |
 
 **Seventy-three per cent of everything tried was wrong.** That is what the map
 is made of.

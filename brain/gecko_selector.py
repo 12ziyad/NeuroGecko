@@ -72,13 +72,12 @@ PrescottParameters = _pbg.PrescottParameters
 #: The six behaviours, in order. Fixed: the gate vector is positional.
 CHANNELS = ("hunt", "flee", "explore", "bask", "rest", "groom")
 
-#: Tonic dopamine. 0.3 is the extended model's OWN default in the authors'
-#: source; the basic variant defaults to 0.2 and the paper describes 0.2 as the
-#: normal level. Our reimplementation sits about +0.10 along the dopamine axis
-#: relative to the published figure -- an open, recorded discrepancy -- so this
-#: is cited from the source for this variant rather than chosen to make
-#: anything line up. Changing it to make behaviour look better would be tuning.
-BASELINE_DOPAMINE = 0.3
+#: Tonic dopamine at rest. The paper describes 0.2 as the normal level, and
+#: with the published dopamine mechanism our sweep now peaks at exactly the
+#: published 0.22 with the axis fit at slope 1.000, so 0.2 here means what it
+#: means in the paper. It was 0.3 while the reimplementation still carried a
+#: dopamine-axis offset; that offset is resolved and the value moves back.
+BASELINE_DOPAMINE = 0.2
 
 
 def salience_from_drives(hunger, fatigue, cold, warm, threat=0.0,

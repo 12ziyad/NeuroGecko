@@ -89,16 +89,35 @@ def classify(gates, n_primary):
     return out
 
 
-def run_level(dopamine, grid, n_channels=5, n_primary=2, variant="extended"):
-    salience = np.zeros((grid.shape[0], n_channels))
-    salience[:, :n_primary] = grid
+def run_level(dopamine, axis, n_channels=5, n_primary=2, variant="extended"):
+    """One dopamine level over the salience square, HYSTERETICALLY.
+
+    The authors' harness never resets the network between salience points: it
+    converges, records, changes the input and converges again, so each
+    competition starts from the previous one's fixed point. That is not a
+    detail -- cold-starting every cell instead moves the whole table by around
+    a percentage point, and the published data carries the fingerprint of the
+    path, disagreeing with its own transpose on thousands of cells. A
+    memoryless model cannot do that.
+
+    Rows are independent of one another, so every row runs as one batch while
+    the columns are walked in order with the state carried along them.
+    """
     params = (PrescottParameters.extended() if variant == "extended"
               else PrescottParameters.basic())
+    n = len(axis)
     bg = PrescottBasalGanglia(n_channels=n_channels, n_primary=n_primary,
-                              dopamine=dopamine, parameters=params,
-                              batch=grid.shape[0])
-    steps, settled = bg.converge(salience)
-    gates = bg.gates()
+                              dopamine=dopamine, parameters=params, batch=n)
+    salience = np.zeros((n, n_channels))
+    salience[:, 0] = axis                       # one row per value of channel 1
+    collected, settled, steps = [], True, 0
+    for value in axis:                          # walk channel 2 along the row
+        salience[:, 1] = value
+        took, ok = bg.converge(salience)        # state carried: no reset
+        steps = max(steps, took)
+        settled = settled and ok
+        collected.append(bg.gates().copy())
+    gates = np.concatenate(collected, axis=0)
     cls = classify(gates, n_primary)
 
     g = gates[:, :n_primary]
@@ -111,8 +130,9 @@ def run_level(dopamine, grid, n_channels=5, n_primary=2, variant="extended"):
     # in which SOMETHING was selected -- which is why the published means are
     # blank wherever every competition ends in no selection.
     active = cls > 0
-    n = float(len(cls))
-    row = {c: 100.0 * float(np.sum(cls == i)) / n for i, c in enumerate(CLASSES)}
+    cells = float(len(cls))
+    row = {c: 100.0 * float(np.sum(cls == i)) / cells
+           for i, c in enumerate(CLASSES)}
     row["DA"] = round(float(dopamine), 4)
     row["eff_mn"] = float(np.mean(winner[active])) if active.any() else None
     row["dis_mn"] = float(np.mean(distortion[active])) if active.any() else None
@@ -143,15 +163,14 @@ def main():
     args = ap.parse_args()
 
     axis = np.linspace(0.0, 1.0, args.steps)
-    grid = np.stack(np.meshgrid(axis, axis, indexing="ij"), axis=-1).reshape(-1, 2)
     published = load_published()
-    print(f"grid {args.steps}x{args.steps} = {grid.shape[0]} competitions, "
-          f"{len(published)} dopamine levels\n")
+    print(f"grid {args.steps}x{args.steps} = {args.steps ** 2} competitions, "
+          f"{len(published)} dopamine levels, hysteretic")
 
     rows, deltas = [], []
     print("   DA |        none          part         clean          dist          mltp |    eff")
     for pub in published:
-        got = run_level(pub["DA"], grid, variant=args.variant)
+        got = run_level(pub["DA"], axis, variant=args.variant)
         rows.append({"published": pub, "measured": got})
 
         def pair(key):
@@ -232,7 +251,7 @@ def main():
         "protocol": {
             "channels": 5, "primary_channels": 2,
             "grid": f"{args.steps}x{args.steps} uniform on [0,1]^2",
-            "competitions_per_level": int(grid.shape[0]),
+            "competitions_per_level": int(args.steps ** 2),
             "convergence": "run to tolerance 1e-4, not a fixed step count",
             "classifier": "full >= 0.95, partial >= 0.05, scored over the two primary channels",
             "sampling_caveat": (

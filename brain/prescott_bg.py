@@ -20,25 +20,48 @@ the selection classifier and the two summary statistics are all taken from that
 code. Nothing is vendored: this is a clean-room reimplementation in Python from
 the published equations, which CC BY would permit anyway.
 
-WHAT DIFFERS FROM THE 2001 MODEL WE HAD, and each of these is load-bearing:
+A CORRECTION THIS FILE ONCE GOT BACKWARDS, kept here because it is the most
+expensive kind of mistake available in this project. The archive ships two
+model builders, bg_basic_f.h and bg_extended_f.h, and both select a "new DA"
+mechanism in which dopamine rotates the striatal output SLOPE about a pivot.
+This file was written from them, because they are the only builders present.
 
-  1. DOPAMINE MODULATES THE OUTPUT SLOPE, NOT THE INPUT GAIN. The 2001 model
-     scales the cortical drive into the striatum by (1 +/- lambda). This model
-     leaves the drive alone and changes the SLOPE of the striatal output
-     function, with the D1 ramp pivoting about a fixed point. The paper calls
-     this "new DA" in its own source. It is the paper's mechanism and the whole
-     subject of the study, so using the 2001 form makes the dopamine sweep
-     meaningless.
-  2. THE STRIATAL THRESHOLD IS 0.1 (basic) or 0.15 (extended), not 0.2.
-  3. SALIENCE REACHES THE STRIATUM AND STN THROUGH A LEAKY CORTICAL RELAY,
+They are the builders nothing uses. Every shipped PROGRAM -- selection.cpp,
+biras.cpp, benchmark.cpp, grad.cpp -- sets `#define NEW_DA 0` and includes
+bg_extended.h or bg_basic.h, and those two files are ABSENT from the archive.
+So the headers that exist are the unused branch, and a faithful reading of what
+was present produced a faithful implementation of the wrong model.
+
+The paper settles it in words. Section 3.1.1: dopamine is "a multiplicative
+factor in the equations, specifying afferent input to the striatum", D1
+weighted (1 + lambda) and D2 (1 - lambda). Supplementary Methods section 5:
+
+    u_i^d1 = (1 + lambda) * 0.5 * (y_i^ssc + y_i^mc),  y_i^d1 = L(a_i^d1, 0.2)
+    u_i^d2 = (1 - lambda) * 0.5 * (y_i^ssc + y_i^mc),  y_i^d2 = L(a_i^d2, 0.2)
+
+No pivot, no 0.8 and no 0.15 appear anywhere in the paper. Both mechanisms are
+implemented here and selected by `da_mode`; "afferent" is the published one and
+the default, and the "new DA" builders are kept under *_new_da() because code
+that ships is worth recording even when nothing calls it.
+
+WHAT DIFFERS FROM THE PLAIN 2001 MODEL:
+
+  1. SALIENCE REACHES THE STRIATUM AND STN THROUGH A LEAKY CORTICAL RELAY,
      not directly.
-  4. The extended variant inserts a motor-cortex population between cortex and
+  2. The extended variant inserts a motor-cortex population between cortex and
      the striatum and splits the striatal and subthalamic drive 0.5/0.5 between
      salience and the thalamocortical return -- which is where persistence
      comes from in this lineage. That is NOT the Girard arrangement.
+  3. The subthalamic drive carries NO dopamine term.
 
-The five-nucleus weights (0.9 diffuse subthalamic, 0.3 pallidal) are the same
-in both lineages and are unchanged.
+The five-nucleus weights (0.9 diffuse subthalamic, 0.3 pallidal) and the
+striatal threshold of 0.2 are the same as the 2001 model, which is why the
+first implementation in brain/basal_ganglia.py had them right.
+
+THE SWEEP IS HYSTERETIC. The authors never reset the network between salience
+points, so each competition starts from the previous one's fixed point. Cold-
+starting every cell instead moves the whole published table by around a
+percentage point. See tools/selection_sweep.py.
 """
 
 from __future__ import annotations
@@ -86,7 +109,26 @@ class PrescottParameters:
     threshold_gpe: float = -0.2
     threshold_gpi: float = -0.2
 
-    # --- the "new DA" transfer -------------------------------------------
+    #: WHICH DOPAMINE MECHANISM. "afferent" is the published one: dopamine is a
+    #: multiplicative factor on the striatal INPUT, (1 + lambda) on D1 and
+    #: (1 - lambda) on D2, with a plain rectifier on the output. "slope"
+    #: modulates the output slope about a pivot instead.
+    #:
+    #: Both are real code in the authors' archive -- da_leaky and da_full_leaky
+    #: -- and this file was first written from the "slope" one, because the only
+    #: model builders SHIPPED are the _f headers that select it. Every shipped
+    #: PROGRAM then sets NEW_DA 0 and includes bg_extended.h, which is absent
+    #: from the archive. So the headers present are the ones nothing uses, and
+    #: the reimplementation faithfully followed the wrong branch.
+    #:
+    #: The paper settles it in words: dopamine is "a multiplicative factor in
+    #: the equations, specifying afferent input to the striatum", D1 weighted
+    #: (1 + lambda) and D2 (1 - lambda). Supplementary Methods section 5 gives
+    #: u_d1 = (1 + lambda) * 0.5 * (y_ssc + y_mc) with y_d1 = L(a_d1, 0.2).
+    #: No pivot and no 0.8 appear anywhere in the paper.
+    da_mode: str = "afferent"
+
+    # --- the "slope" transfer, used only when da_mode == "slope" ----------
     #: D1 slope is 1 + gain*lambda and its ramp pivots about `d1_pivot`.
     d1_gain: float = 1.0
     d1_pivot: float = 0.5               # 0.2 in the extended variant
@@ -109,19 +151,38 @@ class PrescottParameters:
     #: constant, because that is what the number actually is.
     relax: float = 0.3
     tolerance: float = 1e-4             # max |da| for convergence
-    max_steps: int = 5000
+    #: The source caps at 1000 steps and requires TWO consecutive steps under
+    #: tolerance before calling it converged, not one.
+    max_steps: int = 1000
 
     @classmethod
     def basic(cls):
-        """"Basic (new DA)" -- the variant that generates the published sweep."""
+        """The basic five-nucleus model, published dopamine mechanism."""
         return cls(extended=False, salience_share=1.0, motor_share=0.0,
-                   thalamus_to_motor=0.0, threshold_striatum=0.1, d1_pivot=0.5)
+                   thalamus_to_motor=0.0, threshold_striatum=0.2,
+                   d1_pivot=0.5, da_mode="afferent")
+
+    @classmethod
+    def basic_new_da(cls):
+        """The "Basic (new DA)" builder that ships but that nothing includes."""
+        return cls(extended=False, salience_share=1.0, motor_share=0.0,
+                   thalamus_to_motor=0.0, threshold_striatum=0.1,
+                   d1_pivot=0.5, da_mode="slope")
 
     @classmethod
     def extended(cls):
         """"Extended (new DA)" -- adds motor cortex, thalamus and reticular."""
         return cls(extended=True, salience_share=0.5, motor_share=0.5,
-                   thalamus_to_motor=1.0, threshold_striatum=0.15, d1_pivot=0.2,
+                   thalamus_to_motor=1.0, threshold_striatum=0.2,
+                   d1_pivot=0.2, da_mode="afferent",
+                   thalamus_threshold_is_tonic=False)
+
+    @classmethod
+    def extended_new_da(cls):
+        """The "Extended (new DA)" builder that ships but that nothing includes."""
+        return cls(extended=True, salience_share=0.5, motor_share=0.5,
+                   thalamus_to_motor=1.0, threshold_striatum=0.15,
+                   d1_pivot=0.2, da_mode="slope",
                    thalamus_threshold_is_tonic=False)
 
 
@@ -148,7 +209,12 @@ class PrescottBasalGanglia:
         # undefined once it goes negative, so refuse it here rather than
         # halfway through a sweep. The source warns and returns zero; refusing
         # is better, because a silent zero looks like a working model.
-        if self.p.d2_gain * dopamine > 1.0:
+        if self.p.da_mode == "afferent" and dopamine > 1.0:
+            raise ValueError(
+                f"dopamine {dopamine} is outside the published range 0 <= "
+                "lambda <= 1; above 1 the D2 afferent gain (1 - lambda) goes "
+                "negative, which the paper does not define.")
+        if self.p.da_mode == "slope" and self.p.d2_gain * dopamine > 1.0:
             raise ValueError(
                 f"dopamine {dopamine} drives the D2 slope negative "
                 f"(gain {self.p.d2_gain}); the published transfer is undefined "
@@ -182,21 +248,27 @@ class PrescottBasalGanglia:
 
     # ------------------------------------------------- the published DA ramps
     def _y_d1(self, a):
-        """D1 output. Slope rises with dopamine; the ramp pivots about d1_pivot.
+        """D1 striatal output.
 
-        y = m*(a - theta) + (1 - m)*pivot,  m = 1 + gain*lambda
+        In the published "afferent" mode dopamine has already multiplied the
+        INPUT, so the output function is the plain rectifier every other
+        nucleus uses. In "slope" mode the ramp pivots about d1_pivot instead.
         """
+        if self.p.da_mode == "afferent":
+            return rectify(a - self.p.threshold_striatum)
         m = 1.0 + self.p.d1_gain * self.dopamine
         return rectify(m * (a - self.p.threshold_striatum)
                        + (1.0 - m) * self.p.d1_pivot)
 
     def _y_d2(self, a):
-        """D2 output. Slope FALLS with dopamine. No pivot term."""
+        """D2 striatal output. See `_y_d1`."""
+        if self.p.da_mode == "afferent":
+            return rectify(a - self.p.threshold_striatum)
         m = 1.0 - self.p.d2_gain * self.dopamine
         if m < 0.0:
             raise ValueError(
                 f"dopamine {self.dopamine} drives the D2 slope negative; the "
-                "published transfer is undefined there.")
+                "slope transfer is undefined there.")
         return rectify(m * (a - self.p.threshold_striatum))
 
     # ------------------------------------------------------------------ step
@@ -234,8 +306,15 @@ class PrescottBasalGanglia:
         u_mot = y_ctx + p.thalamus_to_motor * y_thl
         drive = p.salience_share * y_ctx + p.motor_share * y_mot
 
-        u_sd1 = drive
-        u_sd2 = drive
+        if p.da_mode == "afferent":
+            # Dopamine multiplies the afferent input: (1 + lambda) to D1,
+            # (1 - lambda) to D2. The subthalamic drive carries NO dopamine
+            # term -- Supplementary Methods section 5 gives it none.
+            u_sd1 = (1.0 + self.dopamine) * drive
+            u_sd2 = (1.0 - self.dopamine) * drive
+        else:
+            u_sd1 = drive
+            u_sd2 = drive
         u_stn = drive - p.gpe_stn * y_gpe
         u_gpe = p.stn_out * stn_total - p.sd2_gpe * y_d2
         u_gpi = p.stn_out * stn_total - p.sd1_gpi * y_d1 - p.gpe_gpi * y_gpe
@@ -273,9 +352,14 @@ class PrescottBasalGanglia:
 
         `strict=True` raises instead, for callers that need a settled state.
         """
+        under = 0
         for i in range(self.p.max_steps):
             if self.step(salience) < self.p.tolerance:
-                return i + 1, True
+                under += 1
+                if under >= 2:          # two consecutive, as the source requires
+                    return i + 1, True
+            else:
+                under = 0
         if strict:
             raise RuntimeError("model did not converge within max_steps")
         return self.p.max_steps, False

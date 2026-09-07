@@ -1,0 +1,157 @@
+{
+ "schema_version": 1,
+ "test": "does attaching the integrated spinal cord change the gait gates",
+ "generated_by": "tools/gate_with_cord.py",
+ "protocol": {
+  "duration_s": 20.0,
+  "seed": 0,
+  "residual": "zero -- the open-loop accepted base",
+  "stance_compensation": "all",
+  "coupling": "load feedback OFF (sigma = 0)",
+  "caveat": "PARITY HARNESS, NOT THE OFFICIAL SCORER. It records at its own rate, so timing_and_acquisition_valid may be False and the absolute pass count is not the project's Gate 2 result. Both arms run through the same harness, so the comparison is valid; the absolute numbers are not a gate claim."
+ },
+ "gates_changed": [],
+ "gates_passed": {
+  "clock": 5,
+  "cord": 5
+ },
+ "clock": {
+  "gate2": {
+   "pass": false,
+   "completed_without_fall": true,
+   "observed_contacts_entrained": false,
+   "timing_and_acquisition_valid": false,
+   "requirements": {
+    "minimum_forward_m_s": 0.04,
+    "minimum_net_path": 0.5,
+    "maximum_hind_swing_load": 0.1,
+    "minimum_front_stance_load": 0.65,
+    "hind_duty_target": 0.78,
+    "hind_duty_tolerance": 0.05,
+    "limb_phase_target": 0.435,
+    "limb_phase_tolerance": 0.03
+   },
+   "checks": {
+    "signed_forward": {
+     "value_m_s": 0.04164718933366114,
+     "pass": true
+    },
+    "net_path": {
+     "value": 0.7426754102133162,
+     "pass": true
+    },
+    "hind_swing_load": {
+     "values": {
+      "HL": 0.08064516129032258,
+      "HR": 0.075
+     },
+     "pass": true
+    },
+    "front_stance_load": {
+     "values": {
+      "FL": 0.5879396984924623,
+      "FR": 0.5841483979763912
+     },
+     "pass": false
+    },
+    "hind_duty": {
+     "values": {
+      "HL": 0.7334179654915091,
+      "HR": 0.737997514250929
+     },
+     "pass": true
+    },
+    "limb_phase": {
+     "values": {
+      "HL_to_FL": 0.6347406758288687,
+      "HR_to_FR": 0.6270272796201314
+     },
+     "pass": false
+    }
+   },
+   "timing_caveat": "Duty/phase retain operational contact-cycle values; non-entrained cycles cannot certify walking."
+  },
+  "duty": {
+   "HL": 0.7334179654915091,
+   "FL": 0.3937553482625045,
+   "HR": 0.737997514250929,
+   "FR": 0.37383902038410277
+  },
+  "limb_phase": {
+   "HL_to_FL": 0.6347406758288687,
+   "HR_to_FR": 0.6270272796201314
+  },
+  "speed": 0.04164718933366114,
+  "strides": null
+ },
+ "cord": {
+  "gate2": {
+   "pass": false,
+   "completed_without_fall": true,
+   "observed_contacts_entrained": false,
+   "timing_and_acquisition_valid": false,
+   "requirements": {
+    "minimum_forward_m_s": 0.04,
+    "minimum_net_path": 0.5,
+    "maximum_hind_swing_load": 0.1,
+    "minimum_front_stance_load": 0.65,
+    "hind_duty_target": 0.78,
+    "hind_duty_tolerance": 0.05,
+    "limb_phase_target": 0.435,
+    "limb_phase_tolerance": 0.03
+   },
+   "checks": {
+    "signed_forward": {
+     "value_m_s": 0.04164718933369298,
+     "pass": true
+    },
+    "net_path": {
+     "value": 0.7426754102136082,
+     "pass": true
+    },
+    "hind_swing_load": {
+     "values": {
+      "HL": 0.08064516129032258,
+      "HR": 0.075
+     },
+     "pass": true
+    },
+    "front_stance_load": {
+     "values": {
+      "FL": 0.5879396984924623,
+      "FR": 0.5841483979763912
+     },
+     "pass": false
+    },
+    "hind_duty": {
+     "values": {
+      "HL": 0.7334179654915091,
+      "HR": 0.737997514250929
+     },
+     "pass": true
+    },
+    "limb_phase": {
+     "values": {
+      "HL_to_FL": 0.6347406758288687,
+      "HR_to_FR": 0.6270272796201314
+     },
+     "pass": false
+    }
+   },
+   "timing_caveat": "Duty/phase retain operational contact-cycle values; non-entrained cycles cannot certify walking."
+  },
+  "duty": {
+   "HL": 0.7334179654915091,
+   "FL": 0.3937553482625045,
+   "HR": 0.737997514250929,
+   "FR": 0.37383902038410277
+  },
+  "limb_phase": {
+   "HL_to_FL": 0.6347406758288687,
+   "HR_to_FR": 0.6270272796201314
+  },
+  "speed": 0.04164718933369298,
+  "strides": null
+ },
+ "verdict": "EQUIVALENT -- every gate agrees, so the cord can drive the walker without changing the accepted result. NOTE: absolute pass counts here are this harness's, not the official Gate 2 run; only the clock-versus-cord comparison is claimed."
+}

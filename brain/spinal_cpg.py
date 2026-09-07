@@ -162,6 +162,37 @@ class SpinalCPG:
             self._t += inner
         return self.phases()
 
+    def advance_to(self, time_s, loads=None):
+        """Integrate forward to an absolute time and return the phase vector.
+
+        The walking controller is written against absolute time -- callers ask
+        "where is this foot at t?" rather than stepping a clock -- so the cord
+        has to answer that question without changing every caller.
+
+        Asking for a time in the PAST replays from zero rather than raising.
+        The gait scorer probes times out of order, and with the coupling off
+        the trajectory is a pure function of elapsed time, so replaying is
+        exact. With the coupling ON it is not: phase would then depend on the
+        load history, and a replay with different loads would silently give a
+        different answer. That case is refused rather than approximated.
+        """
+        t = float(time_s)
+        if not math.isfinite(t) or t < 0.0:
+            raise ValueError("time_s must be finite and non-negative.")
+        if t < self._t:
+            if self.load_feedback != 0.0:
+                raise ValueError(
+                    "cannot replay to an earlier time with load feedback on: "
+                    "phase depends on the load history, so the answer would "
+                    "depend on loads this call does not have.")
+            saved = self._frequency.copy()
+            self.reset()
+            self._frequency = saved
+        remaining = t - self._t
+        if remaining > 0:
+            self.step(remaining, loads=loads)
+        return self.phases()
+
     # ---------------------------------------------------------------- readout
     def phases(self):
         return self._phase.copy()

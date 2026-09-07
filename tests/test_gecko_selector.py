@@ -116,9 +116,10 @@ class DopamineDoesWhatItDoesInAnimals(unittest.TestCase):
                       hunger=0.7, prey_visible=0.9, cold=0.6)
         self.assertGreaterEqual(wild.bg.distortion(), calm.bg.distortion())
 
-    def test_a_dopamine_that_breaks_the_transfer_is_refused(self):
+    def test_a_dopamine_outside_the_published_range_is_refused(self):
         with self.assertRaises(ValueError):
             GeckoSelector(dopamine=5.0)
+        GeckoSelector(dopamine=1.0)                  # the published maximum
 
 
 class TheSeamWithTheHypothalamus(unittest.TestCase):

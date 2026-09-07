@@ -117,6 +117,10 @@ class CPGResidualController:
         self.front_seek_relax = float(front_seek_relax)
         self.shoulder_sprawl_tuck = float(shoulder_sprawl_tuck)
         self.spine_amp = float(spine_amp)
+        # No cord attached: the accepted walker runs on the closed-form clock
+        # until measurement says an integrated one is equivalent. attach_
+        # spinal_cord() opts in.
+        self.spinal_cord = None
         self.spine_phase = float(spine_phase)
         self.tail_amp = float(tail_amp)
         self.tail_phase_lag = float(tail_phase_lag)
@@ -290,10 +294,36 @@ class CPGResidualController:
 
     # ------------------------------------------------------------------ API
     def foot_phase_fraction(self, foot, time_s):
+        # When a spinal cord is attached it OWNS the rhythm: the phase is
+        # integrated rather than evaluated, which is what gives a descending
+        # command somewhere to land. With the cord's coupling off this agrees
+        # with the closed form below to about 1e-11 of a stride, so attaching
+        # it is not supposed to move any gate. That claim is a measurement,
+        # not an assumption -- see tools/gate_with_cord.py.
+        if self.spinal_cord is not None:
+            self.spinal_cord.advance_to(time_s)
+            return self.spinal_cord.phase_fraction(foot)
         if self.gait_profile == "lab":
             return self.profile.phase_fraction(foot, time_s)
         # Deliberately preserve the old ADDITIVE controller convention.
         return (time_s*self.freq+self.phase[foot]) % 1.0
+
+    def attach_spinal_cord(self, cord=None):
+        """Hand the rhythm to an integrated cord. `None` restores the clock.
+
+        Off by default: the accepted 4/6 walker runs on the closed form, and it
+        keeps running on the closed form until measurement says the cord is
+        equivalent.
+        """
+        if cord is None:
+            from brain.spinal_cpg import SpinalCPG, FEET
+            delays = ({f: self.profile.touchdown_delays_cycle[i]
+                       for i, f in enumerate(FEET)}
+                      if self.gait_profile == "lab"
+                      else {f: (-self.phase[f]) % 1.0 for f in FEET})
+            cord = SpinalCPG(self.freq, delays)
+        self.spinal_cord = cord
+        return cord
 
     def stance_for(self, foot):
         if self.gait_profile == "lab":

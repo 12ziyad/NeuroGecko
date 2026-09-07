@@ -48,9 +48,16 @@ class PublishedConstants(unittest.TestCase):
 
     def test_the_two_variants_differ_exactly_where_the_source_says(self):
         b, e = PrescottParameters.basic(), PrescottParameters.extended()
-        self.assertEqual((b.threshold_striatum, b.d1_pivot), (0.1, 0.5))
-        self.assertEqual((e.threshold_striatum, e.d1_pivot), (0.15, 0.2))
-        self.assertEqual(b.d2_gain, e.d2_gain)          # 0.8 in both
+        # Supplementary Methods section 5 gives the striatal threshold as 0.2
+        # in the published model, quoted: y_i^d1 = L(a_i^d1, 0.2).
+        self.assertEqual(b.threshold_striatum, 0.2)
+        self.assertEqual(e.threshold_striatum, 0.2)
+        self.assertEqual((b.da_mode, e.da_mode), ("afferent", "afferent"))
+        # The shipped-but-unused "new DA" builders carry the other numbers.
+        bn, en = PrescottParameters.basic_new_da(), PrescottParameters.extended_new_da()
+        self.assertEqual((bn.threshold_striatum, bn.d1_pivot), (0.1, 0.5))
+        self.assertEqual((en.threshold_striatum, en.d1_pivot), (0.15, 0.2))
+        self.assertEqual((bn.da_mode, en.da_mode), ("slope", "slope"))
         # The basic model has NO thalamocortical persistence; the extended one
         # splits striatal and subthalamic drive 0.5/0.5 with the thalamic return.
         self.assertEqual((b.salience_share, b.motor_share, b.thalamus_to_motor),
@@ -78,10 +85,31 @@ class TheDopamineTransfer(unittest.TestCase):
     leaving every other test green, which is why it is pinned here.
     """
 
-    def test_d1_slope_rises_and_d2_slope_falls_with_dopamine(self):
+    def test_dopamine_multiplies_the_input_not_the_output_function(self):
+        """The published mechanism. Dopamine is "a multiplicative factor in the
+        equations, specifying afferent input to the striatum" -- so the OUTPUT
+        function is the same plain rectifier at every dopamine level, and the
+        difference is upstream."""
         a = np.array([0.8])
         lo = PrescottBasalGanglia(dopamine=0.1)
         hi = PrescottBasalGanglia(dopamine=0.5)
+        self.assertEqual(float(hi._y_d1(a)[0]), float(lo._y_d1(a)[0]))
+        self.assertEqual(float(hi._y_d2(a)[0]), float(lo._y_d2(a)[0]))
+        # ...and it separates the pathways where it actually acts.
+        strong = PrescottBasalGanglia(dopamine=0.5)
+        strong.converge(np.array([0.6, 0.0, 0.0, 0.0, 0.0]))
+        weak = PrescottBasalGanglia(dopamine=0.05)
+        weak.converge(np.array([0.6, 0.0, 0.0, 0.0, 0.0]))
+        self.assertGreater(strong.gates()[0], weak.gates()[0])
+
+    def test_the_slope_variant_still_works_and_is_not_the_default(self):
+        """The "new DA" builders are real code in the archive. Every shipped
+        program disables them, so they are kept and labelled rather than
+        deleted -- a variant that exists is worth recording."""
+        a = np.array([0.8])
+        p = PrescottParameters.extended_new_da()
+        lo = PrescottBasalGanglia(dopamine=0.1, parameters=p)
+        hi = PrescottBasalGanglia(dopamine=0.5, parameters=p)
         self.assertGreater(hi._y_d1(a)[0], lo._y_d1(a)[0])
         self.assertLess(hi._y_d2(a)[0], lo._y_d2(a)[0])
 
@@ -91,22 +119,30 @@ class TheDopamineTransfer(unittest.TestCase):
         A ramp that merely shifted would move the same way everywhere. This is
         what distinguishes the published transfer from a gain change.
         """
-        bg_lo = PrescottBasalGanglia(dopamine=0.1)
-        bg_hi = PrescottBasalGanglia(dopamine=0.5)
+        p = PrescottParameters.extended_new_da()
+        bg_lo = PrescottBasalGanglia(dopamine=0.1, parameters=p)
+        bg_hi = PrescottBasalGanglia(dopamine=0.5, parameters=p)
         pivot_input = np.array([bg_lo.p.threshold_striatum + bg_lo.p.d1_pivot])
         above = pivot_input + 0.3
-        below = pivot_input - 0.3
+        # Far below the pivot both ramps rectify to zero and the comparison is
+        # vacuous, so probe inside the ramp rather than under it.
+        below = pivot_input - 0.05
         self.assertGreater(bg_hi._y_d1(above)[0], bg_lo._y_d1(above)[0])
         self.assertLess(bg_hi._y_d1(below)[0], bg_lo._y_d1(below)[0])
         # and the ramps cross AT the pivot
         self.assertAlmostEqual(float(bg_hi._y_d1(pivot_input)[0]),
                                float(bg_lo._y_d1(pivot_input)[0]), places=9)
 
-    def test_a_dopamine_that_inverts_the_d2_slope_is_refused(self):
-        # Refused at construction, not halfway through a sweep.
+    def test_dopamine_outside_the_published_range_is_refused(self):
+        """The paper's range is 0 <= lambda <= 1; above 1 the D2 afferent gain
+        goes negative. Refused at construction, not halfway through a sweep."""
         with self.assertRaises(ValueError):
-            PrescottBasalGanglia(dopamine=2.0)
-        PrescottBasalGanglia(dopamine=1.25)          # exactly at the limit
+            PrescottBasalGanglia(dopamine=1.5)
+        PrescottBasalGanglia(dopamine=1.0)              # exactly at the limit
+        # the slope variant has its own, different limit
+        p = PrescottParameters.extended_new_da()
+        with self.assertRaises(ValueError):
+            PrescottBasalGanglia(dopamine=2.0, parameters=p)
 
     def test_the_striatum_is_silent_at_rest_at_every_dopamine_level(self):
         """Which is why the resting output, and so the gate constant, does not
