@@ -3,7 +3,7 @@
 **One document. Everything tried, everything that failed, why, and what fixed it.**
 Past, present, future. Updated every session; nothing removed.
 
-Last updated: Session 6e.
+Last updated: Session 6f.
 
 ---
 
@@ -31,7 +31,7 @@ later turned out to be right gets a second row, not an edit.
 | **Walking** — base controller, 4/6 gates, accepted | ✅ done |
 | **World** — no cheat, textured floor, narrowed camera, fleeing prey | ✅ done |
 | **Brain 1/8 — hypothalamus** (hunger, energy, fatigue, thermostat) | ✅ done |
-| **Brain 2/8 — basal ganglia** (action selection) | 🟡 published model reproduced; one dopamine offset open |
+| **Brain 2/8 — basal ganglia** (action selection) | ✅ validated, migrated, and running live beside brain 1 |
 | Brain 3–8 — brainstem, spine, retina, tectum, sleep, memory | ❌ |
 | **Proof** — 15-test battery | 🟡 1 run (A3, failed then fixed) |
 
@@ -384,6 +384,27 @@ closed by adjusting one. Recorded, not tuned.
 
 ---
 
+## Ledger — the gecko moved onto the validated model (Session 6f)
+
+| # | Hypothesis | Verdict | Evidence |
+|---|---|---|---|
+| 95 | The environment has a behaviour arbiter to replace | **Refuted** | it has none. It is reward-driven, and the `target_interest` the plan named lives in the **superseded** drive module |
+| 96 | The selector can be given control of the animal now | **Refuted** | only one behaviour has a controller. A six-way chooser on a one-behaviour body would look like integration and mean nothing |
+| 97 | Persistence needs an invented stickiness constant | **Refuted** | the published cortico-thalamic loop supplies it **structurally** — the invented gain of 0.15 is deleted, not re-tuned |
+| 98 | The two brain modules can run together on live data | **Confirmed** | hypothalamus → selector every control step inside the simulation; a tired gecko rests, and a rested hungry one explores |
+
+**#97 is the quiet win.** Migrating to the published model *removed* a number
+nothing could check. The old selector made a behaviour sticky by feeding its own
+output back through a gain someone chose; the published model gets the same
+effect from wiring that is in the literature.
+
+**#96 is the discipline.** The selector is wired in and **reports only** — its
+choice appears in the info dictionary and steers nothing. It cannot steer
+anything honestly until the cord and brainstem exist to carry a decision to the
+legs.
+
+---
+
 ## My own errors — the meta-ledger
 
 Failures of method, not of hypothesis. These are the ones worth re-reading.
@@ -480,12 +501,12 @@ shortfall.
 
 | | |
 |---|---|
-| Hypotheses tested | **94** |
-| Refuted | **70** |
-| Confirmed | **19** |
+| Hypotheses tested | **98** |
+| Refuted | **73** |
+| Confirmed | **20** |
 | Partly | **4** |
 | My own method errors | **21** |
-| Tests passing | **361**, no expected failures |
+| Tests passing | **385**, no expected failures |
 
 **Seventy-three per cent of everything tried was wrong.** That is what the map
 is made of.

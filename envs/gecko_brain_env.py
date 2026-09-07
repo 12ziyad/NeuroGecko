@@ -126,6 +126,7 @@ class GeckoBrainEnv(gym.Env):
         prey_parameters=None,
         homeostasis: bool = False,
         homeostasis_time_compression: float = 1.0,
+        action_selection: bool = False,
     ):
         super().__init__()
         self.policy_camera_mode = str(policy_camera_mode)
@@ -243,6 +244,22 @@ class GeckoBrainEnv(gym.Env):
         # point hunger moves on a timescale of days and the drives vector is four
         # channels rather than six. Opt-in, because no recovered checkpoint fits
         # the smaller vector.
+        # Brain module 2, reading brain module 1. REPORTING ONLY: the selector
+        # names the behaviour the animal would choose and that name goes into
+        # info, but it does not steer anything. It must not, yet -- only one
+        # behaviour has a controller. Hooking a six-way chooser to a
+        # one-behaviour body would look like integration and mean nothing.
+        # What this DOES buy is the two modules running together on live data
+        # every step, which is the only way the seam gets exercised.
+        self.selector = None
+        if action_selection:
+            if not homeostasis:
+                raise ValueError(
+                    "action_selection needs homeostasis=True: the selector's "
+                    "salience is computed from the hypothalamus drive vector.")
+            from brain.gecko_selector import GeckoSelector
+            self.selector = GeckoSelector()
+
         self.homeostasis = None
         if homeostasis:
             from brain.hypothalamus import Homeostasis, Physiology
@@ -482,6 +499,8 @@ class GeckoBrainEnv(gym.Env):
             # Energy deliberately survives the episode: a gecko does not become
             # full because a rollout ended.
             self.homeostasis.reset()
+        if self.selector is not None:
+            self.selector.reset()
         self._step = 0
         self._prev_action = np.zeros(4, dtype=np.float32)
         self._smooth_lookat = None
@@ -583,6 +602,15 @@ class GeckoBrainEnv(gym.Env):
         obs = self._obs()
         food_visible_frac = _food_visible_frac(obs["image"])
         food_visible_signal = min(food_visible_frac / 0.012, 1.0)
+
+        # Brain 1 -> brain 2, on live data. Threat is the same danger signal the
+        # reward uses; prey_visible is what the retina-substitute actually
+        # reports, so the selector sees the world the animal sees.
+        if self.selector is not None:
+            self.selector.step_from_homeostasis(
+                self.homeostasis.vector(),
+                threat=danger,
+                prey_visible=float(food_visible_signal))
         reward = r_progress + r_eat + r_close + r_time + r_danger
 
         info = {
@@ -610,6 +638,12 @@ class GeckoBrainEnv(gym.Env):
             "reward_time_penalty": float(r_time),
             "reward_danger_penalty": float(r_danger),
         }
+        if self.selector is not None:
+            # Reported, not obeyed. `behaviour` is what the animal WOULD do.
+            info["behaviour"] = self.selector.selected()
+            info["behaviour_gates"] = self.selector.gates().copy()
+            info["behaviour_committed"] = bool(self.selector.committed())
+            info["behaviour_controls_nothing"] = True
         self._last_info = dict(info)
         return obs, float(reward), terminated, truncated, info
 
