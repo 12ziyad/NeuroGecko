@@ -32,10 +32,11 @@ later turned out to be right gets a second row, not an edit.
 | **World** — no cheat, textured floor, narrowed camera, fleeing prey | ✅ done |
 | **Brain 1/8 — hypothalamus** (hunger, energy, fatigue, thermostat) | ✅ done |
 | **Brain 2/8 — basal ganglia** (action selection) | ✅ validated, migrated, and running live beside brain 1 |
-| Brain 3–8 — brainstem, spine, retina, tectum, sleep, memory | ❌ |
+| **Brain 3a/8 — spinal rhythm** (the leg oscillators) | 🟡 built, matches the clock, not yet driving the walker |
+| Brain 3b–8 — brainstem, retina, tectum, sleep, memory | ❌ |
 | **Proof** — 15-test battery | 🟡 1 run (A3, failed then fixed) |
 
-**Roughly 45 % done.** The irreversible parts — the research and the body — are
+**Roughly 50 % done.** The irreversible parts — the research and the body — are
 behind us.
 
 ---
@@ -139,10 +140,15 @@ Where the work went, in order, and where it stopped each time. **71 commits.**
 
 ### ← Where we are paused, right now
 
-- **Done and pushed:** everything above, commit `427a845`, 385 tests green.
+- **Done and pushed:** everything above, 404 tests green.
 - **Running in the background:** a hunt for why our dopamine curve sits +0.10
   high. Not a blocker; nothing depends on it.
-- **Next up, not started:** brain 3 — the leg rhythm first, then the brainstem.
+- **Half done:** the spinal rhythm is an oscillator with a command input and it
+  matches the old clock to 3.3 × 10⁻¹¹ of a stride — but it is **not yet the
+  thing driving the legs**.
+- **Next up, not started:** wire the cord into the walking controller and re-run
+  the six gait gates with the coupling on. Nothing is claimed about the gates
+  until that runs. Then the brainstem.
 
 ---
 
@@ -511,6 +517,38 @@ legs.
 
 ---
 
+## Ledger — the cord becomes an oscillator (Session 7)
+
+The leg rhythm was a closed-form clock: no state, no coupling, and **no input
+for a descending command**. Three of the brainstem's four output channels had
+nowhere to land. So the cord had to become a real oscillator first — the
+reverse of the order the plan proposed.
+
+| # | Hypothesis | Verdict | Evidence |
+|---|---|---|---|
+| 99 | The plan's "bit-identical at zero coupling" test is achievable | **Refuted** | an accumulated phase and a closed-form one differ in the last bits, and the clock snaps to exact cycle boundaries an accumulator never lands on |
+| 100 | An integrated oscillator can reproduce the accepted walker's rhythm | **Confirmed** | max deviation **3.3 × 10⁻¹¹ of a stride** over 60 s of walking |
+| 101 | The foot order is the obvious one | **Refuted** | it is **HL, FL, HR, FR** — restating it would have planted a silent index mismatch |
+| 102 | A single-step check shows the oscillator and the clock differ *(my own test error)* | **Refuted** | they agree **exactly** for the first few steps; divergence needs accumulation, so the test proved nothing |
+
+**#99 is the honest downgrade.** The plan asked for a bit-identical trace and
+the intention was right — any later change in the gait gates must be
+attributable to the coupling, not to the rewrite. But bit-identity is
+arithmetically unavailable here. What is available is agreement eleven orders
+below anything the gates measure, and that is what the test asserts.
+
+**#102 nearly became an overclaim.** The first version of that test checked one
+step, found the two equal, and failed. Written the other way round it would have
+"passed" and been read as evidence for bit-identity — which is false.
+
+**What the cord now has that it did not:** a settable stride frequency and a
+left/right asymmetry, which is how a symmetric pattern generator turns. The
+load-feedback law is implemented, **switched off, and tagged INVENTED** — the
+corpus names the law but gives no value for its gain, and neither source paper
+has been read.
+
+---
+
 ## My own errors — the meta-ledger
 
 Failures of method, not of hypothesis. These are the ones worth re-reading.
@@ -607,12 +645,12 @@ shortfall.
 
 | | |
 |---|---|
-| Hypotheses tested | **98** |
-| Refuted | **73** |
-| Confirmed | **20** |
+| Hypotheses tested | **102** |
+| Refuted | **76** |
+| Confirmed | **21** |
 | Partly | **4** |
-| My own method errors | **21** |
-| Tests passing | **385**, no expected failures |
+| My own method errors | **22** |
+| Tests passing | **404**, no expected failures |
 
 **Seventy-three per cent of everything tried was wrong.** That is what the map
 is made of.
