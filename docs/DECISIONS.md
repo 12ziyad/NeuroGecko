@@ -260,3 +260,32 @@ normalizer, with stop-command and gaze-ownership changes tested explicitly.
     observation keeps its five task slots inside the brain environment because
     they carry where the brain decided to go. Removing them would remove the
     brain's ability to steer its own body.
+
+## Session 5 — the hypothalamus
+
+35. **A mass-specific rate needs the mass it was measured on.** The scorecard
+    states 0.075 mL O2/g/h and, separately, 0.064 after scaling to 40 g; those two
+    pin the measurement mass at 19.5 g. Anchoring at 40 g -- the obvious reading,
+    and the one taken first here -- inflates resting metabolism by 17% and gives a
+    starvation reserve that looks reasonable and disagrees with the scorecard.
+36. **Behavioural hunger is measured in meals; starvation is measured in reserve.**
+    A 38 g gecko burns 1.7% of its tail between meals and 71% of a meal. A drive
+    normalised against the reserve never fires. Both quantities are reported and
+    only one drives behaviour.
+37. **The HRRL drive must not clip and must be convex.** Clipping zeroes the reward
+    for eating exactly when the animal is starving. n = m collapses the drive to a
+    linear distance, so a meal is worth the same at any hunger, which contradicts
+    the effects HRRL is cited for. n=4, m=2, and the constructor refuses n <= m.
+38. **A drive with no published basis does not get modelled.** curiosity and
+    target_interest are gone; fear belongs to the tectal escape integrator and is
+    chemically gated in this species; danger was an input wearing a drive's name.
+    Four channels, not six, and no recovered checkpoint fits that.
+39. **The thermostat ships inert and says so.** No temperature field exists
+    anywhere in the repository, and it is the module's one real dependency. The
+    Hammel error is wired against the published band and reads exactly zero, with
+    `thermostat_inert` in the reported state. Note CTmax is published at 41.07 C
+    while CTmin is NOT IN CORPUS, so the cold side has no anchor at all.
+40. **A constant is not transplanted between unrelated processes.** No metabolic
+    Q10 is published for this species. The corpus's 2.3 is the Q10 of the ultradian
+    sleep period. `metabolic_q10` is registered null and treated as 1.0 -- wrong,
+    but visibly wrong rather than invented.

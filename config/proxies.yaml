@@ -817,6 +817,139 @@
         "source": "User Session 2 minimum engineering viability requirements", "confidence": "uncertain", "recording_temp_C": null,
         "notes": "Every named limb must pass. Duty .78 is informed by Jagnandan & Higham2017; .435 phase is supplied near-trot target. Tolerances and speed/load cutoffs are engineering gates, not animal confidence intervals. Also require full no-fall rollout and independently measured entrainment."
       },
+      "resting_metabolic_rate_mL_O2_per_g_per_h": {
+        "value": 0.075,
+        "units": "mL O2 per gram per hour at 30 C", "species": "E_macularius", "sample_size": 6,
+        "source": "Ha et al. 2017, Experimental Animals 66(2):99-105. Scorecard row: the ONLY direct metabolic measurement of this species. 0.075 +/- 0.011.",
+        "confidence": "verified", "recording_temp_C": 30,
+        "notes": "Mass-specific and measured at 30 C, which is inside the preferred body temperature band. Scale to another mass with resting_metabolic_rate_mass_exponent. This one number sets how fast the animal gets hungry, and everything in the energy model rests on it."
+      },
+      "resting_metabolic_rate_mass_exponent": {
+        "value": -0.22,
+        "units": "dimensionless", "species": "derived", "sample_size": null,
+        "source": "Allometric exponent the scorecard itself applies to scale 0.075 mL O2/g/h to a 40 g adult, giving 0.064 mL O2/g/h.",
+        "confidence": "likely", "recording_temp_C": null,
+        "notes": "Mass-specific metabolic rate falls with body mass. Reproducing the scorecard's own 40 g figure from 0.075 with this exponent is the check that the scaling is being applied the same way."
+      },
+      "inter_meal_interval_days": {
+        "value": 2.33,
+        "units": "days", "species": "E_macularius", "sample_size": null,
+        "source": "Mean inter-meal interval 2.33 days (= 201,600 s), consistent with feeding three times per week.",
+        "confidence": "verified", "recording_temp_C": null,
+        "notes": "This is the timescale BEHAVIOURAL hunger runs on, and it is a hundredfold shorter than the starvation timescale the tail reserve sets. A 38 g gecko burns about 1.7% of its tail reserve between meals but roughly 71% of a meal's worth of energy, so a drive normalised against the reserve would never make the animal hungry while one normalised against a meal makes it hungry exactly on schedule."
+      },
+      "prey_item_wet_mass_kg": {
+        "value": 0.00035,
+        "units": "kg per prey item", "species": "derived", "sample_size": null,
+        "source": "DERIVED. A feeding is 5% of body weight offered and 54.7% consumed, and the corpus describes one feeding bout as 3 crickets. For a 38 g animal that is 0.038*0.05*0.547 = 1.04 g eaten across three items, so ~0.35 g each.",
+        "confidence": "uncertain", "recording_temp_C": null,
+        "notes": "DERIVED from a husbandry offering and a bout size, not from weighing a cricket. It scales with the body mass the offering was expressed as a fraction of, so it is only right for a ~38-40 g animal. Meal energy is linear in it."
+      },
+      "cost_of_transport_mL_O2_per_kg_per_m": {
+        "value": 0.73,
+        "units": "mL O2 per kg per metre", "species": "E_macularius", "sample_size": null,
+        "source": "Measured net cost of transport, reported as temperature-INDEPENDENT.",
+        "confidence": "verified", "recording_temp_C": null,
+        "notes": "Makes the cost of moving a published quantity rather than an invented one. Temperature independence is itself the published finding: the animal pays the same per metre whether warm or cool, even though how FAST it can go is strongly temperature dependent. At 0.055 m/s a 38 g gecko pays about 110 J/h moving, roughly 2.2x its resting 49.5 J/h."
+      },
+      "critical_thermal_maximum_C": {
+        "value": 41.07,
+        "units": "degrees Celsius", "species": "E_macularius", "sample_size": null,
+        "source": "CTmax 41.07 +/- 0.89 C.",
+        "confidence": "verified", "recording_temp_C": null,
+        "notes": "The warm side of the thermostat has a published bound. The COLD side does not: CTmin is NOT IN CORPUS at any confidence, for this species or any proxy, so a cold-side threshold would be entirely invented. Recorded here so that asymmetry is visible."
+      },
+      "metabolic_q10": {
+        "value": null,
+        "units": "dimensionless", "species": "NOT_IN_CORPUS", "sample_size": null,
+        "source": "No metabolic Q10 is published for E. macularius. The corpus contains a Q10 of 2.3 for the reptile ultradian SLEEP-CPG period (Laudakia, Arrhenius) and an engineering suggestion of ~2.5, both explicitly not measurements of this animal's metabolism.",
+        "confidence": "uncertain", "recording_temp_C": null,
+        "notes": "null on purpose. The module treats a missing Q10 as 1.0, i.e. no thermal dependence of metabolism, which is certainly wrong but is visibly wrong. Substituting the sleep-period Q10 for a metabolic one would be transplanting a constant between unrelated processes and calling it physiology."
+      },
+      "resting_metabolic_rate_reference_mass_g": {
+        "value": 19.5,
+        "units": "grams", "species": "derived", "sample_size": 6,
+        "source": "DERIVED. The scorecard states 0.075 mL O2/g/h measured, and 0.064 mL O2/g/h after scaling to a 40 g adult by M^-0.22. Those two numbers pin the mass the 0.075 was measured at: 40 / (0.064/0.075)^(1/-0.22) = 19.5 g.",
+        "confidence": "likely", "recording_temp_C": 30,
+        "notes": "The published mass-specific rate is meaningless without the mass it was measured on, and the scorecard does not state it directly. Recovering 19.5 g and then reproducing the scorecard's own 40 g figures (0.064 mL/g/h, 2.56 mL/h, 51.5 J/h against its stated 0.064, 2.54, 51.1) is the check that the allometry is being applied the way the scorecard applied it. Anchoring at 40 g instead -- the obvious mistake -- inflates resting metabolism by 17% and shortens the starvation reserve from 137 days to 117."
+      },
+      "oxycalorific_J_per_mL_O2": {
+        "value": 20.12,
+        "units": "J per mL O2", "species": "derived", "sample_size": null,
+        "source": "DERIVED from the scorecard's own arithmetic: it states 2.54 mL O2/h = 51.1 J/h for a 40 g adult, so 51.1/2.54 = 20.12 J/mL.",
+        "confidence": "verified", "recording_temp_C": null,
+        "notes": "Recovering 20.12 from the scorecard's two numbers, against a standard oxycalorific equivalent of about 20.1 J/mL, is an independent check that the published conversion was read correctly."
+      },
+      "meal_apparent_dry_matter_digestibility": {
+        "value": 0.71,
+        "units": "fraction", "species": "E_macularius", "sample_size": null,
+        "source": "Apparent dry-matter digestibility 71 +/- 4.7 % (crude protein 81 %, fat 65-74 %, calcium 43 %).",
+        "confidence": "verified", "recording_temp_C": null,
+        "notes": "Only the dry-matter figure is used. Protein, fat and calcium fractions are recorded here because a nutrient-resolved model would need them and would not be able to invent them."
+      },
+      "cricket_energy_kJ_per_g_dry": {
+        "value": 17.7,
+        "units": "kJ per gram dry matter", "species": "PROXY (rooster assay)", "sample_size": null,
+        "source": "Cricket meal ~17.7 kJ/g dry matter, from a rooster assay, not from a gecko trial.",
+        "confidence": "likely", "recording_temp_C": null,
+        "notes": "Energy content of the prey, measured in a bird. Nothing about a gecko changes the calorific content of a cricket, so the proxy is mild, but it is a proxy."
+      },
+      "cricket_dry_matter_fraction": {
+        "value": 0.30,
+        "units": "fraction", "species": "INVENTED", "sample_size": null,
+        "source": "No dry-matter fraction for crickets appears anywhere in the corpus. 0.30 is an engineering assumption needed to convert a wet meal mass into the dry mass the energy figure is expressed per gram of.",
+        "confidence": "uncertain", "recording_temp_C": null,
+        "notes": "INVENTED. Meal energy is linear in this number, so a wrong value scales every meal proportionally. It is isolated as its own entry precisely so that dependence is visible rather than buried inside a meal constant."
+      },
+      "meal_offering_fraction_bodyweight": {
+        "value": 0.05,
+        "units": "fraction of body mass offered per feeding", "species": "E_macularius", "sample_size": null,
+        "source": "Husbandry protocol: animals offered 5 % of body weight, fed three times per week.",
+        "confidence": "likely", "recording_temp_C": null,
+        "notes": "A captive husbandry schedule, not a measurement of wild intake."
+      },
+      "meal_consumed_fraction_of_offering": {
+        "value": 0.547,
+        "units": "fraction", "species": "E_macularius", "sample_size": null,
+        "source": "Animals consumed 54.7 +/- 12.2 % of a 5 %-body-weight offering.",
+        "confidence": "verified", "recording_temp_C": null,
+        "notes": "What the animal actually ate, not what it was given. The 12.2 % spread is wide and is real between-animal variation."
+      },
+      "feeding_events_per_week": {
+        "value": 3,
+        "units": "meals per week", "species": "E_macularius", "sample_size": null,
+        "source": "Husbandry protocol: fed three times per week.",
+        "confidence": "likely", "recording_temp_C": null,
+        "notes": "Used as an independent check on the energy model rather than as an input: one meal should cover roughly the interval to the next one. It does -- about 79 h of resting metabolism against a 56 h interval, a surplus consistent with an animal maintaining condition."
+      },
+      "tail_lipid_fraction": {
+        "value": 0.50,
+        "units": "fraction of tail mass that is lipid", "species": "INVENTED", "sample_size": null,
+        "source": "The scorecard's own tail-reserve estimate assumes 50 % lipid and says so; the lipid fraction itself is not measured anywhere in the corpus.",
+        "confidence": "uncertain", "recording_temp_C": null,
+        "notes": "INVENTED, and flagged as such in the scorecard too. The whole energy reserve is linear in it, so the ~140-day starvation figure carries this assumption entirely."
+      },
+      "lipid_energy_J_per_g": {
+        "value": 39000,
+        "units": "J per gram", "species": "standard", "sample_size": null,
+        "source": "Standard energy density of lipid, used by the scorecard in its tail-reserve derivation.",
+        "confidence": "verified", "recording_temp_C": null,
+        "notes": "A physical constant of fat, not a gecko measurement."
+      },
+      "preferred_body_temperature_C": {
+        "value": [29.5, 31.9],
+        "units": "degrees Celsius, band", "species": "E_macularius", "sample_size": null,
+        "source": "Preferred body temperature 29.5-31.9 C (midpoint 30.7) in a 5-45 C gradient. Separately 25.8 C in a thigmothermal gradient with no day/night difference.",
+        "confidence": "verified", "recording_temp_C": null,
+        "notes": "TWO published values that disagree by ~5 C because the apparatuses differ: a full thermal gradient gives 29.5-31.9, a thigmothermal (contact-heat) gradient gives 25.8. Body temperature tracks SUBSTRATE temperature at r^2 = 0.97, so this animal is a thigmotherm and the thigmothermal figure may be the more ecologically valid one. The band is used here because the gait and metabolic measurements were taken at ~30 C, inside it."
+      },
+      "postprandial_metabolic_peak_multiple": {
+        "value": [3.7, 7.3],
+        "units": "multiple of pre-feeding metabolic rate", "species": "PROXY (Eulamprus tympanum)", "sample_size": null,
+        "source": "Postprandial metabolic rate peaks at 3.7-7.3x pre-feeding, 15-33 h after a meal, returning to baseline at 62-170 h. Another lizard genus, paywalled.",
+        "confidence": "uncertain", "recording_temp_C": null,
+        "notes": "Digesting a meal costs a large multiple of resting metabolism, so a naive model that adds meal energy without subtracting the cost of processing it overstates the benefit of eating. NOT implemented yet; recorded so the omission is visible."
+      },
       "prey_escape_speed_m_s": {
         "value": 0.118,
         "units": "m/s", "species": "Acheta/cricket (prey, not the gecko)", "sample_size": null,

@@ -124,6 +124,8 @@ class GeckoBrainEnv(gym.Env):
         walker_xml_path: str | Path | None = None,
         privileged_food_channel: bool = True,
         prey_parameters=None,
+        homeostasis: bool = False,
+        homeostasis_time_compression: float = 1.0,
     ):
         super().__init__()
         self.policy_camera_mode = str(policy_camera_mode)
@@ -228,13 +230,27 @@ class GeckoBrainEnv(gym.Env):
                     shape=(self.walk_obs_dim,),
                     dtype=np.float32,
                 ),
-                "drives": spaces.Box(0.0, 1.0, shape=(6,), dtype=np.float32),
+                "drives": spaces.Box(0.0, 1.0,
+                                     shape=(4,) if homeostasis else (6,), dtype=np.float32),
                 "prev_action": spaces.Box(-1.0, 1.0, shape=(4,), dtype=np.float32),
                 **({"privileged": spaces.Box(-np.inf, np.inf, shape=(5,), dtype=np.float32)}
                    if privileged_food_channel else {}),
             }
         )
 
+        # brain/drives.py has hunger saturating in 67 s from invented constants.
+        # The hypothalamus replaces it with the published energy budget, at which
+        # point hunger moves on a timescale of days and the drives vector is four
+        # channels rather than six. Opt-in, because no recovered checkpoint fits
+        # the smaller vector.
+        self.homeostasis = None
+        if homeostasis:
+            from brain.hypothalamus import Homeostasis, Physiology
+            mass = float(np.sum(self.walk_env.model.body_mass[1:]))
+            self.homeostasis = Homeostasis(
+                Physiology.from_registry(body_mass_kg=mass),
+                time_compression=float(homeostasis_time_compression),
+            )
         self.drives = DriveState()
         self.food_xy = np.zeros(2, dtype=np.float64)
         self._prev_action = np.zeros(4, dtype=np.float32)
@@ -449,7 +465,8 @@ class GeckoBrainEnv(gym.Env):
         return {
             "image": self._head_cam_image(),
             "proprio": self._walker_obs_raw(),
-            "drives": self.drives.vector(),
+            "drives": (self.homeostasis.vector() if self.homeostasis is not None
+                       else self.drives.vector()),
             "prev_action": self._prev_action.copy(),
             **({"privileged": self._privileged_vector()}
                if self.privileged_food_channel else {}),
@@ -461,6 +478,10 @@ class GeckoBrainEnv(gym.Env):
             self._rng = np.random.default_rng(seed)
         self.walk_env.reset(seed=seed)
         self.drives.reset()
+        if self.homeostasis is not None:
+            # Energy deliberately survives the episode: a gecko does not become
+            # full because a rollout ended.
+            self.homeostasis.reset()
         self._step = 0
         self._prev_action = np.zeros(4, dtype=np.float32)
         self._smooth_lookat = None
@@ -527,6 +548,15 @@ class GeckoBrainEnv(gym.Env):
         moving_drive = float(np.clip(moving_speed / 0.25, 0.0, 1.0))
 
         self.drives.update(total_dt, ate=ate, danger=danger, moving=moving_drive)
+        if self.homeostasis is not None:
+            from common.provenance import parameter_value
+            # Activity cost is the published cost of transport at the speed the
+            # body actually moved, not a guess about effort.
+            self.homeostasis_reward = self.homeostasis.step(
+                total_dt,
+                meal_wet_mass_kg=(float(parameter_value("prey_item_wet_mass_kg")) if ate else 0.0),
+                activity_power_W=self.homeostasis.physiology.locomotion_power_W(moving_speed),
+            )
 
         progress = mouth_dist_before - mouth_dist_after
         r_progress = 12.0 * progress

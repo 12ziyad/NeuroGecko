@@ -1609,3 +1609,166 @@ This predates Session 4 and is recorded rather than quietly stepped over.
 | 37 | The brain evidence files are reproducible | **Refuted** | both pin a body hash no file in the repo has |
 
 264 tests pass, one SciPy skip.
+
+# Session 5 — the hypothalamus: hunger that comes from the animal's own metabolism
+
+`brain/drives.py` has hunger rising at **0.015 per second**, saturating in 67
+seconds, and a meal subtracting a flat **0.55**. It has six drives. Nobody
+measured any of it. It is the R0 problem — a hand-invented drive ODE — in its
+purest form, and it is the thing `docs/research/best_achievable_brain.md` §3.4
+says to replace.
+
+`brain/hypothalamus.py` replaces it with the animal's energy budget.
+
+## One measurement carries the whole module
+
+Resting metabolism is **0.075 ± 0.011 mL O2/g/h at 30 °C, n = 6**, and the
+scorecard calls it the only direct metabolic measurement of *E. macularius* that
+exists. That single number sets how fast this animal gets hungry.
+
+Everything else is arithmetic on published values, and the arithmetic checks out
+three separate ways:
+
+| check | this module | published | |
+|---|---|---|---|
+| resting metabolism, 40 g adult | **51.5 J/h** | 51.1 J/h | scorecard |
+| oxycalorific equivalent | **20.12 J/mL** | ~20.1 J/mL | physical constant |
+| starvation reserve | **139 days** | ~140 days | scorecard |
+| energy per meal | **79 h of resting** | ~81 h | corpus's own derivation |
+
+None of those were fitted. They fall out of the registry.
+
+### A consistency check nobody arranged
+
+One meal is ~79 h of resting metabolism. The husbandry schedule feeds these
+animals every **56 h**. Those numbers come from different papers written for
+different reasons, and they agree — with the small surplus a captive animal
+maintaining condition ought to have.
+
+## Recovering a mass the scorecard never states
+
+A mass-specific rate is meaningless without the mass it was measured on, and the
+scorecard gives only "0.075 mL O2/g/h" and "scaled to a 40 g adult: 0.064". Those
+two pin it: `40 / (0.064/0.075)^(1/-0.22)` = **19.5 g**.
+
+**I anchored the allometry at 40 g first and it was wrong.** That inflates resting
+metabolism by 17 % and shortens the reserve from 137 days to 117 — a number that
+looks perfectly reasonable and disagrees with the scorecard. The 19.5 g anchor
+reproduces the scorecard's own 40 g figures, which is the check that caught it.
+
+## Two timescales, and conflating them was the first version's mistake
+
+The tail holds ~140 days of resting metabolism. The published mean inter-meal
+interval is **2.33 days**. Between meals a 38 g gecko burns:
+
+- **1.7 %** of its tail reserve, and
+- **71 %** of one meal's energy.
+
+So a hunger drive normalised against the reserve **never fires** — the animal is
+never hungry — while one normalised against a meal becomes hungry exactly on the
+schedule the animal is actually fed on. Behavioural hunger is therefore measured
+in **meals** (`energy_deficit`) and physical starvation is reported separately
+(`starvation_fraction`). Both are real; only one drives behaviour.
+
+| elapsed | hunger | starvation |
+|---|---|---|
+| 1 hour | 1.3 % | 0.03 % |
+| 1 day | 30 % | 0.73 % |
+| **2.33 days (published interval)** | **70 %** | **1.7 %** |
+| 1 week | 100 % | 5.1 % |
+| 140 days | 100 % | 100 % |
+
+Nothing was fitted to land hunger at 70 % when the next meal is due. It is the
+measured metabolism against the measured meal against the measured schedule.
+
+## The reward is the physiology, not a bonus
+
+Keramati & Gutkin's HRRL: internal state `h`, setpoint `h*`, convex drive
+`D(h) = (sum |h*-h|^n)^(1/m)`, and **reward = the reduction in drive**. Under that
+definition reward maximisation is provably homeostatic regulation, so the animal's
+goals stop being a hand-written scalar and start being its body.
+
+Two bugs my own tests caught here, both real:
+
+**The drive must not clip.** Clipping it flattened the reward to exactly zero for
+an animal several meals in debt — no reward for eating, at precisely the moment
+food matters most. The *observation* saturates because a policy needs a bounded
+input; the drive does not, because a gradient has to survive out there.
+
+**n must exceed m or the drive is not convex.** With n = m = 2 the drive collapses
+to a linear distance and a meal is worth exactly the same however hungry the
+animal is — which contradicts the anticipatory and satiation effects HRRL is
+cited for in the first place. At Keramati & Gutkin's canonical n=4, m=2:
+
+| hunger | reward for the same meal |
+|---|---|
+| 25 % | 0.06 |
+| 50 % | 0.25 |
+| 70 % | 0.49 |
+| 100 % | 1.00 |
+| 200 % | 2.98 |
+
+Motivation scaling with deficit is the published phenomenon, and it disappears
+entirely if the exponents are set equal. A constructor guard now refuses that.
+
+## Moving costs a published amount too
+
+Cost of transport is **0.73 mL O2 kg⁻¹ m⁻¹**, and the published finding is that it
+is **temperature-independent** — the animal pays the same per metre warm or cool,
+even though how fast it can go is strongly temperature dependent. At 0.055 m/s a
+38 g gecko pays **110 J/h** moving against **49.5 J/h** resting: 2.2×.
+
+So the activity term is measured, not guessed, and it needs no thermal correction.
+
+## Four drives, not six
+
+`curiosity` and `target_interest` had **no published basis of any kind** and are
+gone. `fear` is gone because §3.4 is explicit that it should be *emergent* from
+the tectal escape integrator rather than hand-written — and the published finding
+is that fear here is chemically gated, so a hand-written fear would be wrong twice
+over. `danger` was an input wearing a drive's name.
+
+What survives: **hunger, energy, cold, warm**. The interoception vector is 4-D,
+not 6-D, and no recovered checkpoint fits it. That is the point.
+
+## What is wired but inert, and says so
+
+The **thermostat**. §3.4 calls a temperature field the module's one real
+dependency, and there is **no temperature field anywhere in this repository** — 0
+matches in the world XML, none in code. The Hammel-style warm/cold rectified error
+is implemented against the published 29.5–31.9 °C band and reads exactly
+`(0.0, 0.0)` forever, with `state()["thermostat_inert"] = True` to say so.
+
+It is there so that adding a field switches it on, not so it can be claimed.
+
+Note the published asymmetry: **CTmax is 41.07 ± 0.89 °C, and CTmin is NOT IN
+CORPUS at any confidence for this species or any proxy.** The cold side of the
+thermostat has no anchor at all.
+
+## Not modelled, and recorded rather than omitted
+
+- **Digestion costs nothing.** Postprandial metabolism peaks at **3.7–7.3×**
+  resting for 62–170 h in another lizard genus. Adding meal energy without that
+  cost overstates the benefit of eating.
+- **Metabolism has no thermal dependence.** No metabolic Q10 is published for this
+  species. The corpus offers 2.3 — but that is the Q10 of the ultradian *sleep*
+  period, and transplanting a constant between unrelated processes would be
+  inventing physiology. `metabolic_q10` is registered as `null` and treated as
+  1.0: certainly wrong, but visibly wrong.
+- Hydration, nutrient composition, gut passage time. Field metabolic rate is **NOT
+  IN CORPUS** — no doubly-labelled-water study exists for this animal.
+
+## Session 5 ledger
+
+| # | Hypothesis | Verdict | Evidence |
+|---|---|---|---|
+| 38 | The old drives were roughly the right shape | **Refuted** | hunger saturates in 67 s where the animal takes days |
+| 39 | Anchoring the allometry at 40 g is fine | **Refuted** | inflates metabolism 17 %; the measured mass is 19.5 g |
+| 40 | Hunger should be measured against the energy reserve | **Refuted** | 1.7 % per inter-meal interval — the animal would never eat |
+| 41 | Hunger measured in meals matches the animal | **Confirmed** | 70 % at the published 2.33-day interval, unfitted |
+| 42 | The metabolism and the feeding schedule agree | **Confirmed** | 79 h per meal against a 56 h interval, from separate papers |
+| 43 | A clipped drive is harmless | **Refuted** | zero reward for eating when several meals in debt |
+| 44 | n = m is an acceptable drive exponent | **Refuted** | drive goes linear; a meal is worth the same at any hunger |
+| 45 | The thermostat can be built now | **Refuted** | no temperature field exists; it is wired and inert and says so |
+
+301 tests pass, one SciPy skip.
