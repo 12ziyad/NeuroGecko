@@ -241,3 +241,22 @@ normalizer, with stop-command and gaze-ownership changes tested explicitly.
     recommendations, all INVENTED, and no gecko grating acuity has ever been
     published — so resolution stays at 64x64 and stays an open question rather
     than a quiet choice.
+31. **Published distances are the defaults; the old ones stay reachable.** The
+    brain environment ate from 0.10 m against a published 4.07 cm strike trigger
+    and rendered food four times the width of the prey it stood for. Both now
+    resolve from the registry when left as None. Passing the old numbers
+    explicitly still reproduces the legacy behaviour the recovered checkpoints
+    were trained against.
+32. **Scaling a privileged channel to zero is not removing it.** The five food
+    slots remain in the observation however small their values, and a policy
+    built around that space has still been shaped by it.
+    `privileged_food_channel=False` removes the block; no recovered checkpoint
+    fits the result, and that is the intent.
+33. **Food must be an object, not a marker.** It was a saturated green sphere
+    drawn into the scene after rendering, existing nowhere in the physics. A real
+    mocap geom means the camera sees what the world contains, and both render
+    paths skip the marker so the animal is never shown two food items.
+34. **The brain's commanded target is efference, not a cheat.** The walker
+    observation keeps its five task slots inside the brain environment because
+    they carry where the brain decided to go. Removing them would remove the
+    brain's ability to steer its own body.

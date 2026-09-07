@@ -1522,3 +1522,90 @@ sleep: a published feeding bout is **41-242 s**, and the drives protocols want
 | 32 | A strike can be scored at the control rate | **Refuted** | a 16-20 ms strike is under one 50 Hz step; 500 Hz required |
 
 257 tests pass, one SciPy skip.
+
+# Session 4d — finishing the world, in the environment where it matters
+
+Session 4c built the no-cheat world against `envs/gecko_walk_env.py`. That was the
+wrong environment for most of it. The camera, the food and the recovered visual
+brain all live in `envs/gecko_brain_env.py`, which has its **own** privileged
+channel, its own food, and its own distances. It was untouched.
+
+## What was actually wrong in there
+
+| | before | now | basis |
+|---|---|---|---|
+| `eat_radius` | **0.10 m** | 0.0407 m | published strike trigger 2.03 cm = 0.384 SVL, scaled |
+| `food_radius` | **0.035 m** | 0.009 m | INVENTED sphere proxy for published 0.30-0.40 SVL prey |
+| privileged food | 5 slots, scalable to zero | removable entirely | — |
+| food | a green sphere painted onto the render after the fact | a real mocap geom the camera sees | — |
+
+The eat radius was **2.5x the distance a real gecko launches a strike from**. The
+food was **four times the width** of the prey it stood for. Both now resolve from
+the registry when left as `None`; passing the old numbers explicitly still
+reproduces the legacy behaviour exactly, which is what the recovered checkpoints
+were trained against.
+
+### Scaling the cheat to zero is not the same as removing it
+
+`privileged_target` is a float that scales the five food observations, and there
+is curriculum machinery to fade it out. Faded to zero the five slots are still
+there, still shaped, still part of the observation the policy was built around.
+`privileged_food_channel=False` removes the block from the observation space
+entirely. **No recovered checkpoint fits that space** — that is the point of it,
+not an oversight.
+
+### The food was a marker, not an object
+
+`_add_scene_sphere` drew a bright green sphere (rgba 0.1, 0.95, 0.25) into the
+scene **after** rendering was set up, so the policy's own camera saw a marker
+that existed nowhere in the physics. With a real prey body the camera sees the
+prey material's dull brown instead, and both render paths now skip the marker so
+the animal is not shown two food items.
+
+This is also the honest end of the "green colour mask" the handoff worried about:
+the mask fed no gradient, but the *food itself* being a saturated green blob was
+never questioned. It is now a dull object in a textured world.
+
+## Prey, in the environment that has eyes
+
+`prey_parameters` wires `FleeingPrey` into the brain env. The predator the prey
+reacts to is the **nose site**, not the trunk centre, and the prey's own capture
+distance is the eat radius, so there is one definition of "close enough to eat"
+rather than two that can drift apart.
+
+Verified end to end: prey position reaches `mocap_pos`, the camera renders it,
+`food_xy` follows it, and the drives update from it.
+
+## What is deliberately NOT changed
+
+The walker observation stays 92-D inside the brain env, including its five task
+slots. Those carry the **brain's own commanded target** — the brain picks a place
+and the brainstem is told to walk there. That is efference, an internal command,
+not privileged knowledge of the world, and removing it would be removing the
+brain's ability to steer its own body rather than removing a cheat.
+
+## An integrity finding, not introduced here
+
+`artifacts/evidence/brain_legacy.json` and `artifacts/evidence/brain_sealed.json`
+pin `xml_sha256 = 58cdb1e8a842...`. **No file in the repository has that hash.**
+
+| file | sha256 |
+|---|---|
+| `morphology/gecko_body_r.xml` | `c4293da9a0e8...` |
+| `morphology/gecko_body_lab_v2.xml` | `7567653564177...` |
+| `morphology/gecko_world_v1.xml` | `e6bda295a42e...` |
+
+Those two measurements cannot be reproduced against any body that still exists.
+This predates Session 4 and is recorded rather than quietly stepped over.
+
+## Session 4d ledger
+
+| # | Hypothesis | Verdict | Evidence |
+|---|---|---|---|
+| 33 | The no-cheat work landed where it mattered | **Refuted** | the brain env has its own privileged channel and was untouched |
+| 34 | The eat radius was roughly right | **Refuted** | 0.10 m against a published 4.07 cm strike distance |
+| 35 | Scaling the cheat to zero removes it | **Refuted** | five slots remain in the observation; only removing the block changes the space |
+| 36 | The camera saw a real food object | **Refuted** | it was a sphere drawn into the scene after the fact, in saturated green |
+| 37 | The brain evidence files are reproducible | **Refuted** | both pin a body hash no file in the repo has |
+
+264 tests pass, one SciPy skip.

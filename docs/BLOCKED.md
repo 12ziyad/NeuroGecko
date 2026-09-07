@@ -142,3 +142,42 @@ recovers missing 500 Hz data.
 
 The existing instance continues billing while on. Per-process timeouts do not
 stop EC2; stopping it was asked separately. No new cloud resources were created.
+
+## Two brain evidence files pin a body that no longer exists (found Session 4d)
+
+`artifacts/evidence/brain_legacy.json` and `artifacts/evidence/brain_sealed.json`
+record `xml_sha256 = 58cdb1e8a842...`. No file in the repository hashes to that
+value: `gecko_body_r.xml` is `c4293da9a0e8...`, `gecko_body_lab_v2.xml` is
+`7567653564177...`, `gecko_world_v1.xml` is `e6bda295a42e...`.
+
+Neither measurement can therefore be reproduced against any body still present,
+and neither can be compared to a new one. This predates Session 4 and was not
+introduced by it; it is recorded here rather than stepped over.
+
+Not resolved, because resolving it honestly means one of:
+- recovering the body that hash names, if it exists in `models_recovered/` or on
+  the instance, and committing it; or
+- re-measuring both conditions against a body that does exist and superseding the
+  files, keeping the originals; or
+- marking both files as unreproducible in place.
+
+Choosing among those is a judgement about what the original measurement was for,
+and it belongs to whoever knows why those two conditions were recorded.
+
+## The brain environment's remaining shortcuts (Session 4d)
+
+Fixed: the 0.10 m eat radius (against a published 4.07 cm strike distance), the
+0.035 m food radius, the food-as-painted-marker, and the inability to remove the
+privileged block rather than merely scale it.
+
+Still open and deliberately so:
+- **The reward is ground truth.** `r_progress` is 12.0 x the change in mouth-to-food
+  distance and `r_eat` is a flat 10.0. A reward is external to the animal by
+  construction, so this is not the same shortcut as a privileged observation, but
+  it is still an oracle and it is still doing work.
+- **`oracle_action()` exists** and returns the exact bearing to food. It is the
+  supervision signal the recovered visual student was distilled against.
+- **No strike.** Capture is a distance test. The published capture rate comes from
+  a 0.851 m/s strike from 2.03 cm, and a 16-20 ms strike is shorter than one 50 Hz
+  control step, so scoring one needs 500 Hz sampling. Until that exists, a capture
+  rate measured here is not the published quantity.

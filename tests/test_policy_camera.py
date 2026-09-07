@@ -73,6 +73,10 @@ class CameraPixelTests(unittest.TestCase):
         self.env.walk_env = SimpleNamespace(model=model, data=data)
         self.env.camera_height = self.env.camera_width = 64
         self.env.food_xy, self.env.food_radius = np.array([.7, .4]), .08
+        # This fixture bypasses __init__, so it must supply what the render path
+        # reads. None means "no real prey geom", i.e. draw the food marker --
+        # which is the behaviour these pixel contracts were written against.
+        self.env.prey = None
         self.env.policy_camera_mode = "sealed"
         self.env._policy_scene_option, self.env._render_scene_option = _camera_scene_options("sealed")
         self.env._head_renderer = None

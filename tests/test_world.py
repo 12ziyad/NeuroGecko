@@ -227,5 +227,62 @@ class PreyInTheWorld(unittest.TestCase):
             env.close()
 
 
+class BrainEnvHonesty(unittest.TestCase):
+    """The vision environment is where the cheat actually mattered."""
+
+    def setUp(self):
+        if not WORLD.exists():
+            self.skipTest("no generated world committed")
+        from envs.gecko_brain_env import GeckoBrainEnv
+        self.GeckoBrainEnv = GeckoBrainEnv
+
+    def test_eat_and_food_radius_default_to_the_published_distances(self):
+        """They were 0.10 m and 0.035 m: eaten from 10 cm, food 7 cm wide."""
+        from common.provenance import parameter_value
+        env = self.GeckoBrainEnv(seed=0)
+        self.assertAlmostEqual(env.eat_radius, float(parameter_value("prey_capture_distance_m")))
+        self.assertAlmostEqual(env.food_radius, float(parameter_value("prey_radius_m")))
+        self.assertLess(env.eat_radius, .10, "the old 10 cm eat radius must not be the default")
+
+    def test_the_legacy_distances_are_still_reachable_explicitly(self):
+        env = self.GeckoBrainEnv(seed=0, eat_radius=.10, food_radius=.035)
+        self.assertAlmostEqual(env.eat_radius, .10)
+        self.assertAlmostEqual(env.food_radius, .035)
+
+    def test_the_privileged_block_can_be_removed_entirely(self):
+        """Scaling it to zero leaves five slots; honest means the block is gone."""
+        rich = self.GeckoBrainEnv(seed=0)
+        plain = self.GeckoBrainEnv(seed=0, privileged_food_channel=False)
+        self.assertIn("privileged", rich.observation_space.spaces)
+        self.assertNotIn("privileged", plain.observation_space.spaces)
+        self.assertNotIn("privileged", plain.reset(seed=0)[0])
+
+    def test_prey_needs_a_world_that_can_hold_it(self):
+        with self.assertRaisesRegex(ValueError, "no prey body"):
+            self.GeckoBrainEnv(seed=0, prey_parameters=parameters())
+
+    def test_prey_becomes_a_real_geom_the_camera_sees(self):
+        env = self.GeckoBrainEnv(seed=0, walker_xml_path=str(WORLD),
+                                 prey_parameters=parameters(), max_steps=20)
+        env.reset(seed=0)
+        np.testing.assert_allclose(env.walk_env.data.mocap_pos[0][:2], env.prey.position, atol=1e-12)
+        np.testing.assert_allclose(env.food_xy, env.prey.position, atol=1e-12)
+
+    def test_prey_takes_over_the_eat_and_food_radius(self):
+        prey = parameters(capture_distance_m=.033, radius_m=.007)
+        env = self.GeckoBrainEnv(seed=0, walker_xml_path=str(WORLD), prey_parameters=prey,
+                                 eat_radius=.10, food_radius=.035, max_steps=20)
+        self.assertAlmostEqual(env.eat_radius, .033)
+        self.assertAlmostEqual(env.food_radius, .007)
+
+    def test_a_stationary_food_env_still_works_unchanged(self):
+        env = self.GeckoBrainEnv(seed=0, max_steps=5)
+        obs, _ = env.reset(seed=0)
+        self.assertIn("privileged", obs)
+        self.assertIsNone(env.prey)
+        obs, reward, term, trunc, info = env.step(np.zeros(4, dtype=np.float32))
+        self.assertIn("mouth_food_dist", info)
+
+
 if __name__ == "__main__":
     unittest.main()
