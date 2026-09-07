@@ -236,13 +236,22 @@ class BasalGanglia:
         self._cortex = np.zeros(size)
         self._thalamus = np.zeros(size)
         self._reticular = np.zeros(size)
+        # The winner-take-all arm's gates are stored, not re-derived. Writing
+        # gate-space values into _gpi and reading them back through the gate
+        # function does NOT round-trip: _gpi holds a pre-activation, and
+        # 1.0 - gates ran back through L(1 - y/c) returned zero for every
+        # channel, so gates() and selected() contradicted step()'s own return
+        # one line later. The comparison arm reported "nothing selected" for
+        # every trial in which the caller used the accessor rather than the
+        # return value.
+        self._wta_gates = np.zeros(size)
     @property
     def n(self):
         return len(self.channels)
 
     def reset(self):
         for name in ("_d1", "_d2", "_stn", "_gpe", "_gpi",
-                     "_cortex", "_thalamus", "_reticular"):
+                     "_cortex", "_thalamus", "_reticular", "_wta_gates"):
             getattr(self, name)[:] = 0.0
         return self
 
@@ -313,6 +322,7 @@ class BasalGanglia:
             if np.max(drive) > 0:
                 gates[int(np.argmax(drive))] = 1.0
             self._gpi = 1.0 - gates
+            self._wta_gates = gates
             return gates
 
         # Salience goes DIRECTLY to striatum and STN [Eq 5, 6, 8]. The cortex is
@@ -378,6 +388,9 @@ class BasalGanglia:
         return self._gates_from(self._gpi)
 
     def gates(self):
+        """The disinhibition gates. Must always agree with step()'s return."""
+        if self.winner_take_all:
+            return self._wta_gates.copy()
         return self._gates_from(self._gpi)
 
     def _gates_from(self, gpi):
@@ -432,6 +445,49 @@ class BasalGanglia:
         if best <= 1e-9:
             return 0.0
         return float((np.sum(gates) - best) / best)
+
+    def distortion_dw(self, gates=None):
+        """The PUBLISHED distortion measure, d_w = 2 * (sum(e) - e_w) / sum(e).
+
+        [Prescott et al. 2024, Biomimetics 9(3):139, Equation 3, CC BY.]
+
+        This is NOT what `distortion_amount` computes. That one divides the
+        losers by the WINNER; this divides them by the TOTAL and doubles it.
+        They rank the same competitions differently and only this one can be
+        compared against the published per-dopamine means, so every published
+        comparison must use this method. `distortion_amount` is kept because
+        existing evidence files were generated with it and this project does
+        not silently rewrite the meaning of a recorded number.
+        """
+        gates = self.gates() if gates is None else np.asarray(gates, dtype=float)
+        total = float(np.sum(gates))
+        if total <= 1e-12:
+            return 0.0
+        return float(2.0 * (total - float(np.max(gates))) / total)
+
+    def selection_class(self, gates=None,
+                        full_threshold=0.95, present_threshold=0.05):
+        """The published five-way outcome label for one competition.
+
+        [Prescott et al. 2024 section 3.1.3, verbatim thresholds: a channel is
+        fully selected at or above 0.95, partially selected between 0.05 and
+        0.95, and unselected below 0.05.]
+
+        Returns one of "none", "partial", "clean", "distorted", "multiple".
+        This is the classifier the published Figure 5 table is built from, so
+        it belongs in the module rather than in whatever script happens to be
+        comparing against it.
+        """
+        gates = self.gates() if gates is None else np.asarray(gates, dtype=float)
+        full = int(np.sum(gates >= full_threshold))
+        present = int(np.sum(gates >= present_threshold))
+        if present == 0:
+            return "none"
+        if full == 0:
+            return "partial"
+        if full > 1:
+            return "multiple"
+        return "clean" if present == 1 else "distorted"
 
     def state(self):
         return {

@@ -269,23 +269,53 @@ gradient (93 s at lambda 0.03 falling monotonically to 0.1 s at 0.20), distortio
 deepening monotonically with dopamine, clean selection at baseline with separated
 saliences, stability at zero salience, and GPR differing from a winner-take-all.
 
-STILL OPEN: the switching ratio is inverted -- 0.3x from baseline to lambda 0.43
-against a published ~3x -- and GPR dithers LESS than a winner-take-all here (41
-against 146) where the published result is the opposite (21.3 against 9.2). That
-is the counterintuitive published finding and it does not come out.
+*** THIS BLOCKER IS VOID. Session 6d. Both halves of it were wrong. ***
 
-Most likely explanation, not demonstrated: the published counts are from a robot
-foraging task and this is a disembodied salience test. The corpus itself notes
-clean selection is lower disembodied (73-81%) than embodied (89-95%), so the two
-setups are known to differ. Closing this honestly means either reproducing the
-foraging task or obtaining the switching-bout definition from the Prescott 2024
-supplementary materials, which PMC lists but which were not retrievable.
+It said the switching-bout definition was in supplementary materials "which PMC
+lists but which were not retrievable". The definition is in the MAIN TEXT of
+Prescott et al. 2024, section 3.1.3, freely readable: a bout is an uninterrupted
+run of time steps sharing the same winner with e_w >= 0.05. The supplementary
+archive was also obtained. This is the SECOND time this project recorded a wall
+without verifying it -- see ledger entries 58 and 73. Recording a blocker is not
+verifying one.
 
-Also open, unchanged and recorded as an expectedFailure test: at zero salience
-every gate settles to the same nonzero value, so `selected` returns whichever
-channel the tie-break reaches rather than None. The oscillation that used to
-cause this is fixed; the residual tonic release is not.
+Worse, the comparison the blocker rests on was never a valid one. The published
+21.3-against-7 counts bouts over "the first avoidance sequence and first foraging
+sequence of each trial", and the 7 is the TASK-TOPOLOGY MINIMUM -- two avoidance
+sub-behaviours plus five foraging -- not a rate. The authors state in the same
+sentence that they preferred this to "counting bouts (or switches) within a fixed
+time interval", which is exactly what tools/dopamine_sweep.py does over its
+120-second trial. Disembodied, the denominator does not exist. The 0.55x figure
+is not an inverted reproduction; it is a quantity with no published counterpart,
+and it has been reported as this module's one open failure for three sessions.
 
-The module is NOT wired into any environment and must not be until the switching
-comparison reproduces or is shown to be a task difference. The if/else arbiter on
-target_interest remains the live path.
+REPLACED BY a like-for-like test that was free the whole time. The same paper's
+Study 1 supplementary workbook (CC BY) holds the NON-EMBODIED model's own
+selection statistics at 61 dopamine levels: percentage of competitions ending in
+no / partial / clean / distorted / multiple selection, plus mean efficiency and
+mean distortion. Two channels, a salience grid, no robot, no task, no bouts.
+
+Against that test the module has ONE fault with ONE signature: the winner does
+not saturate. Every ordering reproduces and the onset of distortion lands on the
+published step, but published clean selection at baseline is 78.6% against our
+47.4%, with the whole difference sitting in "partial". A competition the paper
+calls clean, our module calls partial. That is a diagnosis, not a tuning target;
+rule 2 forbids closing it by adjusting constants.
+
+The zero-salience defect recorded here is FIXED (session 6c) and its
+expectedFailure test is now a passing requirement.
+
+Two real defects were found while doing this and are fixed:
+  - distortion was computed as (sum(e) - e_w)/e_w. The published Equation 3 is
+    2*(sum(e) - e_w)/sum(e). Different quantity, so every "distortion reproduces"
+    claim in this file predates a correct comparison. distortion_dw() now
+    implements the published measure; the old one is kept under its own name
+    because recorded evidence was generated with it.
+  - the winner-take-all comparison arm wrote gate-space values into a
+    pre-activation state variable, so gates() returned all zeros and selected()
+    returned None one line after step() named a winner. The arm now stores its
+    gates.
+
+The module is NOT wired into any environment and must not be until the
+saturation fault is explained. The if/else arbiter on target_interest remains the
+live path.

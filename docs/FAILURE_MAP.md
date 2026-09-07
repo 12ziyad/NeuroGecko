@@ -3,7 +3,7 @@
 **One document. Everything tried, everything that failed, why, and what fixed it.**
 Past, present, future. Updated every session; nothing removed.
 
-Last updated: Session 6c.
+Last updated: Session 6d.
 
 ---
 
@@ -287,6 +287,63 @@ demonstrated**, and the module stays unwired until it is.
 
 ---
 
+## Ledger — scouting module 3 (Session 6d)
+
+Six agents swept for the published basis of the next brain module and every
+load-bearing claim was adversarially checked. Twelve claims survived, twelve
+were refuted. **The most important finding is that the basal-ganglia failure
+this project has reported for three sessions is not a failure.**
+
+| # | Hypothesis | Verdict | Evidence |
+|---|---|---|---|
+| 71 | The open-loop CPG contributes ~2% of the walking | **Refuted** | that figure is the *legacy* profile on the wrong body. The accepted walker **is** the open-loop base: 19 strides, 1.1892 Hz measured against 1.1888 commanded, duty 0.733 |
+| 72 | The brainstem's declared output has somewhere to land | **Refuted** | the cord is `(t·freq + offset) % 1.0` — closed form, no phase state, no drive input. **1 of 4 drive channels is consumable** |
+| 73 | The switching-bout definition needs the supplementary materials | **Refuted** | it is in the **main text**, §3.1.3, freely readable — a wall recorded without being verified, for the second time |
+| 74 | The 0.55× switching ratio is a failed reproduction | **Refuted** | the published number counts bouts over two named task sequences against a **task-topology minimum of 7**, and the authors explicitly declined fixed-interval counting — which is what our tool does |
+| 75 | A published *disembodied* acceptance test exists | **Confirmed** | Prescott 2024 Study 1 workbook: 61 dopamine levels × five selection classes, CC BY, obtained |
+| 76 | The module reproduces that table | **Partly** | every ordering reproduces and distortion onset lands on the published step; partial selection 17–47 points high, clean 15–31 low |
+| 77 | The module computes the paper's distortion | **Refuted** | ours divides losers by the **winner**; Eq. 3 divides by the **total** and doubles it |
+| 78 | The registry holds a published stride frequency | **Refuted** | 116 entries, and the only frequency is the invented 1.1888 Hz lock |
+| 79 | This species changes gait with speed | **Refuted** | relative phase not significant over 0.2–1.1 m/s; 44±1.1% walking against 43±1.8% running |
+| 80 | The published EMG pattern is wired into the controller | **Refuted** | `common/emg_pattern.py` is imported by tests and nothing else |
+| 81 | MLR stimulation has never been done in a gecko | **Refuted** | walking, phonation and left/right turns elicited from the midbrain of *Gekko gecko* — the one study in the target family |
+| 82 | The scout's settle loop converged *(a scout's own method error)* | **Refuted** | breaking on two equal gate vectors fired during the clipped-at-zero transient and reported 100% no-selection at every level |
+| 83 | The scout's first walker measurement used the accepted body *(same)* | **Refuted** | it used the default body and legacy profile; the accepted body is identified only by a hash inside a gate evidence file |
+
+### #74 — the failure that was not a failure
+
+For three sessions this project reported an inverted switching ratio as its one
+open basal-ganglia failure. It was measuring something the paper never
+published.
+
+- **Published:** switching bouts counted over *the first avoidance sequence and
+  first foraging sequence of each trial*, against a floor of 7 — which is the
+  **number of sub-behaviours in the task**, not a rate.
+- **Ours:** switches counted in a fixed 120-second window.
+- The authors say in the same sentence that they preferred their measure to
+  *"counting bouts (or switches) within a fixed time interval"* — precisely
+  what our tool does.
+
+Disembodied, the denominator does not exist. **0.55× is not an inverted
+reproduction; it is a quantity with no published counterpart.** The right
+response is to retire the comparison, not to chase it.
+
+### #75 → #76 — and the test that replaces it
+
+The same paper's supplementary workbook holds the **non-embodied** model's own
+selection statistics at 61 dopamine levels — no robot, no task, no bouts. A
+like-for-like test for a like-for-like model, and it was free the whole time.
+
+Against it, every ordering reproduces and the onset of distortion lands on the
+published step. One fault remains, with a single clean signature: **our winner
+does not saturate.** Published clean selection at baseline is 78.6%; ours is
+47.4%, with the difference sitting in "partial". A competition our module calls
+partial, the paper calls clean.
+
+That is a diagnosis, not a tuning target. Rule 2 applies.
+
+---
+
 ## My own errors — the meta-ledger
 
 Failures of method, not of hypothesis. These are the ones worth re-reading.
@@ -302,6 +359,10 @@ Failures of method, not of hypothesis. These are the ones worth re-reading.
 | Let the environment's control rate set the solver's rate | a numerical instability I spent two sessions attributing to the model | a model and its integration are different things |
 | Wrote a guard that pinned one publisher's name | it failed when the citation was **corrected** | guard the property, not the particular |
 | Generated evidence from a throwaway script | it could not be regenerated when the parameters changed | evidence that cannot be re-run is an assertion |
+| Recorded a second unverified blocker | the switching-bout definition was in the paper's main text all along | **twice now.** Recording a wall is not verifying one |
+| Compared against a published number without checking what it counted | three sessions spent on a ratio with no published counterpart | read the definition before reproducing the value |
+| Implemented a published quantity from its name | our distortion divides by the winner; the paper's divides by the total | a formula is not a word |
+| Stored gate-space values in a pre-activation state variable | the comparison arm's accessor returned "nothing selected" one line after naming a winner | a round trip is not a round trip until you run it both ways |
 | Wrote a test asserting zero distortion at every dopamine level | the test **forbade the correct published behaviour** | tests encode expectations, and expectations can be wrong |
 | Used 50 Hz white noise as fluctuating salience | measured seven behaviour switches per *second* | check the test before blaming the model |
 | Claimed the cheat was removed | it was removed from the wrong environment | verify the claim where it matters |
@@ -316,7 +377,9 @@ Failures of method, not of hypothesis. These are the ones worth re-reading.
 | **Fear** | a chemosensory channel | Defence is **chemically gated**: smell 0.20, sight 0, touch 0. There is no odour field, and MuJoCo has no scent primitive. Any fear response now fires on the wrong sense. |
 | **Thermostat** | a temperature field | Built, wired to the published 29.5–31.9 °C band, reports `thermostat_inert: True`. Zero mentions of temperature anywhere in the world. |
 | **Hunting gates** | a strike behaviour | The walker cannot outrun prey and is not meant to. A 16–20 ms strike is shorter than one control step; scoring needs 500 Hz. |
-| **Basal ganglia** | the switching comparison | 6 of 7 reproduce and the selection sequence is exact to four decimals. The switching ratio stays inverted (0.55× against a published ~3×). The published counts come from a robot foraging task; this is disembodied. Plausible, **not demonstrated**. |
+| **Basal ganglia** | *(the old blocker is void — see #73, #74)* | The switching comparison is **retired**: it had no published counterpart. Replaced by the published disembodied Figure 5 test, against which the module now has one clean unexplained fault — **the winner does not saturate**. Clean selection 47.4% against a published 78.6%, the difference sitting in "partial". Diagnosis, not a tuning target. |
+| **Brainstem** | a cord that can be driven | The spinal generator is a closed-form clock — `(t·freq + offset) % 1.0` — with no phase state and no drive input, so three of the brainstem's four declared output channels have nowhere to land. **The cord must be rewritten as integrated oscillators first.** |
+| **Gait selection** | the animal itself | This species does not change footfall pattern with speed. The channel can be built but **has no acceptance test that is not invented**, and must be recorded as present-but-unvalidatable. |
 | **Forefoot gate** | a wrist joint | Closed by decision, not failure. Both unmet checks are INVENTED targets. |
 | **Two evidence files** | a body that no longer exists | `brain_legacy.json` and `brain_sealed.json` pin a hash **no file in the repo has**. Predates this work. |
 | **Walking posture** | unassigned | Shoulder rides 0.125 SVL against a published 0.11. Static audit passes 14/14; the *walking* pose was never checked. Open. |
@@ -373,15 +436,19 @@ shortfall.
 
 | | |
 |---|---|
-| Hypotheses tested | **70** |
-| Refuted | **50** |
-| Confirmed | **18** |
-| Partly | **2** |
-| My own method errors | **13** |
+| Hypotheses tested | **83** |
+| Refuted | **61** |
+| Confirmed | **19** |
+| Partly | **3** |
+| My own method errors | **18** |
 | Tests passing | **341**, no expected failures |
 
-**Seventy per cent of everything tried was wrong.** That is what the map is
-made of.
+**Seventy-three per cent of everything tried was wrong.** That is what the map
+is made of.
+
+Two of the entries above retired a *failure* rather than a hypothesis. The
+project had been reporting an inverted result for three sessions against a
+published number that did not mean what it was being read to mean.
 
 The one number worth watching: the count of *my own* method errors grew faster
 this session than the hypothesis count. That is the healthier direction — a
