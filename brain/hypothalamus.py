@@ -107,6 +107,10 @@ class Physiology:
     preferred_temperature_C: tuple
     metabolic_q10: float
     cost_of_transport_mL_O2_per_kg_per_m: float
+    endurance_coefficient_hours: float
+    endurance_exponent: float
+    maximum_aerobic_speed_m_s: float
+    fatigue_recovery_time_constant_s: float
 
     @classmethod
     def from_registry(cls, body_mass_kg, metabolic_q10=None):
@@ -137,6 +141,10 @@ class Physiology:
             metabolic_q10=1.0 if metabolic_q10 is None else float(metabolic_q10),
             cost_of_transport_mL_O2_per_kg_per_m=float(
                 value("cost_of_transport_mL_O2_per_kg_per_m")),
+            endurance_coefficient_hours=float(value("endurance_coefficient_hours_at_25C")),
+            endurance_exponent=float(value("endurance_exponent_at_25C")),
+            maximum_aerobic_speed_m_s=float(value("maximum_aerobic_speed_m_s_at_25C")),
+            fatigue_recovery_time_constant_s=float(value("fatigue_recovery_time_constant_s")),
         )
 
     def resting_power_W(self, temperature_C=None):
@@ -160,6 +168,28 @@ class Physiology:
         speed = max(0.0, float(speed_m_s))
         mL_per_second = self.cost_of_transport_mL_O2_per_kg_per_m * self.body_mass_kg * speed
         return mL_per_second * self.oxycalorific_J_per_mL
+
+    def endurance_s(self, speed_m_s):
+        """Sustainable duration at this speed, or infinity below the ceiling.
+
+        `t_end = 0.030 * v^-2.07` hours at 25 C, **v in KM/H**. Reading that
+        velocity as m/s inflates endurance about seventyfold, and the units check
+        is that the equation returns 62.6 min at 0.050 m/s while the same body of
+        work separately reports locomotion sustained beyond 60 min there.
+
+        Below the maximum aerobic speed the corpus states locomotion is
+        sustainable indefinitely, so this returns infinity rather than a large
+        number: the animal is not slowly tiring, it is not tiring.
+
+        Measured in *Teratoscincus* and a 9 g *Coleonyx variegatus*, NOT in
+        *E. macularius*.
+        """
+        speed = max(0.0, float(speed_m_s))
+        if speed <= self.maximum_aerobic_speed_m_s:
+            return math.inf
+        km_per_hour = speed * 3.6
+        hours = self.endurance_coefficient_hours * km_per_hour ** self.endurance_exponent
+        return hours * 3600.0
 
     @property
     def reserve_J(self):
@@ -209,6 +239,7 @@ class Homeostasis:
     time_compression: float = 1.0
     energy_setpoint_fraction: float = 1.0
     meal_scale_J: float = field(default=None)
+    fatigue: float = 0.0
     # Keramati & Gutkin's D(h) = (sum_i |h*_i - h_i|^n)^(1/m). n=4, m=2 is their
     # canonical choice and it makes D genuinely CONVEX. That convexity is not
     # decoration: with n=m=2 the drive collapses to a linear distance and a meal
@@ -239,6 +270,8 @@ class Homeostasis:
             self.energy_J = self.physiology.reserve_J * self.energy_setpoint_fraction
         if self.body_temperature_C is None:
             self.body_temperature_C = self.physiology.preferred_temperature_midpoint_C
+        if not 0.0 <= self.fatigue <= 1.0:
+            raise ValueError("fatigue must lie in [0, 1].")
         self.meals = 0
         self.elapsed_s = 0.0
         self._last_drive = self.drive()
@@ -332,11 +365,22 @@ class Homeostasis:
 
     # ---- dynamics -----------------------------------------------------------
 
-    def step(self, dt_s, meal_wet_mass_kg=0.0, activity_power_W=0.0):
+    def step(self, dt_s, meal_wet_mass_kg=0.0, activity_power_W=0.0, speed_m_s=0.0):
         """Advance by dt_s. Returns the HRRL reward: the reduction in drive."""
         if not math.isfinite(dt_s) or dt_s < 0:
             raise ValueError("dt_s must be finite and nonnegative.")
         effective = dt_s * self.time_compression
+        # Fatigue is the minutes-scale variable the old module's
+        # `energy -= 0.045*dt*moving` was reaching for. It is a different
+        # quantity from the energy reserve, on a timescale a hundred thousand
+        # times shorter, and merging them into one `energy` channel was what
+        # made that constant unfittable to anything.
+        endurance = self.physiology.endurance_s(speed_m_s)
+        if math.isinf(endurance):
+            recovery = self.physiology.fatigue_recovery_time_constant_s
+            self.fatigue *= math.exp(-effective / recovery) if recovery > 0 else 0.0
+        else:
+            self.fatigue = min(1.0, self.fatigue + effective / endurance)
         power = self.physiology.resting_power_W(self.body_temperature_C) + max(0.0, activity_power_W)
         self.energy_J -= power * effective
         if meal_wet_mass_kg > 0:
@@ -351,7 +395,7 @@ class Homeostasis:
         self._last_drive = drive_now
         return float(reward)
 
-    def reset(self, energy_J=None, body_temperature_C=None):
+    def reset(self, energy_J=None, body_temperature_C=None, fatigue=None):
         """Reset the EPISODE, not the animal.
 
         Energy deliberately persists unless explicitly given, because a real
@@ -362,6 +406,8 @@ class Homeostasis:
             self.energy_J = float(np.clip(energy_J, 0.0, self.physiology.reserve_J))
         if body_temperature_C is not None:
             self.body_temperature_C = float(body_temperature_C)
+        if fatigue is not None:
+            self.fatigue = float(np.clip(fatigue, 0.0, 1.0))
         self.elapsed_s = 0.0
         self._last_drive = self.drive()
         return self
@@ -379,9 +425,11 @@ class Homeostasis:
         cold, warm = self.thermal_error_C
         low, high = self.physiology.preferred_temperature_C
         half_width = max(0.5 * (high - low), 1e-9)
+        # hunger and fatigue, not hunger and "energy". The second channel used to
+        # be 1 - hunger, which carried no information the first did not.
         return np.array([
             self.energy_deficit,
-            1.0 - self.energy_deficit,
+            self.fatigue,
             min(cold / half_width, 1.0),
             min(warm / half_width, 1.0),
         ], dtype=np.float32)
@@ -401,6 +449,7 @@ class Homeostasis:
             "thermostat_inert": self.thermal_error_C == (0.0, 0.0),
             "drive": self.drive(),
             "drive_exponents": [self.drive_exponent_n, self.drive_exponent_m],
+            "fatigue": self.fatigue,
             "meals": self.meals,
             "elapsed_s": self.elapsed_s,
             "time_compression": self.time_compression,

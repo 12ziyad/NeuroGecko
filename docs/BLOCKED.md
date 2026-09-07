@@ -181,3 +181,42 @@ Still open and deliberately so:
   a 0.851 m/s strike from 2.03 cm, and a 16-20 ms strike is shorter than one 50 Hz
   control step, so scoring one needs 500 Hz sampling. Until that exists, a capture
   rate measured here is not the published quantity.
+
+## Fear cannot be built until a chemosensory channel exists (Session 5b)
+
+`envs/gecko_brain_env.py:546` computes `danger = 0.65*belly_contact + (1.0 if
+fallen else 0.0)` -- entirely mechanosensory. The published defensive-response
+probabilities for this species, n=40-42, are:
+
+    mechanosensory alone   0     (chi2 < 0.01, P > 0.9)
+    visual alone           0
+    chemical alone         0.20  (95% CI 0.09-0.40; chi2 = 8.098, P = 0.0044)
+    chemical + visual      0.40
+
+So the signal feeding fear is built from the one modality that provably produces
+no defensive response, and the modality that does -- smell -- has no input
+anywhere in this repository.
+
+`danger` is left in place as a physical-harm penalty, which it legitimately is:
+falling and belly-dragging are real failure states and the walker terminates on
+them. What is refuted is reading that signal as fear.
+
+Blocked on: a chemosensory input. There is no olfactory or vomeronasal channel in
+the observation, no odour field in the world, and MuJoCo has no scent primitive,
+so this is a world feature to be designed rather than a parameter to be set. Until
+it exists, any fear response in this model is triggered by the wrong sense, and
+the Tier A5 predator-cue test cannot be run honestly.
+
+Related and also open: `brain/drives.py` still carries hand-written `fear` and
+`danger` integration with invented constants. It is the default path; the
+hypothalamus is opt-in. Fear left the hypothalamus deliberately (it belongs to the
+tectal escape integrator per best_achievable_brain.md section 3.4) and has not
+landed anywhere yet.
+
+## Fatigue recovery rate is invented (Session 5b)
+
+The endurance side is published: t_end = 0.030 * v^-2.07 hours at 25 C, n=25,
+Teratoscincus/Coleonyx. How fast a lizard RECOVERS from fatigue appears nowhere in
+the corpus for any species. `fatigue_recovery_time_constant_s` is 600 s by
+engineering choice and is tagged INVENTED. Any behaviour that depends on recovery
+rate -- pacing, rest bouts, whether the animal can sprint twice -- rests on it.

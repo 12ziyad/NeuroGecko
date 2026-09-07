@@ -235,6 +235,72 @@ class CostOfMoving(unittest.TestCase):
         self.assertGreater(moving.energy_deficit, resting.energy_deficit)
 
 
+class Fatigue(unittest.TestCase):
+    """The minutes-scale variable the old module's 0.045/s was reaching for."""
+
+    def setUp(self):
+        self.physiology = Physiology.from_registry(body_mass_kg=0.038)
+
+    def test_the_endurance_equation_reads_velocity_in_km_per_hour(self):
+        """The units check the corpus supplies without stating it as one.
+
+        t_end = 0.030 * v^-2.07 hours must give ~60 min at 0.050 m/s, because the
+        same body of work reports locomotion sustained beyond 60 min there.
+        Reading v as m/s instead gives 15 hours.
+        """
+        physiology = Physiology.from_registry(body_mass_kg=0.038)
+        # Evaluate the raw curve, bypassing the aerobic-ceiling shortcut.
+        km_per_hour = 0.050 * 3.6
+        hours = (physiology.endurance_coefficient_hours
+                 * km_per_hour ** physiology.endurance_exponent)
+        self.assertAlmostEqual(hours * 60.0, 62.0, delta=5.0)
+
+    def test_below_the_aerobic_ceiling_nothing_accumulates(self):
+        """The corpus says this speed is sustainable indefinitely, so it must be."""
+        self.assertEqual(self.physiology.endurance_s(0.055), math.inf)
+        state = Homeostasis(self.physiology)
+        state.step(3 * 3600.0, speed_m_s=0.055)
+        self.assertEqual(state.fatigue, 0.0)
+
+    def test_the_lab_walker_never_tires(self):
+        """0.055 m/s is well under the ceiling. Not an omission -- the finding."""
+        state = Homeostasis(self.physiology)
+        for _ in range(100):
+            state.step(60.0, speed_m_s=0.055)
+        self.assertEqual(state.fatigue, 0.0)
+
+    def test_above_the_ceiling_fatigue_accumulates_faster_at_higher_speed(self):
+        slow = Homeostasis(self.physiology)
+        fast = Homeostasis(self.physiology)
+        slow.step(30.0, speed_m_s=0.158)
+        fast.step(30.0, speed_m_s=0.300)
+        self.assertGreater(fast.fatigue, slow.fatigue)
+        self.assertGreater(slow.fatigue, 0.0)
+
+    def test_fatigue_saturates_and_recovers(self):
+        state = Homeostasis(self.physiology)
+        state.step(600.0, speed_m_s=0.300)
+        self.assertEqual(state.fatigue, 1.0)
+        state.step(600.0, speed_m_s=0.0)
+        self.assertLess(state.fatigue, 1.0)
+        self.assertGreater(state.fatigue, 0.0)
+
+    def test_fatigue_is_a_separate_timescale_from_the_energy_reserve(self):
+        """Two minutes of sprinting exhausts one and barely touches the other."""
+        state = Homeostasis(self.physiology)
+        state.step(120.0, speed_m_s=0.300,
+                   activity_power_W=self.physiology.locomotion_power_W(0.300))
+        self.assertEqual(state.fatigue, 1.0)
+        self.assertLess(state.starvation_fraction, .001)
+
+    def test_the_second_interoception_channel_is_fatigue_not_one_minus_hunger(self):
+        state = Homeostasis(self.physiology)
+        state.step(600.0, speed_m_s=0.300)
+        vector = state.vector()
+        self.assertAlmostEqual(vector[1], state.fatigue, places=6)
+        self.assertNotAlmostEqual(vector[1], 1.0 - state.energy_deficit, places=3)
+
+
 class HonestDriveSet(unittest.TestCase):
     def setUp(self):
         self.physiology = Physiology.from_registry(body_mass_kg=0.038)

@@ -845,6 +845,34 @@
         "confidence": "uncertain", "recording_temp_C": null,
         "notes": "DERIVED from a husbandry offering and a bout size, not from weighing a cricket. It scales with the body mass the offering was expressed as a fraction of, so it is only right for a ~38-40 g animal. Meal energy is linear in it."
       },
+      "endurance_coefficient_hours_at_25C": {
+        "value": 0.030,
+        "units": "hours (coefficient of t_end = a * v^b, v in KM/H)", "species": "PROXY (Teratoscincus / Coleonyx variegatus)", "sample_size": 25,
+        "source": "t_end = 0.030 * v^-2.07 hours at 25 C, r^2 = 0.87, v in km/h. Companion fit at 15 C is t_end = 0.013 * v^-1.70, r^2 = 0.83, n=24.",
+        "confidence": "verified", "recording_temp_C": 25,
+        "notes": "NOT E. macularius. Measured in Teratoscincus and a 9 g Coleonyx variegatus. The velocity is in KM/H, not m/s, and reading it as m/s inflates endurance about seventyfold. The units check: the equation gives 62.6 min at 0.050 m/s and the same body of work separately reports locomotion sustained beyond 60 min at that speed."
+      },
+      "endurance_exponent_at_25C": {
+        "value": -2.07,
+        "units": "dimensionless", "species": "PROXY (Teratoscincus / Coleonyx variegatus)", "sample_size": 25,
+        "source": "Exponent of t_end = 0.030 * v^-2.07 hours at 25 C, r^2 = 0.87.",
+        "confidence": "verified", "recording_temp_C": 25,
+        "notes": "Steeply negative: endurance collapses with speed. Doubling speed cuts sustainable duration by about a factor of four."
+      },
+      "maximum_aerobic_speed_m_s_at_25C": {
+        "value": 0.100,
+        "units": "m/s", "species": "PROXY (Teratoscincus)", "sample_size": null,
+        "source": "VO2max is reached across 0.100-0.158 m/s at 25 C; max aerobic speed is 0.075 m/s at 15 C; locomotion is sustained beyond 60 min at 0.050 m/s.",
+        "confidence": "likely", "recording_temp_C": 25,
+        "notes": "The LOWER bound of the published VO2max range is used as the ceiling, which is the conservative choice: it starts fatiguing the animal at the earliest speed the literature allows. Below this speed the corpus states locomotion is sustainable indefinitely, so fatigue must not accumulate there. The lab walker moves at 0.055 m/s, well below it, and therefore never fatigues -- which is the correct published behaviour, not an omission."
+      },
+      "fatigue_recovery_time_constant_s": {
+        "value": 600.0,
+        "units": "s", "species": "INVENTED", "sample_size": null,
+        "source": "No recovery-from-fatigue timescale appears anywhere in the corpus, for this species or any proxy.",
+        "confidence": "uncertain", "recording_temp_C": null,
+        "notes": "INVENTED. The literature says how fast a lizard tires and says nothing at all about how fast it recovers. Ten minutes is an engineering choice of the same order as the endurance times themselves. Any behaviour that depends on recovery rate is resting on this number."
+      },
       "cost_of_transport_mL_O2_per_kg_per_m": {
         "value": 0.73,
         "units": "mL O2 per kg per metre", "species": "E_macularius", "sample_size": null,

@@ -556,6 +556,7 @@ class GeckoBrainEnv(gym.Env):
                 total_dt,
                 meal_wet_mass_kg=(float(parameter_value("prey_item_wet_mass_kg")) if ate else 0.0),
                 activity_power_W=self.homeostasis.physiology.locomotion_power_W(moving_speed),
+                speed_m_s=moving_speed,
             )
 
         progress = mouth_dist_before - mouth_dist_after

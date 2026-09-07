@@ -1772,3 +1772,111 @@ thermostat has no anchor at all.
 | 45 | The thermostat can be built now | **Refuted** | no temperature field exists; it is wired and inert and says so |
 
 301 tests pass, one SciPy skip.
+
+# Session 5b — completing the hypothalamus, and a refuted fear channel
+
+A spec audit of the module committed in Session 5 found two real gaps. Both are
+now closed, and one of them is a defect in the brain environment rather than in
+the module.
+
+## Fatigue: the variable the old constant was reaching for
+
+`brain/drives.py` had `energy -= 0.045 * dt * moving`. The corpus is explicit
+that this was trying to be two different things at once — a **days-scale energy
+reserve** and a **minutes-scale fatigue** — and that merging them is why the
+constant fits nothing. Session 5 split off the reserve correctly and dropped the
+other half instead of building it. Repo-wide grep for `fatigue|endurance`:
+**zero hits**.
+
+The published relation is `t_end = 0.030 * v^-2.07` hours at 25 °C, r² = 0.87,
+n = 25, in *Teratoscincus* and a 9 g *Coleonyx variegatus* — **not**
+*E. macularius*.
+
+### The unit trap, and the check that catches it
+
+**`v` is in km/h.** Reading it as m/s inflates endurance about seventyfold.
+
+The corpus never states this as a warning, but it supplies the check: the same
+body of work reports locomotion **sustained beyond 60 minutes at 0.050 m/s**. The
+equation in km/h returns **62.6 min** there. In m/s it returns 15 hours.
+
+### Below the aerobic ceiling nothing accumulates
+
+VO₂max is reached across **0.100–0.158 m/s at 25 °C**. Below that the corpus
+states locomotion is sustainable indefinitely, so `endurance_s` returns infinity
+rather than a large number — the animal is not slowly tiring, it is **not
+tiring**. The lower bound of the published range is used as the ceiling, which is
+the conservative choice.
+
+| speed | sustainable for | fatigue after 10 min |
+|---|---|---|
+| 0.055 m/s (the lab walker) | **indefinitely** | 0 % |
+| 0.100 m/s | indefinitely | 0 % |
+| 0.158 m/s | 5.8 min | 100 % |
+| 0.300 m/s | 1.5 min | 100 % |
+
+**The lab walker never fatigues.** That is not an omission; it is the published
+behaviour of an animal walking well under its aerobic ceiling.
+
+Two minutes of sprinting exhausts fatigue completely and consumes less than 0.1 %
+of the energy reserve — the two timescales are visibly different quantities, which
+is the whole reason for separating them.
+
+Recovery from fatigue is **INVENTED**: the literature says how fast a lizard tires
+and says nothing whatever about how fast it recovers. A 600 s constant is an
+engineering choice of the same order as the endurance times, and any behaviour
+depending on recovery rests on it.
+
+The second interoception channel is now **fatigue**, not `1 - hunger`, which
+carried no information the first channel did not.
+
+## The fear channel is driven by a sense that does not frighten this animal
+
+`envs/gecko_brain_env.py:546`:
+
+    danger = 0.65 * belly_contact + (1.0 if fallen else 0.0)
+
+That is **entirely mechanosensory**. The published measurement, n = 40–42:
+
+| cue | P(defensive response) |
+|---|---|
+| mechanosensory alone | **0** |
+| visual alone | **0** |
+| **chemical alone** | **0.20** (95 % CI 0.09–0.40) |
+| chemical + visual | 0.40 |
+
+Mechanosensory χ² < 0.01, P > 0.9. Chemical χ² = 8.098, P = 0.0044.
+
+So the channel feeding fear is built from the one modality that provably produces
+**no** defensive response, while the modality that does — smell — has no input in
+this repository at all.
+
+**Not changed here, deliberately.** `danger` still legitimately serves as a
+physical-harm penalty: falling and belly-dragging are real failure states and the
+walker terminates on them. What is refuted is the *interpretation* of that signal
+as fear. Fear left this module in Session 5 to sit with the tectal escape
+integrator, and the honest conclusion is that it cannot be built anywhere until a
+chemosensory channel exists. Recorded in `docs/BLOCKED.md`.
+
+## Also found: `curiosity` has a published correlate after all
+
+Session 5 deleted it as unsupported. That was right for the *drive vector* and
+wrong about the evidence: there is a measured behavioural correlate, a tongue-flick
+rate rising from 3.66 to 13.18 per 90 s (**3.60×**, ceiling **0.146/s**, n = 40–42),
+and vision drives it (χ² = 14.50, P = 0.0001) while driving defence not at all.
+
+It is an **output rate of an investigation behaviour** with no setpoint, no deficit
+and no error signal, so it is not an axis of the homeostatic space. It belongs to
+the sensing channel, and the numbers are recorded here for whoever builds it.
+
+## Session 5b ledger
+
+| # | Hypothesis | Verdict | Evidence |
+|---|---|---|---|
+| 46 | Session 5's module was complete | **Refuted** | fatigue absent entirely; the second channel carried no information |
+| 47 | The endurance velocity is in m/s | **Refuted** | gives 15 h at 0.050 m/s against a published >60 min; km/h gives 62.6 min |
+| 48 | A walking gecko accumulates fatigue | **Refuted** | 0.055 m/s is under the aerobic ceiling; sustainable indefinitely |
+| 49 | The brain env's danger channel drives fear correctly | **Refuted** | it is mechanosensory, and mechanosensory-alone defence probability is 0 |
+| 50 | `curiosity` had no published basis | **Refuted** | tongue-flick rate 3.60x, ceiling 0.146/s — right to delete, wrong about why |
+
+308 tests pass, one SciPy skip.
