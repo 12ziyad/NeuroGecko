@@ -43,12 +43,20 @@ class SelectionWorks(unittest.TestCase):
         self.assertEqual(bg.selected(gates), "flee")
         self.assertEqual(int(np.argmax(gates)), 1)
 
-    def test_separated_saliences_select_cleanly_at_every_dopamine_level(self):
+    def test_separated_saliences_select_the_right_channel_at_every_dopamine_level(self):
+        """The WINNER is always right. Whether the losers stay shut is a
+        different question, and the published answer is that at high dopamine
+        they do not -- so this must not assert clean losers everywhere."""
         for dopamine in (0.06, 0.20, 0.29, 0.43, 0.46):
             bg = BasalGanglia(dopamine=dopamine)
             gates = settle(bg, [0.55, 0.30, 0.20, 0.10, 0.10, 0.05])
             self.assertEqual(bg.selected(gates), "hunt", f"lambda={dopamine}")
-            self.assertEqual(bg.distortion(gates), 0, f"lambda={dopamine}")
+
+    def test_at_baseline_dopamine_a_separated_competition_is_clean(self):
+        bg = BasalGanglia(dopamine=0.20)
+        gates = settle(bg, [0.55, 0.30, 0.20, 0.10, 0.10, 0.05])
+        self.assertEqual(bg.distortion(gates), 0)
+        self.assertLess(bg.distortion_amount(gates), 0.05)
 
     def test_selection_is_disinhibition_not_a_maximum(self):
         """Losers are actively held down; a loser can be partly released."""
@@ -126,12 +134,26 @@ class DopamineQualitativeDirections(unittest.TestCase):
         self.assertIsNotNone(healthy.selected(settle(healthy, salience, seconds=8.0)))
 
     def test_too_much_dopamine_releases_losing_channels(self):
-        """Published: distortion -- partial expression of losers -- at high lambda."""
+        """Published: distortion -- partial expression of losers -- at high lambda.
+
+        Measured with the continuous amount, not the integer count: a runner-up
+        at 63% of the winner and one at 100% are both "one distorted channel",
+        so the count cannot show distortion deepening even though it does.
+        """
         salience = [0.55, 0.50, 0.20, 0.10, 0.10, 0.05]
         clean = BasalGanglia(dopamine=0.20)
         excess = BasalGanglia(dopamine=0.46)
-        self.assertGreater(excess.distortion(settle(excess, salience)),
-                           clean.distortion(settle(clean, salience)))
+        self.assertGreater(excess.distortion_amount(settle(excess, salience)),
+                           clean.distortion_amount(settle(clean, salience)))
+
+    def test_distortion_deepens_monotonically_with_dopamine(self):
+        salience = [0.55, 0.50, 0.20, 0.10, 0.10, 0.05]
+        amounts = []
+        for dopamine in (0.12, 0.20, 0.29, 0.37, 0.46):
+            bg = BasalGanglia(dopamine=dopamine)
+            amounts.append(bg.distortion_amount(settle(bg, salience)))
+        self.assertEqual(amounts, sorted(amounts), f"not monotonic: {amounts}")
+        self.assertGreater(amounts[-1], amounts[0])
 
     def test_dopamine_is_bounded_and_validated(self):
         for bad in (-0.1, 1.5, float("nan")):
@@ -191,8 +213,13 @@ class SalienceIsSigmaPi(unittest.TestCase):
         self.assertTrue(np.all(salience >= 0.0))
 
 
-class TheSweepIsARecordedFailure(unittest.TestCase):
-    """Guard the honesty of the evidence file rather than the numbers in it."""
+class TheSweepEvidenceStaysHonest(unittest.TestCase):
+    """Guard what the evidence file CLAIMS, not the numbers in it.
+
+    The numbers will move when the module improves. What must not move is that
+    the file names its parameter sources, says plainly which published results
+    do not reproduce, and does not describe itself as validated.
+    """
 
     def setUp(self):
         path = REPO / "artifacts/evidence/session6/dopamine_sweep.json"
@@ -200,16 +227,29 @@ class TheSweepIsARecordedFailure(unittest.TestCase):
             self.skipTest("sweep evidence not generated")
         self.payload = json.loads(path.read_text(encoding="utf-8"))
 
-    def test_the_verdict_is_recorded_as_a_failure(self):
-        self.assertIn("DOES NOT REPRODUCE", self.payload["verdict"])
-        self.assertTrue(self.payload["not_reproduced"])
+    def test_the_verdict_is_not_an_unqualified_success(self):
+        self.assertIn("REPRODUCES", self.payload["verdict"])
+        self.assertNotEqual(self.payload["verdict"], "REPRODUCES")
+        self.assertTrue(self.payload["not_reproduced"],
+                        "a sweep with nothing unreproduced would need explaining")
 
-    def test_the_diagnosis_names_the_missing_parameters(self):
-        self.assertIn("parameter", self.payload["root_cause"].lower())
-        self.assertTrue(self.payload["to_finish"])
+    def test_every_parameter_has_a_named_source(self):
+        source = self.payload["parameter_source"]
+        self.assertIn("arXiv", source["weights_and_thresholds"])
+        self.assertIn("0.169", source["gating_constant_c"])
+        self.assertIn("CC BY", source["gating_constant_c"])
+
+    def test_the_corrections_are_recorded_not_quietly_applied(self):
+        corrections = " ".join(self.payload["errors_found_and_corrected"]).lower()
+        self.assertIn("equation 14", corrections)
+        self.assertIn("slope", corrections)
+
+    def test_the_disembodied_caveat_is_stated(self):
+        self.assertIn("DISEMBODIED", self.payload["protocol"]["caveat"])
 
     def test_it_does_not_claim_to_be_validated(self):
-        self.assertIn("not a validated", self.payload["claim"].lower())
+        self.assertIn("should not be treated as validated",
+                      self.payload["claim"].lower().replace("module ", ""))
 
 
 class Parameters(unittest.TestCase):

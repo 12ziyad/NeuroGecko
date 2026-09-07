@@ -67,36 +67,61 @@ def piecewise_linear(activation, threshold, slope=1.0):
 class GPRParameters:
     """Connection weights and thresholds of the GPR loop.
 
-    These are the parameters of Gurney, Prescott & Redgrave 2001, fitted to rat
-    basal ganglia and transplanted here on the lamprey-to-mammal conservation
-    argument section 3.3 makes (Stephenson-Jones 2011; Grillner 2013).
+    PUBLISHED values, from Girard et al., "Integration of navigation and action
+    selection functionalities in a computational model of cortico-basal
+    ganglia-thalamo-cortical loops", arXiv cs/0601004 -- Table 5 (thresholds and
+    slopes) and Equations 5-14 (weights) -- with the gating constant c = 0.169
+    from Prescott et al. 2024, Biomimetics 9(3):139, which is CC BY.
 
-    The corpus does NOT restate the individual weights -- it names the model and
-    gives the dopamine sweep -- so these come from the primary model rather than
-    from `docs/research/`. That is exactly why the acceptance test is the
-    published *behavioural* sweep and not the parameter values: if these are
-    wrong, the lambda sweep will not reproduce Prescott 2024's pattern, and the
-    test will say so.
+    `docs/research/` names the GPR model and gives the dopamine sweep but does
+    NOT restate these, so they were first reimplemented from recalled equations
+    and the sweep failed. Four of them were wrong, and one wrongly: **the slopes
+    are not all 1**. TRN runs at 0.5 and the ventrolateral thalamus at 0.62, and
+    that 0.62 is what holds the cortico-thalamic loop gain below one. Assuming
+    m = 1 everywhere put the loop exactly at the boundary of instability, which
+    is why the module oscillated at zero input. The failure had a cause, and the
+    cause was a number.
+
+    Corrected against the published table:
+
+        tau            40 ms -> 25 ms
+        STN -> EP/SNr  0.9   -> 0.8
+        GP  -> EP/SNr  0.3   -> 0.4
+        TRN -> VL      0.4   -> 0.13
+        gate c         0.2   -> 0.169
+        slopes         all 1 -> TRN 0.5, VL 0.62
+
+    Rat parameters, transplanted on the lamprey-to-mammal conservation argument
+    section 3.3 makes (Stephenson-Jones 2011; Grillner 2013).
     """
 
-    # striatum
+    # striatum: (1 +/- lambda) * cortical drive        [Eq 5, 6]
     d1_from_salience: float = 1.0
     d2_from_salience: float = 1.0
-    # subthalamic nucleus: excited by salience, inhibited by globus pallidus
+    # subthalamic nucleus: S_i - y_GP                    [Eq 8]
     stn_from_salience: float = 1.0
     stn_from_gpe: float = 1.0
-    # globus pallidus externa: diffuse STN excitation, focused D2 inhibition
-    gpe_from_stn: float = 0.9
+    # globus pallidus: -y_D2 + 0.8 * sum(y_STN)          [Eq 11]
+    gpe_from_stn: float = 0.8
     gpe_from_d2: float = 1.0
-    # output nucleus: diffuse STN excitation, focused D1 inhibition, GPe control
-    gpi_from_stn: float = 0.9
+    # output nucleus: -y_D1 - 0.4 y_GP + 0.8 sum(y_STN)  [Eq 9]
+    gpi_from_stn: float = 0.8
     gpi_from_d1: float = 1.0
-    gpi_from_gpe: float = 0.3
-    # output-function thresholds
+    gpi_from_gpe: float = 0.4
+    # output-function thresholds                          [Table 5]
     threshold_striatum: float = 0.2
     threshold_stn: float = -0.25
     threshold_gpe: float = -0.2
     threshold_gpi: float = -0.2
+    # output-function SLOPES [Table 5]. Not all 1: the 0.62 on the ventrolateral
+    # thalamus is what keeps the cortico-thalamic loop gain below one.
+    slope_striatum: float = 1.0
+    slope_stn: float = 1.0
+    slope_gpe: float = 1.0
+    slope_gpi: float = 1.0
+    slope_cortex: float = 1.0
+    slope_reticular: float = 0.5
+    slope_thalamus: float = 0.62
     # --- Humphries & Gurney 2002 thalamocortical loop ------------------------
     # Section 3.3 requires the EXTENDED model, and this loop is what "extended"
     # means. Without it the model still selects, but it has no persistence: a
@@ -109,19 +134,22 @@ class GPRParameters:
     # between 0 and 0.34 forever. The constraint is arithmetic; the particular
     # value below it is an engineering choice, because the corpus gives the
     # architecture and the dopamine sweep but not these weights.
-    cortex_from_thalamus: float = 0.5
+    # VL thalamus: y_cortex - y_EP - 0.13 * sum(y_TRN)  [Eq 12]
+    # TRN:         y_VL + y_cortex                        [Eq 13]
+    cortex_from_thalamus: float = 1.0
     thalamus_from_cortex: float = 1.0
     thalamus_from_gpi: float = 1.0
     reticular_from_cortex: float = 1.0
     reticular_from_thalamus: float = 1.0
-    thalamus_from_reticular: float = 0.4
+    thalamus_from_reticular: float = 0.13
     threshold_cortex: float = 0.0
-    threshold_thalamus: float = 0.0
+    threshold_thalamus: float = -0.8
     threshold_reticular: float = 0.0
-    # leaky-integrator time constant, seconds
-    tau_s: float = 0.04
-    # output scaling for the disinhibition gate
-    gate_scale: float = 0.2
+    # leaky-integrator time constant, seconds              [Table 5: tau = 25 ms]
+    tau_s: float = 0.025
+    # gating constant c in e_i = L(1 - y_SNr/c)
+    # [Prescott et al. 2024, Biomimetics 9(3):139, section 3.1.2, CC BY]
+    gate_scale: float = 0.169
 
     def __post_init__(self):
         for name, value in self.__dict__.items():
@@ -131,7 +159,11 @@ class GPRParameters:
             raise ValueError("tau_s must be positive.")
         if self.gate_scale <= 0:
             raise ValueError("gate_scale must be positive.")
-        loop_gain = self.cortex_from_thalamus * self.thalamus_from_cortex
+        # The cortico-thalamic loop is positive feedback, so its gain must stay
+        # below one. The published slope on the thalamus (0.62) is what supplies
+        # that margin: with the weights alone it sits exactly at 1.0.
+        loop_gain = (self.cortex_from_thalamus * self.thalamus_from_cortex
+                     * self.slope_thalamus)
         if loop_gain >= 1.0:
             raise ValueError(
                 f"Thalamocortical loop gain is {loop_gain:.3f}. Cortex -> thalamus -> "
@@ -170,28 +202,6 @@ class BasalGanglia:
         self._cortex = np.zeros(size)
         self._thalamus = np.zeros(size)
         self._reticular = np.zeros(size)
-        # `gate_scale` was an invented constant. Selection is release from TONIC
-        # inhibition, so the only non-arbitrary scale is the model's own resting
-        # output: at zero salience the gate must be exactly zero, because nothing
-        # has been selected. Measure that rest state once and use it.
-        self._resting_gpi = self._measure_resting_output()
-
-    def _measure_resting_output(self, seconds=30.0, dt=0.02):
-        """Steady-state GPi output with no salience anywhere."""
-        saved = {name: getattr(self, name).copy()
-                 for name in ("_d1", "_d2", "_stn", "_gpe", "_gpi",
-                              "_cortex", "_thalamus", "_reticular")}
-        try:
-            self.reset()
-            zero = np.zeros(self.n)
-            for _ in range(int(seconds / dt)):
-                self._advance(zero, dt)
-            return float(np.max(piecewise_linear(self._gpi,
-                                                 self.parameters.threshold_gpi)))
-        finally:
-            for name, value in saved.items():
-                getattr(self, name)[:] = value
-
     @property
     def n(self):
         return len(self.channels)
@@ -240,28 +250,32 @@ class BasalGanglia:
             # manufacture the difference rather than measure it.
             self._leak(self._cortex, salience, dt_s)
             gates = np.zeros(self.n)
-            drive = piecewise_linear(self._cortex, p.threshold_cortex)
+            drive = piecewise_linear(self._cortex, p.threshold_cortex, p.slope_cortex)
             if np.max(drive) > 0:
                 gates[int(np.argmax(drive))] = 1.0
             self._gpi = 1.0 - gates
             return gates
 
-        # The striatum is driven by CORTEX, not by raw salience: the loop is
-        # closed through the thalamus, and that closure is the persistence.
-        y_cortex = piecewise_linear(self._cortex, p.threshold_cortex)
-        y_thalamus = piecewise_linear(self._thalamus, p.threshold_thalamus)
-        y_reticular = piecewise_linear(self._reticular, p.threshold_reticular)
+        # Salience goes DIRECTLY to striatum and STN [Eq 5, 6, 8]. The cortex is
+        # a separate population driven only by thalamic return [Eq 14], and the
+        # cortex-VL-TRN loop supplies persistence WITHOUT gating the striatum.
+        # Driving the striatum from cortex instead -- the first implementation --
+        # saturated cortex at 1.0 for every competitive channel and destroyed all
+        # downstream discrimination.
+        y_cortex = piecewise_linear(self._cortex, p.threshold_cortex, p.slope_cortex)
+        y_thalamus = piecewise_linear(self._thalamus, p.threshold_thalamus, p.slope_thalamus)
+        y_reticular = piecewise_linear(self._reticular, p.threshold_reticular, p.slope_reticular)
 
         # Dopamine pushes the two striatal populations in opposite directions.
-        d1_input = p.d1_from_salience * y_cortex * (1.0 + self.dopamine)
-        d2_input = p.d2_from_salience * y_cortex * (1.0 - self.dopamine)
+        d1_input = p.d1_from_salience * salience * (1.0 + self.dopamine)
+        d2_input = p.d2_from_salience * salience * (1.0 - self.dopamine)
 
         # Outputs of the previous state drive this update, so the loop is a
         # dynamical system rather than an algebraic solve; persistence lives here.
-        y_d1 = piecewise_linear(self._d1, p.threshold_striatum)
-        y_d2 = piecewise_linear(self._d2, p.threshold_striatum)
-        y_stn = piecewise_linear(self._stn, p.threshold_stn)
-        y_gpe = piecewise_linear(self._gpe, p.threshold_gpe)
+        y_d1 = piecewise_linear(self._d1, p.threshold_striatum, p.slope_striatum)
+        y_d2 = piecewise_linear(self._d2, p.threshold_striatum, p.slope_striatum)
+        y_stn = piecewise_linear(self._stn, p.threshold_stn, p.slope_stn)
+        y_gpe = piecewise_linear(self._gpe, p.threshold_gpe, p.slope_gpe)
 
         # STN excitation is DIFFUSE: every GPe and GPi cell sees every STN
         # channel. Averaging instead of summing was tried, to stop the effective
@@ -269,7 +283,7 @@ class BasalGanglia:
         # entirely -- a clearly losing channel became fully released. Reverted.
         # The channel-count dependence is real and is recorded as a known defect.
         stn_total = float(np.sum(y_stn))
-        stn_input = p.stn_from_salience * y_cortex - p.stn_from_gpe * y_gpe
+        stn_input = p.stn_from_salience * salience - p.stn_from_gpe * y_gpe
         gpe_input = p.gpe_from_stn * stn_total - p.gpe_from_d2 * y_d2
         gpi_input = (p.gpi_from_stn * stn_total
                      - p.gpi_from_d1 * y_d1
@@ -285,14 +299,14 @@ class BasalGanglia:
         # basal ganglia output and by a DIFFUSE reticular signal; cortex is
         # driven by salience plus its own thalamic return. A disinhibited channel
         # therefore feeds itself, and a losing one is held down twice over.
-        y_gpi_previous = piecewise_linear(self._gpi, p.threshold_gpi)
+        y_gpi_previous = piecewise_linear(self._gpi, p.threshold_gpi, p.slope_gpi)
         reticular_total = float(np.sum(y_reticular))
         thalamus_input = (p.thalamus_from_cortex * y_cortex
                           - p.thalamus_from_gpi * y_gpi_previous
                           - p.thalamus_from_reticular * reticular_total)
         reticular_input = (p.reticular_from_cortex * y_cortex
                            + p.reticular_from_thalamus * y_thalamus)
-        cortex_input = salience + p.cortex_from_thalamus * y_thalamus
+        cortex_input = p.cortex_from_thalamus * y_thalamus       # [Eq 14]
         self._leak(self._thalamus, thalamus_input, dt_s)
         self._leak(self._reticular, reticular_input, dt_s)
         self._leak(self._cortex, cortex_input, dt_s)
@@ -305,7 +319,7 @@ class BasalGanglia:
         return self._gates_from(self._gpi)
 
     def _gates_from(self, gpi):
-        y_gpi = piecewise_linear(gpi, self.parameters.threshold_gpi)
+        y_gpi = piecewise_linear(gpi, self.parameters.threshold_gpi, self.parameters.slope_gpi)
         # Calibrating this to the model's own resting output was tried, to remove
         # an invented constant, and it collapsed the dynamic range so that every
         # dopamine level behaved identically. Reverted; the constant stays, and
@@ -343,6 +357,20 @@ class BasalGanglia:
             return 0
         return int(max(0, np.sum(gates >= fraction * best) - 1))
 
+    def distortion_amount(self, gates=None):
+        """Continuous partial expression of losers, as a fraction of the winner.
+
+        The integer count saturates: a runner-up at 63% of the winner and one at
+        100% both count as one distorted channel, so the count cannot show
+        distortion deepening with dopamine even though it does. This is the
+        quantity that moves.
+        """
+        gates = self.gates() if gates is None else np.asarray(gates, dtype=float)
+        best = float(np.max(gates))
+        if best <= 1e-9:
+            return 0.0
+        return float((np.sum(gates) - best) / best)
+
     def state(self):
         return {
             "channels": list(self.channels),
@@ -353,6 +381,7 @@ class BasalGanglia:
             "thalamus": self._thalamus.tolist(),
             "selected": self.selected(),
             "distortion": self.distortion(),
+            "distortion_amount": self.distortion_amount(),
         }
 
 

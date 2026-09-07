@@ -255,3 +255,37 @@ channel count, so the module is less stable the more behaviours the animal has.
 NOTHING IN THE REPOSITORY DEPENDS ON THIS MODULE. It is not wired into any
 environment and must not be until the sweep reproduces. The if/else arbiter on
 `target_interest` remains the live path.
+
+## Basal ganglia: unblocked on parameters, one published result still missing (Session 6b)
+
+Session 6 recorded this as blocked on a parameter table. The table was findable:
+Girard et al., arXiv cs/0601004, Table 5 and Equations 5-14 (open access), plus
+the gating constant c = 0.169 from Prescott et al. 2024, Biomimetics 9(3):139
+(CC BY). ModelDB 124111 is still unusable -- no licence anywhere -- and nothing
+from it is in this repository.
+
+With the published parameters, five of seven properties reproduce: the immobility
+gradient (93 s at lambda 0.03 falling monotonically to 0.1 s at 0.20), distortion
+deepening monotonically with dopamine, clean selection at baseline with separated
+saliences, stability at zero salience, and GPR differing from a winner-take-all.
+
+STILL OPEN: the switching ratio is inverted -- 0.3x from baseline to lambda 0.43
+against a published ~3x -- and GPR dithers LESS than a winner-take-all here (41
+against 146) where the published result is the opposite (21.3 against 9.2). That
+is the counterintuitive published finding and it does not come out.
+
+Most likely explanation, not demonstrated: the published counts are from a robot
+foraging task and this is a disembodied salience test. The corpus itself notes
+clean selection is lower disembodied (73-81%) than embodied (89-95%), so the two
+setups are known to differ. Closing this honestly means either reproducing the
+foraging task or obtaining the switching-bout definition from the Prescott 2024
+supplementary materials, which PMC lists but which were not retrievable.
+
+Also open, unchanged and recorded as an expectedFailure test: at zero salience
+every gate settles to the same nonzero value, so `selected` returns whichever
+channel the tie-break reaches rather than None. The oscillation that used to
+cause this is fixed; the residual tonic release is not.
+
+The module is NOT wired into any environment and must not be until the switching
+comparison reproduces or is shown to be a task difference. The if/else arbiter on
+target_interest remains the live path.

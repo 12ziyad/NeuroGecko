@@ -1990,3 +1990,111 @@ environment, and it must not be until the sweep reproduces.
 | 57 | Sigma-pi salience gates hunting on hunger AND prey | **Confirmed** | a sated gecko ignores visible prey; a hungry one with none explores |
 
 334 tests pass, one SciPy skip, **one expected failure**.
+
+# Session 6b — the parameters were findable, and two of my errors were structural
+
+Session 6 shipped the basal ganglia as NOT ACCEPTED, blocked on a parameter table
+the research corpus does not contain. The table turned out to be findable.
+
+## Where the numbers came from
+
+**Girard et al., "Integration of navigation and action selection functionalities
+in a computational model of cortico-basal ganglia-thalamo-cortical loops",
+arXiv cs/0601004** — Table 5 gives every threshold and slope, Equations 5–14 give
+every weight. Open access.
+
+**Prescott et al. 2024, Biomimetics 9(3):139**, CC BY, gives the gating constant
+**c = 0.169** in section 3.1.2 — the exact quantity I had invented as 0.2.
+
+MDPI returns 403 to automated fetches; PubMed Central carries the same article
+free. ModelDB 124111 remains unusable: no licence anywhere, so nothing from it is
+in this repository.
+
+## Six constants were wrong, and one of those mattered enormously
+
+| | mine | published |
+|---|---|---|
+| time constant | 40 ms | **25 ms** |
+| STN → EP/SNr | 0.9 | **0.8** |
+| GP → EP/SNr | 0.3 | **0.4** |
+| TRN → VL | 0.4 | **0.13** |
+| gating constant c | 0.2 | **0.169** |
+| output slopes | all 1 | **TRN 0.5, VL 0.62** |
+
+The slopes are the one that mattered. **They are not all 1**, and the 0.62 on the
+ventrolateral thalamus is precisely what holds the cortico-thalamic loop gain
+below one. Assuming m = 1 everywhere put that loop at exactly 1.0 — the boundary
+of positive-feedback instability — which is why Session 6 found the module
+oscillating at zero input and could not fix it. **The instability had a cause and
+the cause was a number.**
+
+My recalled *thresholds* were right (D1/D2 0.2, STN −0.25, GPe −0.2, GPi −0.2).
+The weights and slopes were not.
+
+## The structural error was worse than any constant
+
+Session 6 drove the **striatum from cortex**. Equation 14 is
+`I_cortex = y_VL` — the cortex is driven by the thalamic return **alone**, and
+salience enters the striatum and STN **directly** (Eq 5, 6, 8). The
+cortex–VL–TRN loop supplies persistence *without* gating the striatum.
+
+Driving the striatum from cortex saturated it at 1.0 for every competitive
+channel, so the top three channels looked identical to everything downstream and
+all discrimination was destroyed. No parameter would have fixed that.
+
+## And one of my failures was in the test, not the model
+
+Session 6 measured 825 switching bouts in 120 s — about **seven per second** —
+against a published ~7 per trial. The salience in that test carried fresh white
+noise at every 50 Hz step, so it was measuring the noise, not the animal.
+Salience now fluctuates as an Ornstein–Uhlenbeck process with a 2 s time
+constant, which is a behavioural timescale.
+
+## Where it stands now
+
+| | before | after |
+|---|---|---|
+| Immobility gradient | 120 s at every low lambda | **93 s → 59 s → 0.8 s → 0.1 s**, monotonic |
+| Distortion | saturated at 0.999 everywhere | **rises monotonically 0.001 → 1.11** |
+| Zero salience | oscillating | **stable** |
+| Separated saliences | selected, distortion 1 | **selected, distortion 0** |
+| Switching ratio | inverted | **still inverted** |
+
+Five of seven published properties now reproduce; before, two did.
+
+## What still does not reproduce, stated plainly
+
+The **switching ratio is inverted**: 0.3× from baseline to lambda 0.43 against a
+published ~3×. And GPR dithers *less* than a winner-take-all here (41 against
+146) where the published result is the opposite (21.3 against 9.2). That is the
+counterintuitive published finding and it does not come out.
+
+The published counts are from a **robot foraging task** and this is a
+disembodied salience test — the corpus itself notes clean selection is lower
+disembodied (73–81 %) than embodied (89–95 %). That may be sufficient
+explanation. **It is not demonstrated to be**, and the module is not treated as
+validated until it is.
+
+## Also corrected: a test that encoded a wrong expectation
+
+Session 6's test asserted zero distortion at *every* dopamine level with
+separated saliences. The published finding is that excess dopamine distorts
+selection even then — so the test forbade the correct behaviour. The winner
+being right is now asserted everywhere; clean losers only at baseline.
+
+`distortion()` also gained a continuous companion, `distortion_amount()`: the
+integer count cannot show distortion *deepening*, because a runner-up at 63 % of
+the winner and one at 100 % are both "one distorted channel".
+
+## Session 6b ledger
+
+| # | Hypothesis | Verdict | Evidence |
+|---|---|---|---|
+| 58 | The GPR parameters are unobtainable | **Refuted** | Table 5 of arXiv cs/0601004, plus c = 0.169 from a CC BY paper |
+| 59 | The oscillation was an unfixable structural flaw | **Refuted** | it was the slopes: VL 0.62 keeps the loop gain under one |
+| 60 | The striatum is driven by cortex | **Refuted** | Eq 14 drives cortex from thalamus alone; salience goes direct |
+| 61 | 825 switches per 120 s was a model failure | **Refuted** | 50 Hz white-noise salience; the test measured its own noise |
+| 62 | Distortion can be counted | **Refuted** | the count saturates; deepening needs a continuous measure |
+| 63 | Published parameters make the sweep reproduce | **Partly** | 5 of 7 properties; the switching ratio stays inverted |
+
+338 tests pass, one SciPy skip, one expected failure.

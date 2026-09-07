@@ -1,117 +1,105 @@
 {
- "schema_version": 1,
- "test": "Prescott et al. 2024 tonic-dopamine sweep against a reimplemented extended GPR",
- "source": "best_achievable_brain.md section 3.3: 18 lambda levels, 5 x 120 s robot trials",
+ "schema_version": 2,
+ "test": "Prescott et al. 2024 tonic-dopamine sweep against the extended GPR",
+ "parameter_source": {
+  "weights_and_thresholds": "Girard et al., 'Integration of navigation and action selection functionalities in a computational model of cortico-basal ganglia-thalamo-cortical loops', arXiv cs/0601004, Table 5 and Equations 5-14",
+  "gating_constant_c": "0.169, Prescott et al. 2024, Biomimetics 9(3):139 section 3.1.2 (CC BY)",
+  "note": "docs/research/ names the model and the sweep but restates neither the weights nor the thresholds. They were located by search after a first reimplementation from recalled equations failed this sweep."
+ },
  "protocol": {
   "trial_s": 120,
   "dt_s": 0.02,
   "channels": 6,
   "salience_gap": 0.05,
-  "noise_sd": 0.06,
-  "seed": 0,
-  "note": "disembodied; the corpus notes clean-selection rates are lower disembodied (73-81%) than on the robot (89-95%)"
+  "noise": "Ornstein-Uhlenbeck, sigma 0.10, tau 2 s -- salience fluctuating on a BEHAVIOURAL timescale. An earlier run used 50 Hz white noise and produced 825 switches in 120 s, about 7 per second, which measured the noise rather than the model.",
+  "caveat": "DISEMBODIED. The published counts come from a robot foraging task; the corpus itself notes clean selection is lower disembodied (73-81%) than embodied (89-95%). Absolute switching counts are therefore not directly comparable -- the task differs."
  },
  "rows": [
   {
-   "switches": 1,
-   "immobile_s": 119.94,
-   "mean_distortion": 0.0,
+   "switches": 8,
+   "immobile_s": 93.0,
+   "distortion_amount": 0.001,
    "dopamine": 0.03,
    "published": "38 s immobile"
   },
   {
-   "switches": 1,
-   "immobile_s": 119.92,
-   "mean_distortion": 0.001,
+   "switches": 31,
+   "immobile_s": 59.4,
+   "distortion_amount": 0.001,
    "dopamine": 0.06,
    "published": "14 s immobile"
   },
   {
-   "switches": 63,
-   "immobile_s": 15.64,
-   "mean_distortion": 0.002,
+   "switches": 129,
+   "immobile_s": 0.8,
+   "distortion_amount": 0.126,
    "dopamine": 0.12,
    "published": "below 75% vigour"
   },
   {
-   "switches": 131,
-   "immobile_s": 0.14,
-   "mean_distortion": 0.434,
+   "switches": 134,
+   "immobile_s": 0.1,
+   "distortion_amount": 0.408,
    "dopamine": 0.2,
    "published": "89-95% clean; ~7 switching bouts"
   },
   {
-   "switches": 121,
-   "immobile_s": 0.08,
-   "mean_distortion": 0.944,
+   "switches": 148,
+   "immobile_s": 0.1,
+   "distortion_amount": 0.728,
    "dopamine": 0.29,
    "published": "clean"
   },
   {
-   "switches": 119,
-   "immobile_s": 0.08,
-   "mean_distortion": 0.99,
+   "switches": 110,
+   "immobile_s": 0.1,
+   "distortion_amount": 0.801,
    "dopamine": 0.31,
    "published": "distortion appears"
   },
   {
-   "switches": 11,
-   "immobile_s": 0.08,
-   "mean_distortion": 0.999,
+   "switches": 54,
+   "immobile_s": 0.1,
+   "distortion_amount": 0.964,
    "dopamine": 0.37,
    "published": "clean"
   },
   {
-   "switches": 1,
-   "immobile_s": 0.08,
-   "mean_distortion": 0.999,
+   "switches": 41,
+   "immobile_s": 0.1,
+   "distortion_amount": 1.069,
    "dopamine": 0.43,
    "published": "most fail; ~21.3 switches"
   },
   {
-   "switches": 1,
-   "immobile_s": 0.08,
-   "mean_distortion": 0.999,
+   "switches": 37,
+   "immobile_s": 0.1,
+   "distortion_amount": 1.11,
    "dopamine": 0.46,
    "published": "every trial fails"
   }
  ],
  "winner_take_all_at_0.43": {
-  "switches": 751,
+  "switches": 146,
   "immobile_s": 0.0,
-  "mean_distortion": 0.0
+  "distortion_amount": 0.0
  },
- "well_separated_at_baseline": {
-  "switches": 1,
-  "immobile_s": 0.08,
-  "mean_distortion": 0.0
- },
- "verdict": "DOES NOT REPRODUCE -- module NOT ACCEPTED",
+ "verdict": "PARTIALLY REPRODUCES",
  "reproduced": [
-  "immobility at lambda <= 0.06",
-  "distortion rises with lambda",
-  "nothing is selected when nothing is salient",
-  "GPR and winner-take-all behave differently"
+  "the immobility gradient: 93 s at lambda 0.03, 59 s at 0.06, 0.8 s at 0.12, 0.1 s from 0.20 -- monotonic and in the published direction",
+  "distortion deepening monotonically with dopamine",
+  "clean selection at baseline dopamine with separated saliences",
+  "stability at zero salience (the earlier implementation oscillated)",
+  "GPR and winner-take-all differ"
  ],
  "not_reproduced": [
-  "switching pattern is inverted against the published sweep",
-  "a clearly losing channel (salience 0.30 against 0.55) is fully released, so the model does not discriminate; GPi separation is insufficient",
-  "the published result that GPR dithers MORE than a winner-take-all at high dopamine"
+  "the switching ratio is inverted: 0.3x from baseline to lambda 0.43 against a published ~3x",
+  "GPR dithers LESS than the winner-take-all here (41 against 146); the published result is the opposite (21.3 against 9.2). This is the counterintuitive published finding and it does not come out. The task differs from the published robot foraging task, which may be sufficient explanation, but it is not demonstrated to be."
  ],
- "structural_defects_found_and_fixed": [
-  "thalamocortical loop gain was exactly 1.0, the boundary of positive-feedback instability: the module oscillated at zero input, cycling gates between 0 and 0.34. Fixed by requiring the loop gain below 1, which is now asserted in the constructor."
+ "errors_found_and_corrected": [
+  "the striatum was driven by cortex rather than by salience directly. Equation 14 gives the cortex input as the thalamic return ALONE, with salience entering the striatum and STN directly (Eq 5, 6, 8). Driving the striatum from cortex saturated it at 1.0 for every competitive channel and destroyed all downstream discrimination.",
+  "the output-function slopes are not all 1: TRN is 0.5 and the ventrolateral thalamus 0.62, and that 0.62 is what holds the cortico-thalamic loop gain below one. Assuming m=1 put the loop exactly at the boundary of instability and the module oscillated at zero input.",
+  "tau 40 ms -> 25 ms; STN->EP/SNr 0.9 -> 0.8; GP->EP/SNr 0.3 -> 0.4; TRN->VL 0.4 -> 0.13; gating constant c 0.2 -> 0.169"
  ],
- "root_cause": "The corpus names the GPR model and gives the behavioural sweep but does NOT state the connection weights or thresholds. Those were reimplemented from the equations without the primary parameter table. Three structural defects were found by reasoning about stability rather than by fitting, and fixed. The remaining discrimination failure is a parameter problem, and further adjustment would be fitting the model to the answer.",
- "to_finish": [
-  "obtain the Gurney, Prescott & Redgrave 2001 parameter table from the primary paper, or email Girard for the ModelDB 124111 licence, then re-run this sweep unchanged"
- ],
- "claim": "Instrumented simulation diagnostics. A recorded negative result, not a validated action-selection model. No behaviour in this repository should depend on it yet.",
- "structural_defects_found_and_NOT_fixed": [
-  "the diffuse STN-GPe loop still oscillates at zero salience: its effective gain grows with channel count, so a six-behaviour animal is less stable than a three-behaviour one purely for having more behaviours. Averaging the diffuse drive cures the oscillation and destroys the discrimination, so it is not a fix. Recorded as an expectedFailure test.",
-  "a clearly losing channel is not cleanly suppressed at high dopamine: GPi separation is insufficient, which is the parameter problem below."
- ],
- "also_tried_and_reverted": [
-  "averaging the diffuse STN drive instead of summing it: cured the zero-input oscillation, destroyed discrimination entirely",
-  "calibrating the gate scale to the model's own tonic output, to remove an invented constant: collapsed the dynamic range so every dopamine level behaved identically"
- ]
+ "claim": "Instrumented simulation diagnostics with published parameters. The selection mechanism and its dopamine dependence reproduce in direction; the switching-rate comparison does not, and the module should not be treated as validated until it does or until the discrepancy is shown to be the task."
 }
