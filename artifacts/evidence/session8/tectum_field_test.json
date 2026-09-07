@@ -1,0 +1,62 @@
+{
+ "schema_version": 1,
+ "test": "does the tectum's reported bearing track the prey in the world",
+ "generated_by": "tools/tectum_field_test.py",
+ "criterion": {
+  "correlation_floor": 0.5,
+  "mean_error_ceiling_deg": 20.0,
+  "provenance": "INVENTED, and deliberately low -- a detector even loosely pointing at the prey would clear it.",
+  "note": "The hit rate is NOT the test. A detector that fires constantly on the wrong thing scores a high hit rate and a correlation of zero, which is what happens here."
+ },
+ "prey_size_in_map": [
+  {
+   "distance_m": 0.1,
+   "subtends_deg": 10.29,
+   "pixels": 8.21,
+   "cells_at_16": 2.05
+  },
+  {
+   "distance_m": 0.2,
+   "subtends_deg": 5.15,
+   "pixels": 4.11,
+   "cells_at_16": 1.03
+  },
+  {
+   "distance_m": 0.3,
+   "subtends_deg": 3.44,
+   "pixels": 2.74,
+   "cells_at_16": 0.69
+  },
+  {
+   "distance_m": 0.5,
+   "subtends_deg": 2.06,
+   "pixels": 1.65,
+   "cells_at_16": 0.41
+  }
+ ],
+ "results": [
+  {
+   "cells": 16,
+   "frames": 149,
+   "fired_fraction": 0.993,
+   "correlation": -0.0292,
+   "mean_abs_error_deg": 63.02
+  },
+  {
+   "cells": 32,
+   "frames": 149,
+   "fired_fraction": 0.993,
+   "correlation": 0.0364,
+   "mean_abs_error_deg": 64.34
+  },
+  {
+   "cells": 64,
+   "frames": 149,
+   "fired_fraction": 0.993,
+   "correlation": 0.104,
+   "mean_abs_error_deg": 60.21
+  }
+ ],
+ "passed": false,
+ "verdict": "NOT ACCEPTED. The tectum fires on almost every frame and the bearing it reports is uncorrelated with the prey's. It works on synthetic stimuli -- correct bearing everywhere in the field, silent on a still world, silent on pure self-motion -- and does not transfer to the environment, where the animal's own body and the floor sliding past produce more motion than a prey that covers less than one cell beyond 0.20 m. Raising the map to full pixel resolution reaches only 0.21. Resolution is therefore part of the cause and not the whole of it, and no fix is claimed here."
+}

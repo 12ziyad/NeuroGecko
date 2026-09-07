@@ -177,5 +177,87 @@ class WhatCannotBeTestedIsRecordedAsSuch(unittest.TestCase):
                          "binocular test becomes runnable and must be run")
 
 
+class TheTectumOnSyntheticStimuli(unittest.TestCase):
+    """What it does get right. None of this is evidence that it works in the
+    world -- see TheTectumDoesNotYetWorkInTheWorld below."""
+
+    def _eye(self, **kw):
+        _t = _load("_tectum_test", "brain/tectum.py")
+        retina = Retina(fovy_deg=70.0, pixels=64, cells=16)
+        return retina, _t.Tectum(retina, **kw)
+
+    def _cricket(self, column, shift=0):
+        frame = np.full((64, 64, 3), 60, np.uint8)
+        c = int(column + shift)
+        frame[30:34, c:c + 3, 1] = 210
+        frame[30:34, c:c + 3, 2] = 180
+        return frame
+
+    def test_it_reports_the_side_the_target_is_on(self):
+        retina, tectum = self._eye()
+        for column, expect_negative in ((8, True), (50, False)):
+            retina.reset()
+            tectum.step(retina.step(self._cricket(column)))
+            salience, bearing = tectum.step(retina.step(self._cricket(column, 2)))
+            self.assertGreater(salience, 0.5)
+            self.assertEqual(bearing < 0, expect_negative,
+                             f"column {column} -> bearing {bearing}")
+
+    def test_a_still_world_is_silent(self):
+        retina, tectum = self._eye()
+        frame = self._cricket(31)
+        retina.step(frame)
+        self.assertEqual(tectum.step(retina.step(frame))[0], 0.0)
+
+    def test_pure_self_motion_is_silent(self):
+        """A walking gecko must not hunt its own optic flow."""
+        retina, tectum = self._eye()
+        retina.reset()
+        for i in range(6):
+            out = retina.step(_okr.drum_frame(retina, 30.0 * i * 0.02))
+        self.assertEqual(tectum.step(out)[0], 0.0)
+
+    def test_the_size_test_runs_before_the_subtraction(self):
+        """Order matters and was wrong first: subtracting the field first
+        leaves a ragged residual whose peaks then look small and local and slip
+        through. Measured 0.066 the wrong way round, 0.000 this way."""
+        source = _load("_tectum_src", "brain/tectum.py").Tectum.step.__doc__ or ""
+        body = pathlib.Path(REPO / "brain/tectum.py").read_text(encoding="utf-8")
+        self.assertIn("ORDER MATTERS", body)
+        self.assertLess(body.index("fills the field"), body.index("subtract_field:"))
+
+
+class TheTectumDoesNotYetWorkInTheWorld(unittest.TestCase):
+    """Recorded as a failure rather than hidden. The module is not accepted."""
+
+    def test_the_field_evidence_says_not_accepted(self):
+        import json
+        evidence = REPO / "artifacts/evidence/session8/tectum_field_test.json"
+        if not evidence.is_file():
+            self.skipTest("run tools/tectum_field_test.py first")
+        payload = json.loads(evidence.read_text(encoding="utf-8"))
+        self.assertFalse(payload["passed"])
+        self.assertIn("NOT ACCEPTED", payload["verdict"])
+        # The specific shape of the failure: it fires constantly and the
+        # bearing means nothing. A high hit rate is not evidence.
+        best = max(r["correlation"] for r in payload["results"]
+                   if r["correlation"] is not None)
+        self.assertLess(best, 0.5)
+
+    def test_the_eye_is_off_by_default(self):
+        """It must not become the live prey signal while it does not work."""
+        from envs.gecko_brain_env import GeckoBrainEnv
+        env = GeckoBrainEnv()
+        try:
+            self.assertIsNone(env.eye)
+        finally:
+            env.close()
+
+    def test_the_prey_is_smaller_than_one_cell_at_typical_range(self):
+        """Part of the cause, and a hard constraint: at 0.30 m the prey covers
+        0.69 of a cell on the 16x16 map."""
+        self.assertLess(_r.resolvable(70.0, 64, 3.44) / 4.0, 1.0)
+
+
 if __name__ == "__main__":
     unittest.main()

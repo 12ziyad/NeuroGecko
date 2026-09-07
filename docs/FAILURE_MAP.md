@@ -3,7 +3,7 @@
 **One document. Everything tried, everything that failed, why, and what fixed it.**
 Past, present, future. Updated every session; nothing removed.
 
-Last updated: Session 8b.
+Last updated: Session 8c.
 
 ---
 
@@ -34,8 +34,8 @@ later turned out to be right gets a second row, not an edit.
 | **Brain 2/8 — basal ganglia** (action selection) | ✅ reproduces the published table, mean error 0.10 pp |
 | **Brain 3a/8 — spinal rhythm** (the leg oscillators) | ✅ drives the walker, every gate unchanged |
 | **Brain 3b/8 — brainstem** (decision → command) | ✅ built; thinnest evidence in the project, declared |
-| **Brain 4a/8 — retina + pretectum** (seeing, gaze) | 🟡 built; the published optokinetic asymmetry reproduces |
-| Brain 4b–8 — tectum, sleep, memory | ❌ |
+| **Brain 4/8 — eye** (retina, pretectum, tectum) | 🟡 gaze reproduces; **prey-finding NOT ACCEPTED** |
+| Brains 5–8 — sleep, memory, and the rest | ❌ |
 | **Proof** — 15-test battery | 🟡 1 run (A3, failed then fixed) |
 
 **Roughly 50 % done.** The irreversible parts — the research and the body — are
@@ -142,17 +142,18 @@ Where the work went, in order, and where it stopped each time. **71 commits.**
 
 ### ← Where we are paused, right now
 
-- **Done and pushed:** everything above, 449 tests green.
+- **Done and pushed:** everything above, 456 tests green.
 - **Running in the background:** a hunt for why our dopamine curve sits +0.10
   high. Not a blocker; nothing depends on it.
 - **Brain 3 is finished.** The cord drives the walker with every gate
   unchanged, and the brainstem turns a decision into a stride frequency and a
   turn.
-- **Half done:** the retina keeps position and the pretectum reproduces the
-  published optokinetic asymmetry. Neither is wired into the environment yet.
-- **Next up, not started:** the tectum — turning the retinotopic map into a
-  bearing and a prey salience, and replacing the colour-matching placeholder
-  that stands in for it.
+- **Built and NOT ACCEPTED:** the tectum. It finds a synthetic cricket
+  perfectly and cannot find a real one with a body attached — 99.3% hit rate,
+  correlation −0.03. Committed with the evidence, off by default.
+- **Next up:** either make the prey findable (it covers less than one cell at
+  working range) or accept that vision alone cannot do it and look at what the
+  animal actually uses at that range.
 
 ---
 
@@ -702,6 +703,52 @@ side effect of a vision module.
 
 ---
 
+## Ledger — the tectum, shipped NOT ACCEPTED (Session 8c)
+
+The eye is complete and the prey-finding half **does not work**. It is committed
+that way, with the evidence, exactly as the basal ganglia was in Session 6.
+
+| # | Hypothesis | Verdict | Evidence |
+|---|---|---|---|
+| 127 | The tectum finds prey on synthetic stimuli | **Confirmed** | correct bearing at every position, silent on a still world, silent on pure self-motion |
+| 128 | It finds prey in the **environment** | **Refuted** | fires on **99.3%** of frames and the bearing correlates **−0.03** with the prey's. Mean error **63°** |
+| 129 | The failure is the map being too coarse | **Partly** | full pixel resolution reaches only **+0.10**. Resolution is part of the cause, not the whole |
+| 130 | The prey is resolvable in the map at working range | **Refuted** | it covers **0.69 of one cell at 0.30 m** and 0.41 at 0.50 m |
+| 131 | My self-motion control demonstrated what I claimed | **Refuted** | the **size test** was doing the work; field subtraction is worth a fourfold reduction, not elimination |
+| 132 | The order of the two rejection tests is arbitrary | **Refuted** | size test *after* subtraction leaks **0.066**; *before*, **0.000** |
+
+### #128 — a detector with a 99% hit rate and no information
+
+This is the entry worth re-reading. The tectum reports a target on almost every
+frame, so any summary that counted "did it see something" would call it a
+success. The bearing it reports is uncorrelated with where the prey actually is.
+
+**A hit rate is not a measurement.** The test is the correlation, and the
+correlation is zero.
+
+The cause is not mysterious: the animal's own body and the floor sliding past
+generate more motion than a prey covering less than one cell. Raising the map to
+full pixel resolution moves the correlation from −0.03 to +0.10, which says
+resolution is a contributor and not the answer. **No fix is claimed.**
+
+### #131 → #132 — two errors in my own controls
+
+The first version of the self-motion control showed 0.000 with and without
+field subtraction, and I nearly recorded that as "the subtraction works". It was
+the size test rejecting the stimulus in both arms; the control tested nothing.
+Isolating properly showed the subtraction is worth 1.000 → 0.266.
+
+Then the two mechanisms turned out to **interact badly**: subtracting first
+leaves a ragged residual whose surviving peaks look small and local, and it
+slips past the size test. Asking "does this fill the field?" of the raw map
+first fixes it.
+
+**What works:** the gaze reflex, the retinotopic map, the published optokinetic
+asymmetry. **What does not:** finding prey with a body attached. The eye is off
+by default and a test keeps it off.
+
+---
+
 ## My own errors — the meta-ledger
 
 Failures of method, not of hypothesis. These are the ones worth re-reading.
@@ -800,12 +847,12 @@ shortfall.
 
 | | |
 |---|---|
-| Hypotheses tested | **126** |
-| Refuted | **94** |
-| Confirmed | **24** |
-| Partly | **7** |
-| My own method errors | **24** |
-| Tests passing | **449**, no expected failures |
+| Hypotheses tested | **132** |
+| Refuted | **98** |
+| Confirmed | **25** |
+| Partly | **8** |
+| My own method errors | **26** |
+| Tests passing | **456**, no expected failures |
 
 **Seventy-three per cent of everything tried was wrong.** That is what the map
 is made of.

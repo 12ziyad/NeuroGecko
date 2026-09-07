@@ -173,6 +173,7 @@ class GeckoBrainEnv(gym.Env):
         homeostasis: bool = False,
         homeostasis_time_compression: float = 1.0,
         action_selection: bool = False,
+        eye: bool = False,
     ):
         super().__init__()
         self.policy_camera_mode = str(policy_camera_mode)
@@ -313,6 +314,16 @@ class GeckoBrainEnv(gym.Env):
         # one-behaviour body would look like integration and mean nothing.
         # What this DOES buy is the two modules running together on live data
         # every step, which is the only way the seam gets exercised.
+        # Brain module 4. When present it REPLACES the colour matcher: prey
+        # visibility becomes a small-moving-target response over a retinotopic
+        # map, and a bearing comes with it, which the colour matcher never
+        # produced. Off by default, because turning it on changes what the
+        # policy is given and no trained checkpoint has seen it.
+        self.eye = None
+        if eye:
+            from brain.tectum import Eye
+            self.eye = Eye(fovy_deg=70.0, pixels=64, cells=16)
+
         self.selector = None
         if action_selection:
             if not homeostasis:
@@ -563,6 +574,8 @@ class GeckoBrainEnv(gym.Env):
             self.homeostasis.reset()
         if self.selector is not None:
             self.selector.reset()
+        if self.eye is not None:
+            self.eye.reset()
         self._step = 0
         self._prev_action = np.zeros(4, dtype=np.float32)
         self._smooth_lookat = None
@@ -663,7 +676,20 @@ class GeckoBrainEnv(gym.Env):
 
         obs = self._obs()
         food_visible_frac = _food_visible_frac(obs["image"], self._food_rgb)
-        food_visible_signal = min(food_visible_frac / 0.012, 1.0)
+        prey_bearing_deg = None
+        if self.eye is not None:
+            # The eye supersedes the colour matcher. Its salience is already
+            # in [0, 1] and is what the selector consumes; the colour figure
+            # stays in info so the two can be compared on the same frames.
+            seen = self.eye.step(obs["image"], total_dt)
+            food_visible_frac = float(seen["prey_salience"])
+            prey_bearing_deg = float(seen["prey_bearing_deg"])
+        # The colour matcher reports an AREA FRACTION, so it is rescaled: a
+        # 3 px prey covers under 1% of the frame. The eye reports a salience
+        # that is already in [0, 1], and putting it through the same divisor
+        # would saturate it to 1.0 for anything visible at all.
+        food_visible_signal = (float(food_visible_frac) if self.eye is not None
+                               else min(food_visible_frac / 0.012, 1.0))
 
         # Brain 1 -> brain 2, on live data. Threat is the same danger signal the
         # reward uses; prey_visible is what the retina-substitute actually
@@ -692,6 +718,8 @@ class GeckoBrainEnv(gym.Env):
             "progress": float(progress),
             "moving_speed": float(moving_speed),
             "food_visible_frac": float(food_visible_frac),
+            "prey_bearing_deg": prey_bearing_deg,
+            "vision_source": "eye" if self.eye is not None else "colour_match",
             "food_visible_signal": float(food_visible_signal),
             "food_radius": float(self.food_radius),
             "reward_progress": float(r_progress),
