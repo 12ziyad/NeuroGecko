@@ -817,6 +817,55 @@
         "source": "User Session 2 minimum engineering viability requirements", "confidence": "uncertain", "recording_temp_C": null,
         "notes": "Every named limb must pass. Duty .78 is informed by Jagnandan & Higham2017; .435 phase is supplied near-trot target. Tolerances and speed/load cutoffs are engineering gates, not animal confidence intervals. Also require full no-fall rollout and independently measured entrainment."
       },
+      "prey_escape_speed_m_s": {
+        "value": 0.118,
+        "units": "m/s", "species": "Acheta/cricket (prey, not the gecko)", "sample_size": null,
+        "source": "DERIVED, not published: escape dash length 28-43 mm and dash duration ~0.3 s appear separately in docs/research/strategy_v1.md; the corpus never prints their quotient. Midpoint 35.5 mm / 0.3 s = 0.118 m/s.",
+        "confidence": "uncertain", "recording_temp_C": null,
+        "notes": "NO published cricket escape SPEED exists anywhere in the corpus. This is a quotient of two separately reported quantities and must never be cited as a measured escape speed. Range implied by the endpoints is 0.093-0.143 m/s. Note the consequence: the lab walker moves at 0.055 m/s, so prey fleeing at this speed CANNOT be run down. That is biologically correct -- capture success 82.9% on evasive prey is achieved by a strike at 0.851 m/s from 2.03 cm, not by pursuit -- and it means a hunting gate is meaningless until a strike behaviour exists."
+      },
+      "prey_flee_radius_m": {
+        "value": 0.075,
+        "units": "m", "species": "INVENTED", "sample_size": null,
+        "source": "Engineering trigger distance; the corpus's own suggestion is 'gecko head within ~5-10 cm and closing', itself tagged as a finite-state-machine design choice rather than a measurement.",
+        "confidence": "uncertain", "recording_temp_C": null,
+        "notes": "No published distance at which a cricket initiates escape from an approaching gecko. Midpoint of the corpus's own 5-10 cm engineering suggestion. It is deliberately larger than the 2.03 cm strike trigger distance so that prey reacts before the gecko is in strike range, which is what makes the prey evasive at all."
+      },
+      "prey_escape_latency_s": {
+        "value": 0.085,
+        "units": "s", "species": "cricket", "sample_size": null,
+        "source": "Published escape-response latency: 70-86 ms tethered, ~104 ms free-walking.",
+        "confidence": "likely", "recording_temp_C": null,
+        "notes": "Midpoint of the tethered band. The free-walking figure is longer (~104 ms) and is arguably the better match for an unrestrained cricket; 85 ms is the more conservative choice because a shorter latency makes the prey harder, not easier. Modelled as a fixed delay, not the corpus's suggested N(85,40) ms distribution, because a distribution would need a threat-speed dependence that has no measured form."
+      },
+      "prey_capture_distance_m": {
+        "value": 0.040704,
+        "units": "m", "species": "E_macularius", "sample_size": null,
+        "source": "Strike trigger distance for evasive prey, 2.03 +/- 0.08 cm = 0.384 SVL, scaled to this body's 0.106 m SVL.",
+        "confidence": "uncertain", "recording_temp_C": null,
+        "notes": "This is the distance a real gecko LAUNCHES A STRIKE from, not the distance at which prey is in its mouth. It is used as the capture proxy only because no strike behaviour exists yet; the moment one does, this becomes the strike trigger and capture becomes the outcome of the strike. Recording it this way keeps the substitution visible instead of burying a generous capture radius. For contrast, the brain environment's existing eat_radius is 0.10 m, roughly five times this distance."
+      },
+      "prey_radius_m": {
+        "value": 0.009,
+        "units": "m", "species": "INVENTED", "sample_size": null,
+        "source": "Sphere proxy. Published prey size is 15-20 mm for a ~50 mm SVL gecko = 0.30-0.40 SVL; at 0.35 SVL this body's prey is ~37 mm long. The sphere radius is a crude stand-in for that body, not a measured dimension.",
+        "confidence": "uncertain", "recording_temp_C": null,
+        "notes": "A sphere is not a cricket. Radius chosen so the prey subtends a visual angle in the same range as the published prey rather than to match any measured dimension. Prey shape, legs, antennae and the way a cricket's silhouette changes as it turns are all absent."
+      },
+      "prey_arena_radius_m": {
+        "value": 0.40,
+        "units": "m", "species": "INVENTED", "sample_size": null,
+        "source": "Engineering bound on where prey may be placed and how far it may flee.",
+        "confidence": "uncertain", "recording_temp_C": null,
+        "notes": "Not an enclosure size. Published arenas are far larger -- McElroy 2008 used a 5.2 m racetrack -- and terrarium size has a published null effect on activity (P = 0.926). This radius exists so prey stays inside the camera's world during a 20-300 s episode, and should be revisited when a real enclosure with shelter is built."
+      },
+      "prey_visible_prey_note": {
+        "value": "see notes",
+        "units": "none", "species": "E_macularius", "sample_size": null,
+        "source": "Capture success 82.9% overall on evasive crickets (77.0% intact, 78.6% post-autotomy, not significantly different); 100% (53/53) on non-evasive mealworms.",
+        "confidence": "likely", "recording_temp_C": null,
+        "notes": "Do not push a hunting policy to 100% on evasive prey: the real animal misses roughly one in five. A model that never misses has been fitted to the harness rather than the animal."
+      },
       "lab_base_parameters": {
         "value": {"mirror_left_fa":true,"hind_lift_multiplier":-1.3333333333333333,"front_stance_press":0.05,"front_stance_press_fr":0.05,"front_swing_lift":-0.4,"front_stance_seek":0.0,"front_seek_relax":0.35,"shoulder_sprawl_tuck":0.0,"fore_hind_amplitude_ratio":0.54,"hind_fa_amplitude":0.98,"heading_gain":1.0,"continuous_front_lift":true,"other_amplitude":0.0,"spine_amp":0.30,"tail_amp":0.15,"tail_phase_lag":0.15,"hind_sprawl_amplitude":0.0,"fore_sprawl_amplitude":0.0,"sprawl_phase":0.0,"tail_hindlimb_coupling":0.36},
         "units": "normalized actuator half-ranges except tuck radians and heading_gain per radian", "species": "INVENTED", "sample_size": null,

@@ -211,3 +211,33 @@ normalizer, with stop-command and gaze-ownership changes tested explicitly.
     moves +3.8% where Jagnandan & Higham report −11%. One gain on femur
     retraction cannot produce a per-joint pattern, and adding per-joint gains
     until the table goes green would be fitting the harness to the answer.
+
+24. **The world is generated, not hand-edited.** `utils/build_world.py` derives it
+    from the validated body and asserts the animal is unchanged, by name, at build
+    time. The body's SHA256 is pinned by the training evidence contract, so an
+    in-place edit to retexture a floor would invalidate every measurement citing
+    that hash without anything failing to say so.
+25. **Removing a privileged channel means removing every copy of it.** The target
+    bearing reached the policy twice: as five observations and as the lab
+    controller's steering input. A test pins that both go together.
+26. **The reward's use of target distance is a separate shortcut and stays
+    recorded.** A reward is external to the animal by construction; folding it
+    into the observation cheat would let the harder problem hide behind the
+    easier fix.
+27. **Prey is mocap.** A free-jointed prey would add degrees of freedom to
+    qpos/qvel and shift every index downstream — changing the animal's own state
+    vector in order to add a world object.
+28. **Cricket escape speed is DERIVED, never cited as measured.** No published
+    value exists in the corpus; 0.118 m/s is the quotient of a published dash
+    length and a published dash duration that the corpus itself never divides.
+29. **No hunting gate before a strike exists.** The walker cannot outrun fleeing
+    prey and is not supposed to: the published 82.9% capture rate comes from a
+    0.851 m/s strike launched at 2.03 cm. A capture rate measured without a strike
+    would be measuring the wrong animal. Note also that a 16-20 ms strike is
+    shorter than one 50 Hz control step, so scoring one needs 500 Hz sampling.
+30. **Camera field of view is anchored; resolution is not.** 70 deg is chosen
+    because it makes the 1.6 deg dot the animal is measured to track span more
+    than one pixel. The corpus holds five incompatible resolution
+    recommendations, all INVENTED, and no gecko grating acuity has ever been
+    published — so resolution stays at 64x64 and stays an open question rather
+    than a quiet choice.

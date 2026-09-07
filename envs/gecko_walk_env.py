@@ -73,7 +73,8 @@ class GeckoWalkEnv(gym.Env):
                  render_mode=None, seed=None, gait_profile="legacy", lab_parameters=None,
                  hind_stance_compensation=False, front_lift_residual_scale=None,
                  stance_target_clearance_m=None, stance_sprawl_nodes=None,
-                 stance_sprawl_limit_rad=None):
+                 stance_sprawl_limit_rad=None, privileged_target=True,
+                 prey_parameters=None):
         super().__init__()
         self.model = mujoco.MjModel.from_xml_path(str(xml_path or DEFAULT_XML))
         self.data = mujoco.MjData(self.model)
@@ -84,6 +85,18 @@ class GeckoWalkEnv(gym.Env):
         self.max_steps = int(max_steps)
         self.target_radius = float(target_radius)
         self.reach_dist = float(reach_dist)
+        # The five task observations hand the policy the target's bearing and
+        # range directly: the animal is told where the food is instead of
+        # looking for it, and the lab controller is additionally steered by the
+        # same privileged bearing. With this False the policy must find the
+        # target through the camera, and the controller steers straight.
+        #
+        # The REWARD still uses target distance. That is a separate shortcut,
+        # named in docs/HANDOFF.md alongside oracle supervision, and it is not
+        # in the animal's senses -- a reward is external by construction. It is
+        # left in place and left recorded rather than quietly conflated with
+        # this one.
+        self.privileged_target = bool(privileged_target)
         self.action_scale = float(action_scale)
         self.action_ema = float(action_ema)
         self.reset_noise = float(reset_noise)
@@ -95,6 +108,22 @@ class GeckoWalkEnv(gym.Env):
         self.front_swing_lift = float(front_swing_lift)
         self.render_mode = render_mode
         self._rng = np.random.default_rng(seed)
+        # Prey is opt-in and needs a world that has somewhere to put it. The
+        # mocap body renders to the camera and never enters qpos, so an episode
+        # with prey has exactly the same physics state as one without.
+        self.prey = None
+        self._prey_mocap = -1
+        if prey_parameters is not None:
+            from envs.prey import FleeingPrey
+            body = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_BODY, "prey")
+            if body < 0:
+                raise ValueError("This model has no prey body. Generate a world with "
+                                 "utils/build_world.py --prey-radius before asking for prey.")
+            self._prey_mocap = int(self.model.body_mocapid[body])
+            if self._prey_mocap < 0:
+                raise ValueError("The prey body must be mocap so it stays out of qpos.")
+            self.prey = FleeingPrey(prey_parameters, height_m=prey_parameters.radius_m,
+                                    rng=self._rng)
         self.gait = LateralSequenceCPG(gait_profile=gait_profile)
         self.gait_profile = self.gait.gait_profile
         from rewards.walk_reward import WalkReward, lab_reward_calibration
@@ -194,6 +223,18 @@ class GeckoWalkEnv(gym.Env):
         self._renderer = None
 
     @property
+    def observation_layout(self):
+        """Named observation blocks, so a shape change is legible in a config."""
+        blocks = [("joint_position", 32), ("joint_velocity", 32), ("tendon_position", 3),
+                  ("tendon_velocity", 3), ("foot_force", 4), ("belly_force", 2),
+                  ("gravity_up", 3), ("gyro", 3), ("linear_velocity", 3)]
+        if self.privileged_target:
+            blocks.append(("privileged_target", 5))
+        blocks.append(("gait_phase", 2))
+        return {"blocks": blocks, "total": sum(n for _, n in blocks),
+                "privileged_target": self.privileged_target}
+
+    @property
     def lab_controller_snapshot(self):
         """Plain picklable record of the effective lab base controller.
 
@@ -249,6 +290,11 @@ class GeckoWalkEnv(gym.Env):
             for foot in _GAIT_FEET
         ], dtype=np.float64)
 
+    def _write_prey(self):
+        """Publish prey position into the mocap slot the camera renders."""
+        self.data.mocap_pos[self._prey_mocap] = self.prey.mocap_position
+        mujoco.mj_forward(self.model, self.data)
+
     def _target_egocentric(self):
         """direction & distance to target expressed in the trunk frame (yaw)."""
         root = self.data.xpos[self._trunk][:2]
@@ -270,10 +316,14 @@ class GeckoWalkEnv(gym.Env):
         up = self._s("up_trunk")            # gravity/up vector in trunk frame (3)
         gyro = self._s("gyro_trunk")        # ang vel (3)
         vel = self._s("vel_trunk")          # lin vel in trunk frame (3)
-        ego, dist, head = self._target_egocentric()
-        task = np.array([ego[0], ego[1], np.clip(dist, 0, 2.0), np.cos(head), np.sin(head)])
         phase = self.gait.phase_observation(self._gait_time())
-        return np.concatenate([qp, qv, tp, tv, feet, belly, up, gyro, vel, task, phase]).astype(np.float32)
+        parts = [qp, qv, tp, tv, feet, belly, up, gyro, vel]
+        if self.privileged_target:
+            ego, dist, head = self._target_egocentric()
+            parts.append(np.array([ego[0], ego[1], np.clip(dist, 0, 2.0),
+                                   np.cos(head), np.sin(head)]))
+        parts.append(phase)
+        return np.concatenate(parts).astype(np.float32)
 
     def _step_metrics(self, dist, head, up_z, reached, fallen):
         # Lab scores the stance schedule that generated this held control
@@ -351,6 +401,11 @@ class GeckoWalkEnv(gym.Env):
         self._step = 0
         self._cpg_t = 0.0
         self._last_cpg_command_time_s = 0.0
+        if self.prey is not None:
+            # Prey owns the target once it exists: the reward keeps measuring
+            # distance to food, but the food now moves and runs away.
+            self.target = self.prey.reset(d.xpos[self._trunk][:2], rng=self._rng)
+            self._write_prey()
         _, self._prev_dist, _ = self._target_egocentric()
         self._prev_foot_xy = self._foot_xy().copy()
         self._last_step_metrics = {}
@@ -369,7 +424,10 @@ class GeckoWalkEnv(gym.Env):
             front_contact = {"FL": bool(fc[1] > 0.5), "FR": bool(fc[3] > 0.5)}
             self._last_cpg_command_time_s = self._cpg_t
             if self.gait_profile == "lab":
-                _, _, heading_error = self._target_egocentric()
+                # Steering off the target bearing is the same privileged channel
+                # as the task observation, so it goes with it.
+                _, _, heading_error = (self._target_egocentric() if self.privileged_target
+                                       else (None, None, 0.))
                 self._ctrl = self.cpg.compute(action, self._cpg_t, front_contact=front_contact,
                                               heading_error=heading_error)
             else:
@@ -388,6 +446,11 @@ class GeckoWalkEnv(gym.Env):
             self._step_work += work
             if self.physics_observer is not None:
                 self.physics_observer(work)
+        if self.prey is not None:
+            position, captured = self.prey.step(self.dt, self.data.xpos[self._trunk][:2])
+            self.target = position
+            self._write_prey()
+            self._prey_captured_this_step = captured
         self._episode_work += self._step_work
         work_xy = self.data.xpos[self._trunk, :2].copy()
         self._episode_path_m += float(np.linalg.norm(work_xy - self._work_prev_xy))
@@ -406,7 +469,15 @@ class GeckoWalkEnv(gym.Env):
         self._prev_dist = dist
         self._prev_foot_xy = foot_xy.copy()
         self._last_step_metrics = metrics
-        if reached:                                        # resample a new goal, keep going
+        if self.prey is not None:
+            # Prey decides when it has been caught, by its own capture distance,
+            # and respawns itself. The env's reach_dist goal-resampling is the
+            # static-target behaviour and does not apply.
+            info["prey_captured"] = float(getattr(self, "_prey_captured_this_step", False))
+            info["prey_captures"] = float(self.prey.captures)
+            if info["prey_captured"]:
+                _, self._prev_dist, _ = self._target_egocentric()
+        elif reached:                                      # resample a new goal, keep going
             ang = self._rng.uniform(-np.pi, np.pi)
             self.target = self.target_radius * np.array([np.cos(ang), np.sin(ang)]) \
                 + self.data.xpos[self._trunk][:2]

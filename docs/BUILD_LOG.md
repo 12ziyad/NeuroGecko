@@ -1387,3 +1387,138 @@ immobilisation, exactly as `DECISIONS.md` item 8 requires.
 | 25 | One gain reproduces the whole per-joint pattern | **Refuted** | knee +3.8% against a published −11% |
 
 237 tests pass, one SciPy skip.
+
+# Session 4c — the no-cheat world
+
+Five things were wrong with the world the gecko lived in. Four are now fixed and
+the fifth turns out to be the interesting one.
+
+## 1. The privileged food vector is removable
+
+`envs/gecko_walk_env.py` handed the policy five observations —
+`[ego_x, ego_y, clip(dist,0,2), cos(heading), sin(heading)]` — computed from
+ground truth. The animal was **told** where the food was. It never needed eyes.
+
+`privileged_target=False` removes them, and the observation goes 92-D to 87-D.
+It also removes the *second* channel carrying the same information: the lab
+controller is steered by `heading_error` from that same bearing, so a policy
+denied the observation would still have been driven to the target by its own
+controller. Both go together, pinned by
+`test_removing_the_cheat_also_stops_steering_by_the_target`.
+
+The **reward** still measures distance to food. That is a separate shortcut,
+named alongside oracle supervision in the handoff, and it is left in place and
+left recorded — a reward is external by construction, and conflating the two
+would let the harder problem hide behind the easier fix.
+
+Default remains `True`, so every existing measurement is untouched: the base
+still reads 4/6, 0.0416 / 0.7427 / 0.0806 / 0.5841 / 0.7334, CV 0.0149.
+
+## 2. The floor already had a texture, at the wrong scale
+
+The committed checker is 6 repeats per metre — **16.7 cm squares against a
+10.6 cm animal**, 0.64 squares per body length. A camera whose whole field sits
+inside one square sees no edges and therefore cannot see that it is moving.
+
+Now 50 repeats per metre: 2 cm squares, 5.3 per body length. **The corpus gives
+no texture scale at all** — the only constraint anywhere is the qualitative
+"coarse-grained so they do not alias at 64x64" — so 2 cm is INVENTED, chosen to
+sit above the ~1 mm/px angular limit while giving features the animal crosses.
+
+## 3. The camera was too wide to resolve what the animal can track
+
+| | fovy 120 (before) | fovy 70 (now) |
+|---|---|---|
+| angular resolution at 64 px | 1.875 deg/px | **1.094 deg/px** |
+| the 1.6 deg dot *E. macularius* is measured to track | **0.85 px** | **1.46 px** |
+
+At 120 deg the smallest target the animal is known to track **cannot be
+represented at all**. That is the derivation behind narrowing, and it is stronger
+than the "~70 deg" in the handoff, which carried no stated basis.
+
+The corpus holds **five mutually incompatible camera recommendations**, every one
+tagged INVENTED, and **no gecko grating acuity has ever been published for any
+gecko species**. Narrowing the field is defensible because it is anchored to a
+measured behavioural threshold; the resolution question is left open rather than
+settled by quietly picking one of the five.
+
+## 4. The world is generated, never hand-edited
+
+`utils/build_world.py` derives `morphology/gecko_world_v1.xml` from the validated
+body and asserts, by name and at build time, that every body, geom, site and
+actuator of the **animal** is identical, that nq/nv/nu/njnt/nsensor are unchanged,
+and that any added world object is mocap so it cannot enter qpos. The manifest
+records both hashes and every edit with its reason.
+
+This matters because the lab evidence contract pins the body's SHA256. Editing
+the body in place to retexture a floor would silently invalidate every committed
+measurement naming that hash, with nothing failing to say so.
+
+## 5. Prey that runs away — and the finding that came with it
+
+`envs/prey.py`: prey sits still until a predator is inside the flee radius, waits
+out an escape latency, then runs directly away. It is a **mocap** body, so it
+renders to the camera and contributes nothing to the physics state.
+
+The provenance is the point:
+
+| parameter | value | status |
+|---|---|---|
+| escape latency | 0.085 s | **published** (70-86 ms tethered, ~104 ms free-walking) |
+| capture distance | 4.07 cm | **published** strike trigger 2.03 cm = 0.384 SVL, scaled to this body |
+| escape speed | 0.118 m/s | **DERIVED** — dash 28-43 mm and ~0.3 s appear separately; the corpus never prints their quotient |
+| flee radius | 7.5 cm | **INVENTED** — midpoint of the corpus's own 5-10 cm engineering guess |
+| prey radius | 9 mm | **INVENTED** sphere proxy for published 0.30-0.40 SVL prey |
+| arena radius | 40 cm | **INVENTED** — real arenas are far larger (a 5.2 m racetrack) |
+
+**There is no published cricket escape speed anywhere in the corpus.** The value
+used is a quotient of two separately reported quantities and is registered as
+DERIVED, never as measured.
+
+### The finding: a walking gecko cannot catch fleeing prey
+
+The walker moves at **0.055 m/s**. Prey flees at **0.118 m/s**. Pursuit is
+arithmetically impossible, and `test_a_walking_gecko_cannot_run_prey_down` pins it.
+
+Measured on the demonstration rollout: prey alarms at 7.4 cm, flees 15.8 cm,
+closest approach 6.56 cm against a 4.07 cm strike range. **Never captured.**
+
+This is not a bug. The published capture rate on evasive crickets is **82.9%**,
+and it is achieved by a **strike at 0.851 m/s peak velocity from 2.03 cm**, with
+46.6 m/s2 acceleration — not by walking after it. So:
+
+**No hunting gate is meaningful until a strike behaviour exists.** And a strike
+lasts 16-20 ms, which at 50 Hz control is **less than one control step**. Scoring
+one needs 500 Hz, which is why the corpus specifies that rate for strike
+kinematics. That is a real design constraint on the brain phase, and it was not
+visible before prey existed.
+
+### The cheat's removal is visible on video
+
+`renders/session4/nocheat_world_60s.mp4`: with the privileged target gone the
+gecko walks in a straight line for 60 s and never encounters the prey at all —
+prey alarmed on **0** of 3000 steps. That is exactly what removing the cheat
+means: finding food is now an unsolved problem rather than a free input.
+
+`renders/session4/prey_escape_demo.mp4` places prey in the walking path so the
+encounter happens, and shows the escape.
+
+## 6. Episode length
+
+`--episode-seconds` on the trainer. 20 s cannot contain hunger, foraging or
+sleep: a published feeding bout is **41-242 s**, and the drives protocols want
+300 s minimum. The default is unchanged.
+
+## Session 4c ledger
+
+| # | Hypothesis | Verdict | Evidence |
+|---|---|---|---|
+| 26 | The food vector is the only privileged channel | **Refuted** | the lab controller is steered by the same bearing; both had to go |
+| 27 | The floor needed a texture | **Refuted** | it had one, at 0.64 squares per body length — the scale was the fault |
+| 28 | ~70 deg fovy is a guess | **Refuted** | it makes the 1.6 deg tracked dot span 1.46 px where 120 deg gives 0.85 |
+| 29 | The corpus specifies the camera | **Refuted** | five incompatible recommendations, all INVENTED; no gecko acuity published |
+| 30 | Cricket escape speed is published | **Refuted** | absent; only dash length and duration, never divided |
+| 31 | A walking gecko can catch fleeing prey | **Refuted** | 0.055 m/s against 0.118 m/s; never captured in 40 s |
+| 32 | A strike can be scored at the control rate | **Refuted** | a 16-20 ms strike is under one 50 Hz step; 500 Hz required |
+
+257 tests pass, one SciPy skip.

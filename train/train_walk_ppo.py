@@ -247,7 +247,8 @@ def make_env(seed, control_mode="raw", residual_scale=0.25,
              contact_thresh=None, front_stance_press=0.40,
              front_swing_lift=0.40, reward_cfg=None, xml_path=None,
              gait_profile="legacy", hind_stance_compensation=False,
-             front_lift_residual_scale=None):
+             front_lift_residual_scale=None, privileged_target=True,
+             episode_seconds=None):
     def _f():
         return GeckoWalkEnv(
             xml_path=xml_path,
@@ -261,6 +262,8 @@ def make_env(seed, control_mode="raw", residual_scale=0.25,
             gait_profile=gait_profile,
             hind_stance_compensation=hind_stance_compensation,
             front_lift_residual_scale=front_lift_residual_scale,
+            privileged_target=privileged_target,
+            **({} if episode_seconds is None else {"max_steps": int(round(episode_seconds / 0.02))}),
         )
     return _f
 
@@ -424,6 +427,12 @@ def main():
     p.add_argument("--front-lift-residual-scale", type=float, default=None,
                    help="residual authority on the FL/FR lift actuators; omitted keeps the "
                         "structural lock at 0.0 (see the controller docstring)")
+    p.add_argument("--episode-seconds", type=float, default=None,
+                   help="episode length; the default 20 s is too short for hunger, foraging or "
+                        "sleep to mean anything (a published feeding bout is 41-242 s)")
+    p.add_argument("--no-privileged-target", dest="privileged_target", action="store_false",
+                   help="drop the five task observations that hand the policy the target's bearing "
+                        "and range; the observation becomes 87-D and no saved checkpoint fits it")
     p.add_argument("--target-kl", type=float, default=None,
                    help="stop each PPO epoch loop when approximate KL exceeds this; the 10 M-step "
                         "precedent diverged to approx_kl 67 and lost 63%% of eval return")
@@ -522,7 +531,9 @@ def main():
                  args.contact_thresh, args.front_stance_press, args.front_swing_lift,
                  reward_cfg=reward_cfg, xml_path=args.xml_path, gait_profile=args.gait_profile,
                  hind_stance_compensation=compensation,
-                 front_lift_residual_scale=args.front_lift_residual_scale)
+                 front_lift_residual_scale=args.front_lift_residual_scale,
+                 privileged_target=args.privileged_target,
+                 episode_seconds=args.episode_seconds)
         for i in range(args.envs)
     ]
     venv = VecCls(env_fns)
@@ -550,7 +561,9 @@ def main():
                  args.contact_thresh, args.front_stance_press, args.front_swing_lift,
                  reward_cfg=reward_cfg, xml_path=args.xml_path, gait_profile=args.gait_profile,
                  hind_stance_compensation=compensation,
-                 front_lift_residual_scale=args.front_lift_residual_scale)
+                 front_lift_residual_scale=args.front_lift_residual_scale,
+                 privileged_target=args.privileged_target,
+                 episode_seconds=args.episode_seconds)
     ])
     eval_env = VecMonitor(eval_env)
     eval_env = VecNormalize(eval_env, norm_obs=True, norm_reward=False, training=False, clip_obs=10.0)

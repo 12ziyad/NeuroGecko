@@ -530,6 +530,9 @@ def main(argv=None):
     p.add_argument("--hind-stance-compensation", nargs="?", const=True, default=False,
                    choices=(True, "hind", "all"),
                    help="Lab-only opt-in: hold the collision foot at a constant commanded height through stance. 'all' includes the forelimb.")
+    p.add_argument("--no-privileged-target", dest="privileged_target", action="store_false",
+                   help="remove the five task observations that hand the policy the target's "
+                        "bearing and range, and stop steering the lab controller by that bearing")
     p.add_argument("--stance-sprawl-nodes", type=int, default=None,
                    help="build a sprawl axis into the stance table; required once sprawl moves")
     p.add_argument("--stance-sprawl-limit-deg", type=float, default=None,
@@ -589,6 +592,7 @@ def main(argv=None):
                        residual_scale=args.residual_scale, front_stance_press=args.front_stance_press,
                        front_swing_lift=args.front_swing_lift, gait_profile=args.gait_profile,
                        hind_stance_compensation=(args.hind_stance_compensation if args.hind_stance_compensation != 'hind' else True),
+                       privileged_target=args.privileged_target,
                        stance_sprawl_nodes=args.stance_sprawl_nodes,
                        stance_sprawl_limit_rad=(None if args.stance_sprawl_limit_deg is None
                                                 else math.radians(args.stance_sprawl_limit_deg)),
@@ -642,6 +646,8 @@ def main(argv=None):
             "controller": "zero residual with contact reflex" if args.zero_residual else "frozen PPO residual",
             "gait_profile": args.gait_profile,
             "hind_stance_compensation": bool(args.hind_stance_compensation),
+            "privileged_target": bool(args.privileged_target),
+            "observation_layout": env.observation_layout,
             "stance_target_clearance_m": args.stance_target_clearance_m,
             "front_stance_clearance_m": args.front_stance_clearance_m,
             "lab_params_override": lab_overrides,

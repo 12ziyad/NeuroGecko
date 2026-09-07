@@ -1,0 +1,36 @@
+{
+ "schema_version": 1,
+ "generator": "utils/build_world.py",
+ "source": "morphology/gecko_body_lab_v2.xml",
+ "source_sha256": "756765356417749c72150b05da59565ffc97825cf2457e638cd04ea2e1885c4b",
+ "output": "morphology/gecko_world_v1.xml",
+ "output_sha256": "e6bda295a42e24c731d17825260fd323cf9666e51d5921633bcdcca78fd17533",
+ "edits": [
+  {
+   "element": "worldbody",
+   "attribute": "prey",
+   "before": "absent",
+   "after": "mocap sphere r=0.009 m",
+   "reason": "the animal must see its food rather than be told where it is; mocap keeps nq/nv unchanged and the prey collides with nothing"
+  },
+  {
+   "element": "material grid",
+   "attribute": "texrepeat",
+   "before": "6 6",
+   "after": "50 50",
+   "reason": "optic flow needs features at a scale the animal crosses"
+  },
+  {
+   "element": "camera head_cam",
+   "attribute": "fovy",
+   "before": "120",
+   "after": "70",
+   "reason": "a wider field spends the same pixels on more world"
+  }
+ ],
+ "note": "fovy 120->70: at 64 px a 120 deg field spans 1.875 deg/px, so the 1.6 deg dot E. macularius is measured to track (Masseck 2008) covers 0.85 px and cannot be resolved at all; at 70 deg it covers 1.46 px. texrepeat 6->50 (16.7 cm -> 2 cm squares): the corpus gives NO texture scale, only 'coarse-grained so it does not alias at 64x64', so 2 cm is INVENTED, chosen to sit above the ~1 mm/px Nyquist limit while giving about five features per body length for optic flow. prey radius 0.009 m is an INVENTED sphere proxy for published 0.30-0.40 SVL prey.",
+ "world_bodies_added": [
+  "prey"
+ ],
+ "asserted": "every named body, geom, site and actuator of the animal verified identical to the source at build time, compared by name; nq/nv/nu/njnt/nsensor unchanged; any added world body verified mocap so it cannot enter qpos"
+}
