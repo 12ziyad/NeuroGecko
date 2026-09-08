@@ -978,6 +978,90 @@
         "confidence": "uncertain", "recording_temp_C": null,
         "notes": "Digesting a meal costs a large multiple of resting metabolism, so a naive model that adds meal energy without subtracting the cost of processing it overstates the benefit of eating. NOT implemented yet; recorded so the omission is visible."
       },
+      "strike_trigger_distance_m": {
+        "value": 0.0203,
+        "units": "m", "species": "Coleonyx variegatus", "sample_size": 5,
+        "source": "Starting distance to prey at strike onset, 2.03 +/- 0.08 cm, n=5 juveniles, 500 fps, crickets. Vollin & Higham 2021, Integr Comp Biol 61(2):538-549, doi:10.1093/icb/icab076.",
+        "confidence": "likely", "recording_temp_C": 27.0,
+        "notes": "PUBLISHED but NOT this species. Eublepharidae, same family, but juveniles of a much smaller gecko. Adults of the same species strike from a mean 14.6 mm on non-scorpion prey (Whitford et al. 2022, n=9), so the juvenile figure is the LONGER of the two and is the conservative choice for a trigger. No strike distance has ever been measured in E. macularius: the only feeding kinematics for the target species is Delheusy, Brillet & Bels 1995 at 64 fps, which could not resolve the capture phase and excluded it from every table."
+      },
+      "strike_peak_speed_m_s": {
+        "value": 0.851,
+        "units": "m/s", "species": "Coleonyx variegatus", "sample_size": 5,
+        "source": "Maximum strike velocity 85.1 +/- 2.19 cm/s, pre-autotomy, n=5 juveniles. Vollin & Higham 2021.",
+        "confidence": "likely", "recording_temp_C": 27.0,
+        "notes": "PUBLISHED, wrong species. Note the scale of what this buys: the walker moves at 0.055 m/s and the cricket escapes at 0.093-0.143 m/s, so the strike is roughly 15x the walk and 6-9x the prey's escape. That ratio is why a real gecko catches an animal it cannot outrun, and why a pursuit-only hunter in this codebase could never succeed."
+      },
+      "strike_peak_acceleration_m_s2": {
+        "value": 46.6,
+        "units": "m/s^2", "species": "Coleonyx variegatus", "sample_size": 5,
+        "source": "Maximum acceleration 46.6 +/- 1.97 m/s^2, pre-autotomy. Vollin & Higham 2021.",
+        "confidence": "likely", "recording_temp_C": 27.0,
+        "notes": "PUBLISHED, wrong species. Peak acceleration occurs 16.34 +/- 6.71 ms BEFORE contact and peak velocity 9.03 +/- 5.75 ms before contact, so the animal is already decelerating when it arrives."
+      },
+      "strike_distance_speed_correlation_r": {
+        "value": 0.47,
+        "units": "dimensionless", "species": "Coleonyx variegatus", "sample_size": 9,
+        "source": "Attack distance vs maximum strike velocity, r = 0.47, P = 0.009, n=9 adults, 29 trials. Whitford, Freymiller, Higham & Clark 2022, Biol J Linn Soc 135(3):533-540, doi:10.1093/biolinnean/blab167.",
+        "confidence": "likely", "recording_temp_C": 22.5,
+        "notes": "PUBLISHED, wrong species, and the single most useful relationship found in the whole hunting literature: a longer strike is a FASTER strike. It gives a controller a real scaling law instead of a constant. r=0.47 is a moderate correlation -- it explains about 22% of the variance, so the scaling is a tendency and not a rule, and the residual spread is real animal variability that a deterministic model discards."
+      },
+      "strike_capture_success": {
+        "value": 0.829,
+        "units": "dimensionless", "species": "Coleonyx variegatus", "sample_size": 5,
+        "source": "Capture success on evasive crickets, 116/140 trials = 82.9 %, n=5. Vollin & Higham 2023, Front Behav Neurosci 17:1173065, doi:10.3389/fnbeh.2023.1173065. Non-evasive mealworms: 53/53 = 100 %.",
+        "confidence": "likely", "recording_temp_C": 21.5,
+        "notes": "PUBLISHED, wrong species. A model that never misses has been fitted to the harness rather than the animal: the real animal misses roughly one strike in five on evasive prey. Unaffected by tail autotomy (77.0 % intact vs 78.6 % post-autotomy in the 2021 study), which is why the miss rate is modelled as a property of the strike rather than of the body."
+      },
+      "strike_duration_s": {
+        "value": 0.080,
+        "units": "s", "species": "E_macularius", "sample_size": 6,
+        "source": "Representative capture cycle, Fig. 2: total open-close cycle about 80 ms with peak gape about 37 degrees at 47 ms. Delheusy, Brillet & Bels 1995, Amphibia-Reptilia 16(2):185-201, doi:10.1163/156853895X00361. n=6 adult males, SVL 120 +/- 4 mm, 64 fps, 22 mm Gryllus bimaculatus.",
+        "confidence": "uncertain", "recording_temp_C": null,
+        "notes": "THE ONLY STRIKE-PHASE NUMBER THAT COMES FROM THE TARGET SPECIES, and it is read off a figure rather than a table. That paper could only digitise 5 lateral capture cycles from 2 animals -- insufficient for quantitative analysis -- so capture is described qualitatively there and excluded from Table 1. At 64 fps one frame is 15.6 ms, so an 80 ms cycle spans about 5 frames. Treat as an order of magnitude. Confidence uncertain deliberately."
+      },
+      "prey_flee_speed_reference_m_s": {
+        "value": 0.055,
+        "units": "m/s", "species": "INVENTED", "sample_size": null,
+        "source": "The walker's own steady speed, used as the reference at which the published flee radius applies.",
+        "confidence": "uncertain", "recording_temp_C": null,
+        "notes": "INVENTED, AND IT EXISTS BECAUSE THE MODEL WAS UNWINNABLE WITHOUT IT. The prey fled at a FIXED 0.075 m radius regardless of how the predator approached, while the strike must be launched from 0.0203 m and the prey escapes at 0.118 m/s against a 0.055 m/s walk. Measured over 60 s of pursuit: closest approach 51.1 mm, zero strikes. The gecko could not physically reach striking distance by any route, so adding a strike was necessary and not sufficient. The real animal closes that gap by STALKING -- the published E. macularius ethogram names `walk slow motion` as 'walking with a strongly reduced speed, mostly in context of prey capture' (Kronke & Xu 2023, n=18) -- and a prey that cannot tell a creep from a charge makes that behaviour meaningless. The DIRECTION is well supported: flight initiation distance rises with approach speed across the antipredator literature, and crickets specifically detect approaching predators through cercal air-current receptors, where a faster approach produces a larger signal. The MAGNITUDE here is invented. Any capture rate this model produces depends on it."
+      },
+      "prey_flee_speed_exponent": {
+        "value": 1.0,
+        "units": "dimensionless", "species": "INVENTED", "sample_size": null,
+        "source": "Engineering choice. Linear scaling of flee radius with approach speed.",
+        "confidence": "uncertain", "recording_temp_C": null,
+        "notes": "INVENTED. No published function relates cricket flight-initiation distance to predator approach speed. Linear is the least-assuming monotone choice; the true relationship is unmeasured and could be threshold-like, since cercal interneurons have firing thresholds rather than proportional outputs. Recorded as the specific thing to replace if anyone measures it."
+      },
+      "prey_flee_radius_floor_m": {
+        "value": 0.012,
+        "units": "m", "species": "INVENTED", "sample_size": null,
+        "source": "Engineering floor, set below the 0.0203 m strike trigger distance.",
+        "confidence": "uncertain", "recording_temp_C": null,
+        "notes": "INVENTED. Without a floor an arbitrarily slow approach would let the gecko walk its mouth onto the prey unnoticed, which would make capture success 100 % and would be fitting the harness rather than the animal -- the published rate on evasive crickets is 82.9 %. The floor sits just inside strike range so that a perfect stalk still only BUYS A STRIKE rather than a meal, and the strike can still miss."
+      },
+      "prey_ambient_speed_m_s": {
+        "value": 0.047,
+        "units": "m/s", "species": "INVENTED", "sample_size": null,
+        "source": "Half the low end of the escape-speed band (0.093 m/s). No published walking speed for an undisturbed cricket exists anywhere in the corpus, for Acheta or Gryllus, on any substrate.",
+        "confidence": "uncertain", "recording_temp_C": null,
+        "notes": "INVENTED, and it exists because its ABSENCE was worse. FleeingPrey.step only moved the prey inside the 0.075 m flee radius, while detection range is 0.30-0.50 m, so prey_total_travel_mm measured 0.0 across 1800 frames -- the tectum is a motion detector and it was pointed at a stationary object (ledger #135). A cricket that never moves is not a conservative choice, it is a wrong one. Half the escape speed is an ordering claim (an undisturbed animal moves slower than a fleeing one) rather than a measurement, and any result that depends on the exact value must say so."
+      },
+      "prey_ambient_move_fraction": {
+        "value": 0.35,
+        "units": "dimensionless", "species": "INVENTED", "sample_size": null,
+        "source": "Engineering choice. No move/pause bout structure is published for any cricket.",
+        "confidence": "uncertain", "recording_temp_C": null,
+        "notes": "INVENTED. Crickets walk in bouts rather than continuously, and a prey that glides at constant velocity would be both unrealistic and unrealistically EASY for a motion detector -- constant motion is the easiest possible signal. The one structural insight the corpus does carry is from Teratoscincus, not a cricket: pause length should be sampled conditional on the preceding move length. That refinement is not implemented and its absence is recorded here."
+      },
+      "prey_ambient_turn_rate_rad_s": {
+        "value": 1.2,
+        "units": "rad/s", "species": "INVENTED", "sample_size": null,
+        "source": "Engineering choice.",
+        "confidence": "uncertain", "recording_temp_C": null,
+        "notes": "INVENTED. How sharply an undisturbed cricket changes heading is unmeasured. Set so a walking bout curves visibly within a second rather than tracking a straight line, because a straight-line walker is again the easy case for a motion detector."
+      },
       "prey_escape_speed_m_s": {
         "value": 0.118,
         "units": "m/s", "species": "Acheta/cricket (prey, not the gecko)", "sample_size": null,

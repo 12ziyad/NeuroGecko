@@ -28,7 +28,23 @@ WORLD = REPO / "morphology" / "gecko_world_v1.xml"
 
 def parameters(**overrides):
     base = dict(escape_speed_m_s=.118, flee_radius_m=.075, escape_latency_s=.085,
-                capture_distance_m=.0407, radius_m=.009, arena_radius_m=.40)
+                capture_distance_m=.0407, radius_m=.009, arena_radius_m=.40,
+                # Session 9 gave the prey undisturbed locomotion and a flee
+                # radius that responds to approach speed. These tests predate
+                # both, so they keep the OLD behaviour explicitly: ambient
+                # speed zero is a stationary cricket, and a reference far below
+                # any real approach speed pins the flee radius at its nominal
+                # value. Stated rather than defaulted, so a test that wants the
+                # new behaviour has to ask for it.
+                # A floor just under the nominal radius clamps it there for
+                # every approach speed, which is exactly the fixed-radius
+                # behaviour these tests were written against. It matters:
+                # several of them drive a MOTIONLESS predator, and under the
+                # new rule a predator that is not closing does not frighten
+                # anything -- correct behaviour, and not what they assert.
+                ambient_speed_m_s=0.0, ambient_move_fraction=0.0,
+                ambient_turn_rate_rad_s=0.0, flee_speed_reference_m_s=0.055,
+                flee_speed_exponent=1.0, flee_radius_floor_m=.07499)
     base.update(overrides)
     return PreyParameters(**base)
 

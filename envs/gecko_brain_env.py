@@ -11,6 +11,7 @@ from stable_baselines3 import PPO
 from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize
 
 from brain.drives import DriveState
+from brain.strike import Strike
 from envs.gecko_walk_env import GeckoWalkEnv
 
 REPO = Path(__file__).resolve().parent.parent
@@ -180,6 +181,7 @@ class GeckoBrainEnv(gym.Env):
         privileged_target: float = 1.0,
         privileged_food_dropout_prob: float = 0.0,
         walker_oracle: bool = True,
+        strike: bool = False,
         control_mode: str = "cpg_residual",
         residual_scale: float = 0.25,
         front_stance_press: float = 0.40,
@@ -206,7 +208,7 @@ class GeckoBrainEnv(gym.Env):
         )
         self.walker_run = str(walker_run)
         self.show_debug_markers = bool(show_debug_markers)
-        _valid_views = ("fixed", "chase", "close")
+        _valid_views = ("fixed", "chase", "close", "hunt")
         if str(view_mode).lower() not in _valid_views:
             raise ValueError(f"view_mode must be one of {_valid_views}, got '{view_mode}'")
         self._view_mode = str(view_mode).lower()
@@ -286,6 +288,14 @@ class GeckoBrainEnv(gym.Env):
         # prey mocap body the food IS that body, so the camera sees a real geom
         # rather than a sphere drawn onto the scene after rendering.
         self.prey = None
+        # THE STRIKE. Off by default, like the eye, and for the same reason:
+        # a new module does not become the live path until it is shown to
+        # work. With it off, capture is proximity -- walk within the eat
+        # radius and the prey is eaten, which is what every existing
+        # checkpoint was trained against. With it on, capture requires a
+        # strike that LANDS, and the published miss rate applies: 82.9 % on
+        # evasive crickets, so roughly one in five attempts fails.
+        self.strike = Strike(rng=self._rng) if strike else None
         self._prey_mocap = -1
         #: What the food actually looks like, read from the model so the
         #: detector cannot disagree with the world. None until a prey geom is
@@ -301,7 +311,14 @@ class GeckoBrainEnv(gym.Env):
             if self._prey_mocap < 0:
                 raise ValueError("The prey body must be mocap so it stays out of qpos.")
             self.prey = FleeingPrey(prey_parameters, height_m=prey_parameters.radius_m,
-                                    rng=self._rng)
+                                    rng=self._rng,
+                                    # If a strike exists it owns capture. Leaving
+                                    # proximity capture on would respawn the prey
+                                    # the moment it entered striking range, so no
+                                    # strike could ever fire -- measured, 0 strikes
+                                    # across 1050 frames with the prey placed in
+                                    # range on every step.
+                                    proximity_capture=not strike)
             self.food_radius = float(prey_parameters.radius_m)
             self.eat_radius = float(prey_parameters.capture_distance_m)
             # Read the prey's actual colour out of the model. One source of
@@ -517,6 +534,36 @@ class GeckoBrainEnv(gym.Env):
         self.walk_env.target = np.asarray(target, dtype=np.float64).copy()
         _, self.walk_env._prev_dist, _ = self.walk_env._target_egocentric()
 
+    def _run_strike(self, dt, proximity_capture):
+        """Advance any strike in flight, and launch one if the prey is close.
+
+        Returns whether the prey was actually caught this step. Proximity alone
+        no longer counts: `proximity_capture` is discarded except as the signal
+        that the prey has already respawned itself, which the strike must not
+        then also claim.
+        """
+        # HORIZONTAL distance, and the reason is published. The strike is
+        # mostly a DOWNWARD lunge: Delheusy, Brillet & Bels 1995 measured the
+        # head translating about 8 mm horizontally and about 28 mm VERTICALLY
+        # over the 80 ms capture cycle in this species. Our nose sits 13.7 mm
+        # above a prey that is 9 mm off the floor, so a 3-D trigger of 20.3 mm
+        # can never be met by walking -- the vertical gap alone eats most of
+        # it, and closing that gap is exactly what the strike is for. Measured:
+        # with a 3-D trigger the animal stalls at 40.8 mm and never strikes.
+        offset = np.asarray(self.food_xy)[:2] - self._nose_xy()
+        mouth_distance = float(np.linalg.norm(offset))
+        _, finished, hit = self.strike.step(dt)
+        caught = False
+        if finished and hit and not proximity_capture:
+            caught = True
+            if self.prey is not None:
+                self.prey.captures += 1
+                self.food_xy = self.prey.reset(self._nose_xy(), rng=self._rng)
+                self._write_prey()
+        if not self.strike.active:
+            self.strike.fire(mouth_distance)
+        return bool(caught)
+
     def _brain_action_to_target(self, action: np.ndarray) -> tuple[np.ndarray, float]:
         action = np.clip(np.asarray(action, dtype=np.float32), -1.0, 1.0)
         dir_body = np.asarray(action[:2], dtype=np.float64)
@@ -703,6 +750,10 @@ class GeckoBrainEnv(gym.Env):
             # one definition of "close enough to eat" rather than two.
             self.food_xy, prey_captured = self.prey.step(total_dt, self._nose_xy())
             self._write_prey()
+        if self.strike is not None:
+            # Proximity no longer feeds the animal. It has to strike, and the
+            # strike has to land.
+            prey_captured = self._run_strike(total_dt, prey_captured)
         food_dist_after = self._food_distance()
         mouth_dist_after = self._mouth_food_distance()
         ate = bool(prey_captured) if self.prey is not None else bool(mouth_dist_after <= self.eat_radius)
@@ -794,6 +845,11 @@ class GeckoBrainEnv(gym.Env):
             # Reported every step so no run can later be described as
             # oracle-free without the record contradicting it.
             "walker_oracle": self.walker_oracle,
+            "strike_active": bool(self.strike.active) if self.strike else False,
+            "strike_mode": self.strike.mode if self.strike else None,
+            "strikes": self.strike.strikes if self.strike else 0,
+            "strike_hits": self.strike.hits if self.strike else 0,
+            "capture_requires_a_strike": self.strike is not None,
             "food_oracle_scale": float(self.privileged_target),
             "food_visible_signal": float(food_visible_signal),
             "food_radius": float(self.food_radius),
@@ -864,6 +920,18 @@ class GeckoBrainEnv(gym.Env):
             # camera sits directly behind: heading_deg + 180 in MuJoCo azimuth space
             target_azimuth = heading_deg + 180.0
             target_lookat = np.array([trunk[0], trunk[1], 0.05], dtype=np.float64)
+        elif self._view_mode == "hunt":
+            # Tight enough to see a 9 mm cricket and an 80 ms strike. The
+            # existing "close" view sits 1.5 m back, which renders the whole
+            # animal about twenty pixels tall and the prey as a single dot --
+            # fine for watching gait, useless for watching a strike.
+            distance = 0.34
+            height = 0.13
+            target_azimuth = heading_deg + 205.0
+            lookahead = forward[:2] * 0.07
+            target_lookat = np.array(
+                [trunk[0] + lookahead[0], trunk[1] + lookahead[1], 0.02],
+                dtype=np.float64)
         else:  # "close" — closer 3/4-rear view
             distance = 1.5
             height = 0.50

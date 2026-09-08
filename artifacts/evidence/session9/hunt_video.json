@@ -1,0 +1,39 @@
+{
+ "schema_version": 1,
+ "generated_by": "tools/hunt_video.py",
+ "video": "artifacts/video/hunt_session9.mp4",
+ "part_1_the_hunt": {
+  "closest_mouth_to_prey_mm": 34.5,
+  "strikes": 0,
+  "prey_travel_mm": 397.7
+ },
+ "part_2_the_strike": {
+  "active": true,
+  "mode": "bag_jump",
+  "strikes": 78,
+  "hits": 63,
+  "misses": 14,
+  "success_rate": 0.8076923076923077,
+  "published": {
+   "trigger_distance_m": 0.0203,
+   "peak_speed_m_s": 0.851,
+   "capture_success": 0.829,
+   "species": "Coleonyx variegatus for everything except duration"
+  },
+  "invented": [
+   "mode boundary at half the trigger distance",
+   "speed jitter",
+   "velocity profile shape"
+  ]
+ },
+ "what_it_shows": [
+  "prey with undisturbed locomotion, where it used to travel 0.0 mm",
+  "a flee radius that collapses when the predator creeps instead of charging",
+  "strikes that fire and that miss at roughly the published rate"
+ ],
+ "what_it_does_not_show": [
+  "vision. The approach is driven by the bearing to the prey read out of the environment, an oracle, captioned as one on every frame. The eye still cannot find a cricket -- ledger #134-136.",
+  "a hunt that works. Part 1 never reaches striking distance. The frozen walker arrives within 4 cm of a goal and its nose trails its trunk by about 5 cm, so it cannot place a mouth on a 9 mm cricket. Part 2 places the prey there instead.",
+  "a learned policy. Both parts are scripted."
+ ]
+}

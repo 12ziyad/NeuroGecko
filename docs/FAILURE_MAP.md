@@ -35,7 +35,7 @@ later turned out to be right gets a second row, not an edit.
 | **Brain 3a/8 — spinal rhythm** (the leg oscillators) | ✅ drives the walker, every gate unchanged |
 | **Brain 3b/8 — brainstem** (decision → command) | ✅ built; thinnest evidence in the project, declared |
 | **Brain 4/8 — eye** (retina, pretectum, tectum) | 🟡 gaze reproduces; **prey-finding NOT ACCEPTED** |
-| **Strike** — the thing that actually catches prey | ❌ **absent.** Walking cannot catch a cricket; the real animal strikes from ~2 cm |
+| **Strike** — the thing that actually catches prey | ✅ built, 81 % capture vs published 82.9 %. **The approach cannot reach it** — #174 |
 | **Smell** — the channel this species is documented to gate on | ❌ absent |
 | Brains 5–8 — sleep, memory, and the rest | ❌ |
 | **Proof** — 15-test battery | 🟡 1 run (A3, failed then fixed) |
@@ -936,6 +936,13 @@ retrieve" into "does not exist."
 | 166 | It is present but the policy ignores it | **Refuted, and this is the expensive one** | `tools/oracle_ablation.py` zeroes the five slots at inference, keeping the vector 92 long so the checkpoint still loads. The walker moves **further** with them zeroed (0.0857 -> 0.1103 m) and progress **toward the goal** collapses **0.0664 -> 0.0060 m, a 91% loss**. The legs are fine; the navigation was the oracle. Retiring it needs a retrained walker, so the flag is exposed and declared rather than flipped, and `info["walker_oracle"]` now reports it every step |
 | 167 | The sessions 3-4 gait evidence is unverifiable | **REFUTED, and the claim was mine** | I reported that the recorded body hash `756765356417749c` matched no committed version and that the accepted walker's evidence therefore pointed at a body not in the repository. The physics was identical all along. The **comment-free ElementTree serialization** of the current body is `b178bf26b644b1d3`, which is exactly what `artifacts/evidence/morphology_reproducibility_line_endings_20260905.md` recorded for that file. Both committed versions in git history share that same physics hash. **A comment changed, not the animal.** The evidence was always valid |
 | 168 | Eight gate contracts are failing | **Refuted -- it was one** | the body check raised **before** any other contract could reach its own assertions, so seven unrelated tests reported the wrong failure for four sessions. Fixing the one check turned all eight green. `common/body_identity.py` now compares what MuJoCo reads rather than what the bytes say, and the evidence writer records **both** fingerprints, because recording only the raw one is what made this unverifiable in the first place |
+| 169 | Adding a strike makes hunting possible | **Refuted** | necessary, not sufficient. The prey bolted at a FIXED 0.075 m regardless of how it was approached, the strike must launch from 0.0203 m, and the prey escapes at 0.118 m/s against a 0.055 m/s walk. Measured over 60 s of pursuit: **closest approach 51.1 mm, zero strikes**. The gecko could not physically reach striking distance by any route |
+| 170 | A stalk is just a slower walk | **Refuted** | it is only a behaviour if the PREY can tell the difference. The published ethogram names `walk slow motion`, "walking with a strongly reduced speed, mostly in context of prey capture" -- meaningless against a prey with a fixed flee radius. The flee radius now scales with approach speed: **75 mm at a charge, 12 mm at a creep**, which is inside strike range. Direction supported (flight-initiation distance rises with approach speed; crickets sense predators through cercal air-current receptors); magnitude INVENTED and the capture rate rests on it |
+| 171 | The predator's own speed is what frightens the prey | **Refuted** | the predator point is the gecko's NOSE, which sways with the gait: measured **0.129 m/s of apparent approach during a creep that netted almost nothing**. Reading gait sway as a charge made stalking impossible. What a prey animal has to go on is how fast the threat is getting CLOSER, so closing speed is measured instead, floored at zero |
+| 172 | Striking distance can be measured in three dimensions | **Refuted** | the nose sits **13.7 mm above** a prey that is 9 mm off the floor, so the vertical gap alone eats most of a 20.3 mm trigger. Closing it is what the strike is FOR: Delheusy et al. 1995 measured the head translating ~8 mm horizontally and **~28 mm vertically** in the 80 ms cycle. The trigger is horizontal |
+| 173 | The prey can own capture once a strike exists | **Refuted** | proximity capture respawned the prey the instant it entered striking range, so the strike could never fire -- measured **0 strikes across 1050 frames with the prey placed in range on every single step**. Capture belongs to the strike or to proximity, never both |
+| 174 | The frozen walker can deliver the animal to striking distance | **Refuted, and this is the live blocker** | it cannot. It arrives within **4 cm** of a goal and its nose trails its trunk by about **5 cm**, so "the animal arrived" and "the mouth is on the prey" are five centimetres apart. With prey motion, a working stalk, a collapsed flee radius and a target aimed past the animal, the best approach across 700 steps was **34.5 mm against the 20.3 mm needed**, oscillating rather than converging. The walker was trained to reach a goal, not to place a mouth on a 9 mm cricket |
+| 175 | The strike itself works | **Confirmed** | with the prey placed in range -- which the approach cannot do -- 78 strikes, 63 caught, 14 missed: **81 % against the published 82.9 %**, unfitted. `artifacts/video/hunt_session9.mp4` part 2 |
 
 ### #138 and #134 — the two I told the user were true
 
@@ -1033,9 +1040,9 @@ Recorded so the gaps stay visible rather than getting invented later:
 
 | | |
 |---|---|
-| Hypotheses tested | **168** |
-| Refuted | **134** |
-| Confirmed | **25** |
+| Hypotheses tested | **175** |
+| Refuted | **140** |
+| Confirmed | **26** |
 | Partly | **9** |
 | My own method errors | **32** |
 | Tests passing | **462 of 462**, one skip. Green for the first time since session 8 |
@@ -1044,8 +1051,8 @@ Recorded so the gaps stay visible rather than getting invented later:
 is made of.
 
 Session 9 is the sharpest entry in that number and the only one where the
-refutations came from **reading rather than running**. Thirty-six hypotheses,
-thirty-five refuted. Three of them — #134, #138 and #150 —
+refutations came from **reading rather than running**. Forty-three hypotheses,
+forty-two refuted. Three of them — #134, #138 and #150 —
 had already been stated to the user as fact before anyone checked. #150 was
 stated *inside this session*, in the entry above, and corrected an hour later.
 
