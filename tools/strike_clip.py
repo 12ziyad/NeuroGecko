@@ -31,6 +31,14 @@ than in a file nobody opens.
 Usage:  python tools/strike_clip.py [--out artifacts/video/strike_clip.mp4]
 """
 
+# 50 FPS, AND THE NUMBER IS NOT A STYLE CHOICE. Every tool here appends one
+# frame per brain step, and a brain step is 0.02 s. Writing those frames at
+# 25 fps -- which all three tools did until Session 9f -- plays the animal at
+# HALF SPEED. That is the "lag" in every Session 9 clip: not a gait change,
+# not a physics change, a container header. The Session 4 renders were 50 fps
+# and real-time, which is why they looked right and these did not.
+# Measured: 1000 frames = 20.0 s of simulation shown over 40.0 s of video.
+
 from __future__ import annotations
 
 import argparse
@@ -139,7 +147,7 @@ def main():
 
     out = REPO / args.out
     out.parent.mkdir(parents=True, exist_ok=True)
-    imageio.mimwrite(str(out), frames, fps=25, quality=8, macro_block_size=1)
+    imageio.mimwrite(str(out), frames, fps=50, quality=8, macro_block_size=1)
 
     print(f"attempts : {state['strikes']}")
     print(f"caught   : {state['hits']}")
@@ -147,7 +155,7 @@ def main():
     if state["success_rate"] is not None:
         print(f"success  : {100 * state['success_rate']:.0f}%   (published 82.9%)")
     print(f"written  : {out}  ({len(frames)} frames, "
-          f"{len(frames) / 25:.0f} s, one fixed camera)")
+          f"{len(frames) / 50:.0f} s, one fixed camera)")
 
     evidence = REPO / "artifacts/evidence/session9/strike_clip.json"
     evidence.parent.mkdir(parents=True, exist_ok=True)

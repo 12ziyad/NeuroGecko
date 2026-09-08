@@ -4,9 +4,9 @@
  "video": "artifacts/video/gecko_session9.mp4",
  "camera": "track: follows position, azimuth fixed at the starting heading, no rotation and no smoothing",
  "part_1_walk": {
-  "distance_m": 0.4074,
-  "seconds": 10.0,
-  "speed_m_s": 0.0407
+  "distance_m": 0.3714,
+  "seconds": 15.0,
+  "speed_m_s": 0.0248
  },
  "part_2_strike": {
   "active": false,

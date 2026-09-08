@@ -27,6 +27,14 @@ So this renders both, back to back, from one angle:
 Usage:  python tools/gecko_walks_and_strikes.py
 """
 
+# 50 FPS, AND THE NUMBER IS NOT A STYLE CHOICE. Every tool here appends one
+# frame per brain step, and a brain step is 0.02 s. Writing those frames at
+# 25 fps -- which all three tools did until Session 9f -- plays the animal at
+# HALF SPEED. That is the "lag" in every Session 9 clip: not a gait change,
+# not a physics change, a container header. The Session 4 renders were 50 fps
+# and real-time, which is why they looked right and these did not.
+# Measured: 1000 frames = 20.0 s of simulation shown over 40.0 s of video.
+
 from __future__ import annotations
 
 import argparse
@@ -146,7 +154,7 @@ def main():
 
     out = REPO / args.out
     out.parent.mkdir(parents=True, exist_ok=True)
-    imageio.mimwrite(str(out), walk_frames + strike_frames, fps=25, quality=8,
+    imageio.mimwrite(str(out), walk_frames + strike_frames, fps=50, quality=8,
                      macro_block_size=1)
 
     seconds = args.walk_steps * 0.02
