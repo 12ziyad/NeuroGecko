@@ -24,7 +24,7 @@ if str(REPO) not in sys.path:
     sys.path.insert(0, str(REPO))
 
 from envs.gecko_brain_env import (                      # noqa: E402
-    FOOD_CHROMA_TOLERANCE, LEGACY_MARKER_RGB, _food_visible_frac)
+    FOOD_CHROMA_TOLERANCE, LEGACY_MARKER_RGB, _food_visible_frac, _rendered_rgb)
 
 #: Every material in morphology/gecko_world_v1.xml, so the confusers in these
 #: tests are the real ones rather than invented colours.
@@ -78,6 +78,16 @@ class TheDetectorCannotDisagreeWithTheWorld(unittest.TestCase):
     """The class of bug, not the instance."""
 
     def test_the_target_colour_is_read_from_the_model(self):
+        """THIS TEST USED TO PASS WHILE THE BUG WAS LIVE, and that is the more
+        important finding than the bug.
+
+        It read `geom_rgba`, then asked whether the detector could see a patch
+        of `geom_rgba`. Of course it could -- it was comparing the detector
+        against itself. Meanwhile the prey geom carries `material="prey"` and
+        no rgba, so `geom_rgba` was MuJoCo's default grey and the world was
+        drawing brown. Self-consistency is not correctness: the assertion has
+        to reach the colour the RENDERER uses, or it tests nothing.
+        """
         import mujoco
         world = REPO / "morphology/gecko_world_v1.xml"
         if not world.is_file():
@@ -85,9 +95,39 @@ class TheDetectorCannotDisagreeWithTheWorld(unittest.TestCase):
         model = mujoco.MjModel.from_xml_path(str(world))
         gid = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_GEOM, "prey_geom")
         self.assertGreaterEqual(gid, 0, "the prey geom must be findable by name")
-        rgb = tuple(float(x) for x in model.geom_rgba[gid][:3])
+
+        drawn = _rendered_rgb(model, gid)
+        self.assertGreater(_food_visible_frac(patch(drawn), drawn), 0.9,
+                           "the detector must see the colour that is DRAWN")
         # Whatever colour the world is regenerated in, the detector follows.
-        self.assertGreater(_food_visible_frac(patch(rgb), rgb), 0.9)
+        self.assertAlmostEqual(
+            float(np.abs(np.asarray(drawn) - np.asarray(PREY_RGB)).max()), 0.0,
+            places=6, msg="the world's prey is no longer the colour these "
+                          "tests were written against -- update PREY_RGB")
+
+    def test_the_regression_itself_the_material_not_the_geom(self):
+        """The exact shape of the second occurrence, pinned.
+
+        The prey states its colour on a MATERIAL. `geom_rgba` therefore holds
+        MuJoCo's default grey, and a detector keyed to that scores 0.0 on the
+        prey the renderer actually draws.
+        """
+        import mujoco
+        world = REPO / "morphology/gecko_world_v1.xml"
+        if not world.is_file():
+            self.skipTest("no-cheat world not generated")
+        model = mujoco.MjModel.from_xml_path(str(world))
+        gid = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_GEOM, "prey_geom")
+
+        raw = tuple(float(x) for x in model.geom_rgba[gid][:3])
+        drawn = _rendered_rgb(model, gid)
+        self.assertNotAlmostEqual(
+            float(np.abs(np.asarray(raw) - np.asarray(drawn)).max()), 0.0,
+            places=3, msg="if the world ever sets rgba on the geom directly "
+                          "this test stops guarding anything -- delete it and "
+                          "say so, do not weaken it")
+        self.assertEqual(_food_visible_frac(patch(drawn), raw), 0.0,
+                         "reading geom_rgba scores exactly zero on the real prey")
 
     def test_the_env_reads_it_at_construction(self):
         from envs.gecko_brain_env import GeckoBrainEnv

@@ -99,6 +99,27 @@ LEGACY_MARKER_RGB = (0.10, 0.80, 0.15)
 FOOD_CHROMA_TOLERANCE = 0.07
 
 
+def _rendered_rgb(model, geom_id):
+    """The colour MuJoCo will actually DRAW this geom in.
+
+    Not the same thing as `geom_rgba`, and the difference has now cost this
+    project two identical bugs. A geom with a material and no rgba of its own
+    carries MuJoCo's default 0.5 0.5 0.5 in `geom_rgba` while the renderer uses
+    the material. Anything that asks the model what the prey looks like must
+    ask this, so the detector and the renderer cannot answer differently.
+    """
+    matid = int(model.geom_matid[geom_id])
+    rgba = model.geom_rgba[geom_id]
+    if matid >= 0 and np.allclose(rgba, _MUJOCO_DEFAULT_RGBA):
+        rgba = model.mat_rgba[matid]
+    return tuple(float(x) for x in rgba[:3])
+
+
+#: What MuJoCo puts in geom_rgba when the XML sets none. A geom sitting at
+#: exactly this value has almost certainly not stated a colour at all.
+_MUJOCO_DEFAULT_RGBA = (0.5, 0.5, 0.5, 1.0)
+
+
 def _food_visible_frac(image: np.ndarray, target_rgb=None,
                        tolerance: float = FOOD_CHROMA_TOLERANCE) -> float:
     """Fraction of pixels that look like the food, in a uint8 HxWx3 image.
@@ -158,6 +179,7 @@ class GeckoBrainEnv(gym.Env):
         seed: int | None = None,
         privileged_target: float = 1.0,
         privileged_food_dropout_prob: float = 0.0,
+        walker_oracle: bool = True,
         control_mode: str = "cpg_residual",
         residual_scale: float = 0.25,
         front_stance_press: float = 0.40,
@@ -174,6 +196,8 @@ class GeckoBrainEnv(gym.Env):
         homeostasis_time_compression: float = 1.0,
         action_selection: bool = False,
         eye: bool = False,
+        eye_render_pixels: int | None = None,
+        eye_receptor_pixels: int | None = None,
     ):
         super().__init__()
         self.policy_camera_mode = str(policy_camera_mode)
@@ -234,7 +258,30 @@ class GeckoBrainEnv(gym.Env):
             front_swing_lift=front_swing_lift,
             render_mode=render_mode,
             seed=seed,
+            privileged_target=bool(walker_oracle),
         )
+        # THE WALKER'S OWN ORACLE, NOW PASSED RATHER THAN DEFAULTED.
+        #
+        # GeckoWalkEnv puts five numbers into its 92-long proprioception vector:
+        # exact egocentric direction, distance and bearing to the goal, read out
+        # of the physics engine, noiseless, at any range. It defaults to True and
+        # this constructor never passed the flag, so it was unconditionally on
+        # and nothing here could turn it off. All twelve checkpoints in the
+        # repository record proprio_dim 92, including the ones described as
+        # pure-vision. This is the THIRD time a privileged channel has survived a
+        # "removed everywhere" declaration -- see FAILURE_MAP #26 and #33.
+        #
+        # It is exposed rather than removed, and it still defaults to True,
+        # because tools/oracle_ablation.py measured what removing it costs:
+        # zeroing the five slots leaves the walker moving just as far (0.086 ->
+        # 0.110 m) while progress TOWARD THE GOAL collapses 0.0664 -> 0.0060 m,
+        # a 91 % loss. The legs are fine; the navigation was the oracle. So the
+        # channel is load-bearing, turning it off needs a retrained walker, and
+        # flipping the default silently would break every checkpoint here.
+        #
+        # What changes is that it can no longer be claimed absent: the flag is
+        # real, and step() reports the truth in info["walker_oracle"].
+        self.walker_oracle = bool(walker_oracle)
         # Prey needs a world with somewhere to put it. When the model carries a
         # prey mocap body the food IS that body, so the camera sees a real geom
         # rather than a sphere drawn onto the scene after rendering.
@@ -260,6 +307,18 @@ class GeckoBrainEnv(gym.Env):
             # Read the prey's actual colour out of the model. One source of
             # truth: if the world is regenerated in a different colour the
             # detector follows it without anyone remembering to.
+            #
+            # THE MATERIAL WINS, AND GETTING THAT WRONG WAS THE SAME BUG TWICE.
+            # Session 8 fixed a detector that tested green against a brown prey
+            # by reading the colour from the model instead of hard-coding it --
+            # and read `geom_rgba`. But the prey geom in
+            # morphology/gecko_world_v1.xml carries `material="prey"` and sets
+            # no rgba, so `geom_rgba` is MuJoCo's *default* 0.5 0.5 0.5 grey
+            # while the renderer draws 0.55 0.35 0.18. Measured: the detector
+            # scored 0.0 on a patch of the colour the world actually shows.
+            # A geom's own rgba overrides its material's, so that is checked
+            # first and the material is the fallback -- the same precedence
+            # the renderer uses.
             geom = mujoco.mj_name2id(self.walk_env.model,
                                      mujoco.mjtObj.mjOBJ_GEOM, "prey_geom")
             if geom < 0:
@@ -267,8 +326,7 @@ class GeckoBrainEnv(gym.Env):
                     "The prey body has no geom named 'prey_geom', so its "
                     "appearance cannot be read and the food detector would "
                     "silently key on the wrong colour.")
-            self._food_rgb = tuple(
-                float(x) for x in self.walk_env.model.geom_rgba[geom][:3])
+            self._food_rgb = _rendered_rgb(self.walk_env.model, geom)
         self._nose_sid = mujoco.mj_name2id(
             self.walk_env.model,
             mujoco.mjtObj.mjOBJ_SITE,
@@ -320,9 +378,22 @@ class GeckoBrainEnv(gym.Env):
         # produced. Off by default, because turning it on changes what the
         # policy is given and no trained checkpoint has seen it.
         self.eye = None
+        self._eye_render_px = None
         if eye:
             from brain.tectum import Eye
-            self.eye = Eye(fovy_deg=70.0, pixels=64, cells=16)
+            # SUPERSAMPLE, then limit to the animal. Rendering above the
+            # animal's own resolving power is not a superpower: the image is
+            # low-passed to what its receptors can carry before anything reads
+            # it. What it buys is the removal of ALIASING -- fine floor texture
+            # that the eye could never resolve otherwise survives as false
+            # structure and moves when the animal moves, which is
+            # indistinguishable from prey to a motion detector.
+            render_px = int(eye_render_pixels or 64)
+            receptor_px = int(eye_receptor_pixels or 64)
+            self._eye_render_px = render_px
+            self.eye = Eye(fovy_deg=70.0, pixels=receptor_px,
+                           cells=min(receptor_px, 64),
+                           render_pixels=render_px)
 
         self.selector = None
         if action_selection:
@@ -720,6 +791,10 @@ class GeckoBrainEnv(gym.Env):
             "food_visible_frac": float(food_visible_frac),
             "prey_bearing_deg": prey_bearing_deg,
             "vision_source": "eye" if self.eye is not None else "colour_match",
+            # Reported every step so no run can later be described as
+            # oracle-free without the record contradicting it.
+            "walker_oracle": self.walker_oracle,
+            "food_oracle_scale": float(self.privileged_target),
             "food_visible_signal": float(food_visible_signal),
             "food_radius": float(self.food_radius),
             "reward_progress": float(r_progress),

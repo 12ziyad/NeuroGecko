@@ -1,0 +1,14 @@
+{
+ "filling_median": 0.046875,
+ "filling_max": 0.21484375,
+ "self_motion_rejection_rate": 0.0,
+ "peak_elevation_median_deg": -2.50583463849288,
+ "peak_azimuth_median_deg": 0.0,
+ "peak_outer_third_fraction": 0.62,
+ "head_rotation_per_frame_deg_median": 2.148546027205776,
+ "peak_ray_targets": {
+  "sky(no hit)": 68,
+  "floor": 81,
+  "prey_geom": 1
+ }
+}

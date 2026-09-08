@@ -1,0 +1,90 @@
+{
+ "schema_version": 1,
+ "test": "does zeroing the privileged target channel change what the walker does",
+ "generated_by": "tools/oracle_ablation.py",
+ "why": "The channel is present in every checkpoint in the repository (proprio_dim 92 in all 12). Presence is not the same as dependence, and the difference decides whether it can be retired without retraining.",
+ "checkpoint": "models/v4_5b_speed_polish_1m",
+ "oracle_live": {
+  "summary": {
+   "episodes": 5,
+   "mean_distance_m": 0.0857,
+   "mean_toward_goal_m": 0.0664,
+   "falls": 5
+  },
+  "episodes": [
+   {
+    "episode": 0,
+    "distance_travelled_m": 0.1178,
+    "toward_goal_m": 0.0937,
+    "fell": true
+   },
+   {
+    "episode": 1,
+    "distance_travelled_m": 0.0345,
+    "toward_goal_m": -0.0344,
+    "fell": true
+   },
+   {
+    "episode": 2,
+    "distance_travelled_m": 0.1944,
+    "toward_goal_m": 0.1943,
+    "fell": true
+   },
+   {
+    "episode": 3,
+    "distance_travelled_m": 0.0613,
+    "toward_goal_m": 0.0595,
+    "fell": true
+   },
+   {
+    "episode": 4,
+    "distance_travelled_m": 0.0207,
+    "toward_goal_m": 0.0187,
+    "fell": true
+   }
+  ]
+ },
+ "oracle_zeroed": {
+  "summary": {
+   "episodes": 5,
+   "mean_distance_m": 0.1103,
+   "mean_toward_goal_m": 0.006,
+   "falls": 5
+  },
+  "episodes": [
+   {
+    "episode": 0,
+    "distance_travelled_m": 0.0971,
+    "toward_goal_m": 0.0959,
+    "fell": true
+   },
+   {
+    "episode": 1,
+    "distance_travelled_m": 0.1458,
+    "toward_goal_m": -0.1353,
+    "fell": true
+   },
+   {
+    "episode": 2,
+    "distance_travelled_m": 0.0972,
+    "toward_goal_m": 0.0324,
+    "fell": true
+   },
+   {
+    "episode": 3,
+    "distance_travelled_m": 0.1213,
+    "toward_goal_m": 0.1208,
+    "fell": true
+   },
+   {
+    "episode": 4,
+    "distance_travelled_m": 0.0903,
+    "toward_goal_m": -0.084,
+    "fell": true
+   }
+  ]
+ },
+ "fraction_of_progress_retained": 0.0904,
+ "load_bearing": true,
+ "verdict": "LOAD-BEARING. Zeroing the five privileged numbers costs the walker 91% of its progress toward the goal. The accepted walker is a goal-following policy that was handed the goal. Retiring the channel requires retraining, and the locomotion result must be read with that attached."
+}

@@ -1,0 +1,40 @@
+{
+ "schema_version": 1,
+ "what_this_is": "A record of morphology files whose EXACT BYTES no longer exist in the repository, paired with the physics fingerprint they were measured to have at the time. It exists so that evidence recording a raw file hash can still be checked against the body that file described.",
+ "what_this_is_not": "It is NOT a derivation. The raw files listed here cannot be reconstructed, so these pairings cannot be recomputed today. They are transcribed from a committed evidence document written by the session that produced the files. Anything added here in future must cite a comparable record, and a pairing that cannot be cited must not be added.",
+ "why_it_exists": "Eight gate-contract tests failed for four sessions with 'Lab base evidence measured a different body than --xml-path.' The message was false. The check compared raw bytes, so it could not distinguish a changed mass from a changed comment, and what changed was a comment. Because the check raised before any other contract could be evaluated, it masked seven unrelated tests as well.",
+ "source_document": "artifacts/evidence/morphology_reproducibility_line_endings_20260905.md",
+ "source_document_says": "Both saved candidate XML edits were comment-only. Parsed element trees, including all attributes and the saved stand keyframes, were identical to Git HEAD 9960117a7cd815947293a4d8c7c9de43b6ae06ff.",
+ "corroboration": {
+  "claim": "If the 2026-09-05 edits were comment-only, then every committed version of the body before and after them must share one physics fingerprint.",
+  "method": "Recomputed the comment-free ElementTree serialization of every version of morphology/gecko_body_lab_v2.xml in git history.",
+  "result": [
+   {"commit": "9960117a7cd815947293a4d8c7c9de43b6ae06ff", "raw_sha256_prefix": "f9ed54c5c72bc3f7", "physics_sha256": "b178bf26b644b1d38ab9d157e0a3dfc3cb887868896aad0867a9e7f613ebb9be"},
+   {"commit": "3efa2f6d2d4c9294495a89b81b0dacdb1eb29a2c", "raw_sha256_prefix": "db650f6bf55852cb", "physics_sha256": "b178bf26b644b1d38ab9d157e0a3dfc3cb887868896aad0867a9e7f613ebb9be"}
+  ],
+  "verdict": "Confirmed. Two committed versions with different bytes share one physics fingerprint, which is what a comment-only change looks like. This corroborates the source document's claim; it does not independently prove the pairing for the uncommitted file below."
+ },
+ "equivalences": [
+  {
+   "raw_sha256": "756765356417749c72150b05da59565ffc97825cf2457e638cd04ea2e1885c4b",
+   "physics_sha256": "b178bf26b644b1d38ab9d157e0a3dfc3cb887868896aad0867a9e7f613ebb9be",
+   "label": "gecko_body_lab_v2.xml, 2026-09-05 candidate v2",
+   "recorded_by": "artifacts/evidence/morphology_reproducibility_line_endings_20260905.md, table 'Candidate / Updated local exact raw SHA256 / Comment-free ElementTree serialization SHA256 (unchanged)'",
+   "committed": false,
+   "note": "This is the hash every sessions 3-4 evidence file records. The file was never committed, so the pairing is transcribed, not recomputed. The column heading in the source document says 'unchanged', which is the source's own statement that the physics did not move."
+  },
+  {
+   "raw_sha256": "6ee41aa34cd453508e4a199ce7571977ffe37cfa02e518473ef1fc2181721082",
+   "physics_sha256": "dbc81102603c4db2f2da319d4d4a6db04ff76c47f1640515e0db06a854a1bd88",
+   "label": "gecko_body_v1.xml, 2026-09-05 candidate v1",
+   "recorded_by": "artifacts/evidence/morphology_reproducibility_line_endings_20260905.md, same table",
+   "committed": false,
+   "note": "Recorded for completeness. No current evidence file references it."
+  }
+ ],
+ "limits": [
+  "A transcribed pairing is weaker evidence than a recomputed one, and this file must keep saying so.",
+  "The equivalence is only ever used to ACCEPT evidence whose physics matches the body in hand. It cannot be used to accept a body whose physics differs, because the physics fingerprint covers every element and attribute the simulator reads.",
+  "If the raw file for any pairing here is ever recovered, recompute the pairing and replace the transcription."
+ ]
+}

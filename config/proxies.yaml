@@ -875,10 +875,10 @@
       },
       "cost_of_transport_mL_O2_per_kg_per_m": {
         "value": 0.73,
-        "units": "mL O2 per kg per metre", "species": "E_macularius", "sample_size": null,
-        "source": "Measured net cost of transport, reported as temperature-INDEPENDENT.",
-        "confidence": "verified", "recording_temp_C": null,
-        "notes": "Makes the cost of moving a published quantity rather than an invented one. Temperature independence is itself the published finding: the animal pays the same per metre whether warm or cool, even though how FAST it can go is strongly temperature dependent. At 0.055 m/s a 38 g gecko pays about 110 J/h moving, roughly 2.2x its resting 49.5 J/h."
+        "units": "mL O2 per kg per metre", "species": "Teratoscincus przewalskii", "sample_size": null,
+        "source": "Minimum net cost of transport, reported as temperature-INDEPENDENT. Autumn, Weinstein & Full 1994, Physiol. Zool. 67(1):238-262, in an 11.2 g Teratoscincus przewalskii.",
+        "confidence": "likely", "recording_temp_C": null,
+        "notes": "SPECIES CORRECTED session 9. Confidence downgraded verified -> likely: the schema has no \"proxy\" level, and using one broke the registry loader, so the nearest honest value is used and the proxy status is stated here instead. This entry said species E_macularius and confidence verified, and both were wrong: 0.73 was measured in Teratoscincus przewalskii, a different FAMILY (Gekkonidae, not Eublepharidae). docs/research/gecko_scorecard.md had it right all along, tagged [TP] and defined there as a proxy \"used only for energetics\"; the machine-readable registry that the code actually reads did not carry the tag across. No cost of transport, sprint maximum, endurance or thermal performance curve has ever been measured in E. macularius -- NOT_IN_CORPUS. The companion number for Coleonyx variegatus, an actual eublepharid, is Autumn, Farley, Emshwiller & Full 1997, Physiol. Zool. 70(6):660-669, and would be the closer proxy. Temperature independence is itself the published finding: the animal pays the same per metre whether warm or cool, even though how FAST it can go is strongly temperature dependent. At 0.055 m/s a 38 g gecko pays about 110 J/h moving, roughly 2.2x its resting 49.5 J/h."
       },
       "critical_thermal_maximum_C": {
         "value": 41.07,

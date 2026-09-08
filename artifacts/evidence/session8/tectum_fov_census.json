@@ -1,0 +1,11 @@
+{
+ "model_fovy_deg": 120.0,
+ "seeds": 12,
+ "frames": 1800,
+ "in_70_deg_fraction": 0.1,
+ "in_120_deg_fraction": 0.18833333333333332,
+ "on_image_fraction": 0.18833333333333332,
+ "prey_total_travel_mm": 0.0,
+ "corr_reported_vs_trunk_plus_left": -0.0186604818669701,
+ "corr_reported_vs_camera_plus_right": 0.030617440919580404
+}

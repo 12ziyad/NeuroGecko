@@ -41,6 +41,8 @@ from envs.gecko_walk_env import GeckoWalkEnv
 from envs.cpg_residual_controller import CPGResidualController
 from common.gait_config import get_gait_profile
 from common.provenance import parameter_value
+from common.body_identity import (
+    describe_mismatch, physics_sha256, raw_sha256, same_body)
 from common.checkpoints import (
     CheckpointBundleCallback, atomic_json, export_legacy_final,
     sha256_file, verify_checkpoint_bundle,
@@ -345,9 +347,18 @@ def require_lab_training_readiness(args):
         raise ValueError("Lab base evidence must be a lab-profile report.")
     if protocol.get("controller") != "zero residual with contact reflex":
         raise ValueError("Lab base evidence must measure the base with the policy switched off.")
-    body_sha = sha256_file(args.xml_path)
-    if protocol.get("xml_sha256") != body_sha:
-        raise ValueError("Lab base evidence measured a different body than --xml-path.")
+    # SAME ANIMAL, NOT SAME FILE. This compared raw bytes and refused the
+    # sessions 3-4 evidence for four sessions -- masking eight other gate
+    # contracts, which could never reach their own assertions because this
+    # raised first. The difference was a COMMENT: the 2026-09-05 portability
+    # correction embedded a canonical-LF source hash in the generator's comment
+    # block. The comment-free serializations match exactly (b178bf26...), so
+    # the evidence was measured on this body all along. See
+    # common/body_identity.py and
+    # artifacts/evidence/morphology_reproducibility_line_endings_20260905.md.
+    recorded_sha = protocol.get("xml_sha256")
+    if not same_body(args.xml_path, recorded_sha):
+        raise ValueError(describe_mismatch(args.xml_path, recorded_sha))
     recorded = protocol.get("effective_lab_parameters")
     if not isinstance(recorded, dict):
         raise ValueError("Lab base evidence records no effective lab controller parameters.")
@@ -399,7 +410,12 @@ def require_lab_training_readiness(args):
     return {
         "evidence_path": str(path.resolve()),
         "evidence_sha256": sha256_file(path),
-        "xml_sha256": body_sha,
+        # Both fingerprints, because recording only the raw one is what made
+        # this evidence unverifiable four sessions later. The physics hash
+        # survives a comment edit; the raw hash pins the exact file.
+        "xml_sha256": raw_sha256(args.xml_path),
+        "xml_physics_sha256": physics_sha256(args.xml_path),
+        "xml_sha256_recorded_by_evidence": recorded_sha,
         "hind_stance_compensation": args.hind_stance_compensation,
         "parameters_defaulted_in_older_evidence": missing,
         "report_derivable_gate_values": measurements,

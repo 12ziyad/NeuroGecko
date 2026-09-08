@@ -1,0 +1,4614 @@
+[
+ {
+  "i": 0,
+  "az_cam_deg": -5.90752846479314,
+  "el_cam_deg": -3.2987682584456652,
+  "in_fov": true,
+  "px_col": 26.771219197361397,
+  "px_row": 34.14816574208134,
+  "on_image": true,
+  "dist_m": 0.3893090037984188,
+  "food_angular_radius_deg": 1.3243212388180905,
+  "food_moved_m": 0.0,
+  "salience": 0.0,
+  "reported_bearing_deg": 0.0,
+  "peak_cell": [
+   0,
+   0
+  ],
+  "peak_px": [
+   2.0,
+   2.0
+  ],
+  "peak_value": 0.0,
+  "motion_median": 0.0,
+  "food_cell": [
+   8,
+   6
+  ],
+  "motion_at_food_cell": 0.0,
+  "moving_speed": 0.03611223909682127,
+  "peak_err_px": 40.584699840014316
+ },
+ {
+  "i": 1,
+  "az_cam_deg": -7.1942021851867475,
+  "el_cam_deg": -5.946788546436079,
+  "in_fov": true,
+  "px_col": 25.731352643499697,
+  "px_row": 36.29820775360723,
+  "on_image": true,
+  "dist_m": 0.38766527577680315,
+  "food_angular_radius_deg": 1.329934441513169,
+  "food_moved_m": 0.0,
+  "salience": 0.9368308351177727,
+  "reported_bearing_deg": -21.49783070938183,
+  "peak_cell": [
+   8,
+   3
+  ],
+  "peak_px": [
+   34.0,
+   14.0
+  ],
+  "peak_value": 0.11446078431372547,
+  "motion_median": 0.007230392156862789,
+  "food_cell": [
+   9,
+   6
+  ],
+  "motion_at_food_cell": 0.023406862745098032,
+  "moving_speed": 0.09495587694572402,
+  "peak_err_px": 11.954346227414016
+ },
+ {
+  "i": 2,
+  "az_cam_deg": -9.054186229528312,
+  "el_cam_deg": -9.03238517741065,
+  "in_fov": true,
+  "px_col": 24.21740313762546,
+  "px_row": 38.856428667678685,
+  "on_image": true,
+  "dist_m": 0.3855187049205018,
+  "food_angular_radius_deg": 1.337336844035063,
+  "food_moved_m": 0.0,
+  "salience": 0.930795847750865,
+  "reported_bearing_deg": 7.479522112590492,
+  "peak_cell": [
+   8,
+   9
+  ],
+  "peak_px": [
+   34.0,
+   38.0
+  ],
+  "peak_value": 0.10624999999999998,
+  "motion_median": 0.007352941176470583,
+  "food_cell": [
+   9,
+   6
+  ],
+  "motion_at_food_cell": 0.051715686274509794,
+  "moving_speed": 0.13213012072491756,
+  "peak_err_px": 14.613174729503095
+ },
+ {
+  "i": 3,
+  "az_cam_deg": -10.884636456820958,
+  "el_cam_deg": -12.374510409267485,
+  "in_fov": true,
+  "px_col": 22.712133516374042,
+  "px_row": 41.710336836313175,
+  "on_image": true,
+  "dist_m": 0.3838581308786875,
+  "food_angular_radius_deg": 1.3431200617013028,
+  "food_moved_m": 0.0,
+  "salience": 0.9402277039848197,
+  "reported_bearing_deg": -29.63635396145181,
+  "peak_cell": [
+   9,
+   1
+  ],
+  "peak_px": [
+   38.0,
+   6.0
+  ],
+  "peak_value": 0.12916666666666662,
+  "motion_median": 0.007720588235294118,
+  "food_cell": [
+   10,
+   5
+  ],
+  "motion_at_food_cell": 0.012132352941176473,
+  "moving_speed": 0.12189060721069746,
+  "peak_err_px": 17.119053890563436
+ },
+ {
+  "i": 4,
+  "az_cam_deg": -12.1438670267601,
+  "el_cam_deg": -14.344884943385606,
+  "in_fov": true,
+  "px_col": 21.666007382878334,
+  "px_row": 43.45462183828521,
+  "on_image": true,
+  "dist_m": 0.3828234008497887,
+  "food_angular_radius_deg": 1.3467490339917894,
+  "food_moved_m": 0.0,
+  "salience": 0.9557522123893806,
+  "reported_bearing_deg": 21.49783070938183,
+  "peak_cell": [
+   9,
+   12
+  ],
+  "peak_px": [
+   38.0,
+   50.0
+  ],
+  "peak_value": 0.11078431372549016,
+  "motion_median": 0.0049019607843137185,
+  "food_cell": [
+   10,
+   5
+  ],
+  "motion_at_food_cell": 0.012254901960784308,
+  "moving_speed": 0.08739342290512372,
+  "peak_err_px": 28.854255093933773
+ },
+ {
+  "i": 5,
+  "az_cam_deg": -12.927546245119588,
+  "el_cam_deg": -14.440570359256899,
+  "in_fov": true,
+  "px_col": 21.010007406027842,
+  "px_row": 43.57449758856027,
+  "on_image": true,
+  "dist_m": 0.3815864780232266,
+  "food_angular_radius_deg": 1.351112941592713,
+  "food_moved_m": 0.0,
+  "salience": 0.9783362218370885,
+  "reported_bearing_deg": -33.28267938563705,
+  "peak_cell": [
+   10,
+   0
+  ],
+  "peak_px": [
+   42.0,
+   2.0
+  ],
+  "peak_value": 0.07071078431372547,
+  "motion_median": 0.0015318627450980372,
+  "food_cell": [
+   10,
+   5
+  ],
+  "motion_at_food_cell": 0.012990196078431378,
+  "moving_speed": 0.07393376067393516,
+  "peak_err_px": 19.07509958646653
+ },
+ {
+  "i": 6,
+  "az_cam_deg": -14.168666330999041,
+  "el_cam_deg": -15.14799622389758,
+  "in_fov": true,
+  "px_col": 19.962525124494235,
+  "px_row": 44.260259874718955,
+  "on_image": true,
+  "dist_m": 0.3815147408569331,
+  "food_angular_radius_deg": 1.3513669005231506,
+  "food_moved_m": 0.0,
+  "salience": 0.9793233082706767,
+  "reported_bearing_deg": -33.28267938563705,
+  "peak_cell": [
+   10,
+   0
+  ],
+  "peak_px": [
+   42.0,
+   2.0
+  ],
+  "peak_value": 0.06519607843137254,
+  "motion_median": 0.0013480392156862697,
+  "food_cell": [
+   11,
+   4
+  ],
+  "motion_at_food_cell": 0.004779411764705883,
+  "moving_speed": 0.038676444397236984,
+  "peak_err_px": 18.104173097641084
+ },
+ {
+  "i": 7,
+  "az_cam_deg": -15.82897760750877,
+  "el_cam_deg": -15.10947814687578,
+  "in_fov": true,
+  "px_col": 18.54302747432555,
+  "px_row": 44.32545494397559,
+  "on_image": true,
+  "dist_m": 0.3819357850821655,
+  "food_angular_radius_deg": 1.3498777114760498,
+  "food_moved_m": 0.0,
+  "salience": 0.9834254143646409,
+  "reported_bearing_deg": 25.705823336339154,
+  "peak_cell": [
+   9,
+   13
+  ],
+  "peak_px": [
+   38.0,
+   54.0
+  ],
+  "peak_value": 0.0443627450980392,
+  "motion_median": 0.000735294117647058,
+  "food_cell": [
+   11,
+   4
+  ],
+  "motion_at_food_cell": 0.014093137254901949,
+  "moving_speed": 0.03575947629191343,
+  "peak_err_px": 36.01677777001571
+ },
+ {
+  "i": 8,
+  "az_cam_deg": -17.31230865758497,
+  "el_cam_deg": -14.837493128939045,
+  "in_fov": true,
+  "px_col": 17.255034875854093,
+  "px_row": 44.181149576751665,
+  "on_image": true,
+  "dist_m": 0.3831673931940187,
+  "food_angular_radius_deg": 1.3455404213140654,
+  "food_moved_m": 0.0,
+  "salience": 0.9807692307692308,
+  "reported_bearing_deg": -7.479522112590492,
+  "peak_cell": [
+   9,
+   6
+  ],
+  "peak_px": [
+   38.0,
+   26.0
+  ],
+  "peak_value": 0.0477941176470588,
+  "motion_median": 0.0009191176470588203,
+  "food_cell": [
+   11,
+   4
+  ],
+  "motion_at_food_cell": 0.040196078431372545,
+  "moving_speed": 0.06228467108480832,
+  "peak_err_px": 10.70892268683949
+ },
+ {
+  "i": 9,
+  "az_cam_deg": -18.230793211225127,
+  "el_cam_deg": -14.44537403462775,
+  "in_fov": true,
+  "px_col": 16.447141043497837,
+  "px_row": 43.89470396945037,
+  "on_image": true,
+  "dist_m": 0.3851460997304623,
+  "food_angular_radius_deg": 1.338630164737654,
+  "food_moved_m": 0.0,
+  "salience": 0.9854227405247811,
+  "reported_bearing_deg": -25.705823336339154,
+  "peak_cell": [
+   9,
+   2
+  ],
+  "peak_px": [
+   38.0,
+   10.0
+  ],
+  "peak_value": 0.0420343137254902,
+  "motion_median": 0.0006127450980392239,
+  "food_cell": [
+   10,
+   4
+  ],
+  "motion_at_food_cell": 0.002573529411764707,
+  "moving_speed": 0.10113808687993622,
+  "peak_err_px": 8.73574052511911
+ },
+ {
+  "i": 10,
+  "az_cam_deg": -18.889379226965218,
+  "el_cam_deg": -14.0818936568358,
+  "in_fov": true,
+  "px_col": 15.86260457523916,
+  "px_row": 43.61640363260867,
+  "on_image": true,
+  "dist_m": 0.38758989116971027,
+  "food_angular_radius_deg": 1.3301930152527242,
+  "food_moved_m": 0.0,
+  "salience": 0.9846625766871167,
+  "reported_bearing_deg": -25.705823336339154,
+  "peak_cell": [
+   9,
+   2
+  ],
+  "peak_px": [
+   38.0,
+   10.0
+  ],
+  "peak_value": 0.03995098039215689,
+  "motion_median": 0.0006127450980392135,
+  "food_cell": [
+   10,
+   3
+  ],
+  "motion_at_food_cell": 0.0003676470588235281,
+  "moving_speed": 0.12022074039271138,
+  "peak_err_px": 8.118751269129696
+ },
+ {
+  "i": 11,
+  "az_cam_deg": -18.681565104739978,
+  "el_cam_deg": -13.0119906803753,
+  "in_fov": true,
+  "px_col": 16.047541281651313,
+  "px_row": 42.648286113568446,
+  "on_image": true,
+  "dist_m": 0.3891917739708226,
+  "food_angular_radius_deg": 1.3247200001675377,
+  "food_moved_m": 0.0,
+  "salience": 0.978409090909091,
+  "reported_bearing_deg": -29.63635396145181,
+  "peak_cell": [
+   9,
+   1
+  ],
+  "peak_px": [
+   38.0,
+   6.0
+  ],
+  "peak_value": 0.10784313725490194,
+  "motion_median": 0.0023284313725490113,
+  "food_cell": [
+   10,
+   4
+  ],
+  "motion_at_food_cell": 0.009558823529411764,
+  "moving_speed": 0.10396317966465478,
+  "peak_err_px": 11.070666176887485
+ },
+ {
+  "i": 12,
+  "az_cam_deg": -16.880106111700776,
+  "el_cam_deg": -10.669751853027163,
+  "in_fov": true,
+  "px_col": 17.632385557070442,
+  "px_row": 40.497939116604144,
+  "on_image": true,
+  "dist_m": 0.3869384206717151,
+  "food_angular_radius_deg": 1.3324317936182017,
+  "food_moved_m": 0.0,
+  "salience": 0.9574542897327707,
+  "reported_bearing_deg": -29.63635396145181,
+  "peak_cell": [
+   9,
+   1
+  ],
+  "peak_px": [
+   38.0,
+   6.0
+  ],
+  "peak_value": 0.17426470588235293,
+  "motion_median": 0.007414215686274501,
+  "food_cell": [
+   10,
+   4
+  ],
+  "motion_at_food_cell": 0.03835784313725489,
+  "moving_speed": 0.0659141463061441,
+  "peak_err_px": 11.897566708306456
+ },
+ {
+  "i": 13,
+  "az_cam_deg": -14.890084234315822,
+  "el_cam_deg": -7.967694796302009,
+  "in_fov": true,
+  "px_col": 19.348442964136837,
+  "px_row": 38.11880078576942,
+  "on_image": true,
+  "dist_m": 0.38395203927419247,
+  "food_angular_radius_deg": 1.3427916767688244,
+  "food_moved_m": 0.0,
+  "salience": 0.9363636363636364,
+  "reported_bearing_deg": 33.28267938563705,
+  "peak_cell": [
+   9,
+   15
+  ],
+  "peak_px": [
+   38.0,
+   62.0
+  ],
+  "peak_value": 0.12132352941176469,
+  "motion_median": 0.007720588235294118,
+  "food_cell": [
+   9,
+   4
+  ],
+  "motion_at_food_cell": 0.08223039215686273,
+  "moving_speed": 0.1100946432625855,
+  "peak_err_px": 42.651722488197215
+ },
+ {
+  "i": 14,
+  "az_cam_deg": -13.114625104228832,
+  "el_cam_deg": -4.352244786401923,
+  "in_fov": true,
+  "px_col": 20.85280770398723,
+  "px_row": 35.07131270678304,
+  "on_image": true,
+  "dist_m": 0.37955711665532504,
+  "food_angular_radius_deg": 1.3583341785565002,
+  "food_moved_m": 0.0,
+  "salience": 0.9351145038167941,
+  "reported_bearing_deg": -12.342633493422358,
+  "peak_cell": [
+   8,
+   5
+  ],
+  "peak_px": [
+   34.0,
+   22.0
+  ],
+  "peak_value": 0.1605392156862745,
+  "motion_median": 0.01041666666666663,
+  "food_cell": [
+   8,
+   5
+  ],
+  "motion_at_food_cell": 0.1605392156862745,
+  "moving_speed": 0.1996548230562472,
+  "peak_err_px": 1.569637244635158
+ },
+ {
+  "i": 15,
+  "az_cam_deg": -11.395394461800297,
+  "el_cam_deg": -2.605010602834005,
+  "in_fov": true,
+  "px_col": 22.288937971469736,
+  "px_row": 33.621075784529616,
+  "on_image": true,
+  "dist_m": 0.3765398163013468,
+  "food_angular_radius_deg": 1.3692146963965353,
+  "food_moved_m": 0.0,
+  "salience": 0.9150259067357515,
+  "reported_bearing_deg": 33.28267938563705,
+  "peak_cell": [
+   8,
+   15
+  ],
+  "peak_px": [
+   34.0,
+   62.0
+  ],
+  "peak_value": 0.11825980392156862,
+  "motion_median": 0.010049019607843115,
+  "food_cell": [
+   8,
+   5
+  ],
+  "motion_at_food_cell": 0.03982843137254902,
+  "moving_speed": 0.15888921290670074,
+  "peak_err_px": 39.7128698408318
+ },
+ {
+  "i": 16,
+  "az_cam_deg": -9.639745033727063,
+  "el_cam_deg": -2.6706708348675146,
+  "in_fov": true,
+  "px_col": 23.73768654949215,
+  "px_row": 33.66227788941359,
+  "on_image": true,
+  "dist_m": 0.37575389553962124,
+  "food_angular_radius_deg": 1.3720774300627945,
+  "food_moved_m": 0.0,
+  "salience": 0.9812206572769953,
+  "reported_bearing_deg": -12.342633493422358,
+  "peak_cell": [
+   15,
+   5
+  ],
+  "peak_px": [
+   62.0,
+   22.0
+  ],
+  "peak_value": 0.0522058823529412,
+  "motion_median": 0.0009803921568627486,
+  "food_cell": [
+   8,
+   5
+  ],
+  "motion_at_food_cell": 0.026102941176470586,
+  "moving_speed": 0.033809840790139524,
+  "peak_err_px": 28.39095012431081
+ },
+ {
+  "i": 17,
+  "az_cam_deg": -7.31681388840694,
+  "el_cam_deg": -4.359364290800304,
+  "in_fov": true,
+  "px_col": 25.631968840448263,
+  "px_row": 35.01247941207275,
+  "on_image": true,
+  "dist_m": 0.3759988880571662,
+  "food_angular_radius_deg": 1.3711837563305886,
+  "food_moved_m": 0.0,
+  "salience": 0.919753086419753,
+  "reported_bearing_deg": -17.031963469659434,
+  "peak_cell": [
+   7,
+   4
+  ],
+  "peak_px": [
+   30.0,
+   18.0
+  ],
+  "peak_value": 0.09926470588235294,
+  "motion_median": 0.00796568627450982,
+  "food_cell": [
+   8,
+   6
+  ],
+  "motion_at_food_cell": 0.03749999999999999,
+  "moving_speed": 0.05029979873423959,
+  "peak_err_px": 9.13082133425172
+ },
+ {
+  "i": 18,
+  "az_cam_deg": -7.05904941269031,
+  "el_cam_deg": -6.388330271589875,
+  "in_fov": true,
+  "px_col": 25.840839545375708,
+  "px_row": 36.655814848365765,
+  "on_image": true,
+  "dist_m": 0.37766203809290255,
+  "food_angular_radius_deg": 1.365147620324191,
+  "food_moved_m": 0.0,
+  "salience": 0.944776119402985,
+  "reported_bearing_deg": -7.479522112590492,
+  "peak_cell": [
+   8,
+   6
+  ],
+  "peak_px": [
+   34.0,
+   26.0
+  ],
+  "peak_value": 0.12316176470588235,
+  "motion_median": 0.006801470588235298,
+  "food_cell": [
+   9,
+   6
+  ],
+  "motion_at_food_cell": 0.03786764705882352,
+  "moving_speed": 0.1285438333474669,
+  "peak_err_px": 2.6605797411685073
+ },
+ {
+  "i": 19,
+  "az_cam_deg": -7.386442861257867,
+  "el_cam_deg": -9.029181478013271,
+  "in_fov": true,
+  "px_col": 25.57550631285008,
+  "px_row": 38.82291573262436,
+  "on_image": true,
+  "dist_m": 0.37995953677348177,
+  "food_angular_radius_deg": 1.3568960871803157,
+  "food_moved_m": 0.0,
+  "salience": 0.9402427637721755,
+  "reported_bearing_deg": -7.479522112590492,
+  "peak_cell": [
+   8,
+   6
+  ],
+  "peak_px": [
+   34.0,
+   26.0
+  ],
+  "peak_value": 0.13124999999999998,
+  "motion_median": 0.00784313725490196,
+  "food_cell": [
+   9,
+   6
+  ],
+  "motion_at_food_cell": 0.04301470588235294,
+  "moving_speed": 0.13287102370815235,
+  "peak_err_px": 4.841560807676146
+ },
+ {
+  "i": 20,
+  "az_cam_deg": -7.009612289423471,
+  "el_cam_deg": -10.860039049287023,
+  "in_fov": true,
+  "px_col": 25.880872387598792,
+  "px_row": 40.333547773741685,
+  "on_image": true,
+  "dist_m": 0.38131791035123075,
+  "food_angular_radius_deg": 1.3520641966969769,
+  "food_moved_m": 0.0,
+  "salience": 0.9404494382022474,
+  "reported_bearing_deg": 17.031963469659434,
+  "peak_cell": [
+   9,
+   11
+  ],
+  "peak_px": [
+   38.0,
+   46.0
+  ],
+  "peak_value": 0.10906862745098038,
+  "motion_median": 0.006495098039215663,
+  "food_cell": [
+   10,
+   6
+  ],
+  "motion_at_food_cell": 0.029779411764705884,
+  "moving_speed": 0.07199421632372371,
+  "peak_err_px": 20.254005556837875
+ },
+ {
+  "i": 21,
+  "az_cam_deg": -5.672697247991268,
+  "el_cam_deg": -10.500524552311264,
+  "in_fov": true,
+  "px_col": 26.96045346672706,
+  "px_row": 40.01224989042507,
+  "on_image": true,
+  "dist_m": 0.38045473417159126,
+  "food_angular_radius_deg": 1.355130619086725,
+  "food_moved_m": 0.0,
+  "salience": 0.964963503649635,
+  "reported_bearing_deg": -33.28267938563705,
+  "peak_cell": [
+   8,
+   0
+  ],
+  "peak_px": [
+   34.0,
+   2.0
+  ],
+  "peak_value": 0.08394607843137253,
+  "motion_median": 0.002941176470588242,
+  "food_cell": [
+   10,
+   6
+  ],
+  "motion_at_food_cell": 0.02512254901960784,
+  "moving_speed": 0.030127466388248144,
+  "peak_err_px": 25.674333214507502
+ },
+ {
+  "i": 22,
+  "az_cam_deg": -4.501014986679349,
+  "el_cam_deg": -10.348104862544831,
+  "in_fov": true,
+  "px_col": 27.902459458907664,
+  "px_row": 39.87069009857894,
+  "on_image": true,
+  "dist_m": 0.3790681452610176,
+  "food_angular_radius_deg": 1.3600856769224698,
+  "food_moved_m": 0.0,
+  "salience": 0.9660766961651917,
+  "reported_bearing_deg": 25.705823336339154,
+  "peak_cell": [
+   9,
+   13
+  ],
+  "peak_px": [
+   38.0,
+   54.0
+  ],
+  "peak_value": 0.041544117647058815,
+  "motion_median": 0.001409313725490198,
+  "food_cell": [
+   9,
+   6
+  ],
+  "motion_at_food_cell": 0.030759803921568633,
+  "moving_speed": 0.10481187941058687,
+  "peak_err_px": 26.164500831066494
+ },
+ {
+  "i": 23,
+  "az_cam_deg": -3.739797073256094,
+  "el_cam_deg": -10.624004495007878,
+  "in_fov": true,
+  "px_col": 28.512788504221216,
+  "px_row": 40.090772696893524,
+  "on_image": true,
+  "dist_m": 0.3774982369107645,
+  "food_angular_radius_deg": 1.3657397505586302,
+  "food_moved_m": 0.0,
+  "salience": 0.9742574257425741,
+  "reported_bearing_deg": -33.28267938563705,
+  "peak_cell": [
+   8,
+   0
+  ],
+  "peak_px": [
+   34.0,
+   2.0
+  ],
+  "peak_value": 0.06188725490196077,
+  "motion_median": 0.001593137254901969,
+  "food_cell": [
+   10,
+   7
+  ],
+  "motion_at_food_cell": 0.021691176470588235,
+  "moving_speed": 0.14034737873944533,
+  "peak_err_px": 27.203409093618916
+ },
+ {
+  "i": 24,
+  "az_cam_deg": -3.5126541956106276,
+  "el_cam_deg": -11.058294115557171,
+  "in_fov": true,
+  "px_col": 28.694691990612924,
+  "px_row": 40.448398098176085,
+  "on_image": true,
+  "dist_m": 0.375835780977483,
+  "food_angular_radius_deg": 1.3717786021396876,
+  "food_moved_m": 0.0,
+  "salience": 0.9808510638297872,
+  "reported_bearing_deg": -29.63635396145181,
+  "peak_cell": [
+   8,
+   1
+  ],
+  "peak_px": [
+   34.0,
+   6.0
+  ],
+  "peak_value": 0.05759803921568626,
+  "motion_median": 0.001102941176470593,
+  "food_cell": [
+   10,
+   7
+  ],
+  "motion_at_food_cell": 0.01752450980392157,
+  "moving_speed": 0.1284140772868164,
+  "peak_err_px": 23.5930261429379
+ },
+ {
+  "i": 25,
+  "az_cam_deg": -4.279728450791113,
+  "el_cam_deg": -11.608688034269795,
+  "in_fov": true,
+  "px_col": 28.080004526442572,
+  "px_row": 40.91448730843061,
+  "on_image": true,
+  "dist_m": 0.3742484265860639,
+  "food_angular_radius_deg": 1.377594689272428,
+  "food_moved_m": 0.0,
+  "salience": 0.9760479041916164,
+  "reported_bearing_deg": -33.28267938563705,
+  "peak_cell": [
+   8,
+   0
+  ],
+  "peak_px": [
+   34.0,
+   2.0
+  ],
+  "peak_value": 0.06139705882352939,
+  "motion_median": 0.0014705882352941367,
+  "food_cell": [
+   10,
+   7
+  ],
+  "motion_at_food_cell": 0.035906862745098043,
+  "moving_speed": 0.10716632911322199,
+  "peak_err_px": 26.981044658013392
+ },
+ {
+  "i": 26,
+  "az_cam_deg": -6.1866363150471875,
+  "el_cam_deg": -12.30930677320618,
+  "in_fov": true,
+  "px_col": 26.546096066063903,
+  "px_row": 41.530565185686484,
+  "on_image": true,
+  "dist_m": 0.3726861432718088,
+  "food_angular_radius_deg": 1.3833672640427415,
+  "food_moved_m": 0.0,
+  "salience": 0.9676767676767677,
+  "reported_bearing_deg": 25.705823336339154,
+  "peak_cell": [
+   9,
+   13
+  ],
+  "peak_px": [
+   38.0,
+   54.0
+  ],
+  "peak_value": 0.06066176470588233,
+  "motion_median": 0.0019607843137254884,
+  "food_cell": [
+   10,
+   6
+  ],
+  "motion_at_food_cell": 0.01507352941176471,
+  "moving_speed": 0.1076791218505201,
+  "peak_err_px": 27.679987928902232
+ },
+ {
+  "i": 27,
+  "az_cam_deg": -8.224408843509645,
+  "el_cam_deg": -13.08564614519846,
+  "in_fov": true,
+  "px_col": 24.894548616199238,
+  "px_row": 42.23321314996528,
+  "on_image": true,
+  "dist_m": 0.3707862889462439,
+  "food_angular_radius_deg": 1.3904526585619583,
+  "food_moved_m": 0.0,
+  "salience": 0.959942775393419,
+  "reported_bearing_deg": 33.28267938563705,
+  "peak_cell": [
+   10,
+   15
+  ],
+  "peak_px": [
+   42.0,
+   62.0
+  ],
+  "peak_value": 0.08566176470588233,
+  "motion_median": 0.003431372549019618,
+  "food_cell": [
+   10,
+   6
+  ],
+  "motion_at_food_cell": 0.02500000000000001,
+  "moving_speed": 0.11044477351412414,
+  "peak_err_px": 37.10618426581907
+ },
+ {
+  "i": 28,
+  "az_cam_deg": -9.949472474892266,
+  "el_cam_deg": -13.580968553029946,
+  "in_fov": true,
+  "px_col": 23.48327594524892,
+  "px_row": 42.70867733116551,
+  "on_image": true,
+  "dist_m": 0.36863232280056407,
+  "food_angular_radius_deg": 1.398574035026006,
+  "food_moved_m": 0.0,
+  "salience": 0.9732472324723248,
+  "reported_bearing_deg": 25.705823336339154,
+  "peak_cell": [
+   10,
+   13
+  ],
+  "peak_px": [
+   42.0,
+   54.0
+  ],
+  "peak_value": 0.06642156862745097,
+  "motion_median": 0.0017769607843137261,
+  "food_cell": [
+   10,
+   5
+  ],
+  "motion_at_food_cell": 0.008333333333333333,
+  "moving_speed": 0.12549729180205074,
+  "peak_err_px": 30.524951606735286
+ },
+ {
+  "i": 29,
+  "az_cam_deg": -10.972128978400642,
+  "el_cam_deg": -13.749191134418057,
+  "in_fov": true,
+  "px_col": 22.639745262024675,
+  "px_row": 42.89043364438495,
+  "on_image": true,
+  "dist_m": 0.3661040728533261,
+  "food_angular_radius_deg": 1.4082284639901472,
+  "food_moved_m": 0.0,
+  "salience": 0.9845201238390093,
+  "reported_bearing_deg": -7.479522112590492,
+  "peak_cell": [
+   9,
+   6
+  ],
+  "peak_px": [
+   38.0,
+   26.0
+  ],
+  "peak_value": 0.039583333333333345,
+  "motion_median": 0.0006127450980392135,
+  "food_cell": [
+   10,
+   5
+  ],
+  "motion_at_food_cell": 0.009681372549019606,
+  "moving_speed": 0.1427446452004556,
+  "peak_err_px": 5.933603722377984
+ },
+ {
+  "i": 30,
+  "az_cam_deg": -11.288417659581752,
+  "el_cam_deg": -13.773650646976384,
+  "in_fov": true,
+  "px_col": 22.377698675697886,
+  "px_row": 42.92389890796678,
+  "on_image": true,
+  "dist_m": 0.3633325907601635,
+  "food_angular_radius_deg": 1.41896598231273,
+  "food_moved_m": 0.0,
+  "salience": 0.9850746268656717,
+  "reported_bearing_deg": 17.031963469659434,
+  "peak_cell": [
+   10,
+   11
+  ],
+  "peak_px": [
+   42.0,
+   46.0
+  ],
+  "peak_value": 0.04105392156862746,
+  "motion_median": 0.0006127450980392135,
+  "food_cell": [
+   10,
+   5
+  ],
+  "motion_at_food_cell": 0.018014705882352943,
+  "moving_speed": 0.15320960329572658,
+  "peak_err_px": 23.64036186373355
+ },
+ {
+  "i": 31,
+  "az_cam_deg": -10.853037901631199,
+  "el_cam_deg": -13.624184452364815,
+  "in_fov": true,
+  "px_col": 22.738266590799206,
+  "px_row": 42.778324151765865,
+  "on_image": true,
+  "dist_m": 0.3604595497990371,
+  "food_angular_radius_deg": 1.4302711639380608,
+  "food_moved_m": 0.0,
+  "salience": 0.98068669527897,
+  "reported_bearing_deg": 25.705823336339154,
+  "peak_cell": [
+   10,
+   13
+  ],
+  "peak_px": [
+   42.0,
+   54.0
+  ],
+  "peak_value": 0.05710784313725488,
+  "motion_median": 0.0011029411764705878,
+  "food_cell": [
+   10,
+   5
+  ],
+  "motion_at_food_cell": 0.018504901960784307,
+  "moving_speed": 0.15501396308263182,
+  "peak_err_px": 31.271420886060856
+ },
+ {
+  "i": 32,
+  "az_cam_deg": -9.879764440738334,
+  "el_cam_deg": -13.314738609206813,
+  "in_fov": true,
+  "px_col": 23.540575771248957,
+  "px_row": 42.47841998883543,
+  "on_image": true,
+  "dist_m": 0.3576571701699042,
+  "food_angular_radius_deg": 1.441473171297007,
+  "food_moved_m": 0.0,
+  "salience": 0.9805680119581466,
+  "reported_bearing_deg": 33.28267938563705,
+  "peak_cell": [
+   10,
+   15
+  ],
+  "peak_px": [
+   42.0,
+   62.0
+  ],
+  "peak_value": 0.08198529411764705,
+  "motion_median": 0.0015931372549019551,
+  "food_cell": [
+   10,
+   5
+  ],
+  "motion_at_food_cell": 0.005882352941176467,
+  "moving_speed": 0.14956441994361183,
+  "peak_err_px": 38.462399791130565
+ },
+ {
+  "i": 33,
+  "az_cam_deg": -9.550932008315781,
+  "el_cam_deg": -13.061496801666035,
+  "in_fov": true,
+  "px_col": 23.81055088935795,
+  "px_row": 42.251557939506114,
+  "on_image": true,
+  "dist_m": 0.35567373001248365,
+  "food_angular_radius_deg": 1.449508230259846,
+  "food_moved_m": 0.0,
+  "salience": 0.9790026246719161,
+  "reported_bearing_deg": -17.031963469659434,
+  "peak_cell": [
+   9,
+   4
+  ],
+  "peak_px": [
+   38.0,
+   18.0
+  ],
+  "peak_value": 0.046691176470588236,
+  "motion_median": 0.0009803921568627416,
+  "food_cell": [
+   10,
+   5
+  ],
+  "motion_at_food_cell": 0.004411764705882355,
+  "moving_speed": 0.1026023476815741,
+  "peak_err_px": 7.199878231664472
+ },
+ {
+  "i": 34,
+  "az_cam_deg": -11.689663504659054,
+  "el_cam_deg": -14.924835894293016,
+  "in_fov": true,
+  "px_col": 22.044430450719442,
+  "px_row": 43.939237976789,
+  "on_image": true,
+  "dist_m": 0.35386124149081855,
+  "food_angular_radius_deg": 1.4569294656359062,
+  "food_moved_m": 0.0,
+  "salience": 0.9568403908794789,
+  "reported_bearing_deg": -33.28267938563705,
+  "peak_cell": [
+   9,
+   0
+  ],
+  "peak_px": [
+   38.0,
+   2.0
+  ],
+  "peak_value": 0.15049019607843134,
+  "motion_median": 0.006495098039215677,
+  "food_cell": [
+   10,
+   5
+  ],
+  "motion_at_food_cell": 0.0071078431372549045,
+  "moving_speed": 0.18354518199795447,
+  "peak_err_px": 20.90583028340806
+ },
+ {
+  "i": 35,
+  "az_cam_deg": -15.361386370407912,
+  "el_cam_deg": -15.589769621475464,
+  "in_fov": true,
+  "px_col": 18.945049938084793,
+  "px_row": 44.72349983492416,
+  "on_image": true,
+  "dist_m": 0.3511418203103763,
+  "food_angular_radius_deg": 1.4682077500441384,
+  "food_moved_m": 0.0,
+  "salience": 0.9676007005253939,
+  "reported_bearing_deg": 25.705823336339154,
+  "peak_cell": [
+   9,
+   13
+  ],
+  "peak_px": [
+   38.0,
+   54.0
+  ],
+  "peak_value": 0.13995098039215687,
+  "motion_median": 0.004534313725490215,
+  "food_cell": [
+   11,
+   4
+  ],
+  "motion_at_food_cell": 0.027573529411764698,
+  "moving_speed": 0.2432797476655897,
+  "peak_err_px": 35.69390667710098
+ },
+ {
+  "i": 36,
+  "az_cam_deg": -19.049029704260075,
+  "el_cam_deg": -16.281211980912374,
+  "in_fov": true,
+  "px_col": 15.720217547225076,
+  "px_row": 45.620826424748365,
+  "on_image": true,
+  "dist_m": 0.349198988235714,
+  "food_angular_radius_deg": 1.4763727855294524,
+  "food_moved_m": 0.0,
+  "salience": 0.9611581920903954,
+  "reported_bearing_deg": -29.63635396145181,
+  "peak_cell": [
+   10,
+   1
+  ],
+  "peak_px": [
+   42.0,
+   6.0
+  ],
+  "peak_value": 0.08676470588235291,
+  "motion_median": 0.003370098039215688,
+  "food_cell": [
+   11,
+   3
+  ],
+  "motion_at_food_cell": 0.003921568627450984,
+  "moving_speed": 0.18375797752015258,
+  "peak_err_px": 10.372705199876178
+ },
+ {
+  "i": 37,
+  "az_cam_deg": -20.79370148177329,
+  "el_cam_deg": -16.637641944306395,
+  "in_fov": true,
+  "px_col": 14.14566740142342,
+  "px_row": 46.10818881697096,
+  "on_image": true,
+  "dist_m": 0.34802906103906633,
+  "food_angular_radius_deg": 1.4813335217268067,
+  "food_moved_m": 0.0,
+  "salience": 0.9747081712062258,
+  "reported_bearing_deg": 33.28267938563705,
+  "peak_cell": [
+   8,
+   15
+  ],
+  "peak_px": [
+   34.0,
+   62.0
+  ],
+  "peak_value": 0.09448529411764706,
+  "motion_median": 0.0023897058823529396,
+  "food_cell": [
+   11,
+   3
+  ],
+  "motion_at_food_cell": 0.03308823529411765,
+  "moving_speed": 0.09868679925090927,
+  "peak_err_px": 49.36238836282752
+ },
+ {
+  "i": 38,
+  "az_cam_deg": -20.36033228394989,
+  "el_cam_deg": -16.294904907403822,
+  "in_fov": true,
+  "px_col": 14.540055430640901,
+  "px_row": 45.74969604940236,
+  "on_image": true,
+  "dist_m": 0.34666403197044027,
+  "food_angular_radius_deg": 1.4871638267044682,
+  "food_moved_m": 0.0,
+  "salience": 0.968133535660091,
+  "reported_bearing_deg": 21.49783070938183,
+  "peak_cell": [
+   8,
+   12
+  ],
+  "peak_px": [
+   34.0,
+   50.0
+  ],
+  "peak_value": 0.0807598039215686,
+  "motion_median": 0.0025735294117647037,
+  "food_cell": [
+   11,
+   3
+  ],
+  "motion_at_food_cell": 0.02205882352941177,
+  "moving_speed": 0.06387213690624186,
+  "peak_err_px": 37.35589680512785
+ },
+ {
+  "i": 39,
+  "az_cam_deg": -18.704275453361355,
+  "el_cam_deg": -15.686656478733042,
+  "in_fov": true,
+  "px_col": 16.027353190893784,
+  "px_row": 45.050041404322315,
+  "on_image": true,
+  "dist_m": 0.3449772820939331,
+  "food_angular_radius_deg": 1.4944319534998804,
+  "food_moved_m": 0.0,
+  "salience": 0.9718543046357617,
+  "reported_bearing_deg": 29.63635396145181,
+  "peak_cell": [
+   8,
+   14
+  ],
+  "peak_px": [
+   34.0,
+   58.0
+  ],
+  "peak_value": 0.07401960784313724,
+  "motion_median": 0.0020833333333333294,
+  "food_cell": [
+   11,
+   4
+  ],
+  "motion_at_food_cell": 0.03529411764705882,
+  "moving_speed": 0.05785627439808934,
+  "peak_err_px": 43.40283971353961
+ },
+ {
+  "i": 40,
+  "az_cam_deg": -16.887435153945685,
+  "el_cam_deg": -15.146788991550205,
+  "in_fov": true,
+  "px_col": 17.626001181716745,
+  "px_row": 44.428565590665144,
+  "on_image": true,
+  "dist_m": 0.34320973018529505,
+  "food_angular_radius_deg": 1.5021248558220137,
+  "food_moved_m": 0.0,
+  "salience": 0.972386587771203,
+  "reported_bearing_deg": 25.705823336339154,
+  "peak_cell": [
+   8,
+   13
+  ],
+  "peak_px": [
+   34.0,
+   54.0
+  ],
+  "peak_value": 0.06213235294117646,
+  "motion_median": 0.0017156862745098082,
+  "food_cell": [
+   11,
+   4
+  ],
+  "motion_at_food_cell": 0.05906862745098039,
+  "moving_speed": 0.062172798075729827,
+  "peak_err_px": 37.83943406436302
+ },
+ {
+  "i": 41,
+  "az_cam_deg": -15.93072919326906,
+  "el_cam_deg": -13.737352512767517,
+  "in_fov": true,
+  "px_col": 18.455299437972997,
+  "px_row": 43.118421870831185,
+  "on_image": true,
+  "dist_m": 0.34106115583651225,
+  "food_angular_radius_deg": 1.5115833772953142,
+  "food_moved_m": 0.0,
+  "salience": 0.96684350132626,
+  "reported_bearing_deg": -33.28267938563705,
+  "peak_cell": [
+   10,
+   0
+  ],
+  "peak_px": [
+   42.0,
+   2.0
+  ],
+  "peak_value": 0.0924019607843137,
+  "motion_median": 0.0030637254901960762,
+  "food_cell": [
+   10,
+   4
+  ],
+  "motion_at_food_cell": 0.013480392156862753,
+  "moving_speed": 0.08924481863117113,
+  "peak_err_px": 16.493263687775926
+ },
+ {
+  "i": 42,
+  "az_cam_deg": -15.644216144403659,
+  "el_cam_deg": -11.085202889888803,
+  "in_fov": true,
+  "px_col": 18.702099592460655,
+  "px_row": 40.79833069087968,
+  "on_image": true,
+  "dist_m": 0.33868985290835296,
+  "food_angular_radius_deg": 1.5221616145374095,
+  "food_moved_m": 0.0,
+  "salience": 0.9377267230955261,
+  "reported_bearing_deg": -17.031963469659434,
+  "peak_cell": [
+   9,
+   4
+  ],
+  "peak_px": [
+   38.0,
+   18.0
+  ],
+  "peak_value": 0.10134803921568626,
+  "motion_median": 0.006311274509803913,
+  "food_cell": [
+   10,
+   4
+  ],
+  "motion_at_food_cell": 0.030024509803921573,
+  "moving_speed": 0.10814770461191525,
+  "peak_err_px": 2.8850647294735987
+ },
+ {
+  "i": 43,
+  "az_cam_deg": -15.999936273793367,
+  "el_cam_deg": -7.792413068176177,
+  "in_fov": true,
+  "px_col": 18.395579773539957,
+  "px_row": 38.00609005731676,
+  "on_image": true,
+  "dist_m": 0.33675529147614564,
+  "food_angular_radius_deg": 1.530901841936336,
+  "food_moved_m": 0.0,
+  "salience": 0.9436846339501207,
+  "reported_bearing_deg": -33.28267938563705,
+  "peak_cell": [
+   9,
+   0
+  ],
+  "peak_px": [
+   38.0,
+   2.0
+  ],
+  "peak_value": 0.15232843137254898,
+  "motion_median": 0.008578431372549005,
+  "food_cell": [
+   9,
+   4
+  ],
+  "motion_at_food_cell": 0.056004901960784316,
+  "moving_speed": 0.09877675261433275,
+  "peak_err_px": 16.39558090460081
+ },
+ {
+  "i": 44,
+  "az_cam_deg": -15.802646811449145,
+  "el_cam_deg": -8.143027211362142,
+  "in_fov": true,
+  "px_col": 18.565714913675084,
+  "px_row": 38.29605047784079,
+  "on_image": true,
+  "dist_m": 0.33702071851854687,
+  "food_angular_radius_deg": 1.5296967243152735,
+  "food_moved_m": 0.0,
+  "salience": 0.9584527220630371,
+  "reported_bearing_deg": 33.28267938563705,
+  "peak_cell": [
+   7,
+   15
+  ],
+  "peak_px": [
+   30.0,
+   62.0
+  ],
+  "peak_value": 0.042769607843137256,
+  "motion_median": 0.001776960784313733,
+  "food_cell": [
+   9,
+   4
+  ],
+  "motion_at_food_cell": 0.011642156862745097,
+  "moving_speed": 0.04360079339858123,
+  "peak_err_px": 44.21947053607754
+ },
+ {
+  "i": 45,
+  "az_cam_deg": -13.883106764276048,
+  "el_cam_deg": -9.746484783125007,
+  "in_fov": true,
+  "px_col": 20.204509902335204,
+  "px_row": 39.58615478469376,
+  "on_image": true,
+  "dist_m": 0.3370853821705601,
+  "food_angular_radius_deg": 1.5294034194210784,
+  "food_moved_m": 0.0,
+  "salience": 0.9168814432989689,
+  "reported_bearing_deg": 17.031963469659434,
+  "peak_cell": [
+   8,
+   11
+  ],
+  "peak_px": [
+   34.0,
+   46.0
+  ],
+  "peak_value": 0.09509803921568626,
+  "motion_median": 0.007904411764705892,
+  "food_cell": [
+   9,
+   5
+  ],
+  "motion_at_food_cell": 0.016299019607843135,
+  "moving_speed": 0.04560207524819765,
+  "peak_err_px": 26.393416502174922
+ },
+ {
+  "i": 46,
+  "az_cam_deg": -11.94866999150133,
+  "el_cam_deg": -10.452365566776086,
+  "in_fov": true,
+  "px_col": 21.82879256047748,
+  "px_row": 40.11754952203722,
+  "on_image": true,
+  "dist_m": 0.3368695964158062,
+  "food_angular_radius_deg": 1.5303826309031578,
+  "food_moved_m": 0.0,
+  "salience": 0.9459677419354837,
+  "reported_bearing_deg": -2.50583463849288,
+  "peak_cell": [
+   8,
+   7
+  ],
+  "peak_px": [
+   34.0,
+   30.0
+  ],
+  "peak_value": 0.07598039215686272,
+  "motion_median": 0.004105392156862755,
+  "food_cell": [
+   10,
+   5
+  ],
+  "motion_at_food_cell": 0.041544117647058815,
+  "moving_speed": 0.02429809351226386,
+  "peak_err_px": 10.20749935950456
+ },
+ {
+  "i": 47,
+  "az_cam_deg": -11.360803605596889,
+  "el_cam_deg": -9.501804410845866,
+  "in_fov": true,
+  "px_col": 22.31764594564308,
+  "px_row": 39.302031727848764,
+  "on_image": true,
+  "dist_m": 0.336745009079372,
+  "food_angular_radius_deg": 1.5309485652683126,
+  "food_moved_m": 0.0,
+  "salience": 0.9644859813084113,
+  "reported_bearing_deg": 21.49783070938183,
+  "peak_cell": [
+   8,
+   12
+  ],
+  "peak_px": [
+   34.0,
+   50.0
+  ],
+  "peak_value": 0.06556372549019605,
+  "motion_median": 0.002328431372549015,
+  "food_cell": [
+   9,
+   5
+  ],
+  "motion_at_food_cell": 0.005514705882352942,
+  "moving_speed": 0.016845840414033926,
+  "peak_err_px": 28.185532927973636
+ },
+ {
+  "i": 48,
+  "az_cam_deg": -12.10725293463417,
+  "el_cam_deg": -8.83011453485991,
+  "in_fov": true,
+  "px_col": 21.696559888694672,
+  "px_row": 38.76095323127273,
+  "on_image": true,
+  "dist_m": 0.337892735385668,
+  "food_angular_radius_deg": 1.5257508270828573,
+  "food_moved_m": 0.0,
+  "salience": 0.9566473988439305,
+  "reported_bearing_deg": 33.28267938563705,
+  "peak_cell": [
+   8,
+   15
+  ],
+  "peak_px": [
+   34.0,
+   62.0
+  ],
+  "peak_value": 0.08480392156862743,
+  "motion_median": 0.003676470588235302,
+  "food_cell": [
+   9,
+   5
+  ],
+  "motion_at_food_cell": 0.016911764705882345,
+  "moving_speed": 0.057903486462865944,
+  "peak_err_px": 40.58366617835236
+ },
+ {
+  "i": 49,
+  "az_cam_deg": -13.838315445760509,
+  "el_cam_deg": -8.017852228174705,
+  "in_fov": true,
+  "px_col": 20.24241193035785,
+  "px_row": 38.129773107134355,
+  "on_image": true,
+  "dist_m": 0.33917025805910367,
+  "food_angular_radius_deg": 1.5200066172579587,
+  "food_moved_m": 0.0,
+  "salience": 0.960573476702509,
+  "reported_bearing_deg": -33.28267938563705,
+  "peak_cell": [
+   8,
+   0
+  ],
+  "peak_px": [
+   34.0,
+   2.0
+  ],
+  "peak_value": 0.06838235294117644,
+  "motion_median": 0.0026960784313725394,
+  "food_cell": [
+   9,
+   5
+  ],
+  "motion_at_food_cell": 0.031495098039215685,
+  "moving_speed": 0.0581595913041591,
+  "peak_err_px": 18.70402681117819
+ },
+ {
+  "i": 50,
+  "az_cam_deg": -16.062215053855375,
+  "el_cam_deg": -7.137857790457003,
+  "in_fov": true,
+  "px_col": 18.341803257348055,
+  "px_row": 37.4554863689497,
+  "on_image": true,
+  "dist_m": 0.3403470852037835,
+  "food_angular_radius_deg": 1.5147533029294624,
+  "food_moved_m": 0.0,
+  "salience": 0.9654676258992807,
+  "reported_bearing_deg": 33.28267938563705,
+  "peak_cell": [
+   8,
+   15
+  ],
+  "peak_px": [
+   34.0,
+   62.0
+  ],
+  "peak_value": 0.08517156862745096,
+  "motion_median": 0.002941176470588225,
+  "food_cell": [
+   9,
+   4
+  ],
+  "motion_at_food_cell": 0.02365196078431374,
+  "moving_speed": 0.06236377711958439,
+  "peak_err_px": 43.79473174784956
+ },
+ {
+  "i": 51,
+  "az_cam_deg": -18.401838923526178,
+  "el_cam_deg": -6.382743960762732,
+  "in_fov": true,
+  "px_col": 16.295759383798327,
+  "px_row": 36.887718540524176,
+  "on_image": true,
+  "dist_m": 0.34156422299566996,
+  "food_angular_radius_deg": 1.5093580975806076,
+  "food_moved_m": 0.0,
+  "salience": 0.9637826961770621,
+  "reported_bearing_deg": -21.49783070938183,
+  "peak_cell": [
+   8,
+   3
+  ],
+  "peak_px": [
+   34.0,
+   14.0
+  ],
+  "peak_value": 0.060906862745098024,
+  "motion_median": 0.002205882352941193,
+  "food_cell": [
+   9,
+   4
+  ],
+  "motion_at_food_cell": 0.04448529411764706,
+  "moving_speed": 0.06754711539604522,
+  "peak_err_px": 3.6890960298676356
+ },
+ {
+  "i": 52,
+  "az_cam_deg": -20.541133039567807,
+  "el_cam_deg": -6.176355241659799,
+  "in_fov": true,
+  "px_col": 14.375789619219255,
+  "px_row": 36.78139558585186,
+  "on_image": true,
+  "dist_m": 0.3432739847413384,
+  "food_angular_radius_deg": 1.5018438145497057,
+  "food_moved_m": 0.0,
+  "salience": 0.9753086419753088,
+  "reported_bearing_deg": -29.63635396145181,
+  "peak_cell": [
+   15,
+   1
+  ],
+  "peak_px": [
+   62.0,
+   6.0
+  ],
+  "peak_value": 0.049632352941176475,
+  "motion_median": 0.001225490196078427,
+  "food_cell": [
+   9,
+   3
+  ],
+  "motion_at_food_cell": 0.03063725490196078,
+  "moving_speed": 0.06854612915725512,
+  "peak_err_px": 26.573141710055907
+ },
+ {
+  "i": 53,
+  "az_cam_deg": -22.104489175674882,
+  "el_cam_deg": -6.599520564168707,
+  "in_fov": true,
+  "px_col": 12.938684147257906,
+  "px_row": 37.20682451045338,
+  "on_image": true,
+  "dist_m": 0.3452548223905762,
+  "food_angular_radius_deg": 1.493231167296835,
+  "food_moved_m": 0.0,
+  "salience": 0.9625550660792953,
+  "reported_bearing_deg": -7.479522112590492,
+  "peak_cell": [
+   8,
+   6
+  ],
+  "peak_px": [
+   34.0,
+   26.0
+  ],
+  "peak_value": 0.05563725490196077,
+  "motion_median": 0.002083333333333326,
+  "food_cell": [
+   9,
+   3
+  ],
+  "motion_at_food_cell": 0.05416666666666667,
+  "moving_speed": 0.06924825772547563,
+  "peak_err_px": 13.449226566830395
+ },
+ {
+  "i": 54,
+  "az_cam_deg": -23.65722425253293,
+  "el_cam_deg": -8.132982033898585,
+  "in_fov": true,
+  "px_col": 11.479459743584744,
+  "px_row": 38.630227444403566,
+  "on_image": true,
+  "dist_m": 0.3473505885331484,
+  "food_angular_radius_deg": 1.4842256859408207,
+  "food_moved_m": 0.0,
+  "salience": 0.9631410256410258,
+  "reported_bearing_deg": -33.28267938563705,
+  "peak_cell": [
+   8,
+   0
+  ],
+  "peak_px": [
+   34.0,
+   2.0
+  ],
+  "peak_value": 0.11470588235294116,
+  "motion_median": 0.00422794117647058,
+  "food_cell": [
+   9,
+   2
+  ],
+  "motion_at_food_cell": 0.012745098039215686,
+  "moving_speed": 0.07425460896168642,
+  "peak_err_px": 10.54984185744752
+ },
+ {
+  "i": 55,
+  "az_cam_deg": -25.375680530359443,
+  "el_cam_deg": -6.450364928552032,
+  "in_fov": true,
+  "px_col": 9.823461703611745,
+  "px_row": 37.21858557395485,
+  "on_image": true,
+  "dist_m": 0.34680822354408597,
+  "food_angular_radius_deg": 1.4865457898788772,
+  "food_moved_m": 0.0,
+  "salience": 0.9583333333333334,
+  "reported_bearing_deg": -33.28267938563705,
+  "peak_cell": [
+   8,
+   0
+  ],
+  "peak_px": [
+   34.0,
+   2.0
+  ],
+  "peak_value": 0.11470588235294116,
+  "motion_median": 0.0047794117647058845,
+  "food_cell": [
+   9,
+   2
+  ],
+  "motion_at_food_cell": 0.043627450980392155,
+  "moving_speed": 0.08658329499343852,
+  "peak_err_px": 8.459659929615956
+ },
+ {
+  "i": 56,
+  "az_cam_deg": -26.55007638078247,
+  "el_cam_deg": -3.3083051233117025,
+  "in_fov": true,
+  "px_col": 8.664560343588342,
+  "px_row": 34.45316297634011,
+  "on_image": true,
+  "dist_m": 0.3440774481041136,
+  "food_angular_radius_deg": 1.4983384241818278,
+  "food_moved_m": 0.0,
+  "salience": 0.9246073298429319,
+  "reported_bearing_deg": 17.031963469659434,
+  "peak_cell": [
+   8,
+   11
+  ],
+  "peak_px": [
+   34.0,
+   46.0
+  ],
+  "peak_value": 0.11703431372549017,
+  "motion_median": 0.008823529411764704,
+  "food_cell": [
+   8,
+   2
+  ],
+  "motion_at_food_cell": 0.09877450980392155,
+  "moving_speed": 0.18028330924399963,
+  "peak_err_px": 37.33818971268802
+ },
+ {
+  "i": 57,
+  "az_cam_deg": -25.765582765976003,
+  "el_cam_deg": -1.4796164296532792,
+  "in_fov": true,
+  "px_col": 9.441258647967157,
+  "px_row": 32.8107623070983,
+  "on_image": true,
+  "dist_m": 0.34103699575866697,
+  "food_angular_radius_deg": 1.511690412682772,
+  "food_moved_m": 0.0,
+  "salience": 0.9153225806451616,
+  "reported_bearing_deg": -7.479522112590492,
+  "peak_cell": [
+   7,
+   6
+  ],
+  "peak_px": [
+   30.0,
+   26.0
+  ],
+  "peak_value": 0.10637254901960783,
+  "motion_median": 0.009007352941176442,
+  "food_cell": [
+   8,
+   2
+  ],
+  "motion_at_food_cell": 0.04767156862745097,
+  "moving_speed": 0.16522204192028603,
+  "peak_err_px": 16.795603588752833
+ },
+ {
+  "i": 58,
+  "az_cam_deg": -23.766777111402515,
+  "el_cam_deg": -1.9931683277573677,
+  "in_fov": true,
+  "px_col": 11.375219978047305,
+  "px_row": 33.23782823121848,
+  "on_image": true,
+  "dist_m": 0.33925920297865836,
+  "food_angular_radius_deg": 1.5196082980226524,
+  "food_moved_m": 0.0,
+  "salience": 0.9576771653543309,
+  "reported_bearing_deg": -25.705823336339154,
+  "peak_cell": [
+   15,
+   2
+  ],
+  "peak_px": [
+   62.0,
+   10.0
+  ],
+  "peak_value": 0.062254901960784315,
+  "motion_median": 0.0026348039215686216,
+  "food_cell": [
+   8,
+   2
+  ],
+  "motion_at_food_cell": 0.04583333333333333,
+  "moving_speed": 0.06850081787805427,
+  "peak_err_px": 28.795030037228877
+ },
+ {
+  "i": 59,
+  "az_cam_deg": -22.389600816933683,
+  "el_cam_deg": -2.0804629165258386,
+  "in_fov": true,
+  "px_col": 12.673218899198552,
+  "px_row": 33.29552084463891,
+  "on_image": true,
+  "dist_m": 0.3382495517255036,
+  "food_angular_radius_deg": 1.5241420861532977,
+  "food_moved_m": 0.0,
+  "salience": 0.9811827956989246,
+  "reported_bearing_deg": -21.49783070938183,
+  "peak_cell": [
+   15,
+   3
+  ],
+  "peak_px": [
+   62.0,
+   14.0
+  ],
+  "peak_value": 0.04558823529411766,
+  "motion_median": 0.0008578431372549024,
+  "food_cell": [
+   8,
+   3
+  ],
+  "motion_at_food_cell": 0.03406862745098039,
+  "moving_speed": 0.02480950812976506,
+  "peak_err_px": 28.735126094555483
+ },
+ {
+  "i": 60,
+  "az_cam_deg": -21.940759694518515,
+  "el_cam_deg": -2.784925884783974,
+  "in_fov": true,
+  "px_col": 13.090646084400127,
+  "px_row": 33.89667638915465,
+  "on_image": true,
+  "dist_m": 0.3383827394533903,
+  "food_angular_radius_deg": 1.5235424653587737,
+  "food_moved_m": 0.0,
+  "salience": 0.9660377358490567,
+  "reported_bearing_deg": -7.479522112590492,
+  "peak_cell": [
+   7,
+   6
+  ],
+  "peak_px": [
+   30.0,
+   26.0
+  ],
+  "peak_value": 0.06495098039215685,
+  "motion_median": 0.0022058823529411756,
+  "food_cell": [
+   8,
+   3
+  ],
+  "motion_at_food_cell": 0.04669117647058822,
+  "moving_speed": 0.058155542152494154,
+  "peak_err_px": 13.484639609570923
+ },
+ {
+  "i": 61,
+  "az_cam_deg": -21.75860309065038,
+  "el_cam_deg": -4.331590916933756,
+  "in_fov": true,
+  "px_col": 13.259300256701316,
+  "px_row": 35.22714120461423,
+  "on_image": true,
+  "dist_m": 0.3391131907030631,
+  "food_angular_radius_deg": 1.5202622901638838,
+  "food_moved_m": 0.0,
+  "salience": 0.9113573407202219,
+  "reported_bearing_deg": 25.705823336339154,
+  "peak_cell": [
+   7,
+   13
+  ],
+  "peak_px": [
+   30.0,
+   54.0
+  ],
+  "peak_value": 0.08848039215686274,
+  "motion_median": 0.007843137254901933,
+  "food_cell": [
+   8,
+   3
+  ],
+  "motion_at_food_cell": 0.042401960784313714,
+  "moving_speed": 0.09808855615978354,
+  "peak_err_px": 41.07465910688235
+ },
+ {
+  "i": 62,
+  "az_cam_deg": -22.35151096754325,
+  "el_cam_deg": -6.874398730111318,
+  "in_fov": true,
+  "px_col": 12.708746748645503,
+  "px_row": 37.457258058101694,
+  "on_image": true,
+  "dist_m": 0.34108039169439913,
+  "food_angular_radius_deg": 1.5114981683096598,
+  "food_moved_m": 0.0,
+  "salience": 0.9363103953147874,
+  "reported_bearing_deg": 25.705823336339154,
+  "peak_cell": [
+   8,
+   13
+  ],
+  "peak_px": [
+   34.0,
+   54.0
+  ],
+  "peak_value": 0.16740196078431369,
+  "motion_median": 0.010661764705882391,
+  "food_cell": [
+   9,
+   3
+  ],
+  "motion_at_food_cell": 0.05073529411764706,
+  "moving_speed": 0.14202372859234846,
+  "peak_err_px": 41.43573612653457
+ },
+ {
+  "i": 63,
+  "az_cam_deg": -23.48578502264216,
+  "el_cam_deg": -10.042788221287212,
+  "in_fov": true,
+  "px_col": 11.642234796561983,
+  "px_row": 40.32449815763254,
+  "on_image": true,
+  "dist_m": 0.3435744907912703,
+  "food_angular_radius_deg": 1.5005308336977492,
+  "food_moved_m": 0.0,
+  "salience": 0.9154228855721395,
+  "reported_bearing_deg": 17.031963469659434,
+  "peak_cell": [
+   9,
+   11
+  ],
+  "peak_px": [
+   38.0,
+   46.0
+  ],
+  "peak_value": 0.17242647058823526,
+  "motion_median": 0.01458333333333332,
+  "food_cell": [
+   10,
+   2
+  ],
+  "motion_at_food_cell": 0.01764705882352942,
+  "moving_speed": 0.14691046875007815,
+  "peak_err_px": 34.4363081856841
+ },
+ {
+  "i": 64,
+  "az_cam_deg": -22.61332774190076,
+  "el_cam_deg": -10.311283899685,
+  "in_fov": true,
+  "px_col": 12.464145800225488,
+  "px_row": 40.506978602317034,
+  "on_image": true,
+  "dist_m": 0.3426470177099521,
+  "food_angular_radius_deg": 1.5045905891659512,
+  "food_moved_m": 0.0,
+  "salience": 0.961842105263158,
+  "reported_bearing_deg": 29.63635396145181,
+  "peak_cell": [
+   10,
+   14
+  ],
+  "peak_px": [
+   42.0,
+   58.0
+  ],
+  "peak_value": 0.09313725490196077,
+  "motion_median": 0.0035539215686274384,
+  "food_cell": [
+   10,
+   3
+  ],
+  "motion_at_food_cell": 0.030882352941176472,
+  "moving_speed": 0.03670509879471949,
+  "peak_err_px": 45.56032408353853
+ },
+ {
+  "i": 65,
+  "az_cam_deg": -21.662787228610096,
+  "el_cam_deg": -10.278743697484005,
+  "in_fov": true,
+  "px_col": 13.34784184207917,
+  "px_row": 40.41754143572415,
+  "on_image": true,
+  "dist_m": 0.34096809400494155,
+  "food_angular_radius_deg": 1.5119957485108084,
+  "food_moved_m": 0.0,
+  "salience": 0.9788732394366197,
+  "reported_bearing_deg": 17.031963469659434,
+  "peak_cell": [
+   10,
+   11
+  ],
+  "peak_px": [
+   42.0,
+   46.0
+  ],
+  "peak_value": 0.05220588235294117,
+  "motion_median": 0.0011029411764705843,
+  "food_cell": [
+   10,
+   3
+  ],
+  "motion_at_food_cell": 0.026593137254901953,
+  "moving_speed": 0.12751073892925163,
+  "peak_err_px": 32.690481909533325
+ },
+ {
+  "i": 66,
+  "az_cam_deg": -21.27958285386484,
+  "el_cam_deg": -10.864468779228657,
+  "in_fov": true,
+  "px_col": 13.700785713076382,
+  "px_row": 40.91295608057667,
+  "on_image": true,
+  "dist_m": 0.33949390999234114,
+  "food_angular_radius_deg": 1.5185582183162478,
+  "food_moved_m": 0.0,
+  "salience": 0.9629921259842519,
+  "reported_bearing_deg": 25.705823336339154,
+  "peak_cell": [
+   10,
+   13
+  ],
+  "peak_px": [
+   42.0,
+   54.0
+  ],
+  "peak_value": 0.07781862745098037,
+  "motion_median": 0.002879901960784314,
+  "food_cell": [
+   10,
+   3
+  ],
+  "motion_at_food_cell": 0.026470588235294124,
+  "moving_speed": 0.19158659685505325,
+  "peak_err_px": 40.31387275648599
+ },
+ {
+  "i": 67,
+  "az_cam_deg": -21.018886185762728,
+  "el_cam_deg": -11.391983553584673,
+  "in_fov": true,
+  "px_col": 13.939844920163726,
+  "px_row": 41.36459915349269,
+  "on_image": true,
+  "dist_m": 0.33810274884623637,
+  "food_angular_radius_deg": 1.5248035502783914,
+  "food_moved_m": 0.0,
+  "salience": 0.9724409448818898,
+  "reported_bearing_deg": 33.28267938563705,
+  "peak_cell": [
+   10,
+   15
+  ],
+  "peak_px": [
+   42.0,
+   62.0
+  ],
+  "peak_value": 0.06225490196078429,
+  "motion_median": 0.0017156862745097996,
+  "food_cell": [
+   10,
+   3
+  ],
+  "motion_at_food_cell": 0.0258578431372549,
+  "moving_speed": 0.17217635242121834,
+  "peak_err_px": 48.06435519731493
+ },
+ {
+  "i": 68,
+  "az_cam_deg": -21.1087598844091,
+  "el_cam_deg": -11.801104484704782,
+  "in_fov": true,
+  "px_col": 13.857525584926968,
+  "px_row": 41.73509073933001,
+  "on_image": true,
+  "dist_m": 0.33689007230244084,
+  "food_angular_radius_deg": 1.5302896598030886,
+  "food_moved_m": 0.0,
+  "salience": 0.9792284866468842,
+  "reported_bearing_deg": -2.50583463849288,
+  "peak_cell": [
+   9,
+   7
+  ],
+  "peak_px": [
+   38.0,
+   30.0
+  ],
+  "peak_value": 0.04129901960784312,
+  "motion_median": 0.0008578431372549059,
+  "food_cell": [
+   10,
+   3
+  ],
+  "motion_at_food_cell": 0.019240196078431374,
+  "moving_speed": 0.12162366677789478,
+  "peak_err_px": 16.568958418449732
+ },
+ {
+  "i": 69,
+  "az_cam_deg": -21.955169113176527,
+  "el_cam_deg": -12.33854978998926,
+  "in_fov": true,
+  "px_col": 13.077286375097941,
+  "px_row": 42.27826216994482,
+  "on_image": true,
+  "dist_m": 0.3361472631767044,
+  "food_angular_radius_deg": 1.5336696392107751,
+  "food_moved_m": 0.0,
+  "salience": 0.9785958904109587,
+  "reported_bearing_deg": -21.49783070938183,
+  "peak_cell": [
+   9,
+   3
+  ],
+  "peak_px": [
+   38.0,
+   14.0
+  ],
+  "peak_value": 0.07156862745098037,
+  "motion_median": 0.0015318627450980407,
+  "food_cell": [
+   10,
+   3
+  ],
+  "motion_at_food_cell": 0.02732843137254902,
+  "moving_speed": 0.1257902306500615,
+  "peak_err_px": 4.376634280855647
+ },
+ {
+  "i": 70,
+  "az_cam_deg": -22.859606969303215,
+  "el_cam_deg": -12.575778649610962,
+  "in_fov": true,
+  "px_col": 12.233209492518256,
+  "px_row": 42.56401503492315,
+  "on_image": true,
+  "dist_m": 0.33436560976044966,
+  "food_angular_radius_deg": 1.5418378006511853,
+  "food_moved_m": 0.0,
+  "salience": 0.9572727272727274,
+  "reported_bearing_deg": 7.479522112590492,
+  "peak_cell": [
+   9,
+   9
+  ],
+  "peak_px": [
+   38.0,
+   38.0
+  ],
+  "peak_value": 0.06740196078431371,
+  "motion_median": 0.0028799019607843104,
+  "food_cell": [
+   10,
+   3
+  ],
+  "motion_at_food_cell": 0.02953431372549021,
+  "moving_speed": 0.11968475908410518,
+  "peak_err_px": 26.167875846072334
+ },
+ {
+  "i": 71,
+  "az_cam_deg": -23.46650180762412,
+  "el_cam_deg": -12.935100591306972,
+  "in_fov": true,
+  "px_col": 11.660516946962204,
+  "px_row": 42.94272906127407,
+  "on_image": true,
+  "dist_m": 0.332034091641041,
+  "food_angular_radius_deg": 1.552659187151358,
+  "food_moved_m": 0.0,
+  "salience": 0.9761061946902656,
+  "reported_bearing_deg": 25.705823336339154,
+  "peak_cell": [
+   10,
+   13
+  ],
+  "peak_px": [
+   42.0,
+   54.0
+  ],
+  "peak_value": 0.06924019607843135,
+  "motion_median": 0.0016544117647058834,
+  "food_cell": [
+   10,
+   2
+  ],
+  "motion_at_food_cell": 0.010171568627450982,
+  "moving_speed": 0.14283276578037035,
+  "peak_err_px": 42.34997713436744
+ },
+ {
+  "i": 72,
+  "az_cam_deg": -23.467146336985792,
+  "el_cam_deg": -13.1087941649652,
+  "in_fov": true,
+  "px_col": 11.659905963876614,
+  "px_row": 43.101898700872084,
+  "on_image": true,
+  "dist_m": 0.32937967464503354,
+  "food_angular_radius_deg": 1.5651656148093673,
+  "food_moved_m": 0.0,
+  "salience": 0.9840425531914895,
+  "reported_bearing_deg": 2.50583463849288,
+  "peak_cell": [
+   9,
+   8
+  ],
+  "peak_px": [
+   38.0,
+   34.0
+  ],
+  "peak_value": 0.046078431372549036,
+  "motion_median": 0.0007352941176470562,
+  "food_cell": [
+   10,
+   2
+  ],
+  "motion_at_food_cell": 0.005759803921568624,
+  "moving_speed": 0.1488401992600689,
+  "peak_err_px": 22.915260677042188
+ },
+ {
+  "i": 73,
+  "az_cam_deg": -22.766268437654634,
+  "el_cam_deg": -13.08967279417375,
+  "in_fov": true,
+  "px_col": 12.320831104016307,
+  "px_row": 43.024036075429635,
+  "on_image": true,
+  "dist_m": 0.3266418572318616,
+  "food_angular_radius_deg": 1.5782777718380423,
+  "food_moved_m": 0.0,
+  "salience": 0.9825072886297377,
+  "reported_bearing_deg": 2.50583463849288,
+  "peak_cell": [
+   9,
+   8
+  ],
+  "peak_px": [
+   38.0,
+   34.0
+  ],
+  "peak_value": 0.0420343137254902,
+  "motion_median": 0.0007352941176470597,
+  "food_cell": [
+   10,
+   3
+  ],
+  "motion_at_food_cell": 0.01568627450980393,
+  "moving_speed": 0.14746515376059327,
+  "peak_err_px": 22.25370311898236
+ },
+ {
+  "i": 74,
+  "az_cam_deg": -21.823995304572794,
+  "el_cam_deg": -12.888238426034627,
+  "in_fov": true,
+  "px_col": 13.198804714708139,
+  "px_row": 42.7643030006289,
+  "on_image": true,
+  "dist_m": 0.323870105376919,
+  "food_angular_radius_deg": 1.5917781017703703,
+  "food_moved_m": 0.0,
+  "salience": 0.9718574108818012,
+  "reported_bearing_deg": 25.705823336339154,
+  "peak_cell": [
+   10,
+   13
+  ],
+  "peak_px": [
+   42.0,
+   54.0
+  ],
+  "peak_value": 0.06531862745098038,
+  "motion_median": 0.0018382352941176405,
+  "food_cell": [
+   10,
+   3
+  ],
+  "motion_at_food_cell": 0.034558823529411774,
+  "moving_speed": 0.1471715095885049,
+  "peak_err_px": 40.808353259906156
+ },
+ {
+  "i": 75,
+  "az_cam_deg": -22.886669360230815,
+  "el_cam_deg": -12.623977099836438,
+  "in_fov": true,
+  "px_col": 12.207782163723444,
+  "px_row": 42.610034362402274,
+  "on_image": true,
+  "dist_m": 0.32004627021951526,
+  "food_angular_radius_deg": 1.610786319933197,
+  "food_moved_m": 0.0,
+  "salience": 0.9409302325581397,
+  "reported_bearing_deg": 7.479522112590492,
+  "peak_cell": [
+   9,
+   9
+  ],
+  "peak_px": [
+   38.0,
+   38.0
+  ],
+  "peak_value": 0.13174019607843135,
+  "motion_median": 0.007781862745098012,
+  "food_cell": [
+   10,
+   3
+  ],
+  "motion_at_food_cell": 0.03799019607843139,
+  "moving_speed": 0.26073615214126644,
+  "peak_err_px": 26.2009716945092
+ },
+ {
+  "i": 76,
+  "az_cam_deg": -26.182455497040625,
+  "el_cam_deg": -12.416786512189637,
+  "in_fov": true,
+  "px_col": 9.029829583458497,
+  "px_row": 42.71246792941724,
+  "on_image": true,
+  "dist_m": 0.3174492301805403,
+  "food_angular_radius_deg": 1.6239570735275015,
+  "food_moved_m": 0.0,
+  "salience": 0.9628055260361317,
+  "reported_bearing_deg": 2.50583463849288,
+  "peak_cell": [
+   9,
+   8
+  ],
+  "peak_px": [
+   38.0,
+   34.0
+  ],
+  "peak_value": 0.1153186274509804,
+  "motion_median": 0.004289215686274515,
+  "food_cell": [
+   10,
+   2
+  ],
+  "motion_at_food_cell": 0.030637254901960793,
+  "moving_speed": 0.22287942609404313,
+  "peak_err_px": 25.410957569853807
+ },
+ {
+  "i": 77,
+  "az_cam_deg": -29.465749377902593,
+  "el_cam_deg": -12.188636058812987,
+  "in_fov": true,
+  "px_col": 5.6798194484820534,
+  "px_row": 42.83792280678093,
+  "on_image": true,
+  "dist_m": 0.31544023456974696,
+  "food_angular_radius_deg": 1.6342942421807973,
+  "food_moved_m": 0.0,
+  "salience": 0.9403508771929827,
+  "reported_bearing_deg": 7.479522112590492,
+  "peak_cell": [
+   9,
+   9
+  ],
+  "peak_px": [
+   38.0,
+   38.0
+  ],
+  "peak_value": 0.06985294117647059,
+  "motion_median": 0.004166666666666652,
+  "food_cell": [
+   10,
+   1
+  ],
+  "motion_at_food_cell": 0.03750000000000001,
+  "moving_speed": 0.19392288798878446,
+  "peak_err_px": 32.680262666739544
+ },
+ {
+  "i": 78,
+  "az_cam_deg": -32.20840717052424,
+  "el_cam_deg": -11.64353282737001,
+  "in_fov": true,
+  "px_col": 2.71134452420279,
+  "px_row": 42.62993627145434,
+  "on_image": true,
+  "dist_m": 0.31367047925684555,
+  "food_angular_radius_deg": 1.6435100252200352,
+  "food_moved_m": 0.0,
+  "salience": 0.9605839416058396,
+  "reported_bearing_deg": 12.342633493422358,
+  "peak_cell": [
+   8,
+   10
+  ],
+  "peak_px": [
+   34.0,
+   42.0
+  ],
+  "peak_value": 0.08394607843137253,
+  "motion_median": 0.003308823529411753,
+  "food_cell": [
+   10,
+   0
+  ],
+  "motion_at_food_cell": 0.024019607843137253,
+  "moving_speed": 0.16400980018392164,
+  "peak_err_px": 40.225293648962385
+ },
+ {
+  "i": 79,
+  "az_cam_deg": -33.663801138896666,
+  "el_cam_deg": -10.184448004142645,
+  "in_fov": true,
+  "px_col": 1.06309556600673,
+  "px_row": 41.364243945159046,
+  "on_image": true,
+  "dist_m": 0.31147832317454704,
+  "food_angular_radius_deg": 1.6550704882256015,
+  "food_moved_m": 0.0,
+  "salience": 0.9531478770131772,
+  "reported_bearing_deg": 12.342633493422358,
+  "peak_cell": [
+   8,
+   10
+  ],
+  "peak_px": [
+   34.0,
+   42.0
+  ],
+  "peak_value": 0.08370098039215686,
+  "motion_median": 0.003921568627450977,
+  "food_cell": [
+   10,
+   0
+  ],
+  "motion_at_food_cell": 0.05747549019607844,
+  "moving_speed": 0.14522003072812165,
+  "peak_err_px": 41.594016799555554
+ },
+ {
+  "i": 80,
+  "az_cam_deg": -33.799456082565584,
+  "el_cam_deg": -7.516598819000394,
+  "in_fov": true,
+  "px_col": 0.9066519399920594,
+  "px_row": 38.75651037233125,
+  "on_image": true,
+  "dist_m": 0.30869014679337303,
+  "food_angular_radius_deg": 1.6700111237551587,
+  "food_moved_m": 0.0,
+  "salience": 0.9447916666666668,
+  "reported_bearing_deg": -7.479522112590492,
+  "peak_cell": [
+   8,
+   6
+  ],
+  "peak_px": [
+   34.0,
+   26.0
+  ],
+  "peak_value": 0.11764705882352938,
+  "motion_median": 0.006495098039215663,
+  "food_cell": [
+   9,
+   0
+  ],
+  "motion_at_food_cell": 0.03296568627450981,
+  "moving_speed": 0.1369201645305417,
+  "peak_err_px": 25.54017438826131
+ },
+ {
+  "i": 81,
+  "az_cam_deg": -32.94559422204194,
+  "el_cam_deg": -4.234493283026405,
+  "in_fov": true,
+  "px_col": 1.8832537038930965,
+  "px_row": 35.53213259746916,
+  "on_image": true,
+  "dist_m": 0.30566123527327044,
+  "food_angular_radius_deg": 1.6865503778562052,
+  "food_moved_m": 0.0,
+  "salience": 0.9084880636604775,
+  "reported_bearing_deg": -33.28267938563705,
+  "peak_cell": [
+   8,
+   0
+  ],
+  "peak_px": [
+   34.0,
+   2.0
+  ],
+  "peak_value": 0.09240196078431372,
+  "motion_median": 0.00845588235294117,
+  "food_cell": [
+   8,
+   0
+  ],
+  "motion_at_food_cell": 0.09240196078431372,
+  "moving_speed": 0.12909734139689072,
+  "peak_err_px": 1.5365741094663377
+ },
+ {
+  "i": 82,
+  "az_cam_deg": -30.548784017927442,
+  "el_cam_deg": -4.868839938595831,
+  "in_fov": true,
+  "px_col": 4.527769973438371,
+  "px_row": 36.0203371922771,
+  "on_image": true,
+  "dist_m": 0.3048771506233055,
+  "food_angular_radius_deg": 1.6908853421750458,
+  "food_moved_m": 0.0,
+  "salience": 0.9577278731836195,
+  "reported_bearing_deg": 33.28267938563705,
+  "peak_cell": [
+   7,
+   15
+  ],
+  "peak_px": [
+   30.0,
+   62.0
+  ],
+  "peak_value": 0.09276960784313723,
+  "motion_median": 0.003921568627450984,
+  "food_cell": [
+   9,
+   1
+  ],
+  "motion_at_food_cell": 0.05122549019607843,
+  "moving_speed": 0.023952861122393754,
+  "peak_err_px": 57.7866912371242
+ },
+ {
+  "i": 83,
+  "az_cam_deg": -27.649224879067326,
+  "el_cam_deg": -6.689412384327276,
+  "in_fov": true,
+  "px_col": 7.558215963777517,
+  "px_row": 37.551038315361346,
+  "on_image": true,
+  "dist_m": 0.3052173116881147,
+  "food_angular_radius_deg": 1.6890019627099662,
+  "food_moved_m": 0.0,
+  "salience": 0.9159733777038273,
+  "reported_bearing_deg": -33.28267938563705,
+  "peak_cell": [
+   8,
+   0
+  ],
+  "peak_px": [
+   34.0,
+   2.0
+  ],
+  "peak_value": 0.07365196078431371,
+  "motion_median": 0.006188725490196063,
+  "food_cell": [
+   9,
+   1
+  ],
+  "motion_at_food_cell": 0.05955882352941176,
+  "moving_speed": 0.0763249135567323,
+  "peak_err_px": 6.5957287555777775
+ },
+ {
+  "i": 84,
+  "az_cam_deg": -25.48341591744307,
+  "el_cam_deg": -8.81976510918513,
+  "in_fov": true,
+  "px_col": 9.718102121520321,
+  "px_row": 39.355227902718006,
+  "on_image": true,
+  "dist_m": 0.3062450690063136,
+  "food_angular_radius_deg": 1.6833369450957543,
+  "food_moved_m": 0.0,
+  "salience": 0.9438559322033898,
+  "reported_bearing_deg": -25.705823336339154,
+  "peak_cell": [
+   8,
+   2
+  ],
+  "peak_px": [
+   34.0,
+   10.0
+  ],
+  "peak_value": 0.1156862745098039,
+  "motion_median": 0.006495098039215691,
+  "food_cell": [
+   9,
+   2
+  ],
+  "motion_at_food_cell": 0.040441176470588244,
+  "moving_speed": 0.08974360646848512,
+  "peak_err_px": 5.362642287524019
+ },
+ {
+  "i": 85,
+  "az_cam_deg": -24.275329236762964,
+  "el_cam_deg": -9.608101812742012,
+  "in_fov": true,
+  "px_col": 10.88901160627421,
+  "px_row": 39.986742740664184,
+  "on_image": true,
+  "dist_m": 0.30725638324879906,
+  "food_angular_radius_deg": 1.6777995239552397,
+  "food_moved_m": 0.0,
+  "salience": 0.9614093959731543,
+  "reported_bearing_deg": -25.705823336339154,
+  "peak_cell": [
+   8,
+   2
+  ],
+  "peak_px": [
+   34.0,
+   10.0
+  ],
+  "peak_value": 0.07303921568627449,
+  "motion_median": 0.0028186274509803943,
+  "food_cell": [
+   9,
+   2
+  ],
+  "motion_at_food_cell": 0.02450980392156862,
+  "moving_speed": 0.07959549382536209,
+  "peak_err_px": 6.052390459891493
+ },
+ {
+  "i": 86,
+  "az_cam_deg": -23.396908115591554,
+  "el_cam_deg": -8.799326028184078,
+  "in_fov": true,
+  "px_col": 11.726453389064542,
+  "px_row": 39.20808657657647,
+  "on_image": true,
+  "dist_m": 0.308047333780766,
+  "food_angular_radius_deg": 1.673494014079694,
+  "food_moved_m": 0.0,
+  "salience": 0.9672447013487476,
+  "reported_bearing_deg": -25.705823336339154,
+  "peak_cell": [
+   8,
+   2
+  ],
+  "peak_px": [
+   34.0,
+   10.0
+  ],
+  "peak_value": 0.06360294117647056,
+  "motion_median": 0.002083333333333331,
+  "food_cell": [
+   9,
+   2
+  ],
+  "motion_at_food_cell": 0.003921568627450977,
+  "moving_speed": 0.08224439787587573,
+  "peak_err_px": 5.486784768307251
+ },
+ {
+  "i": 87,
+  "az_cam_deg": -23.495782270082753,
+  "el_cam_deg": -9.80647415770296,
+  "in_fov": true,
+  "px_col": 11.632754439443556,
+  "px_row": 40.11334321913762,
+  "on_image": true,
+  "dist_m": 0.30964464981597684,
+  "food_angular_radius_deg": 1.6648660900166814,
+  "food_moved_m": 0.0,
+  "salience": 0.9467496542185337,
+  "reported_bearing_deg": -21.49783070938183,
+  "peak_cell": [
+   8,
+   3
+  ],
+  "peak_px": [
+   34.0,
+   14.0
+  ],
+  "peak_value": 0.08860294117647058,
+  "motion_median": 0.004718137254901972,
+  "food_cell": [
+   10,
+   2
+  ],
+  "motion_at_food_cell": 0.01764705882352941,
+  "moving_speed": 0.09627461757480593,
+  "peak_err_px": 6.555670588044376
+ },
+ {
+  "i": 88,
+  "az_cam_deg": -24.026006710357063,
+  "el_cam_deg": -9.776383247599338,
+  "in_fov": true,
+  "px_col": 11.127860590596502,
+  "px_row": 40.1214454092903,
+  "on_image": true,
+  "dist_m": 0.310836804529993,
+  "food_angular_radius_deg": 1.6584843896425778,
+  "food_moved_m": 0.0,
+  "salience": 0.9840425531914894,
+  "reported_bearing_deg": 29.63635396145181,
+  "peak_cell": [
+   8,
+   14
+  ],
+  "peak_px": [
+   34.0,
+   58.0
+  ],
+  "peak_value": 0.046078431372549,
+  "motion_median": 0.0007352941176470562,
+  "food_cell": [
+   10,
+   2
+  ],
+  "motion_at_food_cell": 0.012990196078431366,
+  "moving_speed": 0.058352778627093954,
+  "peak_err_px": 47.27017608083852
+ },
+ {
+  "i": 89,
+  "az_cam_deg": -25.012988995061995,
+  "el_cam_deg": -9.0083361005142,
+  "in_fov": true,
+  "px_col": 10.176782202668686,
+  "px_row": 39.494930485081916,
+  "on_image": true,
+  "dist_m": 0.31187247571937904,
+  "food_angular_radius_deg": 1.6529799282971196,
+  "food_moved_m": 0.0,
+  "salience": 0.9708333333333332,
+  "reported_bearing_deg": -21.49783070938183,
+  "peak_cell": [
+   8,
+   3
+  ],
+  "peak_px": [
+   34.0,
+   14.0
+  ],
+  "peak_value": 0.07352941176470586,
+  "motion_median": 0.002144607843137261,
+  "food_cell": [
+   9,
+   2
+  ],
+  "motion_at_food_cell": 0.012377450980392155,
+  "moving_speed": 0.04464512484921598,
+  "peak_err_px": 6.694120955115278
+ },
+ {
+  "i": 90,
+  "az_cam_deg": -26.384449268993745,
+  "el_cam_deg": -8.213894608622821,
+  "in_fov": true,
+  "px_col": 8.829415634686594,
+  "px_row": 38.86397780610432,
+  "on_image": true,
+  "dist_m": 0.31326664751859457,
+  "food_angular_radius_deg": 1.645627508217494,
+  "food_moved_m": 0.0,
+  "salience": 0.978021978021978,
+  "reported_bearing_deg": -33.28267938563705,
+  "peak_cell": [
+   8,
+   0
+  ],
+  "peak_px": [
+   34.0,
+   2.0
+  ],
+  "peak_value": 0.08921568627450978,
+  "motion_median": 0.00196078431372549,
+  "food_cell": [
+   9,
+   2
+  ],
+  "motion_at_food_cell": 0.03357843137254901,
+  "moving_speed": 0.05642875669996609,
+  "peak_err_px": 8.384461700644659
+ },
+ {
+  "i": 91,
+  "az_cam_deg": -28.422135543847688,
+  "el_cam_deg": -7.291706248822673,
+  "in_fov": true,
+  "px_col": 6.766881613645939,
+  "px_row": 38.14913008445089,
+  "on_image": true,
+  "dist_m": 0.31487743729654893,
+  "food_angular_radius_deg": 1.6372137152408426,
+  "food_moved_m": 0.0,
+  "salience": 0.9713876967095852,
+  "reported_bearing_deg": -33.28267938563705,
+  "peak_cell": [
+   8,
+   0
+  ],
+  "peak_px": [
+   34.0,
+   2.0
+  ],
+  "peak_value": 0.08566176470588235,
+  "motion_median": 0.002450980392156854,
+  "food_cell": [
+   9,
+   1
+  ],
+  "motion_at_food_cell": 0.01960784313725491,
+  "moving_speed": 0.059693104830299305,
+  "peak_err_px": 6.319686762507391
+ },
+ {
+  "i": 92,
+  "az_cam_deg": -30.73135131145346,
+  "el_cam_deg": -6.604981082476354,
+  "in_fov": true,
+  "px_col": 4.331054831913384,
+  "px_row": 37.656292967142825,
+  "on_image": true,
+  "dist_m": 0.31645014615478373,
+  "food_angular_radius_deg": 1.6290814088303283,
+  "food_moved_m": 0.0,
+  "salience": 0.9779874213836477,
+  "reported_bearing_deg": 33.28267938563705,
+  "peak_cell": [
+   8,
+   15
+  ],
+  "peak_px": [
+   34.0,
+   62.0
+  ],
+  "peak_value": 0.07794117647058821,
+  "motion_median": 0.0017156862745098152,
+  "food_cell": [
+   9,
+   1
+  ],
+  "motion_at_food_cell": 0.047794117647058834,
+  "moving_speed": 0.06174479739551221,
+  "peak_err_px": 57.7847360040812
+ },
+ {
+  "i": 93,
+  "az_cam_deg": -32.981387484786524,
+  "el_cam_deg": -6.256474749761006,
+  "in_fov": true,
+  "px_col": 1.8426972566746933,
+  "px_row": 37.47280360953809,
+  "on_image": true,
+  "dist_m": 0.31808895374541635,
+  "food_angular_radius_deg": 1.620692801155688,
+  "food_moved_m": 0.0,
+  "salience": 0.9670050761421322,
+  "reported_bearing_deg": -21.49783070938183,
+  "peak_cell": [
+   15,
+   3
+  ],
+  "peak_px": [
+   62.0,
+   14.0
+  ],
+  "peak_value": 0.048284313725490226,
+  "motion_median": 0.0015931372549019551,
+  "food_cell": [
+   9,
+   0
+  ],
+  "motion_at_food_cell": 0.0386029411764706,
+  "moving_speed": 0.06530717861708123,
+  "peak_err_px": 27.374867538842132
+ },
+ {
+  "i": 94,
+  "az_cam_deg": -35.05123849663737,
+  "el_cam_deg": -6.104803081782661,
+  "in_fov": false,
+  "px_col": -0.5609452765899832,
+  "px_row": 37.47073430215224,
+  "on_image": false,
+  "dist_m": 0.3198516139964193,
+  "food_angular_radius_deg": 1.6117661000231192,
+  "food_moved_m": 0.0,
+  "salience": 0.9751552795031057,
+  "reported_bearing_deg": -33.28267938563705,
+  "peak_cell": [
+   9,
+   0
+  ],
+  "peak_px": [
+   38.0,
+   2.0
+  ],
+  "peak_value": 0.05919117647058825,
+  "motion_median": 0.0014705882352941124,
+  "food_cell": [
+   9,
+   0
+  ],
+  "motion_at_food_cell": null,
+  "moving_speed": 0.07059012615487874
+ },
+ {
+  "i": 95,
+  "az_cam_deg": -36.5745789444651,
+  "el_cam_deg": -6.297497093342651,
+  "in_fov": false,
+  "px_col": -2.4089122413119384,
+  "px_row": 37.780041114416164,
+  "on_image": false,
+  "dist_m": 0.3214831870891546,
+  "food_angular_radius_deg": 1.6035904387672282,
+  "food_moved_m": 0.0,
+  "salience": 0.9678284182305631,
+  "reported_bearing_deg": 25.705823336339154,
+  "peak_cell": [
+   8,
+   13
+  ],
+  "peak_px": [
+   34.0,
+   54.0
+  ],
+  "peak_value": 0.045710784313725494,
+  "motion_median": 0.0014705882352941124,
+  "food_cell": [
+   9,
+   0
+  ],
+  "motion_at_food_cell": null,
+  "moving_speed": 0.06928920635237841
+ },
+ {
+  "i": 96,
+  "az_cam_deg": -38.18442779491012,
+  "el_cam_deg": -7.736893013043565,
+  "in_fov": false,
+  "px_col": -4.442825101867243,
+  "px_row": 39.39917611662916,
+  "on_image": false,
+  "dist_m": 0.32358305774979257,
+  "food_angular_radius_deg": 1.5931894264147857,
+  "food_moved_m": 0.0,
+  "salience": 0.9609250398724082,
+  "reported_bearing_deg": -25.705823336339154,
+  "peak_cell": [
+   8,
+   2
+  ],
+  "peak_px": [
+   34.0,
+   10.0
+  ],
+  "peak_value": 0.07683823529411761,
+  "motion_median": 0.00300245098039216,
+  "food_cell": [
+   9,
+   0
+  ],
+  "motion_at_food_cell": null,
+  "moving_speed": 0.04872261256090739
+ },
+ {
+  "i": 97,
+  "az_cam_deg": -39.57910199238283,
+  "el_cam_deg": -4.768935691378027,
+  "in_fov": false,
+  "px_col": -6.278868803178163,
+  "px_row": 36.4466987109863,
+  "on_image": false,
+  "dist_m": 0.32284689681591344,
+  "food_angular_radius_deg": 1.5968203650874642,
+  "food_moved_m": 0.0,
+  "salience": 0.9427272727272727,
+  "reported_bearing_deg": -33.28267938563705,
+  "peak_cell": [
+   8,
+   0
+  ],
+  "peak_px": [
+   34.0,
+   2.0
+  ],
+  "peak_value": 0.13480392156862742,
+  "motion_median": 0.007720588235294127,
+  "food_cell": [
+   9,
+   0
+  ],
+  "motion_at_food_cell": null,
+  "moving_speed": 0.11140853074386439
+ },
+ {
+  "i": 98,
+  "az_cam_deg": -40.28171019144971,
+  "el_cam_deg": -2.5888260274315087,
+  "in_fov": false,
+  "px_col": -7.231968970820212,
+  "px_row": 34.20860621847167,
+  "on_image": false,
+  "dist_m": 0.3209199722698117,
+  "food_angular_radius_deg": 1.606403268013988,
+  "food_moved_m": 0.0,
+  "salience": 0.934489402697495,
+  "reported_bearing_deg": -29.63635396145181,
+  "peak_cell": [
+   7,
+   1
+  ],
+  "peak_px": [
+   30.0,
+   6.0
+  ],
+  "peak_value": 0.12720588235294117,
+  "motion_median": 0.008333333333333349,
+  "food_cell": [
+   8,
+   0
+  ],
+  "motion_at_food_cell": null,
+  "moving_speed": 0.17425585982560068
+ },
+ {
+  "i": 99,
+  "az_cam_deg": -38.60326546324345,
+  "el_cam_deg": -2.621301584222219,
+  "in_fov": false,
+  "px_col": -4.986683081236976,
+  "px_row": 34.17731893520839,
+  "on_image": false,
+  "dist_m": 0.3183552600340755,
+  "food_angular_radius_deg": 1.6193378030061722,
+  "food_moved_m": 0.0,
+  "salience": 0.9304347826086958,
+  "reported_bearing_deg": 25.705823336339154,
+  "peak_cell": [
+   7,
+   13
+  ],
+  "peak_px": [
+   30.0,
+   54.0
+  ],
+  "peak_value": 0.11274509803921566,
+  "motion_median": 0.007843137254901933,
+  "food_cell": [
+   8,
+   0
+  ],
+  "motion_at_food_cell": null,
+  "moving_speed": 0.13756951390371372
+ },
+ {
+  "i": 100,
+  "az_cam_deg": -36.57676029609111,
+  "el_cam_deg": -2.604111085571838,
+  "in_fov": false,
+  "px_col": -2.4116100975435657,
+  "px_row": 34.08828249029019,
+  "on_image": false,
+  "dist_m": 0.31648768816762785,
+  "food_angular_radius_deg": 1.6288882700544307,
+  "food_moved_m": 0.0,
+  "salience": 0.972636815920398,
+  "reported_bearing_deg": 33.28267938563705,
+  "peak_cell": [
+   15,
+   15
+  ],
+  "peak_px": [
+   62.0,
+   62.0
+  ],
+  "peak_value": 0.07389705882352941,
+  "motion_median": 0.002022058823529422,
+  "food_cell": [
+   8,
+   0
+  ],
+  "motion_at_food_cell": null,
+  "moving_speed": 0.04871062731454354
+ },
+ {
+  "i": 101,
+  "az_cam_deg": -35.01582430876249,
+  "el_cam_deg": -3.3317827093467693,
+  "in_fov": false,
+  "px_col": -0.5188139627476218,
+  "px_row": 34.74852814561605,
+  "on_image": false,
+  "dist_m": 0.3158127165581031,
+  "food_angular_radius_deg": 1.6323677345149743,
+  "food_moved_m": 0.0,
+  "salience": 0.958656330749354,
+  "reported_bearing_deg": 21.49783070938183,
+  "peak_cell": [
+   7,
+   12
+  ],
+  "peak_px": [
+   30.0,
+   50.0
+  ],
+  "peak_value": 0.09485294117647058,
+  "motion_median": 0.00392156862745098,
+  "food_cell": [
+   8,
+   0
+  ],
+  "motion_at_food_cell": null,
+  "moving_speed": 0.035538837128114245
+ },
+ {
+  "i": 102,
+  "az_cam_deg": -34.292906879476945,
+  "el_cam_deg": -3.9805231251345266,
+  "in_fov": true,
+  "px_col": 0.3333611217703698,
+  "px_row": 35.34921188854676,
+  "on_image": true,
+  "dist_m": 0.3157243298789687,
+  "food_angular_radius_deg": 1.632824466720346,
+  "food_moved_m": 0.0,
+  "salience": 0.9115805946791863,
+  "reported_bearing_deg": -2.50583463849288,
+  "peak_cell": [
+   7,
+   7
+  ],
+  "peak_px": [
+   30.0,
+   30.0
+  ],
+  "peak_value": 0.07830882352941174,
+  "motion_median": 0.006924019607843121,
+  "food_cell": [
+   8,
+   0
+  ],
+  "motion_at_food_cell": 0.03186274509803919,
+  "moving_speed": 0.11038201623387227,
+  "peak_err_px": 30.14504155180178
+ },
+ {
+  "i": 103,
+  "az_cam_deg": -33.96888405726824,
+  "el_cam_deg": -5.1106837520372626,
+  "in_fov": true,
+  "px_col": 0.7105616101619283,
+  "px_row": 36.428335953482666,
+  "on_image": true,
+  "dist_m": 0.31644751448343894,
+  "food_angular_radius_deg": 1.6290949494537093,
+  "food_moved_m": 0.0,
+  "salience": 0.9433070866141731,
+  "reported_bearing_deg": 33.28267938563705,
+  "peak_cell": [
+   8,
+   15
+  ],
+  "peak_px": [
+   34.0,
+   62.0
+  ],
+  "peak_value": 0.1556372549019608,
+  "motion_median": 0.008823529411764737,
+  "food_cell": [
+   9,
+   0
+  ],
+  "motion_at_food_cell": 0.03357843137254902,
+  "moving_speed": 0.16419596525287175,
+  "peak_err_px": 61.33752581939324
+ },
+ {
+  "i": 104,
+  "az_cam_deg": -32.918374206680795,
+  "el_cam_deg": -7.57726055000776,
+  "in_fov": true,
+  "px_col": 1.914074042684799,
+  "px_row": 38.74206586702192,
+  "on_image": true,
+  "dist_m": 0.317176291775822,
+  "food_angular_radius_deg": 1.6253537813274734,
+  "food_moved_m": 0.0,
+  "salience": 0.9213062098501069,
+  "reported_bearing_deg": -7.479522112590492,
+  "peak_cell": [
+   8,
+   6
+  ],
+  "peak_px": [
+   34.0,
+   26.0
+  ],
+  "peak_value": 0.11446078431372546,
+  "motion_median": 0.00900735294117648,
+  "food_cell": [
+   9,
+   0
+  ],
+  "motion_at_food_cell": 0.06678921568627452,
+  "moving_speed": 0.10912779063418342,
+  "peak_err_px": 24.54829969485554
+ },
+ {
+  "i": 105,
+  "az_cam_deg": -31.428307244381898,
+  "el_cam_deg": -9.261554942123514,
+  "in_fov": true,
+  "px_col": 3.5731508490349775,
+  "px_row": 40.233572569112,
+  "on_image": true,
+  "dist_m": 0.31740121987925196,
+  "food_angular_radius_deg": 1.624202582695347,
+  "food_moved_m": 0.0,
+  "salience": 0.9469483568075118,
+  "reported_bearing_deg": 25.705823336339154,
+  "peak_cell": [
+   9,
+   13
+  ],
+  "peak_px": [
+   38.0,
+   54.0
+  ],
+  "peak_value": 0.13051470588235292,
+  "motion_median": 0.00692401960784313,
+  "food_cell": [
+   10,
+   0
+  ],
+  "motion_at_food_cell": 0.053308823529411756,
+  "moving_speed": 0.05064195097536591,
+  "peak_err_px": 50.47629108517851
+ },
+ {
+  "i": 106,
+  "az_cam_deg": -29.25786319657888,
+  "el_cam_deg": -8.178627807528638,
+  "in_fov": true,
+  "px_col": 5.898118381068393,
+  "px_row": 39.0286092201633,
+  "on_image": true,
+  "dist_m": 0.31544484049364113,
+  "food_angular_radius_deg": 1.6342703922020785,
+  "food_moved_m": 0.0,
+  "salience": 0.9629360465116279,
+  "reported_bearing_deg": -25.705823336339154,
+  "peak_cell": [
+   8,
+   2
+  ],
+  "peak_px": [
+   34.0,
+   10.0
+  ],
+  "peak_value": 0.08431372549019606,
+  "motion_median": 0.0031250000000000028,
+  "food_cell": [
+   9,
+   1
+  ],
+  "motion_at_food_cell": 0.023284313725490197,
+  "moving_speed": 0.04901726166717021,
+  "peak_err_px": 6.489402399669811
+ },
+ {
+  "i": 107,
+  "az_cam_deg": -28.385706624993002,
+  "el_cam_deg": -8.331215513003073,
+  "in_fov": true,
+  "px_col": 6.80443599499597,
+  "px_row": 39.10706549326236,
+  "on_image": true,
+  "dist_m": 0.3141740087757647,
+  "food_angular_radius_deg": 1.6408773980566742,
+  "food_moved_m": 0.0,
+  "salience": 0.9737903225806452,
+  "reported_bearing_deg": 21.49783070938183,
+  "peak_cell": [
+   9,
+   12
+  ],
+  "peak_px": [
+   38.0,
+   50.0
+  ],
+  "peak_value": 0.060784313725490174,
+  "motion_median": 0.0015931372549019551,
+  "food_cell": [
+   9,
+   1
+  ],
+  "motion_at_food_cell": 0.021691176470588235,
+  "moving_speed": 0.14150269945457028,
+  "peak_err_px": 43.20974824870856
+ },
+ {
+  "i": 108,
+  "az_cam_deg": -28.21115542407729,
+  "el_cam_deg": -9.389401679817956,
+  "in_fov": true,
+  "px_col": 6.9840229746010145,
+  "px_row": 40.07572045101152,
+  "on_image": true,
+  "dist_m": 0.3134757686499188,
+  "food_angular_radius_deg": 1.6445303055553024,
+  "food_moved_m": 0.0,
+  "salience": 0.96,
+  "reported_bearing_deg": 29.63635396145181,
+  "peak_cell": [
+   9,
+   14
+  ],
+  "peak_px": [
+   38.0,
+   58.0
+  ],
+  "peak_value": 0.10110294117647056,
+  "motion_median": 0.004044117647058821,
+  "food_cell": [
+   10,
+   1
+  ],
+  "motion_at_food_cell": 0.027205882352941173,
+  "moving_speed": 0.20901974576103816,
+  "peak_err_px": 51.058187661204585
+ },
+ {
+  "i": 109,
+  "az_cam_deg": -27.99269410610639,
+  "el_cam_deg": -9.800490615598104,
+  "in_fov": true,
+  "px_col": 7.207961890841222,
+  "px_row": 40.44023130879985,
+  "on_image": true,
+  "dist_m": 0.31258491039796116,
+  "food_angular_radius_deg": 1.6492145862232896,
+  "food_moved_m": 0.0,
+  "salience": 0.9777777777777779,
+  "reported_bearing_deg": 33.28267938563705,
+  "peak_cell": [
+   9,
+   15
+  ],
+  "peak_px": [
+   38.0,
+   62.0
+  ],
+  "peak_value": 0.04411764705882351,
+  "motion_median": 0.0009803921568627416,
+  "food_cell": [
+   10,
+   1
+  ],
+  "motion_at_food_cell": 0.02769607843137254,
+  "moving_speed": 0.1584410073052563,
+  "peak_err_px": 54.846350553122086
+ },
+ {
+  "i": 110,
+  "az_cam_deg": -28.30836038116636,
+  "el_cam_deg": -9.780856192536802,
+  "in_fov": true,
+  "px_col": 6.884086371335037,
+  "px_row": 40.448308085984095,
+  "on_image": true,
+  "dist_m": 0.31111282214606745,
+  "food_angular_radius_deg": 1.6570138119115458,
+  "food_moved_m": 0.0,
+  "salience": 0.9888888888888889,
+  "reported_bearing_deg": 33.28267938563705,
+  "peak_cell": [
+   9,
+   15
+  ],
+  "peak_px": [
+   38.0,
+   62.0
+  ],
+  "peak_value": 0.04411764705882351,
+  "motion_median": 0.0004901960784313708,
+  "food_cell": [
+   10,
+   1
+  ],
+  "motion_at_food_cell": 0.017647058823529405,
+  "moving_speed": 0.1331328162270111,
+  "peak_err_px": 55.17026506739252
+ },
+ {
+  "i": 111,
+  "az_cam_deg": -29.647193072141764,
+  "el_cam_deg": -10.095073022889993,
+  "in_fov": true,
+  "px_col": 5.488554884851595,
+  "px_row": 40.86209964133963,
+  "on_image": true,
+  "dist_m": 0.30963858424828217,
+  "food_angular_radius_deg": 1.6648986850323932,
+  "food_moved_m": 0.0,
+  "salience": 0.9733520336605892,
+  "reported_bearing_deg": 25.705823336339154,
+  "peak_cell": [
+   9,
+   13
+  ],
+  "peak_px": [
+   38.0,
+   54.0
+  ],
+  "peak_value": 0.08737745098039214,
+  "motion_median": 0.0023284313725490113,
+  "food_cell": [
+   10,
+   1
+  ],
+  "motion_at_food_cell": 0.03848039215686275,
+  "moving_speed": 0.12984674544924563,
+  "peak_err_px": 48.595801480344086
+ },
+ {
+  "i": 112,
+  "az_cam_deg": -31.08904100357684,
+  "el_cam_deg": -10.26933234831635,
+  "in_fov": true,
+  "px_col": 3.9434741131063014,
+  "px_row": 41.16872324491054,
+  "on_image": true,
+  "dist_m": 0.3078021575980218,
+  "food_angular_radius_deg": 1.6748262571189259,
+  "food_moved_m": 0.0,
+  "salience": 0.9755201958384332,
+  "reported_bearing_deg": 25.705823336339154,
+  "peak_cell": [
+   9,
+   13
+  ],
+  "peak_px": [
+   38.0,
+   54.0
+  ],
+  "peak_value": 0.10012254901960779,
+  "motion_median": 0.002450980392156866,
+  "food_cell": [
+   10,
+   0
+  ],
+  "motion_at_food_cell": 0.013602941176470588,
+  "moving_speed": 0.14886377520948432,
+  "peak_err_px": 50.156720296168636
+ },
+ {
+  "i": 113,
+  "az_cam_deg": -32.10471538723307,
+  "el_cam_deg": -10.579901833392398,
+  "in_fov": true,
+  "px_col": 2.826740800776115,
+  "px_row": 41.57707344374143,
+  "on_image": true,
+  "dist_m": 0.3055619799394701,
+  "food_angular_radius_deg": 1.687097901448394,
+  "food_moved_m": 0.0,
+  "salience": 0.9708737864077671,
+  "reported_bearing_deg": 33.28267938563705,
+  "peak_cell": [
+   10,
+   15
+  ],
+  "peak_px": [
+   42.0,
+   62.0
+  ],
+  "peak_value": 0.05049019607843137,
+  "motion_median": 0.0014705882352941124,
+  "food_cell": [
+   10,
+   0
+  ],
+  "motion_at_food_cell": 0.023651960784313728,
+  "moving_speed": 0.1657996206643047,
+  "peak_err_px": 59.17477056255075
+ },
+ {
+  "i": 114,
+  "az_cam_deg": -32.498625031151,
+  "el_cam_deg": -10.836693199701614,
+  "in_fov": true,
+  "px_col": 2.386961861212015,
+  "px_row": 41.872507641822494,
+  "on_image": true,
+  "dist_m": 0.3030067249234913,
+  "food_angular_radius_deg": 1.7013168676973693,
+  "food_moved_m": 0.0,
+  "salience": 0.9855491329479767,
+  "reported_bearing_deg": 7.479522112590492,
+  "peak_cell": [
+   9,
+   9
+  ],
+  "peak_px": [
+   38.0,
+   38.0
+  ],
+  "peak_value": 0.042401960784313714,
+  "motion_median": 0.0006127450980392187,
+  "food_cell": [
+   10,
+   0
+  ],
+  "motion_at_food_cell": 0.01605392156862745,
+  "moving_speed": 0.1699291389896598,
+  "peak_err_px": 35.8229647141431
+ },
+ {
+  "i": 115,
+  "az_cam_deg": -32.36669447302057,
+  "el_cam_deg": -11.005628390725468,
+  "in_fov": true,
+  "px_col": 2.5346815851978093,
+  "px_row": 42.022814641870035,
+  "on_image": true,
+  "dist_m": 0.3004153740199187,
+  "food_angular_radius_deg": 1.715983508550363,
+  "food_moved_m": 0.0,
+  "salience": 0.9869281045751634,
+  "reported_bearing_deg": -33.28267938563705,
+  "peak_cell": [
+   8,
+   0
+  ],
+  "peak_px": [
+   34.0,
+   2.0
+  ],
+  "peak_value": 0.03750000000000002,
+  "motion_median": 0.0004901960784313708,
+  "food_cell": [
+   10,
+   0
+  ],
+  "motion_at_food_cell": 0.021936274509803934,
+  "moving_speed": 0.16178004043152233,
+  "peak_err_px": 8.040611865732226
+ },
+ {
+  "i": 116,
+  "az_cam_deg": -31.981312375257506,
+  "el_cam_deg": -10.925396740362535,
+  "in_fov": true,
+  "px_col": 2.963732271050162,
+  "px_row": 41.900103219602286,
+  "on_image": true,
+  "dist_m": 0.29804301113031,
+  "food_angular_radius_deg": 1.7296341308039789,
+  "food_moved_m": 0.0,
+  "salience": 0.9768270944741534,
+  "reported_bearing_deg": 33.28267938563705,
+  "peak_cell": [
+   10,
+   15
+  ],
+  "peak_px": [
+   42.0,
+   62.0
+  ],
+  "peak_value": 0.06874999999999998,
+  "motion_median": 0.001593137254901962,
+  "food_cell": [
+   10,
+   0
+  ],
+  "motion_at_food_cell": 0.026348039215686278,
+  "moving_speed": 0.14901138292158947,
+  "peak_err_px": 59.036352247839446
+ },
+ {
+  "i": 117,
+  "az_cam_deg": -33.50909136085906,
+  "el_cam_deg": -11.916537527667607,
+  "in_fov": true,
+  "px_col": 1.2409131009789434,
+  "px_row": 43.06686675765352,
+  "on_image": true,
+  "dist_m": 0.29688161547804276,
+  "food_angular_radius_deg": 1.736396294916954,
+  "food_moved_m": 0.0,
+  "salience": 0.9743589743589745,
+  "reported_bearing_deg": 29.63635396145181,
+  "peak_cell": [
+   9,
+   14
+  ],
+  "peak_px": [
+   38.0,
+   58.0
+  ],
+  "peak_value": 0.09080882352941175,
+  "motion_median": 0.002328431372549013,
+  "food_cell": [
+   10,
+   0
+  ],
+  "motion_at_food_cell": 0.043627450980392155,
+  "moving_speed": 0.15652538204981428,
+  "peak_err_px": 56.98479695805222
+ },
+ {
+  "i": 118,
+  "az_cam_deg": -36.849393830245006,
+  "el_cam_deg": -15.484795602244073,
+  "in_fov": false,
+  "px_col": -2.750005229965943,
+  "px_row": 47.32185030256124,
+  "on_image": false,
+  "dist_m": 0.29738739062607983,
+  "food_angular_radius_deg": 1.7334449598728316,
+  "food_moved_m": 0.0,
+  "salience": 0.9717336683417085,
+  "reported_bearing_deg": -33.28267938563705,
+  "peak_cell": [
+   9,
+   0
+  ],
+  "peak_px": [
+   38.0,
+   2.0
+  ],
+  "peak_value": 0.19509803921568625,
+  "motion_median": 0.005514705882352946,
+  "food_cell": [
+   11,
+   0
+  ],
+  "motion_at_food_cell": null,
+  "moving_speed": 0.19967888256911784
+ },
+ {
+  "i": 119,
+  "az_cam_deg": -40.45776859085252,
+  "el_cam_deg": -17.814978894351732,
+  "in_fov": false,
+  "px_col": -7.473896157417201,
+  "px_row": 50.80132942805836,
+  "on_image": false,
+  "dist_m": 0.29839231199346117,
+  "food_angular_radius_deg": 1.7276106324410005,
+  "food_moved_m": 0.0,
+  "salience": 0.9666666666666667,
+  "reported_bearing_deg": -33.28267938563705,
+  "peak_cell": [
+   10,
+   0
+  ],
+  "peak_px": [
+   42.0,
+   2.0
+  ],
+  "peak_value": 0.1176470588235294,
+  "motion_median": 0.003921568627450984,
+  "food_cell": [
+   12,
+   0
+  ],
+  "motion_at_food_cell": null,
+  "moving_speed": 0.18155582945140414
+ },
+ {
+  "i": 120,
+  "az_cam_deg": -42.83294492988687,
+  "el_cam_deg": -20.015711994309562,
+  "in_fov": false,
+  "px_col": -10.868182648537214,
+  "px_row": 54.20150656800972,
+  "on_image": false,
+  "dist_m": 0.2996751965541983,
+  "food_angular_radius_deg": 1.7202193283400973,
+  "food_moved_m": 0.0,
+  "salience": 0.9718592964824122,
+  "reported_bearing_deg": -33.28267938563705,
+  "peak_cell": [
+   10,
+   0
+  ],
+  "peak_px": [
+   42.0,
+   2.0
+  ],
+  "peak_value": 0.1219362745098039,
+  "motion_median": 0.0034313725490196026,
+  "food_cell": [
+   13,
+   0
+  ],
+  "motion_at_food_cell": null,
+  "moving_speed": 0.10060272668539526
+ },
+ {
+  "i": 121,
+  "az_cam_deg": -43.69019464645878,
+  "el_cam_deg": -21.862871614612118,
+  "in_fov": false,
+  "px_col": -12.157611296551202,
+  "px_row": 56.85964278182283,
+  "on_image": false,
+  "dist_m": 0.3007050501713431,
+  "food_angular_radius_deg": 1.7143314487162582,
+  "food_moved_m": 0.0,
+  "salience": 0.9694267515923568,
+  "reported_bearing_deg": -25.705823336339154,
+  "peak_cell": [
+   10,
+   2
+  ],
+  "peak_px": [
+   42.0,
+   10.0
+  ],
+  "peak_value": 0.09620098039215684,
+  "motion_median": 0.002941176470588225,
+  "food_cell": [
+   14,
+   0
+  ],
+  "motion_at_food_cell": null,
+  "moving_speed": 0.03656202060963367
+ },
+ {
+  "i": 122,
+  "az_cam_deg": -44.033046742650086,
+  "el_cam_deg": -22.07221210192175,
+  "in_fov": false,
+  "px_col": -12.683656604883723,
+  "px_row": 57.2759424096313,
+  "on_image": false,
+  "dist_m": 0.3002938164476017,
+  "food_angular_radius_deg": 1.7166777153262593,
+  "food_moved_m": 0.0,
+  "salience": 0.9761904761904762,
+  "reported_bearing_deg": 33.28267938563705,
+  "peak_cell": [
+   8,
+   15
+  ],
+  "peak_px": [
+   34.0,
+   62.0
+  ],
+  "peak_value": 0.1029411764705882,
+  "motion_median": 0.002450980392156866,
+  "food_cell": [
+   14,
+   0
+  ],
+  "motion_at_food_cell": null,
+  "moving_speed": 0.049511811707503184
+ },
+ {
+  "i": 123,
+  "az_cam_deg": -44.09992481942449,
+  "el_cam_deg": -20.678716008254664,
+  "in_fov": false,
+  "px_col": -12.786978128724442,
+  "px_row": 55.52007738024578,
+  "on_image": false,
+  "dist_m": 0.298288468165673,
+  "food_angular_radius_deg": 1.7282117047084882,
+  "food_moved_m": 0.0,
+  "salience": 0.9643782383419689,
+  "reported_bearing_deg": 33.28267938563705,
+  "peak_cell": [
+   8,
+   15
+  ],
+  "peak_px": [
+   34.0,
+   62.0
+  ],
+  "peak_value": 0.09460784313725489,
+  "motion_median": 0.003370098039215688,
+  "food_cell": [
+   13,
+   0
+  ],
+  "motion_at_food_cell": null,
+  "moving_speed": 0.1096618078560351
+ },
+ {
+  "i": 124,
+  "az_cam_deg": -44.06812416618618,
+  "el_cam_deg": -17.270929774889865,
+  "in_fov": false,
+  "px_col": -12.73781943224838,
+  "px_row": 51.2752228652631,
+  "on_image": false,
+  "dist_m": 0.2946676663484352,
+  "food_angular_radius_deg": 1.7494344172601455,
+  "food_moved_m": 0.0,
+  "salience": 0.9582289055973264,
+  "reported_bearing_deg": -33.28267938563705,
+  "peak_cell": [
+   10,
+   0
+  ],
+  "peak_px": [
+   42.0,
+   2.0
+  ],
+  "peak_value": 0.1466911764705882,
+  "motion_median": 0.00612745098039218,
+  "food_cell": [
+   12,
+   0
+  ],
+  "motion_at_food_cell": null,
+  "moving_speed": 0.17847726985316148
+ },
+ {
+  "i": 125,
+  "az_cam_deg": -43.24528575802639,
+  "el_cam_deg": -13.73000900917845,
+  "in_fov": false,
+  "px_col": -11.483872638535374,
+  "px_row": 46.828914268761594,
+  "on_image": false,
+  "dist_m": 0.29090921060814506,
+  "food_angular_radius_deg": 1.7720222427801562,
+  "food_moved_m": 0.0,
+  "salience": 0.9432296047098402,
+  "reported_bearing_deg": -21.49783070938183,
+  "peak_cell": [
+   9,
+   3
+  ],
+  "peak_px": [
+   38.0,
+   14.0
+  ],
+  "peak_value": 0.14571078431372547,
+  "motion_median": 0.00827205882352942,
+  "food_cell": [
+   11,
+   0
+  ],
+  "motion_at_food_cell": null,
+  "moving_speed": 0.1526696933966839
+ },
+ {
+  "i": 126,
+  "az_cam_deg": -42.79735283737399,
+  "el_cam_deg": -9.858633735178316,
+  "in_fov": false,
+  "px_col": -10.815423903009894,
+  "px_row": 42.3237653481177,
+  "on_image": false,
+  "dist_m": 0.28772629287652063,
+  "food_angular_radius_deg": 1.7916121981198962,
+  "food_moved_m": 0.0,
+  "salience": 0.9164859002169193,
+  "reported_bearing_deg": -33.28267938563705,
+  "peak_cell": [
+   9,
+   0
+  ],
+  "peak_px": [
+   38.0,
+   2.0
+  ],
+  "peak_value": 0.11299019607843136,
+  "motion_median": 0.009436274509803968,
+  "food_cell": [
+   10,
+   0
+  ],
+  "motion_at_food_cell": null,
+  "moving_speed": 0.13484997687779612
+ },
+ {
+  "i": 127,
+  "az_cam_deg": -42.41718101073426,
+  "el_cam_deg": -10.427463197382574,
+  "in_fov": false,
+  "px_col": -10.255644071498594,
+  "px_row": 42.89216331194694,
+  "on_image": false,
+  "dist_m": 0.2877840872089065,
+  "food_angular_radius_deg": 1.7912526314427581,
+  "food_moved_m": 0.0,
+  "salience": 0.9536178107606677,
+  "reported_bearing_deg": 29.63635396145181,
+  "peak_cell": [
+   7,
+   14
+  ],
+  "peak_px": [
+   30.0,
+   58.0
+  ],
+  "peak_value": 0.06605392156862742,
+  "motion_median": 0.0030637254901960988,
+  "food_cell": [
+   10,
+   0
+  ],
+  "motion_at_food_cell": null,
+  "moving_speed": 0.023474523358713462
+ },
+ {
+  "i": 128,
+  "az_cam_deg": -41.59742648616954,
+  "el_cam_deg": -10.950497500371965,
+  "in_fov": false,
+  "px_col": -9.071341654586007,
+  "px_row": 43.3240486958146,
+  "on_image": false,
+  "dist_m": 0.2878438661213174,
+  "food_angular_radius_deg": 1.7908808694913285,
+  "food_moved_m": 0.0,
+  "salience": 0.9425556858147716,
+  "reported_bearing_deg": 29.63635396145181,
+  "peak_cell": [
+   7,
+   14
+  ],
+  "peak_px": [
+   30.0,
+   58.0
+  ],
+  "peak_value": 0.10453431372549016,
+  "motion_median": 0.006004901960784292,
+  "food_cell": [
+   10,
+   0
+  ],
+  "motion_at_food_cell": null,
+  "moving_speed": 0.0908669034799905
+ },
+ {
+  "i": 129,
+  "az_cam_deg": -38.966343080528624,
+  "el_cam_deg": -11.617746926612515,
+  "in_fov": false,
+  "px_col": -5.463297829206681,
+  "px_row": 43.58434646019047,
+  "on_image": false,
+  "dist_m": 0.28577930337253754,
+  "food_angular_radius_deg": 1.8038102595105066,
+  "food_moved_m": 0.0,
+  "salience": 0.9292803970223328,
+  "reported_bearing_deg": 12.342633493422358,
+  "peak_cell": [
+   8,
+   10
+  ],
+  "peak_px": [
+   34.0,
+   42.0
+  ],
+  "peak_value": 0.14816176470588233,
+  "motion_median": 0.010477941176470551,
+  "food_cell": [
+   10,
+   0
+  ],
+  "motion_at_food_cell": null,
+  "moving_speed": 0.09470527740747253
+ },
+ {
+  "i": 130,
+  "az_cam_deg": -35.97859500921717,
+  "el_cam_deg": -11.27041016739729,
+  "in_fov": false,
+  "px_col": -1.6774499297583674,
+  "px_row": 42.754270388335,
+  "on_image": false,
+  "dist_m": 0.28184846772040756,
+  "food_angular_radius_deg": 1.8289503611146858,
+  "food_moved_m": 0.0,
+  "salience": 0.975483870967742,
+  "reported_bearing_deg": 33.28267938563705,
+  "peak_cell": [
+   8,
+   15
+  ],
+  "peak_px": [
+   34.0,
+   62.0
+  ],
+  "peak_value": 0.09497549019607841,
+  "motion_median": 0.0023284313725490113,
+  "food_cell": [
+   10,
+   0
+  ],
+  "motion_at_food_cell": null,
+  "moving_speed": 0.10666421463508478
+ },
+ {
+  "i": 131,
+  "az_cam_deg": -33.97490006171398,
+  "el_cam_deg": -10.414000115640906,
+  "in_fov": true,
+  "px_col": 0.7035845410603834,
+  "px_row": 41.62827186387848,
+  "on_image": true,
+  "dist_m": 0.2792628686810342,
+  "food_angular_radius_deg": 1.845872323788892,
+  "food_moved_m": 0.0,
+  "salience": 0.9707207207207207,
+  "reported_bearing_deg": 25.705823336339154,
+  "peak_cell": [
+   8,
+   13
+  ],
+  "peak_px": [
+   34.0,
+   54.0
+  ],
+  "peak_value": 0.10882352941176468,
+  "motion_median": 0.0031862745098039224,
+  "food_cell": [
+   10,
+   0
+  ],
+  "motion_at_food_cell": 0.07450980392156864,
+  "moving_speed": 0.07629448138545258,
+  "peak_err_px": 53.83956196331038
+ },
+ {
+  "i": 132,
+  "az_cam_deg": -33.43582277889166,
+  "el_cam_deg": -10.800790199436298,
+  "in_fov": true,
+  "px_col": 1.3249033918916062,
+  "px_row": 41.94757108631763,
+  "on_image": true,
+  "dist_m": 0.27925238485652176,
+  "food_angular_radius_deg": 1.8459415744537206,
+  "food_moved_m": 0.0,
+  "salience": 0.9811715481171549,
+  "reported_bearing_deg": -33.28267938563705,
+  "peak_cell": [
+   10,
+   0
+  ],
+  "peak_px": [
+   42.0,
+   2.0
+  ],
+  "peak_value": 0.05857843137254901,
+  "motion_median": 0.0011029411764705843,
+  "food_cell": [
+   10,
+   0
+  ],
+  "motion_at_food_cell": 0.05857843137254901,
+  "moving_speed": 0.04821023027228184,
+  "peak_err_px": 0.6771293977293938
+ },
+ {
+  "i": 133,
+  "az_cam_deg": -35.18798290611257,
+  "el_cam_deg": -9.214777472460272,
+  "in_fov": false,
+  "px_col": -0.723970237142801,
+  "px_row": 40.571713187429516,
+  "on_image": false,
+  "dist_m": 0.2805211443660707,
+  "food_angular_radius_deg": 1.8375983653954977,
+  "food_moved_m": 0.0,
+  "salience": 0.9555555555555557,
+  "reported_bearing_deg": -33.28267938563705,
+  "peak_cell": [
+   10,
+   0
+  ],
+  "peak_px": [
+   42.0,
+   2.0
+  ],
+  "peak_value": 0.08272058823529413,
+  "motion_median": 0.003676470588235281,
+  "food_cell": [
+   10,
+   0
+  ],
+  "motion_at_food_cell": null,
+  "moving_speed": 0.027417847396859138
+ },
+ {
+  "i": 134,
+  "az_cam_deg": -37.60916916030205,
+  "el_cam_deg": -7.737922888468375,
+  "in_fov": false,
+  "px_col": -3.70595719669123,
+  "px_row": 39.33873874396509,
+  "on_image": false,
+  "dist_m": 0.2820086594887951,
+  "food_angular_radius_deg": 1.8279121519430916,
+  "food_moved_m": 0.0,
+  "salience": 0.967948717948718,
+  "reported_bearing_deg": -25.705823336339154,
+  "peak_cell": [
+   8,
+   2
+  ],
+  "peak_px": [
+   34.0,
+   10.0
+  ],
+  "peak_value": 0.09558823529411763,
+  "motion_median": 0.0030637254901960745,
+  "food_cell": [
+   9,
+   0
+  ],
+  "motion_at_food_cell": null,
+  "moving_speed": 0.04791056588201028
+ },
+ {
+  "i": 135,
+  "az_cam_deg": -39.95532432579438,
+  "el_cam_deg": -6.641668867353026,
+  "in_fov": false,
+  "px_col": -6.786786123722841,
+  "px_row": 38.4421061530022,
+  "on_image": false,
+  "dist_m": 0.2833871785029135,
+  "food_angular_radius_deg": 1.8190263771028674,
+  "food_moved_m": 0.0,
+  "salience": 0.9654150197628457,
+  "reported_bearing_deg": 33.28267938563705,
+  "peak_cell": [
+   8,
+   15
+  ],
+  "peak_px": [
+   34.0,
+   62.0
+  ],
+  "peak_value": 0.0620098039215686,
+  "motion_median": 0.002144607843137261,
+  "food_cell": [
+   9,
+   0
+  ],
+  "motion_at_food_cell": null,
+  "moving_speed": 0.05647215002016106
+ },
+ {
+  "i": 136,
+  "az_cam_deg": -41.86014008112475,
+  "el_cam_deg": -6.464992199197336,
+  "in_fov": false,
+  "px_col": -9.447572384006435,
+  "px_row": 38.453309011479774,
+  "on_image": false,
+  "dist_m": 0.2849355137155692,
+  "food_angular_radius_deg": 1.8091484023351256,
+  "food_moved_m": 0.0,
+  "salience": 0.9770270270270269,
+  "reported_bearing_deg": 7.479522112590492,
+  "peak_cell": [
+   15,
+   9
+  ],
+  "peak_px": [
+   62.0,
+   38.0
+  ],
+  "peak_value": 0.045343137254901966,
+  "motion_median": 0.00104166666666667,
+  "food_cell": [
+   9,
+   0
+  ],
+  "motion_at_food_cell": null,
+  "moving_speed": 0.05482465701680643
+ },
+ {
+  "i": 137,
+  "az_cam_deg": -43.55086590120283,
+  "el_cam_deg": -6.6936894875499755,
+  "in_fov": false,
+  "px_col": -11.945552991615742,
+  "px_row": 38.90035013097564,
+  "on_image": false,
+  "dist_m": 0.2866036697194854,
+  "food_angular_radius_deg": 1.7986253212027794,
+  "food_moved_m": 0.0,
+  "salience": 0.972222222222222,
+  "reported_bearing_deg": -2.50583463849288,
+  "peak_cell": [
+   8,
+   7
+  ],
+  "peak_px": [
+   34.0,
+   30.0
+  ],
+  "peak_value": 0.04411764705882351,
+  "motion_median": 0.0012254901960784374,
+  "food_cell": [
+   9,
+   0
+  ],
+  "motion_at_food_cell": null,
+  "moving_speed": 0.053909658948981434
+ },
+ {
+  "i": 138,
+  "az_cam_deg": -45.093093464234926,
+  "el_cam_deg": -7.056829311389246,
+  "in_fov": false,
+  "px_col": -14.349485999933954,
+  "px_row": 39.51374997859145,
+  "on_image": false,
+  "dist_m": 0.2880732608520808,
+  "food_angular_radius_deg": 1.7894557062212069,
+  "food_moved_m": 0.0,
+  "salience": 0.9740566037735847,
+  "reported_bearing_deg": -17.031963469659434,
+  "peak_cell": [
+   8,
+   4
+  ],
+  "peak_px": [
+   34.0,
+   18.0
+  ],
+  "peak_value": 0.05196078431372547,
+  "motion_median": 0.0013480392156862801,
+  "food_cell": [
+   9,
+   0
+  ],
+  "motion_at_food_cell": null,
+  "moving_speed": 0.045810254877373974
+ },
+ {
+  "i": 139,
+  "az_cam_deg": -46.38676221760465,
+  "el_cam_deg": -7.118892932309463,
+  "in_fov": false,
+  "px_col": -16.46830387690943,
+  "px_row": 39.774486022723096,
+  "on_image": false,
+  "dist_m": 0.28914892272861137,
+  "food_angular_radius_deg": 1.782803062411069,
+  "food_moved_m": 0.0,
+  "salience": 0.9697452229299363,
+  "reported_bearing_deg": -12.342633493422358,
+  "peak_cell": [
+   8,
+   5
+  ],
+  "peak_px": [
+   34.0,
+   22.0
+  ],
+  "peak_value": 0.07696078431372547,
+  "motion_median": 0.002328431372549027,
+  "food_cell": [
+   9,
+   0
+  ],
+  "motion_at_food_cell": null,
+  "moving_speed": 0.028328273583245658
+ },
+ {
+  "i": 140,
+  "az_cam_deg": -47.41044514262037,
+  "el_cam_deg": -3.794678442496683,
+  "in_fov": false,
+  "px_col": -18.21736518347722,
+  "px_row": 35.97907366829886,
+  "on_image": false,
+  "dist_m": 0.28827441156456146,
+  "food_angular_radius_deg": 1.7882078795150382,
+  "food_moved_m": 0.0,
+  "salience": 0.919021739130435,
+  "reported_bearing_deg": -12.342633493422358,
+  "peak_cell": [
+   8,
+   5
+  ],
+  "peak_px": [
+   34.0,
+   22.0
+  ],
+  "peak_value": 0.11274509803921567,
+  "motion_median": 0.0091299019607843,
+  "food_cell": [
+   8,
+   0
+  ],
+  "motion_at_food_cell": null,
+  "moving_speed": 0.1255777075797516
+ },
+ {
+  "i": 141,
+  "az_cam_deg": -46.58796165551266,
+  "el_cam_deg": -3.090236997279591,
+  "in_fov": false,
+  "px_col": -16.806838430293944,
+  "px_row": 35.09008909109302,
+  "on_image": false,
+  "dist_m": 0.28616474043583096,
+  "food_angular_radius_deg": 1.8013822980937795,
+  "food_moved_m": 0.0,
+  "salience": 0.9199057714958776,
+  "reported_bearing_deg": -12.342633493422358,
+  "peak_cell": [
+   7,
+   5
+  ],
+  "peak_px": [
+   30.0,
+   22.0
+  ],
+  "peak_value": 0.10404411764705881,
+  "motion_median": 0.008333333333333314,
+  "food_cell": [
+   8,
+   0
+  ],
+  "motion_at_food_cell": null,
+  "moving_speed": 0.16160001572476354
+ },
+ {
+  "i": 142,
+  "az_cam_deg": -44.44480070613121,
+  "el_cam_deg": -2.8164279060186623,
+  "in_fov": false,
+  "px_col": -13.323523640994757,
+  "px_row": 34.64917195047602,
+  "on_image": false,
+  "dist_m": 0.2836919338402321,
+  "food_angular_radius_deg": 1.8170736033336927,
+  "food_moved_m": 0.0,
+  "salience": 0.9492242595204513,
+  "reported_bearing_deg": 17.031963469659434,
+  "peak_cell": [
+   7,
+   11
+  ],
+  "peak_px": [
+   30.0,
+   46.0
+  ],
+  "peak_value": 0.08688725490196075,
+  "motion_median": 0.004411764705882355,
+  "food_cell": [
+   8,
+   0
+  ],
+  "motion_at_food_cell": null,
+  "moving_speed": 0.10273202155769624
+ },
+ {
+  "i": 143,
+  "az_cam_deg": -42.01596367745073,
+  "el_cam_deg": -2.92157079568275,
+  "in_fov": false,
+  "px_col": -9.672189641715917,
+  "px_row": 34.63927333819661,
+  "on_image": false,
+  "dist_m": 0.28183943731242556,
+  "food_angular_radius_deg": 1.8290089226498085,
+  "food_moved_m": 0.0,
+  "salience": 0.9462121212121211,
+  "reported_bearing_deg": 29.63635396145181,
+  "peak_cell": [
+   7,
+   14
+  ],
+  "peak_px": [
+   30.0,
+   58.0
+  ],
+  "peak_value": 0.08088235294117646,
+  "motion_median": 0.004350490196078451,
+  "food_cell": [
+   8,
+   0
+  ],
+  "motion_at_food_cell": null,
+  "moving_speed": 0.010618604917409282
+ },
+ {
+  "i": 144,
+  "az_cam_deg": -41.08757599469027,
+  "el_cam_deg": -3.434374650213709,
+  "in_fov": false,
+  "px_col": -8.349845404387878,
+  "px_row": 35.1388728069022,
+  "on_image": false,
+  "dist_m": 0.2812710900161521,
+  "food_angular_radius_deg": 1.8327021713410354,
+  "food_moved_m": 0.0,
+  "salience": 0.9471999999999996,
+  "reported_bearing_deg": 17.031963469659434,
+  "peak_cell": [
+   7,
+   11
+  ],
+  "peak_px": [
+   30.0,
+   46.0
+  ],
+  "peak_value": 0.07659313725490192,
+  "motion_median": 0.004044117647058851,
+  "food_cell": [
+   8,
+   0
+  ],
+  "motion_at_food_cell": null,
+  "moving_speed": 0.07896708658817773
+ },
+ {
+  "i": 145,
+  "az_cam_deg": -41.14114877403267,
+  "el_cam_deg": -4.237098664726505,
+  "in_fov": false,
+  "px_col": -8.425128114857472,
+  "px_row": 35.995876128941056,
+  "on_image": false,
+  "dist_m": 0.28157131721269263,
+  "food_angular_radius_deg": 1.830749371576182,
+  "food_moved_m": 0.0,
+  "salience": 0.9325637910085054,
+  "reported_bearing_deg": 21.49783070938183,
+  "peak_cell": [
+   8,
+   12
+  ],
+  "peak_px": [
+   34.0,
+   50.0
+  ],
+  "peak_value": 0.10085784313725489,
+  "motion_median": 0.006801470588235301,
+  "food_cell": [
+   8,
+   0
+  ],
+  "motion_at_food_cell": null,
+  "moving_speed": 0.12799830140653407
+ },
+ {
+  "i": 146,
+  "az_cam_deg": -41.34464040048454,
+  "el_cam_deg": -5.51745082828646,
+  "in_fov": false,
+  "px_col": -8.712208506847908,
+  "px_row": 37.380161162505004,
+  "on_image": false,
+  "dist_m": 0.2825439752407492,
+  "food_angular_radius_deg": 1.8244512810113742,
+  "food_moved_m": 0.0,
+  "salience": 0.9244060475161986,
+  "reported_bearing_deg": 2.50583463849288,
+  "peak_cell": [
+   8,
+   8
+  ],
+  "peak_px": [
+   34.0,
+   34.0
+  ],
+  "peak_value": 0.11348039215686273,
+  "motion_median": 0.008578431372549029,
+  "food_cell": [
+   9,
+   0
+  ],
+  "motion_at_food_cell": null,
+  "moving_speed": 0.12208191256063367
+ },
+ {
+  "i": 147,
+  "az_cam_deg": -40.197992502436385,
+  "el_cam_deg": -8.047031680954673,
+  "in_fov": false,
+  "px_col": -7.117371735193132,
+  "px_row": 39.958917382684795,
+  "on_image": false,
+  "dist_m": 0.28256876789217805,
+  "food_angular_radius_deg": 1.8242913113904091,
+  "food_moved_m": 0.0,
+  "salience": 0.9371497197758207,
+  "reported_bearing_deg": 29.63635396145181,
+  "peak_cell": [
+   9,
+   14
+  ],
+  "peak_px": [
+   38.0,
+   58.0
+  ],
+  "peak_value": 0.15306372549019603,
+  "motion_median": 0.009620098039215692,
+  "food_cell": [
+   9,
+   0
+  ],
+  "motion_at_food_cell": null,
+  "moving_speed": 0.057336065872298045
+ },
+ {
+  "i": 148,
+  "az_cam_deg": -38.01203812471436,
+  "el_cam_deg": -6.695069896804388,
+  "in_fov": false,
+  "px_col": -4.220793913427464,
+  "px_row": 38.30891330942407,
+  "on_image": false,
+  "dist_m": 0.28011349936508545,
+  "food_angular_radius_deg": 1.8402707574384287,
+  "food_moved_m": 0.0,
+  "salience": 0.9649350649350651,
+  "reported_bearing_deg": -33.28267938563705,
+  "peak_cell": [
+   8,
+   0
+  ],
+  "peak_px": [
+   34.0,
+   2.0
+  ],
+  "peak_value": 0.09436274509803921,
+  "motion_median": 0.0033088235294117564,
+  "food_cell": [
+   9,
+   0
+  ],
+  "motion_at_food_cell": null,
+  "moving_speed": 0.05038726690986162
+ },
+ {
+  "i": 149,
+  "az_cam_deg": -37.29346708106322,
+  "el_cam_deg": -6.799559642668342,
+  "in_fov": false,
+  "px_col": -3.306397258797979,
+  "px_row": 38.349572641847026,
+  "on_image": false,
+  "dist_m": 0.27890463984275504,
+  "food_angular_radius_deg": 1.8482415435071882,
+  "food_moved_m": 0.0,
+  "salience": 0.9674796747967481,
+  "reported_bearing_deg": -25.705823336339154,
+  "peak_cell": [
+   8,
+   2
+  ],
+  "peak_px": [
+   34.0,
+   10.0
+  ],
+  "peak_value": 0.04522058823529411,
+  "motion_median": 0.0014705882352941124,
+  "food_cell": [
+   9,
+   0
+  ],
+  "motion_at_food_cell": null,
+  "moving_speed": 0.13754707150118908
+ }
+]

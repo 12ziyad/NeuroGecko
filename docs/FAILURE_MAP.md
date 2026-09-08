@@ -35,8 +35,11 @@ later turned out to be right gets a second row, not an edit.
 | **Brain 3a/8 — spinal rhythm** (the leg oscillators) | ✅ drives the walker, every gate unchanged |
 | **Brain 3b/8 — brainstem** (decision → command) | ✅ built; thinnest evidence in the project, declared |
 | **Brain 4/8 — eye** (retina, pretectum, tectum) | 🟡 gaze reproduces; **prey-finding NOT ACCEPTED** |
+| **Strike** — the thing that actually catches prey | ❌ **absent.** Walking cannot catch a cricket; the real animal strikes from ~2 cm |
+| **Smell** — the channel this species is documented to gate on | ❌ absent |
 | Brains 5–8 — sleep, memory, and the rest | ❌ |
 | **Proof** — 15-test battery | 🟡 1 run (A3, failed then fixed) |
+| **Gate contracts** | ✅ 16/16. One check compared bytes instead of physics and masked seven others — #167, #168 |
 
 **Roughly 50 % done.** The irreversible parts — the research and the body — are
 behind us.
@@ -140,20 +143,41 @@ Where the work went, in order, and where it stopped each time. **71 commits.**
 | **6e** | found the authors' own source on disk | **the whole model was the wrong one**; reimplemented and reproduced |
 | **6f** | migrated the gecko onto the validated model | brains 1 and 2 **running together in the simulation** |
 
+### Phase 7 — the eye, and then the literature (Sessions 8–9)
+
+The retina and pretectum landed and the pretectum reproduces the one published
+sensorimotor measurement that exists for this species. The tectum landed and
+**does not work**: it finds a synthetic cricket perfectly and a real one not at
+all. Session 8d tried to fix that with better optics and failed.
+
+Session 9 stopped building. Six literature searches asked what a real leopard
+gecko actually does and senses, and refuted sixteen of seventeen assumptions —
+including that the animal chases prey, that it basks, that it flees what it
+sees, and that stationary prey is invisible to a visual predator. Ledger
+133–149.
+
 ### ← Where we are paused, right now
 
-- **Done and pushed:** everything above, 456 tests green.
-- **Running in the background:** a hunt for why our dopamine curve sits +0.10
-  high. Not a blocker; nothing depends on it.
+- **Working tree is uncommitted.** Five modified files from session 8d plus the
+  session 9 provenance correction and this map entry.
+- **8 tests fail** — `test_session2_gate.GateContracts`. They fail in a clean
+  worktree at `e4196d8` too, so they pre-date session 8d. Earlier sessions
+  reported 456 passing; **that report was wrong.** Ledger #149.
+- **Underneath it:** the sessions 3–4 evidence records a body hash no committed
+  version of `gecko_body_lab_v2.xml` produces. The accepted 4/6 walker's
+  evidence points at a body that is not in the repository. **Unresolved, and
+  everything else stands on the locomotion work.**
 - **Brain 3 is finished.** The cord drives the walker with every gate
-  unchanged, and the brainstem turns a decision into a stride frequency and a
-  turn.
-- **Built and NOT ACCEPTED:** the tectum. It finds a synthetic cricket
-  perfectly and cannot find a real one with a body attached — 99.3% hit rate,
-  correlation −0.03. Committed with the evidence, off by default.
-- **Next up:** either make the prey findable (it covers less than one cell at
-  working range) or accept that vision alone cannot do it and look at what the
-  animal actually uses at that range.
+  unchanged; the brainstem turns a decision into a stride frequency and a turn.
+- **Brain 4 is half done.** Gaze reproduces. Prey-finding does not, and session
+  9 explains why: the prey never moves and is off-image 81 % of the time, so
+  the detector was never the problem.
+- **What is now known to be missing:** a strike. The animal walks at 0.055 m/s
+  and the cricket escapes at 0.093–0.143 m/s, so pursuit cannot work and the
+  real animal does not attempt it — it strikes from ~2 cm at 0.851 m/s. Until a
+  strike exists the hunting channel cannot succeed by any route.
+- **Next decision, not yet taken:** chase the body-hash mismatch first, or
+  build the world and the strike and come back to it.
 
 ---
 
@@ -843,19 +867,187 @@ shortfall.
 
 ---
 
+## Ledger — the eye was the wrong question (Sessions 8d–9)
+
+Session 8d chased the cricket with better optics and failed. Session 9 stopped
+building and went to the literature instead: six searches on what a real
+leopard gecko does, what it senses, and how it understands its world. The
+searches refuted more of this project's assumptions than any session so far,
+including two I had stated to the user as fact.
+
+**The headline, stated correctly on the second attempt.** My first version of
+this line said no one has ever published a study of a leopard gecko hunting.
+That is wrong, and a later search found the paper: **Delheusy, Brillet & Bels
+1995**, *Amphibia-Reptilia* 16(2):185–201, n = 6 adult males, SVL 120 ± 4 mm,
+filmed at 64 fps eating 22 mm *Gryllus bimaculatus*. It has a full kinematic
+table.
+
+What is true is narrower and still severe. **The capture itself is the one
+phase that paper could not quantify** — only 5 lateral cycles from 2 animals
+were usable, so capture is described qualitatively and excluded from every
+table and statistic. At 64 fps the frame interval is 15.6 ms, which cannot
+resolve a strike. So chewing, transport and licking are measured in this
+species; **strike distance, strike speed, approach speed and capture success
+are not**, and those are exactly the numbers a hunting controller needs. They
+come instead from *Coleonyx variegatus*, a cousin in the same family, mostly
+from **five juveniles**.
+
+The correction matters more than the fact. I wrote "not one, nobody has filmed
+it" from one agent's negative result, in a session whose entire subject was
+this project repeating unchecked claims. The first agent had actually named the
+paper and flagged that it could not retrieve the numbers; I turned "could not
+retrieve" into "does not exist."
+
+| # | Hypothesis | Verdict | Evidence |
+|---|---|---|---|
+| 133 | Subtracting the surround stops the tectum hunting its own optic flow | **Refuted** | it subtracted a **scalar**, and `argmax(clip(x-c,0,None)) == argmax(x)` for any scalar c. Identical on **20000/20000** random maps — it had never changed a single reported bearing. Replaced with a spatially varying local surround, which moves the answer on **1735/2000** |
+| 134 | A sharper eye finds the cricket | **Refuted** | four configurations, render 64→512 px and receptors 64→256. Correlation with true prey bearing ≈ **0** in all four. I had told the user resolution was the fix; it is not |
+| 135 | There is prey motion for a motion detector to find | **Refuted** | `prey_total_travel_mm = 0.0` across 1800 frames. `FleeingPrey.step` only moves within 0.075 m while detection range is 0.30–0.50 m. **The prey is stationary** |
+| 136 | The prey is in the camera's field of view | **Refuted** | present on **18.7%** of frames. Off the rendered image four frames in five |
+| 137 | An open-source retina model can be adopted | **Refuted** | the only candidate, `openretina`, is a **mouse** retina (MIT code, CC-BY-SA weights) and retraining needs gecko recordings that do not exist for any reptile |
+| 138 | Geckos head-bob to judge prey distance by motion parallax | **Refuted** | **no gecko study shows it**, and none shows it for prey in any lizard. It is a stated *hypothesis* in other lizards, never demonstrated. Every confident claim traced to pet-care sites. **I asserted this to the user as fact.** The one lizard-clade distance mechanism that IS established is chameleon **accommodation**, which is not motion-based |
+| 139 | Stationary prey is undetectable by a visual predator | **Refuted** | mice capture **fresh-frozen crickets** as fast as live ones — 8.06 ± 1.08 s vs 7.6 ± 1.34 s, n=8, n.s. Motion is not required. The blindness is our architecture's, not nature's |
+| 140 | A better tectum would find still prey | **Refuted** | in frogs the **pretectum** handles stationary objects and the tectum handles motion: pretectal lesions leave feeding and threat avoidance intact but the animal walks into a barrier it can see. A tectum-only model is **correctly** blind to a frozen cricket. This needs a second structure, not a better one |
+| 141 | One prey channel is enough | **Refuted** | mouse superior colliculus splits it: **wide-field** (RF 700–900 deg², not direction-selective) triggers approach from >22 cm; **narrow-field** (<200 deg², direction-selective) supplies bearing during pursuit. Suppress the second and the animal reaches the prey and **stalls beside it**. Echoed in zebrafish posterior/anterior tectum |
+| 142 | Prey selectivity is a conjunction of features | **Refuted** | the one worked-out vertebrate is the opposite. The toad tectum's default is *attack anything that moves*; selectivity is a **subtractive pretectal veto**. Lesion the pretectum and the toad attacks everything moving. Our tectum ANDs its criteria — architecturally backwards |
+| 143 | Elevation in the visual field is a soft weight | **Refuted** | it is categorical. Identical looming disc: **75% escape overhead vs 53% and much slower at the side**. Identical small sweeping disc: freeze overhead, **80% approach** at the side. Floor-mounted looms produced **zero** escapes |
+| 144 | The prey velocity band is a free parameter | **Refuted** | four independent lineages converge on the same order: toad behaviour peaks 30–60 °/s and dies above ~200; **pit viper tectum** (a squamate) is near-silent at 5 °/s and peaks ~50; mouse looming escape needs 35 °/s. This is the most robust cross-species number found |
+| 145 | Our gecko basks | **Refuted** | it is **thigmothermic**. Body temperature tracks the **substrate** at r²=0.97 against air at 0.92, n=12. It takes heat by lying on warm ground, not from light. And preferred temperature is not a set point but a **diel ramp**, ~26 °C morning to ~30 °C at dusk — the rise is proposed as what triggers evening emergence |
+| 146 | A visual threat channel models this animal's escape | **Refuted** | for **this species**, n=42: defensive reaction probability is **0.21 to snake smell and 0.07 to the sight of a snake**. Factorially: chemical χ²=8.098, p<0.0044; visual χ²<0.01, p>0.9. Verbatim: *"the initiation of costly defensive action remains strictly gated by chemoreception"* |
+| 147 | Smell can localise prey | **Refuted as unsupported** | tongue-flicking is real and quantified for this species — **3.0/min baseline → 14.57/min to cricket chemicals**, n=7 — but the assay presents the swab **1 cm from the snout, in plain view**. It demonstrates *discrimination*, never *localisation*. Cooper flagged the missing experiment in 1998 and nobody has done it since |
+| 148 | `cost_of_transport = 0.73` is a leopard gecko measurement | **Refuted** | it is *Teratoscincus przewalskii*, a different **family**. `docs/research/gecko_scorecard.md` had it right, tagged `[TP]` and defined as a proxy for energetics only; `config/proxies.yaml` — the file the code reads — said `species: E_macularius, confidence: verified`. Corrected. No cost of transport, sprint maximum, endurance or thermal performance curve has ever been measured in this species |
+| 149 | 456 tests pass | **Refuted** | 8 `test_session2_gate.GateContracts` tests fail, and they fail in a **clean worktree at commit e4196d8** — they are not caused by session 8d's edits. See below |
+| 150 | No feeding kinematics exist for this species | **Refuted — my own overstatement** | Delheusy, Brillet & Bels 1995, *Amphibia-Reptilia* 16(2):185–201, **n=6 adult males**, 64 fps, 22 mm crickets, full Table 1. I turned one agent's "could not retrieve the numbers" into "does not exist". What *is* absent is narrower: the **capture phase** was unquantifiable at 64 fps (5 usable cycles from 2 animals) and is excluded from the paper's tables |
+| 151 | The gecko takes prey with its tongue | **Refuted** | **jaws alone** — the standard scleroglossan pattern, no tongue prehension. And the orienting rule is published: the head is aligned **transverse to the prey's long axis**. Capture is a single open–close cycle with no slow/fast subdivision: **~80 ms, peak gape ~37° at 47 ms**, head translating ~8 mm horizontally and ~28 mm vertically |
+| 152 | Eyelid geckos cannot lick their own eyes | **Refuted** | Delheusy et al. 1995, verbatim: *"La langue se déplace hors de la cavité buccale et **atteint parfois l'oeil**"* — the tongue sometimes reaches the eye, during post-feeding licking and grooming. The "cannot" claim traces only to care sites. Separately: **labial-licking is a different behaviour** and the words *eye*, *ocular*, *eyelid* appear nowhere in the paper that defines it |
+| 153 | This animal navigates by what things look like | **Refuted** | given a conflict between **geometry** and **visual features**, *E. macularius* preferentially used geometry (Kundey 2021, *Behav Processes* 188:104412). Its world model is shaped more by layout than by appearance — which is the opposite of what a vision-first build assumes |
+| 154 | The circulating leopard-gecko strike numbers have some source | **Refuted, source pinned** | "486 m/s², 5.8 m/s, 35 cm" is Wainwright, Kraklau & Bennett 1991, *J Exp Biol* 159:109–133, **tongue projection in *Chamaeleo oustaleti***, n=3 sequences from 2 animals. A leopard gecko does not project its tongue 35 cm |
+| 155 | Sleep is unmeasurable in this animal | **Refuted** | *E. macularius* is one of seven lizard species in Bergel et al. 2026, *Nat Neurosci* 29:543–550 — **sleep-dependent infraslow rhythms conserved across reptiles and mammals**, EOG under each eyelid. It **closes its eyelids to sleep**; the tokay cannot. Brain 5–8 has a starting point that did not exist when they were listed as ❌ |
+| 156 | The gecko vibration band is press-release-only and unusable | **Refuted** | read from the paper itself. Han & Carr 2024, **n=31 tokay geckos, 38 single units**: saccule → *nucleus vestibularis ovalis* → torus semicircularis, a channel entirely separate from hearing. Best frequencies **50–200 Hz, mode ~100 Hz**; threshold **−53 to −23 dB re 1 m/s²**, mean −42.6; **phase locking VS 0.89**. Sound at 15 dB above the loudest vibration used evoked **nothing** — it is vibration, not sound |
+| 157 | The ear covers low frequencies, so vibration adds little | **Refuted** | **no lizard auditory-nerve fibre has ever been recorded below ~200 Hz CF**, across four primary datasets, and the audiogram is a flat insensitive shelf from 100–500 Hz. The vibration channel covers **exactly the band hearing cannot reach**. They are not redundant; they are complementary |
+| 158 | No lizard has been shown to find prey without seeing it | **Refuted** | *Scincus scincus*, buried in sand, detects crickets moving on the surface **up to ~15 cm away**, extracts **direction**, emerges and captures. It responds far less to **dead** insects at the same distance, so it is vibration and not smell, and it **discriminates prey speed** — faster prey, faster emergence. It also **plunges its head into the sand**, and experiments show this is what couples it to the substrate |
+| 159 | No usable audiogram exists for this animal | **Refuted, with a substitution** | none is *accessible* for *E. macularius* — Werner et al. 1998 and 2008 hold it and both are hard-paywalled with no open copy anywhere. Two usable substitutes: eight gekkotan species best **22–72 dB SPL at 0.5–1.0 kHz** (Werner et al. 2008), and a **free, full** audiogram for *Coleonyx variegatus*, an actual eublepharid — best **~19 dB SPL at 500 Hz** at 21 °C (Wever et al. 1964, PMC300117) |
+| 160 | One audiogram describes this animal | **Refuted** | gecko hearing is **temperature-dependent in both sensitivity and best frequency**: as the animal cools it hears less *and* its best frequency **shifts downward**. 249 sensitivity functions, 50 animals, 15–40 °C. A fixed audiogram is biologically wrong for an ectotherm, and this project's animal already has a body temperature |
+| 161 | Vibration prey-detection is demonstrated in geckos | **Refuted** | it has **never been tested behaviourally in any gecko**. Han & Carr say so themselves — "no behavioral role for a dedicated vibration receptor has been demonstrated" — and their one mention of predator-prey sits bracketed with *wind and rain*. I first recorded this as a *mechanistic coincidence worth noticing* — cricket signals below 120 Hz, saccular channel 50–200 Hz, "the bands line up". **The next search refuted that too. See #162–164: on the numbers the gecko is not sensitive enough and is tuned to the wrong band.** The tympanic ear being ~55 dB down at 100 Hz stands |
+| 162 | A gecko could feel a cricket walking | **Refuted on the numbers** | measured arthropod footsteps on sand are **4x10-4 to 1.5x10-3 m/s2** (Devetak et al. 2007, four species). The most sensitive gecko saccular cell ever recorded thresholds at **-53 dB re 1 m/s2 = 2.2x10-3 m/s2**, mean **7.4x10-3**. **The loudest measured footstep sits below the best single cell's threshold**, before any distance damping. A scorpion does this because its receptors trigger at **~1 nm (10 A)** - the gecko's need roughly **19 nm**. Twenty-fold short |
+| 163 | The gecko's vibration band is the right band for sand | **Refuted** | sand is a lossy low-pass medium: Rayleigh waves at **40-50 m/s** dry, damped **0.26-2.61 dB/cm at 300 Hz**, worse as grains get finer. The band that actually *propagates* usefully is **200-500 Hz** (Brownell & van Hemmen 2001). The gecko's saccular channel is **50-200 Hz** - it sits **below** the window where sand carries prey information. And a cricket's own low-frequency signal peaks at **43 Hz**, below both |
+| 164 | Detection range is a property of the animal | **Refuted** | it is a property of the **ground**. Antlion mean reaction distance is **3.3 cm in fine sand (<=0.23 mm grains) and 12.3 cm in coarse (1-1.54 mm)** - a near fourfold change from substrate alone, in the same species. Any vibration range this project ever quotes is meaningless without the grain size beside it |
+| 165 | The privileged target channel is removed everywhere | **Refuted, third occurrence** | `GeckoBrainEnv` built the walker without naming `privileged_target`, so the walker's own `True` default won and nothing in the brain env could override it. Five numbers -- exact egocentric direction, distance and bearing to the goal, straight out of the physics engine, noiseless, at any range. **All 12 checkpoints in the repository record proprio_dim 92**, including the ones described as pure-vision. See #26 and #33 for the first two times this was declared removed |
+| 166 | It is present but the policy ignores it | **Refuted, and this is the expensive one** | `tools/oracle_ablation.py` zeroes the five slots at inference, keeping the vector 92 long so the checkpoint still loads. The walker moves **further** with them zeroed (0.0857 -> 0.1103 m) and progress **toward the goal** collapses **0.0664 -> 0.0060 m, a 91% loss**. The legs are fine; the navigation was the oracle. Retiring it needs a retrained walker, so the flag is exposed and declared rather than flipped, and `info["walker_oracle"]` now reports it every step |
+| 167 | The sessions 3-4 gait evidence is unverifiable | **REFUTED, and the claim was mine** | I reported that the recorded body hash `756765356417749c` matched no committed version and that the accepted walker's evidence therefore pointed at a body not in the repository. The physics was identical all along. The **comment-free ElementTree serialization** of the current body is `b178bf26b644b1d3`, which is exactly what `artifacts/evidence/morphology_reproducibility_line_endings_20260905.md` recorded for that file. Both committed versions in git history share that same physics hash. **A comment changed, not the animal.** The evidence was always valid |
+| 168 | Eight gate contracts are failing | **Refuted -- it was one** | the body check raised **before** any other contract could reach its own assertions, so seven unrelated tests reported the wrong failure for four sessions. Fixing the one check turned all eight green. `common/body_identity.py` now compares what MuJoCo reads rather than what the bytes say, and the evidence writer records **both** fingerprints, because recording only the raw one is what made this unverifiable in the first place |
+
+### #138 and #134 — the two I told the user were true
+
+These are the entries that matter most, because both left this project as
+statements of fact before they were checked.
+
+I told the user a sharper eye would find the cricket. Four configurations later
+the correlation was still zero. I told the user geckos head-bob to reveal
+stationary prey by motion parallax. There is no gecko study, no lizard prey
+study, and the confident version of the claim lives only on pet-care sites.
+
+The second one is the worse error. It was not a bad inference from thin
+evidence — it was **repeating a popular claim in the voice of a finding**, in a
+project whose entire discipline is refusing to do that.
+
+One half survives. The **pit viper** paper argues the mechanism directly: IR
+tectal units are near-silent at 5 °/s, so a motionless snake cannot detect a
+motionless object, and the authors conclude it must be revealed by **scanning
+head movements**. Same clade as our animal, the authors' own conclusion. Self-
+generated motion to reveal still objects stands; head-bobbing as a
+*rangefinder* does not.
+
+### #135 and #136 — the cricket was never findable
+
+Two measurements settle why the tectum failed, and neither is about the eye.
+The prey moves **0.0 mm**, and it is off the rendered image **81%** of the
+time. A motion detector was pointed at a stationary object it could mostly not
+see. Sessions 8b–8d spent their whole effort on the detector.
+
+### #149 — a test report that was wrong
+
+Sessions 8b and 8c both reported "456 tests pass, no expected failures". Eight
+tests fail, and a clean worktree at that commit fails the same eight, so the
+report was wrong when it was written rather than broken afterwards.
+
+The cause underneath is worse than the count. **Every evidence file in sessions
+3 and 4 records body hash `756765356417749c`.** `morphology/gecko_body_lab_v2.xml`
+hashes to `db650f6bf55852cb` in LF form and `506712cb13cccfc3` in CRLF form,
+and no historical committed version of the file produces the recorded hash.
+
+So the accepted 4/6 walker's evidence was measured against a body that is not
+in the repository, and the gate contracts have been saying so. This is
+unresolved and it sits underneath the locomotion work, which everything else
+stands on.
+
+### What the literature changes about the plan
+
+Five findings, all published, that redirect the build:
+
+- **The animal does not chase.** Strike from ~2 cm at 0.851 m/s, walking at
+  0.055 m/s, cricket escape 0.093–0.143 m/s. Pursuit is arithmetically
+  impossible and the real animal does not attempt it. **There is no strike in
+  the code**, so the hunting channel currently cannot succeed by any route.
+- **Attack distance and strike speed scale together**, r=0.47, p=0.009 — a real
+  control law, from real animals, ready to implement.
+- **Two strikes, not one.** The published *E. macularius* ethogram (n=18)
+  separates `snap` — "a snap can be unsuccessful" — from `bag jump`, "jump
+  towards a prey in order to bag it", alongside `walk slow motion` "mostly in
+  context of prey capture".
+- **The tail is not decoration.** Lateral tail undulation drives pelvic
+  rotation and therefore step length; restricting it reproduces the kinematic
+  changes of autotomy. The body already has five tail yaw joints and an
+  actuator pair, all currently unused.
+- **Hearing degrades with cold** — sensitivity falls and best frequency drops
+  as temperature drops, 249 functions across 50 animals. The only measured
+  coupling between two systems this project already has.
+
+### What cannot be built honestly
+
+Recorded so the gaps stay visible rather than getting invented later:
+
+- No CTmin for this species or any eublepharid. The cold side of the thermostat
+  has no floor.
+- No field study of wild *E. macularius* at all — no home range, no activity
+  budget, no diet, no microhabitat selection. The richest habitat description
+  in existence is a non-peer-reviewed field manuscript.
+- No tightness-of-fit or crevice-preference experiment. The "tight hide" rule
+  every care sheet states has **zero** primary support in this species.
+- No prey-capture kinematics, foraging-mode metric, or approach speed for this
+  species.
+- No visual receptive field, size tuning, or velocity tuning for **any** lizard
+  tectum. No prey-selective cell class has ever been described in a reptile.
+- ~~No cricket substrate-vibration spectrum~~ - **found, and it closed the idea
+  rather than opening it.** See #162-164. What is still NOT_FOUND is the
+  vibration a cricket makes by *walking*: every measurement is of deliberate
+  courtship signalling. The nearest usable figure is four unnamed arthropod
+  species walking on sand (Devetak et al. 2007), and the identity of those four
+  is behind a paywall.
+- No calibrated vibration threshold has ever been published for a **whole
+  lizard** - every reptile vibrogram in existence is a python.
+
+---
+
 ## Scoreboard
 
 | | |
 |---|---|
-| Hypotheses tested | **132** |
-| Refuted | **98** |
+| Hypotheses tested | **168** |
+| Refuted | **134** |
 | Confirmed | **25** |
-| Partly | **8** |
-| My own method errors | **26** |
-| Tests passing | **456**, no expected failures |
+| Partly | **9** |
+| My own method errors | **32** |
+| Tests passing | **462 of 462**, one skip. Green for the first time since session 8 |
 
-**Seventy-three per cent of everything tried was wrong.** That is what the map
+**Seventy-seven per cent of everything tried was wrong.** That is what the map
 is made of.
+
+Session 9 is the sharpest entry in that number and the only one where the
+refutations came from **reading rather than running**. Thirty-six hypotheses,
+thirty-five refuted. Three of them — #134, #138 and #150 —
+had already been stated to the user as fact before anyone checked. #150 was
+stated *inside this session*, in the entry above, and corrected an hour later.
 
 Two of the entries above retired a *failure* rather than a hypothesis. The
 project had been reporting an inverted result for three sessions against a

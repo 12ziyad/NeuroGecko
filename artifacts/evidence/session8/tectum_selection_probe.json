@@ -1,0 +1,26 @@
+{
+ "raw": {
+  "hits": 5,
+  "frames": 90,
+  "median_cell_error": 5.385164807134504,
+  "corr_bearing_vs_truth": -0.10713526986438096
+ },
+ "scalar": {
+  "hits": 5,
+  "frames": 90,
+  "median_cell_error": 5.385164807134504,
+  "corr_bearing_vs_truth": -0.10713526986438096
+ },
+ "surround": {
+  "hits": 4,
+  "frames": 90,
+  "median_cell_error": 5.385164807134504,
+  "corr_bearing_vs_truth": -0.07943471481322155
+ },
+ "z": {
+  "hits": 1,
+  "frames": 90,
+  "median_cell_error": 4.47213595499958,
+  "corr_bearing_vs_truth": -0.08848979936095203
+ }
+}

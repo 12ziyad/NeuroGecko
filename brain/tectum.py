@@ -79,13 +79,16 @@ class Tectum:
 
     def __init__(self, retina, motion_floor=MOTION_FLOOR,
                  max_target_fraction=MAX_TARGET_FRACTION,
-                 subtract_field=True):
+                 subtract_field=True, surround_cells=3):
         self.retina = retina
         self.motion_floor = float(motion_floor)
         self.max_target_fraction = float(max_target_fraction)
         #: Leave this on. Off only in the test that measures what it is worth,
         #: which is a fourfold reduction in the response to self-motion.
         self.subtract_field = bool(subtract_field)
+        #: Width of the surround each cell is compared against, in cells.
+        #: INVENTED.
+        self.surround_cells = int(surround_cells)
         self.last = {"salience": 0.0, "bearing_deg": 0.0, "elevation_cell": None}
 
     def step(self, retina_output):
@@ -117,14 +120,23 @@ class Tectum:
                 return 0.0, 0.0
 
         if self.subtract_field:
-            # Self-motion is what the WHOLE field is doing. Subtract it and
-            # what remains is what is moving differently from the world.
-            # Measured worth, with the size test disabled so this is the only
-            # thing rejecting pure self-motion: salience 1.000 without it,
-            # 0.266 with. It reduces the response fourfold and does not
-            # eliminate it, which is why the size test is there as well.
-            field = float(np.median(motion))
-            local = motion - field
+            # SUBTRACTING A SCALAR WAS A NO-OP AND THIS IS THE CORRECTION.
+            #
+            # The previous version did `motion - float(np.median(motion))`.
+            # clip(x - c, 0, None) is monotonic in x for any SCALAR c, so it
+            # cannot move the argmax -- and the argmax is where the reported
+            # bearing comes from. Checked on 20000 random maps: the argmax was
+            # identical every single time. The stage had never changed a
+            # reported bearing, and an earlier "measured worth: 1.000 -> 0.266"
+            # in this file was measuring the salience VALUE, not the bearing,
+            # which is the quantity that matters.
+            #
+            # A local-versus-global comparison has to be SPATIALLY VARYING to
+            # do anything. Each cell is now measured against its own
+            # surroundings, which is what object-motion-sensitive retinal cells
+            # actually do: they respond when local motion differs from the
+            # background and fall silent when the whole field moves together.
+            local = motion - _surround(motion, self.surround_cells)
         else:
             local = motion.copy()
         local = np.clip(local, 0.0, None)
@@ -151,6 +163,28 @@ class Tectum:
                     invented=["MOTION_FLOOR", "MAX_TARGET_FRACTION"])
 
 
+def _surround(plane, width):
+    """Mean of the neighbourhood around each cell, edges extended.
+
+    This has to be SPATIALLY VARYING. A scalar reference cannot change which
+    cell is the largest, which is the whole reason the previous version did
+    nothing.
+    """
+    if width < 1:
+        return np.zeros_like(plane)
+    padded = np.pad(plane, width, mode="edge")
+    out = np.zeros_like(plane)
+    n = 0
+    for dy in range(-width, width + 1):
+        for dx in range(-width, width + 1):
+            if dx == 0 and dy == 0:
+                continue
+            out += padded[width + dy:width + dy + plane.shape[0],
+                          width + dx:width + dx + plane.shape[1]]
+            n += 1
+    return out / max(n, 1)
+
+
 class Eye:
     """Retina, pretectum and tectum as one object, because they share a frame.
 
@@ -158,10 +192,12 @@ class Eye:
     order or to give two of them different frames. This makes that impossible.
     """
 
-    def __init__(self, fovy_deg=70.0, pixels=64, cells=16):
+    def __init__(self, fovy_deg=70.0, pixels=64, cells=16,
+                 render_pixels=None):
         from brain.retina import Retina
         from brain.pretectum import Pretectum
-        self.retina = Retina(fovy_deg=fovy_deg, pixels=pixels, cells=cells)
+        self.retina = Retina(fovy_deg=fovy_deg, pixels=pixels, cells=cells,
+                             render_pixels=render_pixels)
         self.pretectum = Pretectum(self.retina)
         self.tectum = Tectum(self.retina)
         self.last = {}

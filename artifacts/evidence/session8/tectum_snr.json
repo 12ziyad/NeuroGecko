@@ -1,0 +1,29 @@
+[
+ {
+  "tag": "gecko walking",
+  "n": 60,
+  "signal_median": 0.03504901960784313,
+  "background_median": 0.009681372549019589,
+  "ceiling_median": 0.08137254901960783,
+  "global_ratio": 0.43072289156626503,
+  "frames_signal_beats_ceiling": 4
+ },
+ {
+  "tag": "gecko walking",
+  "n": 60,
+  "signal_median": 0.021875,
+  "background_median": 0.0,
+  "ceiling_median": 0.08137254901960783,
+  "global_ratio": 0.2688253012048193,
+  "frames_signal_beats_ceiling": 0
+ },
+ {
+  "tag": "BODY FROZEN",
+  "n": 60,
+  "signal_median": 0.0,
+  "background_median": 0.0,
+  "ceiling_median": 0.0,
+  "global_ratio": 0.0,
+  "frames_signal_beats_ceiling": 0
+ }
+]

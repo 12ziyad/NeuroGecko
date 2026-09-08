@@ -55,6 +55,15 @@ import numpy as np
 
 #: Green and blue survive; red is dropped. See point 2 above.
 KEPT_CHANNELS = (1, 2)
+
+#: The animal's own resolving power, cycles per degree. DERIVED, from published
+#: cone outer-segment spacing (10-15 um) and focal length (3.5 mm) in
+#: *Tarentola chazaliae* -- not measured in any eublepharid, and a SAMPLING
+#: limit rather than an optical one. The eye is multifocal with roughly 15 D
+#: between zones and positive spherical aberration, so the true optical cutoff
+#: is LOWER than this and has never been measured. The conservative end of the
+#: range is used, which errs toward the animal seeing less rather than more.
+ACUITY_CYC_DEG = 2.0
 #: What those channels are being read AS. A mapping, not a match.
 CHANNEL_NM = (521.0, 467.0)
 
@@ -91,9 +100,35 @@ class Retina:
     """Turns frames into a retinotopic map of motion and contrast."""
 
     def __init__(self, fovy_deg=70.0, pixels=64, cells=16,
-                 surround_ratio=3.0):
+                 surround_ratio=3.0, render_pixels=None,
+                 acuity_cyc_deg=ACUITY_CYC_DEG):
+        """
+        `render_pixels` is the resolution the WORLD is rendered at, which may be
+        far higher than the resolution the animal sees. That is not a cheat and
+        it is not a superpower -- it is how an eye actually works, and skipping
+        it is the error.
+
+        A real eye receives a sharp image, its OPTICS blur it, and only then do
+        the receptors sample it. Rendering coarse and sampling coarse omits the
+        blur entirely, so fine detail that the eye could never resolve does not
+        get removed -- it gets ALIASED, and turns into false structure that
+        moves when the animal moves. Floor texture shimmering like a moving
+        object is exactly that error, and a motion detector cannot tell the
+        difference.
+
+        So: render high, low-pass to `acuity_cyc_deg`, then sample. What
+        reaches the brain is limited to what the animal's receptors can carry,
+        whatever the render resolution was. Raising the render resolution makes
+        the model MORE faithful and never sharper than the animal.
+        """
         if cells < 2 or pixels % cells:
             raise ValueError("pixels must be a whole multiple of cells.")
+        self.render_pixels = int(render_pixels) if render_pixels else int(pixels)
+        if self.render_pixels < pixels or self.render_pixels % pixels:
+            raise ValueError("render_pixels must be a whole multiple of pixels.")
+        self.acuity_cyc_deg = float(acuity_cyc_deg)
+        if self.acuity_cyc_deg <= 0:
+            raise ValueError("acuity_cyc_deg must be positive.")
         self.fovy_deg = float(fovy_deg)
         self.pixels = int(pixels)
         self.cells = int(cells)
@@ -120,16 +155,40 @@ class Retina:
         return self
 
     # ------------------------------------------------------------ the signal
+    def optical_limit_px(self):
+        """Blur width, in RENDER pixels, that limits the image to the animal's
+        own resolving power. A feature finer than one cycle at
+        `acuity_cyc_deg` cannot be transmitted by the eye and must not survive
+        into the retinal image."""
+        per_px = self.fovy_deg / self.render_pixels
+        cycle_deg = 1.0 / self.acuity_cyc_deg
+        return max(1.0, (cycle_deg / 2.0) / per_px)
+
     def _receptors(self, image):
-        """uint8 HxWx3 -> float HxWx2, red dropped, normalised to [0, 1]."""
+        """uint8 HxWx3 -> float, red dropped, blurred to the animal's acuity,
+        then sampled at the receptor grid."""
         frame = np.asarray(image)
         if frame.ndim != 3 or frame.shape[2] < 3:
             raise ValueError("expected an HxWx3 image")
-        if frame.shape[0] != self.pixels or frame.shape[1] != self.pixels:
+        if frame.shape[0] != frame.shape[1]:
+            raise ValueError("expected a square image")
+        if frame.shape[0] not in (self.pixels, self.render_pixels):
             raise ValueError(
-                f"expected {self.pixels}x{self.pixels}, got "
-                f"{frame.shape[0]}x{frame.shape[1]}")
-        return frame[:, :, KEPT_CHANNELS].astype(np.float64) / 255.0
+                f"expected {self.pixels} or {self.render_pixels} px, "
+                f"got {frame.shape[0]}")
+        planes = frame[:, :, KEPT_CHANNELS].astype(np.float64) / 255.0
+
+        if frame.shape[0] == self.render_pixels and                 self.render_pixels != self.pixels:
+            # THE OPTICS. Low-pass to what the eye can transmit, THEN sample.
+            # Doing it in this order is the whole point: sampling first would
+            # alias detail the animal cannot resolve into false structure.
+            width = self.optical_limit_px()
+            planes = np.stack([_blur(planes[:, :, i], width)
+                               for i in range(planes.shape[2])], axis=-1)
+            k = self.render_pixels // self.pixels
+            planes = planes.reshape(self.pixels, k, self.pixels, k,
+                                    planes.shape[2]).mean(axis=(1, 3))
+        return planes
 
     def _bin(self, plane):
         """Pool to the cell grid. Uniform: every cell gets the same count."""
