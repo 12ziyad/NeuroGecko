@@ -1,0 +1,15 @@
+{
+ "schema_version": 1,
+ "generated_by": "tools/session4_style_walk.py",
+ "video": "artifacts/video/session4_style_walk.mp4",
+ "reproduces": "the Session 4 render setup, not the Session 4 file. The script that made renders/session4/*.mp4 was never committed.",
+ "gait_profile": "lab",
+ "checkpoint": "models/v4_5b_speed_polish_1m",
+ "world": "morphology/gecko_world_v1.xml",
+ "fps": 50,
+ "real_time": true,
+ "shadows": true,
+ "path_m": 8.0591,
+ "speed_along_track_m_s": 0.2686,
+ "episode_resets": 11
+}

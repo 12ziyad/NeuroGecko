@@ -944,6 +944,9 @@ retrieve" into "does not exist."
 | 174 | The frozen walker can deliver the animal to striking distance | **Refuted, and this is the live blocker** | it cannot. It arrives within **4 cm** of a goal and its nose trails its trunk by about **5 cm**, so "the animal arrived" and "the mouth is on the prey" are five centimetres apart. With prey motion, a working stalk, a collapsed flee radius and a target aimed past the animal, the best approach across 700 steps was **34.5 mm against the 20.3 mm needed**, oscillating rather than converging. The walker was trained to reach a goal, not to place a mouth on a 9 mm cricket |
 | 175 | The strike itself works | **Confirmed** | with the prey placed in range -- which the approach cannot do -- 78 strikes, 63 caught, 14 missed: **81 % against the published 82.9 %**, unfitted. `artifacts/video/hunt_session9.mp4` part 2 |
 | 176 | The Session 9 videos show a changed gait | **Refuted -- they show HALF SPEED** | every Session 9 video tool appends one frame per 0.02 s brain step and wrote them at **25 fps**. That plays 20.0 s of simulation over 40.0 s of video: **2.0x slow motion**, in all four clips. The Session 4 renders were **50 fps** and real-time, which is why they looked right. The "lag" the user saw was a container header. Gait, body, checkpoint and physics unchanged -- 481 tests, three independent body-hash confirmations, walker speed 0.054 vs 0.055 m/s. Fixed to 50 fps; `accepted_walk_replay.mp4` was already real-time because it samples the trace at the output rate rather than per step |
+| 177 | The brain runs the accepted walker | **Refuted** | the 4/6 gate evidence was measured under `gait_profile="lab"` (`artifacts/evidence/lab_frozen/report.json`). `GeckoBrainEnv` never passes the parameter, so `GeckoWalkEnv`'s **`"legacy"` default wins**. Same body, same frozen checkpoint -- model sha256 `77b7a99d...` is byte-identical to the one the evidence used -- but a different CPG scaffolding underneath. Same shape of defect as #165: a default won because nobody named the parameter. **Everything built in Session 9 sits on the un-gated profile** |
+| 178 | The Session 4 renders can be regenerated | **Refuted** | the script that made `renders/session4/*.mp4` was **never committed**. Only `utils/render_trace_video.py` is in the history, and it cannot produce them: it replays a trace against the archived BODY file, so it draws the default floor, has no prey, and disables shadows. The setup is reproducible; the file is not |
+| 179 | The accepted walker can be re-run live | **Refuted, and unresolved** | loading the accepted checkpoint into a live `gait_profile="lab"` env makes it **fall after 1.2 s**, in both the body XML and the world XML, with and without a distant target. Cause located but not fixed: `lab_controller_snapshot` is **None** in the live env, so the lab base controller is not configured -- the evidence protocol carries a whole reward-calibration and controller block that a bare constructor does not reproduce. **This is a harness gap on my side, not evidence the walker is broken**: the 20 s recorded trace walks without falling. But until a live run reproduces it, the accepted walker exists only as a recording |
 
 ### #138 and #134 — the two I told the user were true
 
@@ -1041,8 +1044,8 @@ Recorded so the gaps stay visible rather than getting invented later:
 
 | | |
 |---|---|
-| Hypotheses tested | **176** |
-| Refuted | **141** |
+| Hypotheses tested | **179** |
+| Refuted | **144** |
 | Confirmed | **26** |
 | Partly | **9** |
 | My own method errors | **33** |

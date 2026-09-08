@@ -79,7 +79,8 @@ def caption_image(frame, text, font):
 
 def render_replay(trace_path, xml_path, output, preview, *, fps=25,
                   width=960, height=540, max_wall_seconds=120., caption="",
-                  azimuth=None, elevation=None, distance=None, side_on=False):
+                  azimuth=None, elevation=None, distance=None, side_on=False,
+                  shadows=False):
     if fps <= 0 or width < 128 or height < 128 or width % 2 or height % 2:
         raise ValueError("Use positive fps and even video dimensions >=128")
     if not math.isfinite(max_wall_seconds) or max_wall_seconds <= 0:
@@ -142,7 +143,7 @@ def render_replay(trace_path, xml_path, output, preview, *, fps=25,
         "rendered_frames": 0, "physics_steps_executed": 0,
         "sampling": "nearest existing recorded qpos; no interpolation/controller/optimization",
         "human_render": {"sites": False, "collision_geoms": False,
-                         "shadows": False, "reflections": False, "body_visible": True},
+                         "shadows": bool(shadows), "reflections": False, "body_visible": True},
         "caption": caption,
     }
     try:
@@ -158,7 +159,10 @@ def render_replay(trace_path, xml_path, output, preview, *, fps=25,
             mujoco.mj_forward(model, data)
             camera.lookat[:] = data.xpos[trunk]
             rendering.update_scene(data, camera=camera, scene_option=options)
-            rendering.scene.flags[mujoco.mjtRndFlag.mjRND_SHADOW] = 0
+            # Shadows off by default so earlier renders reproduce byte for byte.
+            # The contact shadow is most of what makes a foot read as planted,
+            # which is why the Session 4 clips have it and the replays did not.
+            rendering.scene.flags[mujoco.mjtRndFlag.mjRND_SHADOW] = 1 if shadows else 0
             rendering.scene.flags[mujoco.mjtRndFlag.mjRND_REFLECTION] = 0
             frame = caption_image(rendering.render(), caption, font)
             writer.append_data(frame)
@@ -194,6 +198,8 @@ def main():
     parser.add_argument("--fps", type=int, default=25)
     parser.add_argument("--max-wall-seconds", type=float, default=120)
     parser.add_argument("--caption", default="NEW BODY - UNTUNED GAIT | recorded simulation")
+    parser.add_argument("--shadows", action="store_true",
+                        help="contact shadows, as the Session 4 renders have")
     parser.add_argument("--azimuth", type=float, default=None)
     parser.add_argument("--elevation", type=float, default=None)
     parser.add_argument("--distance", type=float, default=None)
@@ -203,7 +209,8 @@ def main():
     render_replay(args.trace, args.xml, args.output, args.preview,
                   fps=args.fps, max_wall_seconds=args.max_wall_seconds, caption=args.caption,
                   azimuth=args.azimuth, elevation=args.elevation,
-                  distance=args.distance, side_on=args.side_on)
+                  distance=args.distance, side_on=args.side_on,
+                  shadows=args.shadows)
 
 
 if __name__ == "__main__":
