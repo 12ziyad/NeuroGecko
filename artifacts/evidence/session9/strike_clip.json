@@ -1,0 +1,29 @@
+{
+ "schema_version": 1,
+ "generated_by": "tools/strike_clip.py",
+ "video": "artifacts/video/strike_clip.mp4",
+ "camera": "static, world-anchored, no smoothing, no tracking",
+ "strike": {
+  "active": true,
+  "mode": "snap",
+  "strikes": 54,
+  "hits": 42,
+  "misses": 11,
+  "success_rate": 0.7777777777777778,
+  "published": {
+   "trigger_distance_m": 0.0203,
+   "peak_speed_m_s": 0.851,
+   "capture_success": 0.829,
+   "species": "Coleonyx variegatus for everything except duration"
+  },
+  "invented": [
+   "mode boundary at half the trigger distance",
+   "speed jitter",
+   "velocity profile shape"
+  ]
+ },
+ "what_it_does_not_show": [
+  "vision -- the bearing is an oracle read from the environment",
+  "an approach -- the cricket is placed inside striking distance because the frozen walker cannot close the last 2 cm (#174)"
+ ]
+}

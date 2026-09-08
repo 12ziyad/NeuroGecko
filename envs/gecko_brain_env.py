@@ -208,12 +208,14 @@ class GeckoBrainEnv(gym.Env):
         )
         self.walker_run = str(walker_run)
         self.show_debug_markers = bool(show_debug_markers)
-        _valid_views = ("fixed", "chase", "close", "hunt")
+        _valid_views = ("fixed", "chase", "close", "hunt", "static")
         if str(view_mode).lower() not in _valid_views:
             raise ValueError(f"view_mode must be one of {_valid_views}, got '{view_mode}'")
         self._view_mode = str(view_mode).lower()
         self._camera_smoothing = float(max(0.0, min(1.0, camera_smoothing)))
         self._smooth_lookat: np.ndarray | None = None
+        self._static_anchor: np.ndarray | None = None
+        self._static_azimuth: float = 0.0
         self._smooth_azimuth: float | None = None
         self.max_steps = int(max_steps)
         self.brain_steps_per_action = int(brain_steps_per_action)
@@ -697,6 +699,7 @@ class GeckoBrainEnv(gym.Env):
         self._step = 0
         self._prev_action = np.zeros(4, dtype=np.float32)
         self._smooth_lookat = None
+        self._static_anchor = None
         self._smooth_azimuth = None
         self._spawn_food()
         self._brain_action_to_target(np.array([1.0, 0.0, -1.0, -1.0], dtype=np.float32))
@@ -920,6 +923,29 @@ class GeckoBrainEnv(gym.Env):
             # camera sits directly behind: heading_deg + 180 in MuJoCo azimuth space
             target_azimuth = heading_deg + 180.0
             target_lookat = np.array([trunk[0], trunk[1], 0.05], dtype=np.float64)
+        elif self._view_mode == "static":
+            # A camera bolted to the world. Every other mode tracks the trunk,
+            # so the animal stays centred and the GROUND slides -- which reads
+            # as camera shake and makes it impossible to tell whether the gecko
+            # moved or the view did. This one does not move at all. It is
+            # anchored where the episode began rather than at the origin, so it
+            # frames wherever the action actually is.
+            if self._static_anchor is None:
+                # Anchored ONCE, from the animal's heading at that moment, then
+                # never touched again. A hard-coded azimuth frames the gecko
+                # differently depending on which way it happened to start, and
+                # put the prey behind it as often as in front. Computing it
+                # once keeps the camera genuinely fixed while still guaranteeing
+                # a side view with the head -- and therefore the strike -- facing
+                # into frame. Slightly ahead of the trunk, because the mouth is
+                # what this is filming.
+                self._static_anchor = np.array(
+                    [trunk[0] + forward[0] * 0.05, trunk[1] + forward[1] * 0.05, 0.02])
+                self._static_azimuth = heading_deg + 90.0
+            distance = 0.34
+            height = 0.115
+            target_azimuth = self._static_azimuth
+            target_lookat = self._static_anchor.copy()
         elif self._view_mode == "hunt":
             # Tight enough to see a 9 mm cricket and an 80 ms strike. The
             # existing "close" view sits 1.5 m back, which renders the whole
@@ -943,7 +969,7 @@ class GeckoBrainEnv(gym.Env):
                 dtype=np.float64,
             )
 
-        alpha = self._camera_smoothing
+        alpha = 0.0 if self._view_mode == 'static' else self._camera_smoothing
         if alpha > 0.0 and self._smooth_lookat is not None and self._smooth_azimuth is not None:
             lookat = alpha * self._smooth_lookat + (1.0 - alpha) * target_lookat
             # wrap azimuth delta to [-180, 180] to avoid spinning through 360
