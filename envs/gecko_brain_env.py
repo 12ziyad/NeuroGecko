@@ -182,6 +182,7 @@ class GeckoBrainEnv(gym.Env):
         privileged_food_dropout_prob: float = 0.0,
         walker_oracle: bool = True,
         strike: bool = False,
+        gait_profile: str = "legacy",
         control_mode: str = "cpg_residual",
         residual_scale: float = 0.25,
         front_stance_press: float = 0.40,
@@ -263,7 +264,25 @@ class GeckoBrainEnv(gym.Env):
             render_mode=render_mode,
             seed=seed,
             privileged_target=bool(walker_oracle),
+            gait_profile=gait_profile,
         )
+        # THE PROFILE THE BRAIN ACTUALLY WALKS ON, NOW NAMED RATHER THAN
+        # INHERITED. This constructor never passed `gait_profile`, so
+        # GeckoWalkEnv's "legacy" default won -- and the 4/6 gate evidence was
+        # measured under "lab" (artifacts/evidence/lab_frozen/report.json,
+        # gait_profile: lab). Same body, and the same frozen checkpoint: model
+        # sha256 77b7a99d is byte-identical to the one the evidence used. What
+        # differs is the CPG scaffolding the residual rides on. So everything
+        # built on this environment has been running the UN-GATED profile.
+        # That is the third time a default has won because nobody named the
+        # parameter -- see the walker oracle above, and #26/#33 before it.
+        #
+        # The default stays "legacy" for the same reason the oracle stays on:
+        # every brain checkpoint in models/brain/ was trained against it, and
+        # flipping a default silently is how this class of defect gets made in
+        # the first place. Measured cost of the difference is in ledger #180.
+        # What changes is that it can no longer be silent.
+        self.gait_profile = self.walk_env.gait_profile
         # THE WALKER'S OWN ORACLE, NOW PASSED RATHER THAN DEFAULTED.
         #
         # GeckoWalkEnv puts five numbers into its 92-long proprioception vector:
@@ -849,6 +868,8 @@ class GeckoBrainEnv(gym.Env):
             # Reported every step so no run can later be described as
             # oracle-free without the record contradicting it.
             "walker_oracle": self.walker_oracle,
+            "gait_profile": self.gait_profile,
+            "gate_validated_profile": self.gait_profile == "lab",
             "strike_active": bool(self.strike.active) if self.strike else False,
             "strike_mode": self.strike.mode if self.strike else None,
             "strikes": self.strike.strikes if self.strike else 0,
