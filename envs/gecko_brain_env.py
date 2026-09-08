@@ -208,14 +208,14 @@ class GeckoBrainEnv(gym.Env):
         )
         self.walker_run = str(walker_run)
         self.show_debug_markers = bool(show_debug_markers)
-        _valid_views = ("fixed", "chase", "close", "hunt", "static")
+        _valid_views = ("fixed", "chase", "close", "hunt", "static", "track")
         if str(view_mode).lower() not in _valid_views:
             raise ValueError(f"view_mode must be one of {_valid_views}, got '{view_mode}'")
         self._view_mode = str(view_mode).lower()
         self._camera_smoothing = float(max(0.0, min(1.0, camera_smoothing)))
         self._smooth_lookat: np.ndarray | None = None
         self._static_anchor: np.ndarray | None = None
-        self._static_azimuth: float = 0.0
+        self._static_azimuth: float | None = None
         self._smooth_azimuth: float | None = None
         self.max_steps = int(max_steps)
         self.brain_steps_per_action = int(brain_steps_per_action)
@@ -700,6 +700,7 @@ class GeckoBrainEnv(gym.Env):
         self._prev_action = np.zeros(4, dtype=np.float32)
         self._smooth_lookat = None
         self._static_anchor = None
+        self._static_azimuth = None
         self._smooth_azimuth = None
         self._spawn_food()
         self._brain_action_to_target(np.array([1.0, 0.0, -1.0, -1.0], dtype=np.float32))
@@ -923,6 +924,21 @@ class GeckoBrainEnv(gym.Env):
             # camera sits directly behind: heading_deg + 180 in MuJoCo azimuth space
             target_azimuth = heading_deg + 180.0
             target_lookat = np.array([trunk[0], trunk[1], 0.05], dtype=np.float64)
+        elif self._view_mode == "track":
+            # FOLLOWS POSITION, NEVER ROTATES. This is the one that looks right,
+            # and working out why corrected a mistake of mine: I blamed the
+            # sliding ground for the shake in the earlier clips. It was not the
+            # ground. `close` and `chase` set azimuth = heading + 180, so the
+            # camera SWINGS every time the gecko turns, and a walking gecko
+            # yaws constantly. Holding the azimuth fixed while tracking the
+            # animal removes the shake completely and keeps it in frame -- the
+            # ground slides past exactly as it should when something walks.
+            if self._static_azimuth is None:
+                self._static_azimuth = heading_deg + 128.0
+            distance = 0.62
+            height = 0.30
+            target_azimuth = self._static_azimuth
+            target_lookat = np.array([trunk[0], trunk[1], 0.03], dtype=np.float64)
         elif self._view_mode == "static":
             # A camera bolted to the world. Every other mode tracks the trunk,
             # so the animal stays centred and the GROUND slides -- which reads
@@ -969,7 +985,7 @@ class GeckoBrainEnv(gym.Env):
                 dtype=np.float64,
             )
 
-        alpha = 0.0 if self._view_mode == 'static' else self._camera_smoothing
+        alpha = 0.0 if self._view_mode in ('static', 'track') else self._camera_smoothing
         if alpha > 0.0 and self._smooth_lookat is not None and self._smooth_azimuth is not None:
             lookat = alpha * self._smooth_lookat + (1.0 - alpha) * target_lookat
             # wrap azimuth delta to [-180, 180] to avoid spinning through 360
