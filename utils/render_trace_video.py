@@ -78,7 +78,8 @@ def caption_image(frame, text, font):
 
 
 def render_replay(trace_path, xml_path, output, preview, *, fps=25,
-                  width=960, height=540, max_wall_seconds=120., caption=""):
+                  width=960, height=540, max_wall_seconds=120., caption="",
+                  azimuth=None, elevation=None, distance=None, side_on=False):
     if fps <= 0 or width < 128 or height < 128 or width % 2 or height % 2:
         raise ValueError("Use positive fps and even video dimensions >=128")
     if not math.isfinite(max_wall_seconds) or max_wall_seconds <= 0:
@@ -100,11 +101,24 @@ def render_replay(trace_path, xml_path, output, preview, *, fps=25,
     model.vis.global_.offheight = max(height, model.vis.global_.offheight)
     data = mujoco.MjData(model)
     trunk = model.body("trunk_middle").id
+    if side_on:
+        # Stand beside the animal's actual line of travel in THIS trace, rather
+        # than at a compass bearing that means nothing to it.
+        travel = qpos[-1][:2] - qpos[0][:2]
+        if float(np.linalg.norm(travel)) > 1e-6:
+            azimuth = math.degrees(math.atan2(travel[1], travel[0])) + 90.0
     camera = mujoco.MjvCamera()
     mujoco.mjv_defaultCamera(camera)
-    camera.azimuth = 135.
-    camera.elevation = -23.
-    camera.distance = .40  # Human presentation choice; not an animal measurement.
+    # Human presentation choices; not animal measurements. The defaults are the
+    # ones every earlier render used and are unchanged, so those videos still
+    # reproduce. They are overridable because a WORLD-fixed azimuth points
+    # wherever the animal happens to walk: on the lab_frozen trace the gecko
+    # walks straight at the camera and the whole clip is a close-up of its
+    # face. `--side-on` solves that properly by reading the direction the
+    # animal actually travels in this trace and standing beside it.
+    camera.azimuth = 135. if azimuth is None else float(azimuth)
+    camera.elevation = -23. if elevation is None else float(elevation)
+    camera.distance = .40 if distance is None else float(distance)
     options = mujoco.MjvOption()
     options.geomgroup[:] = 0
     options.geomgroup[0] = options.geomgroup[1] = 1
@@ -180,9 +194,16 @@ def main():
     parser.add_argument("--fps", type=int, default=25)
     parser.add_argument("--max-wall-seconds", type=float, default=120)
     parser.add_argument("--caption", default="NEW BODY - UNTUNED GAIT | recorded simulation")
+    parser.add_argument("--azimuth", type=float, default=None)
+    parser.add_argument("--elevation", type=float, default=None)
+    parser.add_argument("--distance", type=float, default=None)
+    parser.add_argument("--side-on", action="store_true",
+                        help="stand beside the animal's line of travel in this trace")
     args = parser.parse_args()
     render_replay(args.trace, args.xml, args.output, args.preview,
-                  fps=args.fps, max_wall_seconds=args.max_wall_seconds, caption=args.caption)
+                  fps=args.fps, max_wall_seconds=args.max_wall_seconds, caption=args.caption,
+                  azimuth=args.azimuth, elevation=args.elevation,
+                  distance=args.distance, side_on=args.side_on)
 
 
 if __name__ == "__main__":

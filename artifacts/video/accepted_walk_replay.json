@@ -1,0 +1,27 @@
+{
+  "caption": "ACCEPTED WALKER | recorded trace, replayed",
+  "complete": true,
+  "controller_recorded": "frozen PPO residual",
+  "duration_s": 20.00000000000681,
+  "elapsed_wall_seconds": 8.437999999994645,
+  "fps": 25,
+  "gait_profile_recorded": "lab",
+  "human_render": {
+    "body_visible": true,
+    "collision_geoms": false,
+    "reflections": false,
+    "shadows": false,
+    "sites": false
+  },
+  "kind": "recorded_qpos_human_replay",
+  "physics_steps_executed": 0,
+  "planned_frames": 500,
+  "rendered_frames": 500,
+  "sampling": "nearest existing recorded qpos; no interpolation/controller/optimization",
+  "source_files_unchanged": true,
+  "trace_path": "C:\\Users\\ziyad\\GeckoBrain\\artifacts\\evidence\\lab_frozen\\traces\\episode_000.json",
+  "trace_sha256": "b0a89d728ef6da702cb9e894157b4a64f40e5ce6027b50d0ded60b5f39371492",
+  "video_sha256": "01d13c61fe0507fb4b508ad82aa3b9c8d7c865307da8252b6918d693b2243800",
+  "xml_path": "C:\\Users\\ziyad\\GeckoBrain\\artifacts\\video\\_archived_body.xml",
+  "xml_sha256": "cfc485e6fab752dc4ab25d25beebf549fded5fb241b3da6c828df55156b9c22d"
+}
