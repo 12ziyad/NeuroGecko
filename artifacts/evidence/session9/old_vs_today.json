@@ -1,0 +1,25 @@
+{
+ "schema_version": 1,
+ "test": "does the walk differ between the Session 4 commit and today",
+ "method": "git worktree at 33be60c (Session 4c). One render script, run twice, with only sys.path differing. Body, world, checkpoint, seed, camera, step count and frame rate all pinned. Checkpoint loaded from the live repo because models/ is gitignored and was never modified.",
+ "session4_commit": "33be60c",
+ "result": {
+  "session4": {
+   "frames": 1000,
+   "seconds": 20.0,
+   "path_m": 1.95,
+   "speed_m_s": 0.0975,
+   "falls": 0
+  },
+  "today": {
+   "frames": 1000,
+   "seconds": 20.0,
+   "path_m": 1.95,
+   "speed_m_s": 0.0975,
+   "falls": 0
+  },
+  "max_pixel_difference": 0
+ },
+ "verdict": "IDENTICAL. Not merely similar -- every sampled frame matches to zero pixels of difference. The walk did not change between Session 4 and today. Every complaint about the Session 9 clips was about how they were FILMED: 25 fps on 50 fps footage (half speed, #176), a camera at a compass bearing the animal walked into, and a clip of the animal deliberately holding position with no walk shown beside it.",
+ "video": "artifacts/video/old_vs_today.mp4"
+}
