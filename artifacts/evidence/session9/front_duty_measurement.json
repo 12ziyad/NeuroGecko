@@ -1,0 +1,15 @@
+{
+ "schema_version": 1,
+ "question": "why does the walk read as pushing then dragging rather than flowing",
+ "method": "800 steps, gait_profile=lab, control_mode=cpg_residual, frozen checkpoint v4_5b_speed_polish_1m, target pushed 5 m ahead each step",
+ "duty_factor_front_left": 0.203,
+ "duty_factor_front_right": 0.591,
+ "published_front_target": 0.7,
+ "published_hind": 0.765,
+ "front_duty_score": 0.289,
+ "foot_participation": 0.988,
+ "belly_contact_rate": 0.0,
+ "reading": "The front-left foot carries load only 20 % of the cycle against a 70 % target, and the front-right 59 %. The hind limbs are near their 76.5 % target. So the back end propels on schedule while the front end is off the ground far more than it should be -- which is exactly the push-then-drag rhythm a viewer sees. It is not a rendering artefact and not a tuning failure.",
+ "cause": "FAILURE_MAP #18, already confirmed: the forelimb has ONE free joint against the hindlimb's TWO, so it cannot set foot height and foot position independently. #17 measured the consequence directly -- the forefoot sits 3.1 mm airborne. This is why 6 M steps of training never beat the hand-written base (#11), and it is one of the two gates that kept the walker at 4/6.",
+ "fix_requires": "a forelimb with a second free joint -- a body change, not a controller change. The body is 14/14 on static checks and every piece of gait evidence is tied to its hash, so this is not a side effect of any other work."
+}
