@@ -1,0 +1,20 @@
+{
+ "schema_version": 1,
+ "question": "why does the Session 4 demo look like a clean walk while every clip I rendered this session drags",
+ "answer": "I filmed the wrong gait profile. Every A/B render used lab; the Session 4 demo is legacy.",
+ "front_foot_duty_factor": {
+  "published_target": 0.7,
+  "lab": {
+   "front_left": 0.203,
+   "front_right": 0.591,
+   "note": "asymmetric by a factor of nearly three -- one front foot carries load for a fifth of the step, the other for well over half. That limp is the push-then-drag."
+  },
+  "legacy": {
+   "front_left": 0.483,
+   "front_right": 0.5,
+   "note": "balanced left to right, both near half. Reads as a walk."
+  }
+ },
+ "consequence_for_session_9j": "The pixel-identical A/B result stands -- the CODE did not change between 33be60c and today. But it was lab against lab, which is not the configuration the user was ever watching, so it did not answer the question they were actually asking.",
+ "uncomfortable_corollary": "lab is the GATE-VALIDATED profile -- the 4/6 evidence was measured under it (artifacts/evidence/lab_frozen/report.json) -- and it is the one that limps. legacy is un-gated and looks better. Whether the gate battery ever scored front-foot symmetry, or scored it and accepted the failure as one of the two unmet checks, is the next thing to establish. Looking better is not the same as being right."
+}
