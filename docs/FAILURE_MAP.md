@@ -948,6 +948,7 @@ retrieve" into "does not exist."
 | 178 | The Session 4 renders can be regenerated | **Refuted** | the script that made `renders/session4/*.mp4` was **never committed**. Only `utils/render_trace_video.py` is in the history, and it cannot produce them: it replays a trace against the archived BODY file, so it draws the default floor, has no prey, and disables shadows. The setup is reproducible; the file is not |
 | 179 | The accepted walker can be re-run live | **~~Refuted~~ RETRACTED same session -- it was my harness** | loading the accepted checkpoint into a live `gait_profile="lab"` env makes it **fall after 1.2 s**, in both the body XML and the world XML, with and without a distant target. Cause located but not fixed: `lab_controller_snapshot` is **None** in the live env, so the lab base controller is not configured -- the evidence protocol carries a whole reward-calibration and controller block that a bare constructor does not reproduce. Found within the hour: `GeckoWalkEnv` defaults to **`control_mode="raw"`**, which builds **no CPG at all**, and the frozen policy is a RESIDUAL that rides on one. With `control_mode="cpg_residual"` the accepted walker runs the **full 20 s with zero falls**, 1.642 m of path at 0.082 m/s, and `lab_controller_snapshot` is populated. The walker was never broken; I gave it no scaffolding to stand on. Recorded rather than deleted, because I reported it to the user as a finding before checking my own harness |
 | 180 | Running the brain on the gated profile costs something | **Refuted -- it costs almost nothing** | `gait_profile` is now a real parameter on `GeckoBrainEnv` and reaches the walker. Measured over 500 brain steps, same seed, same action: **legacy 1.041 m (0.1041 m/s), lab 1.021 m (0.1021 m/s), zero terminations either way** -- a 2 % difference. `lab_controller_snapshot` is populated under lab and None under legacy, which is the honest check that the profile actually took effect rather than merely being stored. The default stays `legacy` because every brain checkpoint was trained against it and flipping a default quietly is how this class of defect gets made; `info["gait_profile"]` and `info["gate_validated_profile"]` now report the truth every step |
+| 181 | The camera shake is the ground sliding | **Refuted twice, and the second answer is the right one** | first I blamed the sliding ground and bolted the camera to the world, which stopped the shake and let the animal walk out of frame. Then I blamed the azimuth swinging with heading, which was real but not the whole of it. The remaining shake is the camera pointing **at the trunk**, and the trunk rises, falls and yaws once per stride -- so the whole world jitters at stride frequency. Following a smoothed path at fixed height instead: measured background jitter **1.538 -> 0.000**. Two further filming faults fell out of it: a 1 s smoothing constant left the camera ~10 cm behind a 0.0975 m/s animal and framed it from the rear, and a rear-quarter azimuth makes a sprawling lizard read as flat and splayed while it is fully upright -- up-vector 0.998, never below 0.99, trunk 19-27 mm off the floor for all 1000 frames |
 
 ### #138 and #134 — the two I told the user were true
 
@@ -1045,8 +1046,8 @@ Recorded so the gaps stay visible rather than getting invented later:
 
 | | |
 |---|---|
-| Hypotheses tested | **180** |
-| Refuted | **144** |
+| Hypotheses tested | **181** |
+| Refuted | **145** |
 | Confirmed | **26** |
 | Partly | **9** |
 | My own method errors | **33** |
