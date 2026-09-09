@@ -1,0 +1,1466 @@
+[
+ {
+  "n": 1,
+  "hypothesis": "Hind stance height causes the duty failure",
+  "verdict": "Confirmed",
+  "class": "Confirmed",
+  "evidence": "compensator: 0.641 \u2192 0.733",
+  "section": "the walking phase (Sessions 1\u20133)"
+ },
+ {
+  "n": 2,
+  "hypothesis": "Limb phase = fore/hind touchdown-lateness difference",
+  "verdict": "Confirmed",
+  "class": "Confirmed",
+  "evidence": "0.320 \u2212 0.123 = 0.197, exactly the measured error",
+  "section": "the walking phase (Sessions 1\u20133)"
+ },
+ {
+  "n": 3,
+  "hypothesis": "Hind stance height causes the *phase* failure",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "fixing it moved phase the wrong way, 0.577 \u2192 0.607",
+  "section": "the walking phase (Sessions 1\u20133)"
+ },
+ {
+  "n": 4,
+  "hypothesis": "Fore stance height causes it",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "forelimb table nearly flat; front load fell 0.611 \u2192 0.584",
+  "section": "the walking phase (Sessions 1\u20133)"
+ },
+ {
+  "n": 5,
+  "hypothesis": "Actuator bandwidth is the cause",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "stiffening cut elbow lag 17.0\u00b0 \u2192 2.9\u00b0; phase moved 0.6347 \u2192 0.6283",
+  "section": "the walking phase (Sessions 1\u20133)"
+ },
+ {
+  "n": 6,
+  "hypothesis": "Spine bending supplies the missing stride",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "4\u00d7 amplitude: +6.5 % excursion, \u221217 % speed",
+  "section": "the walking phase (Sessions 1\u20133)"
+ },
+ {
+  "n": 7,
+  "hypothesis": "Fore/hind gearing mismatch",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "real, predicts the slip, but equalising it is slower at every step",
+  "section": "the walking phase (Sessions 1\u20133)"
+ },
+ {
+  "n": 8,
+  "hypothesis": "Contact softness lets the feet creep",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "impratio 1 \u2192 100: slip 13.5 \u2192 12 mm. Required \u03bc \u2248 0.01 against a floor of 0.9",
+  "section": "the walking phase (Sessions 1\u20133)"
+ },
+ {
+  "n": 9,
+  "hypothesis": "Commanding an earlier touchdown fixes phase",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "commanding 0.197 earlier gave 0.688 \u2014 worse",
+  "section": "the walking phase (Sessions 1\u20133)"
+ },
+ {
+  "n": 10,
+  "hypothesis": "Parameter search can reach 6/6",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "~200 generations, four searches; 23.20 \u2192 22.92, tiebreaker only",
+  "section": "the walking phase (Sessions 1\u20133)"
+ },
+ {
+  "n": 11,
+  "hypothesis": "A learned residual can fix the forefoot",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "2 \u00d7 3.01 M steps; best trained 3/6 against base 4/6",
+  "section": "training (Session 4)"
+ },
+ {
+  "n": 12,
+  "hypothesis": "Trunk pitch lifts the shoulder",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "measured 3.87\u00b0 against a published 3.72 \u00b1 0.61 \u2014 it was correct all along",
+  "section": "training (Session 4)"
+ },
+ {
+  "n": 13,
+  "hypothesis": "Elbow authority is the missing lever",
+  "verdict": "Confirmed",
+  "class": "Confirmed",
+  "evidence": "front load 0.584 \u2192 0.674, unreachable with the elbow locked",
+  "section": "training (Session 4)"
+ },
+ {
+  "n": 14,
+  "hypothesis": "\u2026and it can be had without cost",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "every passing row had stride CV 0.16\u20130.38 against a 0.10 ceiling",
+  "section": "training (Session 4)"
+ },
+ {
+  "n": 15,
+  "hypothesis": "Pressing harder in the base fixes it",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "0.584 \u2192 0.625 then collapse; the press is overwritten during stance",
+  "section": "training (Session 4)"
+ },
+ {
+  "n": 16,
+  "hypothesis": "Aiming the frozen pose deeper fixes it",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "flat front-only, worse uniform, across \u22120.6 to \u22127.0 mm",
+  "section": "training (Session 4)"
+ },
+ {
+  "n": 17,
+  "hypothesis": "The walking posture rides too high",
+  "verdict": "Confirmed",
+  "class": "Confirmed",
+  "evidence": "shoulder 0.125 SVL against a published 0.11; forefoot 3.1 mm airborne",
+  "section": "training (Session 4)"
+ },
+ {
+  "n": 18,
+  "hypothesis": "**The forelimb is under-actuated**",
+  "verdict": "Confirmed",
+  "class": "Confirmed",
+  "evidence": "1 free joint against the hindlimb's 2",
+  "section": "training (Session 4)"
+ },
+ {
+  "n": 19,
+  "hypothesis": "The limbs are barely articulated",
+  "verdict": "Confirmed",
+  "class": "Confirmed",
+  "evidence": "6 of 8 excursions at 0.00\u20130.37 of published",
+  "section": "body motion (Session 4b)"
+ },
+ {
+  "n": 20,
+  "hypothesis": "Sprawl can reach the published excursion",
+  "verdict": "Confirmed",
+  "class": "Confirmed",
+  "evidence": "55.25\u00b0 against a published 52.42",
+  "section": "body motion (Session 4b)"
+ },
+ {
+  "n": 21,
+  "hypothesis": "\u2026without losing the planted foot",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "hind duty 0.631 \u2192 0.094 across the sweep",
+  "section": "body motion (Session 4b)"
+ },
+ {
+  "n": 22,
+  "hypothesis": "A sprawl-aware stance table rescues it",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "\u00b115\u00b0 solvable \u2014 half what is needed \u2014 and 2/6 at zero amplitude",
+  "section": "body motion (Session 4b)"
+ },
+ {
+  "n": 23,
+  "hypothesis": "The tail was a passive pendulum",
+  "verdict": "Confirmed",
+  "class": "Confirmed",
+  "evidence": "every hindlimb excursion moved < 1 % when tail drive was removed",
+  "section": "body motion (Session 4b)"
+ },
+ {
+  "n": 24,
+  "hypothesis": "A caudofemoralis coupling reproduces the ablation",
+  "verdict": "Confirmed",
+  "class": "Confirmed",
+  "evidence": "\u221220.7 % / \u221216.5 % against a published \u221221 % / \u221217 %",
+  "section": "body motion (Session 4b)"
+ },
+ {
+  "n": 25,
+  "hypothesis": "One gain reproduces the whole per-joint pattern",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "knee +3.8 % against a published \u221211 %",
+  "section": "body motion (Session 4b)"
+ },
+ {
+  "n": 26,
+  "hypothesis": "The food vector is the only privileged channel",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "the controller was steered by the same bearing; both had to go",
+  "section": "the world (Sessions 4c\u20134d)"
+ },
+ {
+  "n": 27,
+  "hypothesis": "The floor needed a texture",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "it had one \u2014 at 0.64 squares per body length. The scale was the fault",
+  "section": "the world (Sessions 4c\u20134d)"
+ },
+ {
+  "n": 28,
+  "hypothesis": "~70\u00b0 camera is a guess",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "it makes the 1.6\u00b0 tracked dot span 1.46 px where 120\u00b0 gives 0.85",
+  "section": "the world (Sessions 4c\u20134d)"
+ },
+ {
+  "n": 29,
+  "hypothesis": "The corpus specifies the camera",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "five incompatible recommendations, all INVENTED",
+  "section": "the world (Sessions 4c\u20134d)"
+ },
+ {
+  "n": 30,
+  "hypothesis": "Cricket escape speed is published",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "absent \u2014 only dash length and duration, never divided",
+  "section": "the world (Sessions 4c\u20134d)"
+ },
+ {
+  "n": 31,
+  "hypothesis": "A walking gecko can catch fleeing prey",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "0.055 m/s against 0.118 m/s; never captured in 40 s",
+  "section": "the world (Sessions 4c\u20134d)"
+ },
+ {
+  "n": 32,
+  "hypothesis": "A strike can be scored at the control rate",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "a 16\u201320 ms strike is under one 50 Hz step; 500 Hz needed",
+  "section": "the world (Sessions 4c\u20134d)"
+ },
+ {
+  "n": 33,
+  "hypothesis": "The no-cheat work landed where it mattered",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "the vision env had its own privileged channel, untouched",
+  "section": "the world (Sessions 4c\u20134d)"
+ },
+ {
+  "n": 34,
+  "hypothesis": "The eat radius was roughly right",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "0.10 m against a published 4.07 cm strike distance",
+  "section": "the world (Sessions 4c\u20134d)"
+ },
+ {
+  "n": 35,
+  "hypothesis": "Scaling the cheat to zero removes it",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "five slots remain in the observation",
+  "section": "the world (Sessions 4c\u20134d)"
+ },
+ {
+  "n": 36,
+  "hypothesis": "The camera saw a real food object",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "a green sphere painted on after rendering",
+  "section": "the world (Sessions 4c\u20134d)"
+ },
+ {
+  "n": 37,
+  "hypothesis": "The brain evidence files are reproducible",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "both pin a body hash no file in the repo has",
+  "section": "the world (Sessions 4c\u20134d)"
+ },
+ {
+  "n": 38,
+  "hypothesis": "The old drives were roughly right",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "hunger saturated in 67 s where the animal takes days",
+  "section": "hypothalamus (Sessions 5\u20135b)"
+ },
+ {
+  "n": 39,
+  "hypothesis": "Anchoring the allometry at 40 g is fine",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "inflates metabolism 17 %; measured mass is 19.5 g",
+  "section": "hypothalamus (Sessions 5\u20135b)"
+ },
+ {
+  "n": 40,
+  "hypothesis": "Hunger measured against the energy reserve",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "1.7 % per inter-meal interval \u2014 the animal would never eat",
+  "section": "hypothalamus (Sessions 5\u20135b)"
+ },
+ {
+  "n": 41,
+  "hypothesis": "Hunger measured in **meals** matches the animal",
+  "verdict": "Confirmed",
+  "class": "Confirmed",
+  "evidence": "70 % at the published 2.33-day interval, unfitted",
+  "section": "hypothalamus (Sessions 5\u20135b)"
+ },
+ {
+  "n": 42,
+  "hypothesis": "The metabolism and the feeding schedule agree",
+  "verdict": "Confirmed",
+  "class": "Confirmed",
+  "evidence": "79 h per meal against a 56 h interval, from separate papers",
+  "section": "hypothalamus (Sessions 5\u20135b)"
+ },
+ {
+  "n": 43,
+  "hypothesis": "A clipped drive is harmless",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "zero reward for eating when several meals in debt",
+  "section": "hypothalamus (Sessions 5\u20135b)"
+ },
+ {
+  "n": 44,
+  "hypothesis": "n = m is an acceptable drive exponent",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "drive goes linear; a meal worth the same at any hunger",
+  "section": "hypothalamus (Sessions 5\u20135b)"
+ },
+ {
+  "n": 45,
+  "hypothesis": "The thermostat can be built now",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "no temperature field exists anywhere",
+  "section": "hypothalamus (Sessions 5\u20135b)"
+ },
+ {
+  "n": 46,
+  "hypothesis": "Session 5's module was complete",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "fatigue absent; the second channel carried no information",
+  "section": "hypothalamus (Sessions 5\u20135b)"
+ },
+ {
+  "n": 47,
+  "hypothesis": "The endurance velocity is in m/s",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "gives 15 h at 0.050 m/s against a published >60 min",
+  "section": "hypothalamus (Sessions 5\u20135b)"
+ },
+ {
+  "n": 48,
+  "hypothesis": "A walking gecko accumulates fatigue",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "0.055 m/s is under the aerobic ceiling \u2014 sustainable indefinitely",
+  "section": "hypothalamus (Sessions 5\u20135b)"
+ },
+ {
+  "n": 49,
+  "hypothesis": "The danger channel drives fear correctly",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "it is mechanosensory, and mechanosensory-alone defence is 0",
+  "section": "hypothalamus (Sessions 5\u20135b)"
+ },
+ {
+  "n": 50,
+  "hypothesis": "`curiosity` had no published basis",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "tongue-flick 3.60\u00d7, ceiling 0.146/s \u2014 right to delete, wrong about why",
+  "section": "hypothalamus (Sessions 5\u20135b)"
+ },
+ {
+  "n": 51,
+  "hypothesis": "The architecture can be built from the corpus alone",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "the weights are not in it",
+  "section": "basal ganglia (Sessions 6\u20136b)"
+ },
+ {
+  "n": 52,
+  "hypothesis": "Loop gain 1.0 is acceptable in positive feedback",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "oscillated at zero input, gates cycling 0 \u2192 0.34",
+  "section": "basal ganglia (Sessions 6\u20136b)"
+ },
+ {
+  "n": 53,
+  "hypothesis": "Diffuse drive can be summed regardless of channel count",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "effective gain scales with N",
+  "section": "basal ganglia (Sessions 6\u20136b)"
+ },
+ {
+  "n": 54,
+  "hypothesis": "Averaging the diffuse drive fixes it",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "cures oscillation, destroys discrimination",
+  "section": "basal ganglia (Sessions 6\u20136b)"
+ },
+ {
+  "n": 55,
+  "hypothesis": "Self-calibrating the gate is safe",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "collapsed the range; every dopamine level identical",
+  "section": "basal ganglia (Sessions 6\u20136b)"
+ },
+ {
+  "n": 56,
+  "hypothesis": "Selection is disinhibition, not a maximum",
+  "verdict": "Confirmed",
+  "class": "Confirmed",
+  "evidence": "losers are partially released; a WTA cannot do that",
+  "section": "basal ganglia (Sessions 6\u20136b)"
+ },
+ {
+  "n": 57,
+  "hypothesis": "Sigma-pi salience gates hunting on hunger AND prey",
+  "verdict": "Confirmed",
+  "class": "Confirmed",
+  "evidence": "a sated gecko ignores visible prey",
+  "section": "basal ganglia (Sessions 6\u20136b)"
+ },
+ {
+  "n": 58,
+  "hypothesis": "The GPR parameters are unobtainable",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "Table 5 of arXiv cs/0601004, plus c = 0.169 from a CC BY paper",
+  "section": "basal ganglia (Sessions 6\u20136b)"
+ },
+ {
+  "n": 59,
+  "hypothesis": "The oscillation was an unfixable structural flaw",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "it was the slopes: VL 0.62 keeps the loop gain under one",
+  "section": "basal ganglia (Sessions 6\u20136b)"
+ },
+ {
+  "n": 60,
+  "hypothesis": "The striatum is driven by cortex",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "Eq 14 drives cortex from thalamus alone; salience goes direct",
+  "section": "basal ganglia (Sessions 6\u20136b)"
+ },
+ {
+  "n": 61,
+  "hypothesis": "825 switches per 120 s was a model failure",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "50 Hz white-noise salience \u2014 the test measured its own noise",
+  "section": "basal ganglia (Sessions 6\u20136b)"
+ },
+ {
+  "n": 62,
+  "hypothesis": "Distortion can be counted",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "the count saturates; deepening needs a continuous measure",
+  "section": "basal ganglia (Sessions 6\u20136b)"
+ },
+ {
+  "n": 63,
+  "hypothesis": "Published parameters make the sweep reproduce",
+  "verdict": "Partly",
+  "class": "Partly",
+  "evidence": "5 of 7 properties; the switching ratio stays inverted",
+  "section": "basal ganglia (Sessions 6\u20136b)"
+ },
+ {
+  "n": 64,
+  "hypothesis": "Girard 2005 Table 5 holds the GPR parameters",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "it is a re-tuned robotic variant; six independent sources give 0.9 / 0.3, not 0.8 / 0.4",
+  "section": "basal ganglia, second correction (Session 6c)"
+ },
+ {
+  "n": 65,
+  "hypothesis": "The oscillation at zero salience had one cause",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "it had three, and each hid the next",
+  "section": "basal ganglia, second correction (Session 6c)"
+ },
+ {
+  "n": 66,
+  "hypothesis": "The caller's control rate can be the solver's rate",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "at 50 Hz the resting output oscillates over 0.143\u20130.205; at 200 Hz it is exact",
+  "section": "basal ganglia, second correction (Session 6c)"
+ },
+ {
+  "n": 67,
+  "hypothesis": "The diffuse STN drive caused the instability",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "the drive is published and deliberate; the integration step was the fault",
+  "section": "basal ganglia, second correction (Session 6c)"
+ },
+ {
+  "n": 68,
+  "hypothesis": "A guard pinned to one publisher's name is a good guard",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "it failed when the citation was corrected, which is backwards",
+  "section": "basal ganglia, second correction (Session 6c)"
+ },
+ {
+  "n": 69,
+  "hypothesis": "The sweep evidence was reproducible",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "generated by a throwaway script; could not be re-run when parameters changed",
+  "section": "basal ganglia, second correction (Session 6c)"
+ },
+ {
+  "n": 70,
+  "hypothesis": "Canonical parameters make the sweep reproduce",
+  "verdict": "Partly",
+  "class": "Partly",
+  "evidence": "6 of 7; switching ratio improved 0.3\u00d7 \u2192 0.55\u00d7, still inverted",
+  "section": "basal ganglia, second correction (Session 6c)"
+ },
+ {
+  "n": 71,
+  "hypothesis": "The open-loop CPG contributes ~2% of the walking",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "that figure is the legacy profile on the wrong body. The accepted walker is the open-loop base: 19 strides, 1.1892 Hz measured against 1.1888 commanded, duty 0.733",
+  "section": "scouting module 3 (Session 6d)"
+ },
+ {
+  "n": 72,
+  "hypothesis": "The brainstem's declared output has somewhere to land",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "the cord is `(t\u00b7freq + offset) % 1.0` \u2014 closed form, no phase state, no drive input. 1 of 4 drive channels is consumable",
+  "section": "scouting module 3 (Session 6d)"
+ },
+ {
+  "n": 73,
+  "hypothesis": "The switching-bout definition needs the supplementary materials",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "it is in the main text, \u00a73.1.3, freely readable \u2014 a wall recorded without being verified, for the second time",
+  "section": "scouting module 3 (Session 6d)"
+ },
+ {
+  "n": 74,
+  "hypothesis": "The 0.55\u00d7 switching ratio is a failed reproduction",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "the published number counts bouts over two named task sequences against a task-topology minimum of 7, and the authors explicitly declined fixed-interval counting \u2014 which is what our tool does",
+  "section": "scouting module 3 (Session 6d)"
+ },
+ {
+  "n": 75,
+  "hypothesis": "A published *disembodied* acceptance test exists",
+  "verdict": "Confirmed",
+  "class": "Confirmed",
+  "evidence": "Prescott 2024 Study 1 workbook: 61 dopamine levels \u00d7 five selection classes, CC BY, obtained",
+  "section": "scouting module 3 (Session 6d)"
+ },
+ {
+  "n": 76,
+  "hypothesis": "The module reproduces that table",
+  "verdict": "Partly",
+  "class": "Partly",
+  "evidence": "every ordering reproduces and distortion onset lands on the published step; partial selection 17\u201347 points high, clean 15\u201331 low",
+  "section": "scouting module 3 (Session 6d)"
+ },
+ {
+  "n": 77,
+  "hypothesis": "The module computes the paper's distortion",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "ours divides losers by the winner; Eq. 3 divides by the total and doubles it",
+  "section": "scouting module 3 (Session 6d)"
+ },
+ {
+  "n": 78,
+  "hypothesis": "The registry holds a published stride frequency",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "116 entries, and the only frequency is the invented 1.1888 Hz lock",
+  "section": "scouting module 3 (Session 6d)"
+ },
+ {
+  "n": 79,
+  "hypothesis": "This species changes gait with speed",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "relative phase not significant over 0.2\u20131.1 m/s; 44\u00b11.1% walking against 43\u00b11.8% running",
+  "section": "scouting module 3 (Session 6d)"
+ },
+ {
+  "n": 80,
+  "hypothesis": "The published EMG pattern is wired into the controller",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "`common/emg_pattern.py` is imported by tests and nothing else",
+  "section": "scouting module 3 (Session 6d)"
+ },
+ {
+  "n": 81,
+  "hypothesis": "MLR stimulation has never been done in a gecko",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "walking, phonation and left/right turns elicited from the midbrain of Gekko gecko \u2014 the one study in the target family",
+  "section": "scouting module 3 (Session 6d)"
+ },
+ {
+  "n": 82,
+  "hypothesis": "The scout's settle loop converged *(a scout's own method error)*",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "breaking on two equal gate vectors fired during the clipped-at-zero transient and reported 100% no-selection at every level",
+  "section": "scouting module 3 (Session 6d)"
+ },
+ {
+  "n": 83,
+  "hypothesis": "The scout's first walker measurement used the accepted body *(same)*",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "it used the default body and legacy profile; the accepted body is identified only by a hash inside a gate evidence file",
+  "section": "scouting module 3 (Session 6d)"
+ },
+ {
+  "n": 84,
+  "hypothesis": "The winner failing to saturate was a defect in our model",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "it was a model mismatch; every constant we had was right for a different model",
+  "section": "the saturation fault explained (Session 6e)"
+ },
+ {
+  "n": 85,
+  "hypothesis": "The 2024 paper uses the 2001 (1\u00b1\u03bb) dopamine mechanism",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "dopamine modulates the striatal output slope about a pivot, not the input gain. The authors call it \"new DA\" in their own source",
+  "section": "the saturation fault explained (Session 6e)"
+ },
+ {
+  "n": 86,
+  "hypothesis": "The striatal threshold is 0.2",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "0.1 in the basic variant, 0.15 in the extended",
+  "section": "the saturation fault explained (Session 6e)"
+ },
+ {
+  "n": 87,
+  "hypothesis": "Salience reaches the striatum directly",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "through a leaky cortical relay \u2014 and the extended model splits it 0.5/0.5 with the thalamic return",
+  "section": "the saturation fault explained (Session 6e)"
+ },
+ {
+  "n": 88,
+  "hypothesis": "The supplementary materials were unobtainable",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "on disk: the authors' C++ source and the Figure 5 data workbook",
+  "section": "the saturation fault explained (Session 6e)"
+ },
+ {
+  "n": 89,
+  "hypothesis": "Figure 5 came from the basic variant",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "the shipped harness sets `EXTENDED 0`, but the basic variant peaks at 8% clean selection where the extended reaches 79%",
+  "section": "the saturation fault explained (Session 6e)"
+ },
+ {
+  "n": 90,
+  "hypothesis": "The published distortion carries the paper's factor of two",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "the authors' code has no factor of two, and the published range 0\u20130.217 fits the unfactored form",
+  "section": "the saturation fault explained (Session 6e)"
+ },
+ {
+  "n": 91,
+  "hypothesis": "A faithful implementation reproduces the published table",
+  "verdict": "Partly",
+  "class": "Partly",
+  "evidence": "akinesia exact, peak clean 79.9 against 78.6, efficiency 0.996 against 0.999 \u2014 but the curve sits +0.10 higher in dopamine",
+  "section": "the saturation fault explained (Session 6e)"
+ },
+ {
+  "n": 92,
+  "hypothesis": "The residual disagreement is a shape error",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "axis fit slope 1.08 \u2014 a constant shift, not a scaling or a deformation",
+  "section": "the saturation fault explained (Session 6e)"
+ },
+ {
+  "n": 93,
+  "hypothesis": "The sampling behind Figure 5 is recoverable",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "percentages exact to 1e-5 imply 100,000 competitions per level; the shipped harness sweeps 202 ramp points",
+  "section": "the saturation fault explained (Session 6e)"
+ },
+ {
+  "n": 94,
+  "hypothesis": "The winner-take-all comparison arm reported its own result",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "`gates()` returned all zeros one line after `step()` named a winner",
+  "section": "the saturation fault explained (Session 6e)"
+ },
+ {
+  "n": 95,
+  "hypothesis": "The environment has a behaviour arbiter to replace",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "it has none. It is reward-driven, and the `target_interest` the plan named lives in the superseded drive module",
+  "section": "the gecko moved onto the validated model (Session 6f)"
+ },
+ {
+  "n": 96,
+  "hypothesis": "The selector can be given control of the animal now",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "only one behaviour has a controller. A six-way chooser on a one-behaviour body would look like integration and mean nothing",
+  "section": "the gecko moved onto the validated model (Session 6f)"
+ },
+ {
+  "n": 97,
+  "hypothesis": "Persistence needs an invented stickiness constant",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "the published cortico-thalamic loop supplies it structurally \u2014 the invented gain of 0.15 is deleted, not re-tuned",
+  "section": "the gecko moved onto the validated model (Session 6f)"
+ },
+ {
+  "n": 98,
+  "hypothesis": "The two brain modules can run together on live data",
+  "verdict": "Confirmed",
+  "class": "Confirmed",
+  "evidence": "hypothalamus \u2192 selector every control step inside the simulation; a tired gecko rests, and a rested hungry one explores",
+  "section": "the gecko moved onto the validated model (Session 6f)"
+ },
+ {
+  "n": 99,
+  "hypothesis": "The plan's \"bit-identical at zero coupling\" test is achievable",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "an accumulated phase and a closed-form one differ in the last bits, and the clock snaps to exact cycle boundaries an accumulator never lands on",
+  "section": "the cord becomes an oscillator (Session 7)"
+ },
+ {
+  "n": 100,
+  "hypothesis": "An integrated oscillator can reproduce the accepted walker's rhythm",
+  "verdict": "Confirmed",
+  "class": "Confirmed",
+  "evidence": "max deviation 3.3 \u00d7 10\u207b\u00b9\u00b9 of a stride over 60 s of walking",
+  "section": "the cord becomes an oscillator (Session 7)"
+ },
+ {
+  "n": 101,
+  "hypothesis": "The foot order is the obvious one",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "it is HL, FL, HR, FR \u2014 restating it would have planted a silent index mismatch",
+  "section": "the cord becomes an oscillator (Session 7)"
+ },
+ {
+  "n": 102,
+  "hypothesis": "A single-step check shows the oscillator and the clock differ *(my own test error)*",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "they agree exactly for the first few steps; divergence needs accumulation, so the test proved nothing",
+  "section": "the cord becomes an oscillator (Session 7)"
+ },
+ {
+  "n": 103,
+  "hypothesis": "The dopamine discrepancy is a constant offset",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "neither an offset nor a scaling \u2014 the mechanism was wrong",
+  "section": "the dopamine offset resolved, and brain 3 finished (Session 7b\u20137c)"
+ },
+ {
+  "n": 104,
+  "hypothesis": "The published model modulates the striatal output slope",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "it multiplies the afferent input: (1 + \u03bb) to D1, (1 \u2212 \u03bb) to D2, threshold 0.2, quoted verbatim in Supplementary Methods \u00a75",
+  "section": "the dopamine offset resolved, and brain 3 finished (Session 7b\u20137c)"
+ },
+ {
+  "n": 105,
+  "hypothesis": "Reading the files an archive contains is enough",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "the builders every program includes are absent; the two present are the branch every program disables",
+  "section": "the dopamine offset resolved, and brain 3 finished (Session 7b\u20137c)"
+ },
+ {
+  "n": 106,
+  "hypothesis": "Session 6e's \"the whole model was wrong\" was right",
+  "verdict": "Partly",
+  "class": "Partly",
+  "evidence": "right about the structure. Wrong about dopamine and the threshold, which the first implementation had right",
+  "section": "the dopamine offset resolved, and brain 3 finished (Session 7b\u20137c)"
+ },
+ {
+  "n": 107,
+  "hypothesis": "The published sweep is memoryless",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "it is hysteretic; cold-starting each cell moves the table by ~1 percentage point",
+  "section": "the dopamine offset resolved, and brain 3 finished (Session 7b\u20137c)"
+ },
+ {
+  "n": 108,
+  "hypothesis": "The corrected model reproduces the published table",
+  "verdict": "Confirmed",
+  "class": "Confirmed",
+  "evidence": "mean error 0.103 pp, all four onsets exact, peak at 0.22 = published, axis fit slope 1.000, intercept 0.000",
+  "section": "the dopamine offset resolved, and brain 3 finished (Session 7b\u20137c)"
+ },
+ {
+  "n": 109,
+  "hypothesis": "Attaching the integrated cord changes the gait",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "every gate identical; hind duty 0.733418 both; speed differs by 3.2 \u00d7 10\u207b\u00b9\u2074 m/s",
+  "section": "the dopamine offset resolved, and brain 3 finished (Session 7b\u20137c)"
+ },
+ {
+  "n": 110,
+  "hypothesis": "The parity harness is the official gate scorer",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "it records at its own rate, so only the comparison is claimed, never the absolute count",
+  "section": "the dopamine offset resolved, and brain 3 finished (Session 7b\u20137c)"
+ },
+ {
+  "n": 111,
+  "hypothesis": "isinstance is safe for path-loaded modules",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "the same file under two names gives two classes, and a perfectly good cord was rejected",
+  "section": "the dopamine offset resolved, and brain 3 finished (Session 7b\u20137c)"
+ },
+ {
+  "n": 112,
+  "hypothesis": "The food detector can see the food",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "it tested for green; the prey that replaced the painted marker is brown. Returns exactly 0.000 at every illumination from 0.4\u00d7 to 3.0\u00d7",
+  "section": "scouting the eye (Session 8)"
+ },
+ {
+  "n": 113,
+  "hypothesis": "The no-cheat world is in use",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "referenced only by its own test and its generator. No training or evidence run has ever loaded it",
+  "section": "scouting the eye (Session 8)"
+ },
+ {
+  "n": 114,
+  "hypothesis": "The old detector at least worked for its own marker",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "absolute channel thresholds, so the painted sphere also scored 0.0 at gain 0.4 \u2014 it failed on illumination change too",
+  "section": "scouting the eye (Session 8)"
+ },
+ {
+  "n": 115,
+  "hypothesis": "A colour detector can find the prey in this world",
+  "verdict": "Partly",
+  "class": "Partly",
+  "evidence": "it can, but the margin is thin: the nearest confuser is the gecko's own spots at 0.145. A brown cricket on sand is genuinely camouflaged",
+  "section": "scouting the eye (Session 8)"
+ },
+ {
+  "n": 116,
+  "hypothesis": "The policy receives an image",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "the encoder average-pools to 128 numbers over the whole visual field \u2014 \"how much\", never \"where\". There is no retinotopic map at all",
+  "section": "scouting the eye (Session 8)"
+ },
+ {
+  "n": 117,
+  "hypothesis": "A rectilinear camera samples uniformly, as the animal does",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "corners sample 4\u00d7 finer than the centre at 120\u00b0 \u2014 an inverse fovea, worst exactly where the animal aims",
+  "section": "scouting the eye (Session 8)"
+ },
+ {
+  "n": 118,
+  "hypothesis": "The default build can resolve what the animal tracks",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "the published 1.6\u00b0 tracked dot spans 0.516 px at fovy 120 \u2014 not resolvable",
+  "section": "scouting the eye (Session 8)"
+ },
+ {
+  "n": 119,
+  "hypothesis": "The eye's field of view is sourceable",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "still NOT_IN_CORPUS for this species; the five corpus recommendations remain invented",
+  "section": "scouting the eye (Session 8)"
+ },
+ {
+  "n": 120,
+  "hypothesis": "Leopard geckos have a tapetum",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "unverifiable from any primary source \u2014 every confident claim traced to a pet-care site. Do not build one",
+  "section": "scouting the eye (Session 8)"
+ },
+ {
+  "n": 121,
+  "hypothesis": "A gradient flow estimator on the cell grid is accurate",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "2.07x too large at every velocity \u2014 the drum's stripes span four cells, where a central difference underestimates the gradient by a third",
+  "section": "the retina and the optokinetic reflex (Session 8b)"
+ },
+ {
+  "n": 122,
+  "hypothesis": "Estimating at pixel resolution fixes it",
+  "verdict": "Partly",
+  "class": "Partly",
+  "evidence": "2.07x to 1.15x. The residual is the inverse fovea: pixels are not uniform in angle",
+  "section": "the retina and the optokinetic reflex (Session 8b)"
+ },
+ {
+  "n": 123,
+  "hypothesis": "Differencing against **azimuth** removes the bias",
+  "verdict": "Confirmed",
+  "class": "Confirmed",
+  "evidence": "ratio 1.02 against truth across 10-40 deg/s",
+  "section": "the retina and the optokinetic reflex (Session 8b)"
+ },
+ {
+  "n": 124,
+  "hypothesis": "The published monocular asymmetry can be reproduced",
+  "verdict": "Confirmed",
+  "class": "Confirmed",
+  "evidence": "naso-temporal gain exactly 0.000 at all three velocities \u2014 a symmetric estimator cannot do this",
+  "section": "the retina and the optokinetic reflex (Session 8b)"
+ },
+ {
+  "n": 125,
+  "hypothesis": "The binocular-versus-monocular comparison can be run",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "the body has ONE camera. There is no second eye to cover. Recorded as blocked, not as passed",
+  "section": "the retina and the optokinetic reflex (Session 8b)"
+ },
+ {
+  "n": 126,
+  "hypothesis": "The optokinetic gain should approach 1",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "published gain is 0.9 and falls to 0.7-0.8 by 40 deg/s. Perfect stabilisation would be over-reproduction",
+  "section": "the retina and the optokinetic reflex (Session 8b)"
+ },
+ {
+  "n": 127,
+  "hypothesis": "The tectum finds prey on synthetic stimuli",
+  "verdict": "Confirmed",
+  "class": "Confirmed",
+  "evidence": "correct bearing at every position, silent on a still world, silent on pure self-motion",
+  "section": "the tectum, shipped NOT ACCEPTED (Session 8c)"
+ },
+ {
+  "n": 128,
+  "hypothesis": "It finds prey in the **environment**",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "fires on 99.3% of frames and the bearing correlates \u22120.03 with the prey's. Mean error 63\u00b0",
+  "section": "the tectum, shipped NOT ACCEPTED (Session 8c)"
+ },
+ {
+  "n": 129,
+  "hypothesis": "The failure is the map being too coarse",
+  "verdict": "Partly",
+  "class": "Partly",
+  "evidence": "full pixel resolution reaches only +0.10. Resolution is part of the cause, not the whole",
+  "section": "the tectum, shipped NOT ACCEPTED (Session 8c)"
+ },
+ {
+  "n": 130,
+  "hypothesis": "The prey is resolvable in the map at working range",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "it covers 0.69 of one cell at 0.30 m and 0.41 at 0.50 m",
+  "section": "the tectum, shipped NOT ACCEPTED (Session 8c)"
+ },
+ {
+  "n": 131,
+  "hypothesis": "My self-motion control demonstrated what I claimed",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "the size test was doing the work; field subtraction is worth a fourfold reduction, not elimination",
+  "section": "the tectum, shipped NOT ACCEPTED (Session 8c)"
+ },
+ {
+  "n": 132,
+  "hypothesis": "The order of the two rejection tests is arbitrary",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "size test after subtraction leaks 0.066; before, 0.000",
+  "section": "the tectum, shipped NOT ACCEPTED (Session 8c)"
+ },
+ {
+  "n": 133,
+  "hypothesis": "Subtracting the surround stops the tectum hunting its own optic flow",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "it subtracted a scalar, and `argmax(clip(x-c,0,None)) == argmax(x)` for any scalar c. Identical on 20000/20000 random maps \u2014 it had never changed a single reported bearing. Replaced with a spatially varying local surround, which moves the answer on 1735/2000",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 134,
+  "hypothesis": "A sharper eye finds the cricket",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "four configurations, render 64\u2192512 px and receptors 64\u2192256. Correlation with true prey bearing \u2248 0 in all four. I had told the user resolution was the fix; it is not",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 135,
+  "hypothesis": "There is prey motion for a motion detector to find",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "`prey_total_travel_mm = 0.0` across 1800 frames. `FleeingPrey.step` only moves within 0.075 m while detection range is 0.30\u20130.50 m. The prey is stationary",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 136,
+  "hypothesis": "The prey is in the camera's field of view",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "present on 18.7% of frames. Off the rendered image four frames in five",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 137,
+  "hypothesis": "An open-source retina model can be adopted",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "the only candidate, `openretina`, is a mouse retina (MIT code, CC-BY-SA weights) and retraining needs gecko recordings that do not exist for any reptile",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 138,
+  "hypothesis": "Geckos head-bob to judge prey distance by motion parallax",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "no gecko study shows it, and none shows it for prey in any lizard. It is a stated hypothesis in other lizards, never demonstrated. Every confident claim traced to pet-care sites. I asserted this to the user as fact. The one lizard-clade distance mechanism that IS established is chameleon accommodation, which is not motion-based",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 139,
+  "hypothesis": "Stationary prey is undetectable by a visual predator",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "mice capture fresh-frozen crickets as fast as live ones \u2014 8.06 \u00b1 1.08 s vs 7.6 \u00b1 1.34 s, n=8, n.s. Motion is not required. The blindness is our architecture's, not nature's",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 140,
+  "hypothesis": "A better tectum would find still prey",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "in frogs the pretectum handles stationary objects and the tectum handles motion: pretectal lesions leave feeding and threat avoidance intact but the animal walks into a barrier it can see. A tectum-only model is correctly blind to a frozen cricket. This needs a second structure, not a better one",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 141,
+  "hypothesis": "One prey channel is enough",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "mouse superior colliculus splits it: wide-field (RF 700\u2013900 deg\u00b2, not direction-selective) triggers approach from >22 cm; narrow-field (<200 deg\u00b2, direction-selective) supplies bearing during pursuit. Suppress the second and the animal reaches the prey and stalls beside it. Echoed in zebrafish posterior/anterior tectum",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 142,
+  "hypothesis": "Prey selectivity is a conjunction of features",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "the one worked-out vertebrate is the opposite. The toad tectum's default is attack anything that moves; selectivity is a subtractive pretectal veto. Lesion the pretectum and the toad attacks everything moving. Our tectum ANDs its criteria \u2014 architecturally backwards",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 143,
+  "hypothesis": "Elevation in the visual field is a soft weight",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "it is categorical. Identical looming disc: 75% escape overhead vs 53% and much slower at the side. Identical small sweeping disc: freeze overhead, 80% approach at the side. Floor-mounted looms produced zero escapes",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 144,
+  "hypothesis": "The prey velocity band is a free parameter",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "four independent lineages converge on the same order: toad behaviour peaks 30\u201360 \u00b0/s and dies above ~200; pit viper tectum (a squamate) is near-silent at 5 \u00b0/s and peaks ~50; mouse looming escape needs 35 \u00b0/s. This is the most robust cross-species number found",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 145,
+  "hypothesis": "Our gecko basks",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "it is thigmothermic. Body temperature tracks the substrate at r\u00b2=0.97 against air at 0.92, n=12. It takes heat by lying on warm ground, not from light. And preferred temperature is not a set point but a diel ramp, ~26 \u00b0C morning to ~30 \u00b0C at dusk \u2014 the rise is proposed as what triggers evening emergence",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 146,
+  "hypothesis": "A visual threat channel models this animal's escape",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "for this species, n=42: defensive reaction probability is 0.21 to snake smell and 0.07 to the sight of a snake. Factorially: chemical \u03c7\u00b2=8.098, p<0.0044; visual \u03c7\u00b2<0.01, p>0.9. Verbatim: \"the initiation of costly defensive action remains strictly gated by chemoreception\"",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 147,
+  "hypothesis": "Smell can localise prey",
+  "verdict": "Refuted as unsupported",
+  "class": "Refuted",
+  "evidence": "tongue-flicking is real and quantified for this species \u2014 3.0/min baseline \u2192 14.57/min to cricket chemicals, n=7 \u2014 but the assay presents the swab 1 cm from the snout, in plain view. It demonstrates discrimination, never localisation. Cooper flagged the missing experiment in 1998 and nobody has done it since",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 148,
+  "hypothesis": "`cost_of_transport = 0.73` is a leopard gecko measurement",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "it is Teratoscincus przewalskii, a different family. `docs/research/gecko_scorecard.md` had it right, tagged `[TP]` and defined as a proxy for energetics only; `config/proxies.yaml` \u2014 the file the code reads \u2014 said `species: E_macularius, confidence: verified`. Corrected. No cost of transport, sprint maximum, endurance or thermal performance curve has ever been measured in this species",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 149,
+  "hypothesis": "456 tests pass",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "8 `test_session2_gate.GateContracts` tests fail, and they fail in a clean worktree at commit e4196d8 \u2014 they are not caused by session 8d's edits. See below",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 150,
+  "hypothesis": "No feeding kinematics exist for this species",
+  "verdict": "Refuted \u2014 my own overstatement",
+  "class": "Refuted",
+  "evidence": "Delheusy, Brillet & Bels 1995, Amphibia-Reptilia 16(2):185\u2013201, n=6 adult males, 64 fps, 22 mm crickets, full Table 1. I turned one agent's \"could not retrieve the numbers\" into \"does not exist\". What is absent is narrower: the capture phase was unquantifiable at 64 fps (5 usable cycles from 2 animals) and is excluded from the paper's tables",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 151,
+  "hypothesis": "The gecko takes prey with its tongue",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "jaws alone \u2014 the standard scleroglossan pattern, no tongue prehension. And the orienting rule is published: the head is aligned transverse to the prey's long axis. Capture is a single open\u2013close cycle with no slow/fast subdivision: ~80 ms, peak gape ~37\u00b0 at 47 ms, head translating ~8 mm horizontally and ~28 mm vertically",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 152,
+  "hypothesis": "Eyelid geckos cannot lick their own eyes",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "Delheusy et al. 1995, verbatim: \"La langue se d\u00e9place hors de la cavit\u00e9 buccale et atteint parfois l'oeil\" \u2014 the tongue sometimes reaches the eye, during post-feeding licking and grooming. The \"cannot\" claim traces only to care sites. Separately: labial-licking is a different behaviour and the words eye, ocular, eyelid appear nowhere in the paper that defines it",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 153,
+  "hypothesis": "This animal navigates by what things look like",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "given a conflict between geometry and visual features, E. macularius preferentially used geometry (Kundey 2021, Behav Processes 188:104412). Its world model is shaped more by layout than by appearance \u2014 which is the opposite of what a vision-first build assumes",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 154,
+  "hypothesis": "The circulating leopard-gecko strike numbers have some source",
+  "verdict": "Refuted, source pinned",
+  "class": "Refuted",
+  "evidence": "\"486 m/s\u00b2, 5.8 m/s, 35 cm\" is Wainwright, Kraklau & Bennett 1991, J Exp Biol 159:109\u2013133, tongue projection in Chamaeleo oustaleti, n=3 sequences from 2 animals. A leopard gecko does not project its tongue 35 cm",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 155,
+  "hypothesis": "Sleep is unmeasurable in this animal",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "E. macularius is one of seven lizard species in Bergel et al. 2026, Nat Neurosci 29:543\u2013550 \u2014 sleep-dependent infraslow rhythms conserved across reptiles and mammals, EOG under each eyelid. It closes its eyelids to sleep; the tokay cannot. Brain 5\u20138 has a starting point that did not exist when they were listed as \u274c",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 156,
+  "hypothesis": "The gecko vibration band is press-release-only and unusable",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "read from the paper itself. Han & Carr 2024, n=31 tokay geckos, 38 single units: saccule \u2192 nucleus vestibularis ovalis \u2192 torus semicircularis, a channel entirely separate from hearing. Best frequencies 50\u2013200 Hz, mode ~100 Hz; threshold \u221253 to \u221223 dB re 1 m/s\u00b2, mean \u221242.6; phase locking VS 0.89. Sound at 15 dB above the loudest vibration used evoked nothing \u2014 it is vibration, not sound",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 157,
+  "hypothesis": "The ear covers low frequencies, so vibration adds little",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "no lizard auditory-nerve fibre has ever been recorded below ~200 Hz CF, across four primary datasets, and the audiogram is a flat insensitive shelf from 100\u2013500 Hz. The vibration channel covers exactly the band hearing cannot reach. They are not redundant; they are complementary",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 158,
+  "hypothesis": "No lizard has been shown to find prey without seeing it",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "Scincus scincus, buried in sand, detects crickets moving on the surface up to ~15 cm away, extracts direction, emerges and captures. It responds far less to dead insects at the same distance, so it is vibration and not smell, and it discriminates prey speed \u2014 faster prey, faster emergence. It also plunges its head into the sand, and experiments show this is what couples it to the substrate",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 159,
+  "hypothesis": "No usable audiogram exists for this animal",
+  "verdict": "Refuted, with a substitution",
+  "class": "Refuted",
+  "evidence": "none is accessible for E. macularius \u2014 Werner et al. 1998 and 2008 hold it and both are hard-paywalled with no open copy anywhere. Two usable substitutes: eight gekkotan species best 22\u201372 dB SPL at 0.5\u20131.0 kHz (Werner et al. 2008), and a free, full audiogram for Coleonyx variegatus, an actual eublepharid \u2014 best ~19 dB SPL at 500 Hz at 21 \u00b0C (Wever et al. 1964, PMC300117)",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 160,
+  "hypothesis": "One audiogram describes this animal",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "gecko hearing is temperature-dependent in both sensitivity and best frequency: as the animal cools it hears less and its best frequency shifts downward. 249 sensitivity functions, 50 animals, 15\u201340 \u00b0C. A fixed audiogram is biologically wrong for an ectotherm, and this project's animal already has a body temperature",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 161,
+  "hypothesis": "Vibration prey-detection is demonstrated in geckos",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "it has never been tested behaviourally in any gecko. Han & Carr say so themselves \u2014 \"no behavioral role for a dedicated vibration receptor has been demonstrated\" \u2014 and their one mention of predator-prey sits bracketed with wind and rain. I first recorded this as a mechanistic coincidence worth noticing \u2014 cricket signals below 120 Hz, saccular channel 50\u2013200 Hz, \"the bands line up\". The next search refuted that too. See #162\u2013164: on the numbers the gecko is not sensitive enough and is tuned to the wrong band. The tympanic ear being ~55 dB down at 100 Hz stands",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 162,
+  "hypothesis": "A gecko could feel a cricket walking",
+  "verdict": "Refuted on the numbers",
+  "class": "Refuted",
+  "evidence": "measured arthropod footsteps on sand are 4x10-4 to 1.5x10-3 m/s2 (Devetak et al. 2007, four species). The most sensitive gecko saccular cell ever recorded thresholds at -53 dB re 1 m/s2 = 2.2x10-3 m/s2, mean 7.4x10-3. The loudest measured footstep sits below the best single cell's threshold, before any distance damping. A scorpion does this because its receptors trigger at ~1 nm (10 A) - the gecko's need roughly 19 nm. Twenty-fold short",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 163,
+  "hypothesis": "The gecko's vibration band is the right band for sand",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "sand is a lossy low-pass medium: Rayleigh waves at 40-50 m/s dry, damped 0.26-2.61 dB/cm at 300 Hz, worse as grains get finer. The band that actually propagates usefully is 200-500 Hz (Brownell & van Hemmen 2001). The gecko's saccular channel is 50-200 Hz - it sits below the window where sand carries prey information. And a cricket's own low-frequency signal peaks at 43 Hz, below both",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 164,
+  "hypothesis": "Detection range is a property of the animal",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "it is a property of the ground. Antlion mean reaction distance is 3.3 cm in fine sand (<=0.23 mm grains) and 12.3 cm in coarse (1-1.54 mm) - a near fourfold change from substrate alone, in the same species. Any vibration range this project ever quotes is meaningless without the grain size beside it",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 165,
+  "hypothesis": "The privileged target channel is removed everywhere",
+  "verdict": "Refuted, third occurrence",
+  "class": "Refuted",
+  "evidence": "`GeckoBrainEnv` built the walker without naming `privileged_target`, so the walker's own `True` default won and nothing in the brain env could override it. Five numbers -- exact egocentric direction, distance and bearing to the goal, straight out of the physics engine, noiseless, at any range. All 12 checkpoints in the repository record proprio_dim 92, including the ones described as pure-vision. See #26 and #33 for the first two times this was declared removed",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 166,
+  "hypothesis": "It is present but the policy ignores it",
+  "verdict": "Refuted, and this is the expensive one",
+  "class": "Refuted",
+  "evidence": "`tools/oracle_ablation.py` zeroes the five slots at inference, keeping the vector 92 long so the checkpoint still loads. The walker moves further with them zeroed (0.0857 -> 0.1103 m) and progress toward the goal collapses 0.0664 -> 0.0060 m, a 91% loss. The legs are fine; the navigation was the oracle. Retiring it needs a retrained walker, so the flag is exposed and declared rather than flipped, and `info[\"walker_oracle\"]` now reports it every step",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 167,
+  "hypothesis": "The sessions 3-4 gait evidence is unverifiable",
+  "verdict": "REFUTED, and the claim was mine",
+  "class": "Refuted",
+  "evidence": "I reported that the recorded body hash `756765356417749c` matched no committed version and that the accepted walker's evidence therefore pointed at a body not in the repository. The physics was identical all along. The comment-free ElementTree serialization of the current body is `b178bf26b644b1d3`, which is exactly what `artifacts/evidence/morphology_reproducibility_line_endings_20260905.md` recorded for that file. Both committed versions in git history share that same physics hash. A comment changed, not the animal. The evidence was always valid",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 168,
+  "hypothesis": "Eight gate contracts are failing",
+  "verdict": "Refuted -- it was one",
+  "class": "Refuted",
+  "evidence": "the body check raised before any other contract could reach its own assertions, so seven unrelated tests reported the wrong failure for four sessions. Fixing the one check turned all eight green. `common/body_identity.py` now compares what MuJoCo reads rather than what the bytes say, and the evidence writer records both fingerprints, because recording only the raw one is what made this unverifiable in the first place",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 169,
+  "hypothesis": "Adding a strike makes hunting possible",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "necessary, not sufficient. The prey bolted at a FIXED 0.075 m regardless of how it was approached, the strike must launch from 0.0203 m, and the prey escapes at 0.118 m/s against a 0.055 m/s walk. Measured over 60 s of pursuit: closest approach 51.1 mm, zero strikes. The gecko could not physically reach striking distance by any route",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 170,
+  "hypothesis": "A stalk is just a slower walk",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "it is only a behaviour if the PREY can tell the difference. The published ethogram names `walk slow motion`, \"walking with a strongly reduced speed, mostly in context of prey capture\" -- meaningless against a prey with a fixed flee radius. The flee radius now scales with approach speed: 75 mm at a charge, 12 mm at a creep, which is inside strike range. Direction supported (flight-initiation distance rises with approach speed; crickets sense predators through cercal air-current receptors); magnitude INVENTED and the capture rate rests on it",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 171,
+  "hypothesis": "The predator's own speed is what frightens the prey",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "the predator point is the gecko's NOSE, which sways with the gait: measured 0.129 m/s of apparent approach during a creep that netted almost nothing. Reading gait sway as a charge made stalking impossible. What a prey animal has to go on is how fast the threat is getting CLOSER, so closing speed is measured instead, floored at zero",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 172,
+  "hypothesis": "Striking distance can be measured in three dimensions",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "the nose sits 13.7 mm above a prey that is 9 mm off the floor, so the vertical gap alone eats most of a 20.3 mm trigger. Closing it is what the strike is FOR: Delheusy et al. 1995 measured the head translating ~8 mm horizontally and ~28 mm vertically in the 80 ms cycle. The trigger is horizontal",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 173,
+  "hypothesis": "The prey can own capture once a strike exists",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "proximity capture respawned the prey the instant it entered striking range, so the strike could never fire -- measured 0 strikes across 1050 frames with the prey placed in range on every single step. Capture belongs to the strike or to proximity, never both",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 174,
+  "hypothesis": "The frozen walker can deliver the animal to striking distance",
+  "verdict": "Refuted, and this is the live blocker",
+  "class": "Refuted",
+  "evidence": "it cannot. It arrives within 4 cm of a goal and its nose trails its trunk by about 5 cm, so \"the animal arrived\" and \"the mouth is on the prey\" are five centimetres apart. With prey motion, a working stalk, a collapsed flee radius and a target aimed past the animal, the best approach across 700 steps was 34.5 mm against the 20.3 mm needed, oscillating rather than converging. The walker was trained to reach a goal, not to place a mouth on a 9 mm cricket",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 175,
+  "hypothesis": "The strike itself works",
+  "verdict": "Confirmed",
+  "class": "Confirmed",
+  "evidence": "with the prey placed in range -- which the approach cannot do -- 78 strikes, 63 caught, 14 missed: 81 % against the published 82.9 %, unfitted. `artifacts/video/hunt_session9.mp4` part 2",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 176,
+  "hypothesis": "The Session 9 videos show a changed gait",
+  "verdict": "Refuted -- they show HALF SPEED",
+  "class": "Refuted",
+  "evidence": "every Session 9 video tool appends one frame per 0.02 s brain step and wrote them at 25 fps. That plays 20.0 s of simulation over 40.0 s of video: 2.0x slow motion, in all four clips. The Session 4 renders were 50 fps and real-time, which is why they looked right. The \"lag\" the user saw was a container header. Gait, body, checkpoint and physics unchanged -- 481 tests, three independent body-hash confirmations, walker speed 0.054 vs 0.055 m/s. Fixed to 50 fps; `accepted_walk_replay.mp4` was already real-time because it samples the trace at the output rate rather than per step",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 177,
+  "hypothesis": "The brain runs the accepted walker",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "the 4/6 gate evidence was measured under `gait_profile=\"lab\"` (`artifacts/evidence/lab_frozen/report.json`). `GeckoBrainEnv` never passes the parameter, so `GeckoWalkEnv`'s `\"legacy\"` default wins. Same body, same frozen checkpoint -- model sha256 `77b7a99d...` is byte-identical to the one the evidence used -- but a different CPG scaffolding underneath. Same shape of defect as #165: a default won because nobody named the parameter. Everything built in Session 9 sits on the un-gated profile",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 178,
+  "hypothesis": "The Session 4 renders can be regenerated",
+  "verdict": "Refuted",
+  "class": "Refuted",
+  "evidence": "the script that made `renders/session4/.mp4` was never committed. Only `utils/render_trace_video.py` is in the history, and it cannot produce them: it replays a trace against the archived BODY file, so it draws the default floor, has no prey, and disables shadows. The setup is reproducible; the file is not",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 179,
+  "hypothesis": "The accepted walker can be re-run live",
+  "verdict": "Refuted RETRACTED same session -- it was my harness",
+  "class": "Refuted",
+  "evidence": "loading the accepted checkpoint into a live `gait_profile=\"lab\"` env makes it fall after 1.2 s, in both the body XML and the world XML, with and without a distant target. Cause located but not fixed: `lab_controller_snapshot` is None in the live env, so the lab base controller is not configured -- the evidence protocol carries a whole reward-calibration and controller block that a bare constructor does not reproduce. Found within the hour: `GeckoWalkEnv` defaults to `control_mode=\"raw\"`, which builds no CPG at all, and the frozen policy is a RESIDUAL that rides on one. With `control_mode=\"cpg_residual\"` the accepted walker runs the full 20 s with zero falls, 1.642 m of path at 0.082 m/s, and `lab_controller_snapshot` is populated. The walker was never broken; I gave it no scaffolding to stand on. Recorded rather than deleted, because I reported it to the user as a finding before checking my own harness",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 180,
+  "hypothesis": "Running the brain on the gated profile costs something",
+  "verdict": "Refuted -- it costs almost nothing",
+  "class": "Refuted",
+  "evidence": "`gait_profile` is now a real parameter on `GeckoBrainEnv` and reaches the walker. Measured over 500 brain steps, same seed, same action: legacy 1.041 m (0.1041 m/s), lab 1.021 m (0.1021 m/s), zero terminations either way -- a 2 % difference. `lab_controller_snapshot` is populated under lab and None under legacy, which is the honest check that the profile actually took effect rather than merely being stored. The default stays `legacy` because every brain checkpoint was trained against it and flipping a default quietly is how this class of defect gets made; `info[\"gait_profile\"]` and `info[\"gate_validated_profile\"]` now report the truth every step",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 181,
+  "hypothesis": "The camera shake is the ground sliding",
+  "verdict": "Refuted twice, and the second answer is the right one",
+  "class": "Refuted",
+  "evidence": "first I blamed the sliding ground and bolted the camera to the world, which stopped the shake and let the animal walk out of frame. Then I blamed the azimuth swinging with heading, which was real but not the whole of it. The remaining shake is the camera pointing at the trunk, and the trunk rises, falls and yaws once per stride -- so the whole world jitters at stride frequency. Following a smoothed path at fixed height instead: measured background jitter 1.538 -> 0.000. Two further filming faults fell out of it: a 1 s smoothing constant left the camera ~10 cm behind a 0.0975 m/s animal and framed it from the rear, and a rear-quarter azimuth makes a sprawling lizard read as flat and splayed while it is fully upright -- up-vector 0.998, never below 0.99, trunk 19-27 mm off the floor for all 1000 frames",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 182,
+  "hypothesis": "The push-then-drag is in the Session 4 walk too",
+  "verdict": "Refuted -- I filmed the wrong profile",
+  "class": "Refuted",
+  "evidence": "the user said their demo does not drag, and they were right. Front-foot duty factor against a 0.70 target: lab FL 0.203 / FR 0.591 -- asymmetric by nearly threefold, one front foot loaded a fifth of the step and the other over half, which IS the limp. legacy FL 0.483 / FR 0.500 -- balanced, and it reads as a walk. Every A/B render I made this session used `lab`; the Session 4 demo is `legacy`. So #9j's pixel-identical result stands as a statement about the CODE and answers a question nobody asked. The uncomfortable part: `lab` is the gate-validated profile and it is the one that limps. Whether the gate battery scored front-foot symmetry at all, or scored it and accepted the failure as one of its two unmet checks, is the next thing to establish -- looking better is not the same as being right",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ },
+ {
+  "n": 183,
+  "hypothesis": "The limp is the profile",
+  "verdict": "Refuted -- it is the POLICY, and the ledger already said so",
+  "class": "Refuted",
+  "evidence": "#182 blamed `lab` versus `legacy`. Wrong again. With the residual switched OFF -- the hand-written base, no policy -- both profiles balance: lab FL 0.432 / FR 0.454, legacy FL 0.463 / FR 0.491. The asymmetry only appears when `models/v4_5b_speed_polish_1m` is loaded on top. The accepted walker IS the open-loop base -- #71 states it outright, #11 measured the trained residual at 3/6 against the base's 4/6, and `lab_zero_residual/report.json` records controller \"zero residual with contact reflex\" in its own protocol field. I read all three this session and still loaded the checkpoint into every clip. So every video I sent was the REJECTED walker, and I explained its limp away three times -- as a camera artefact, a frame-rate artefact, and then as an under-actuated forelimb the user would have to accept. The forelimb IS under-actuated (#18) and that is real; it is not what made the animal limp on screen",
+  "section": "the eye was the wrong question (Sessions 8d\u20139)"
+ }
+]

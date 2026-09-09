@@ -1,0 +1,738 @@
+[
+ {
+  "hash": "11f6cf7",
+  "subject": "Initial commit",
+  "date": "2026-06-08",
+  "files": 1,
+  "added": 201,
+  "removed": 0
+ },
+ {
+  "hash": "53face5",
+  "subject": "Initial NeuroGecko code release",
+  "date": "2026-06-08",
+  "files": 24,
+  "added": 2330,
+  "removed": 0
+ },
+ {
+  "hash": "bc91977",
+  "subject": "Merge branch 'main' of https://github.com/12ziyad/NeuroGecko",
+  "date": "2026-06-08",
+  "files": 1,
+  "added": 201,
+  "removed": 0
+ },
+ {
+  "hash": "481a226",
+  "subject": "Add V4.2.2 front-foot correction and dual-view rendering",
+  "date": "2026-06-09",
+  "files": 5,
+  "added": 163,
+  "removed": 25
+ },
+ {
+  "hash": "e1404c6",
+  "subject": "Add V4.2.3 front-loading controller",
+  "date": "2026-06-09",
+  "files": 2,
+  "added": 123,
+  "removed": 96
+ },
+ {
+  "hash": "c486d90",
+  "subject": "Add V4.2.4 escape-proof front-load gate",
+  "date": "2026-06-09",
+  "files": 2,
+  "added": 68,
+  "removed": 57
+ },
+ {
+  "hash": "152fefc",
+  "subject": "Add V4.2.6 front-load polish and knee residual cap",
+  "date": "2026-06-09",
+  "files": 2,
+  "added": 6,
+  "removed": 4
+ },
+ {
+  "hash": "6770779",
+  "subject": "Add V4.2.7 front duty reward gate",
+  "date": "2026-06-10",
+  "files": 1,
+  "added": 51,
+  "removed": 1
+ },
+ {
+  "hash": "e522bb5",
+  "subject": "Add V4.2.8 contact tracking reflex curriculum",
+  "date": "2026-06-11",
+  "files": 4,
+  "added": 95,
+  "removed": 8
+ },
+ {
+  "hash": "eff902e",
+  "subject": "Tune V4.2.9 reflex wean controller",
+  "date": "2026-06-11",
+  "files": 1,
+  "added": 2,
+  "removed": 2
+ },
+ {
+  "hash": "fdccbc6",
+  "subject": "Add V4.3 velocity tracking experiment",
+  "date": "2026-06-12",
+  "files": 2,
+  "added": 56,
+  "removed": 1
+ },
+ {
+  "hash": "570bd01",
+  "subject": "Add V4.5 matched stance cadence experiment",
+  "date": "2026-06-12",
+  "files": 3,
+  "added": 22,
+  "removed": 15
+ },
+ {
+  "hash": "d2e845b",
+  "subject": "Add V4.6 front de-stick experiment",
+  "date": "2026-06-12",
+  "files": 2,
+  "added": 4,
+  "removed": 4
+ },
+ {
+  "hash": "0f6c7ca",
+  "subject": "Add V4.5 final locomotion base",
+  "date": "2026-06-12",
+  "files": 2,
+  "added": 4,
+  "removed": 4
+ },
+ {
+  "hash": "0e7858c",
+  "subject": "Record V4 locomotion final results",
+  "date": "2026-06-12",
+  "files": 1,
+  "added": 37,
+  "removed": 0
+ },
+ {
+  "hash": "1c6e2ef",
+  "subject": "Accept V4.5B as final locomotion champion",
+  "date": "2026-06-12",
+  "files": 1,
+  "added": 20,
+  "removed": 9
+ },
+ {
+  "hash": "aad003a",
+  "subject": "starting brain",
+  "date": "2026-06-13",
+  "files": 5,
+  "added": 693,
+  "removed": 0
+ },
+ {
+  "hash": "cb93609",
+  "subject": "Add AGWM brain environment wiring",
+  "date": "2026-06-13",
+  "files": 2,
+  "added": 29,
+  "removed": 7
+ },
+ {
+  "hash": "9541f8f",
+  "subject": "Add trainable visual brain policy",
+  "date": "2026-06-13",
+  "files": 7,
+  "added": 424,
+  "removed": 1
+ },
+ {
+  "hash": "f72ca1c",
+  "subject": "Add brain curriculum and stable viewer controls",
+  "date": "2026-06-13",
+  "files": 4,
+  "added": 244,
+  "removed": 17
+ },
+ {
+  "hash": "2b5c158",
+  "subject": "Add privileged food taper curriculum",
+  "date": "2026-06-13",
+  "files": 3,
+  "added": 165,
+  "removed": 7
+ },
+ {
+  "hash": "d0f9deb",
+  "subject": "Make brain camera see food and add privileged dropout curriculum",
+  "date": "2026-06-13",
+  "files": 4,
+  "added": 235,
+  "removed": 7
+ },
+ {
+  "hash": "d60f33f",
+  "subject": "Use mouth distance and add brain resume support",
+  "date": "2026-06-14",
+  "files": 3,
+  "added": 139,
+  "removed": 27
+ },
+ {
+  "hash": "a505ade",
+  "subject": "Fix brain food reward scaling",
+  "date": "2026-06-14",
+  "files": 3,
+  "added": 22,
+  "removed": 5
+ },
+ {
+  "hash": "cd014fe",
+  "subject": "Add brain watcher stochastic diagnostics",
+  "date": "2026-06-15",
+  "files": 1,
+  "added": 59,
+  "removed": 3
+ },
+ {
+  "hash": "342eaa1",
+  "subject": "Rebalance brain food reward",
+  "date": "2026-06-15",
+  "files": 1,
+  "added": 11,
+  "removed": 7
+ },
+ {
+  "hash": "0a57988",
+  "subject": "Add brain visual lock reward and checkpoints",
+  "date": "2026-06-16",
+  "files": 3,
+  "added": 55,
+  "removed": 21
+ },
+ {
+  "hash": "3460cb0",
+  "subject": "Use visual delta reward and fix brain checkpoints",
+  "date": "2026-06-16",
+  "files": 3,
+  "added": 34,
+  "removed": 8
+ },
+ {
+  "hash": "7e90df7",
+  "subject": "Add brain food cue radius curriculum",
+  "date": "2026-06-16",
+  "files": 3,
+  "added": 97,
+  "removed": 9
+ },
+ {
+  "hash": "6953dcf",
+  "subject": "Add oracle action eval mode",
+  "date": "2026-06-17",
+  "files": 1,
+  "added": 10,
+  "removed": 1
+ },
+ {
+  "hash": "11d0a08",
+  "subject": "Add recurrent PPO brain support",
+  "date": "2026-06-17",
+  "files": 2,
+  "added": 130,
+  "removed": 20
+ },
+ {
+  "hash": "a3de4ee",
+  "subject": "Add privileged oracle behavior cloning",
+  "date": "2026-06-18",
+  "files": 4,
+  "added": 485,
+  "removed": 7
+ },
+ {
+  "hash": "9efac13",
+  "subject": "Fix BC diagnostics timing",
+  "date": "2026-06-18",
+  "files": 2,
+  "added": 4,
+  "removed": 2
+ },
+ {
+  "hash": "c8c616e",
+  "subject": "Add BC policy debug script",
+  "date": "2026-06-18",
+  "files": 1,
+  "added": 396,
+  "removed": 0
+ },
+ {
+  "hash": "b370892",
+  "subject": "Add Patch37B DAgger recovery BC",
+  "date": "2026-06-18",
+  "files": 2,
+  "added": 366,
+  "removed": 10
+ },
+ {
+  "hash": "407e5d5",
+  "subject": "Add Patch38A visual distillation preflight",
+  "date": "2026-06-18",
+  "files": 5,
+  "added": 1117,
+  "removed": 6
+ },
+ {
+  "hash": "c05ca81",
+  "subject": "Add Patch38C visual DAgger recovery",
+  "date": "2026-06-18",
+  "files": 4,
+  "added": 823,
+  "removed": 15
+ },
+ {
+  "hash": "2681c9e",
+  "subject": "Add Patch39A visual search baseline",
+  "date": "2026-06-20",
+  "files": 3,
+  "added": 703,
+  "removed": 0
+ },
+ {
+  "hash": "ddbb105",
+  "subject": "Add Patch40A drive-based GeckoBrain controller",
+  "date": "2026-06-20",
+  "files": 2,
+  "added": 961,
+  "removed": 0
+ },
+ {
+  "hash": "44a921c",
+  "subject": "Recover and verify the cloud model lineage before implementation",
+  "date": "2026-09-05",
+  "files": 6,
+  "added": 1308,
+  "removed": 1
+ },
+ {
+  "hash": "0c9f639",
+  "subject": "Add measured baselines, camera isolation and verified checkpoint recovery",
+  "date": "2026-09-05",
+  "files": 25,
+  "added": 3966,
+  "removed": 24
+ },
+ {
+  "hash": "9960117",
+  "subject": "Add constrained lab morphology, shared gait calibration and verified recovery evidence",
+  "date": "2026-09-05",
+  "files": 41,
+  "added": 184185,
+  "removed": 63
+ },
+ {
+  "hash": "3efa2f6",
+  "subject": "Verify candidate motion and cross-platform reproducibility without altering legacy models",
+  "date": "2026-09-05",
+  "files": 15,
+  "added": 26271,
+  "removed": 19
+ },
+ {
+  "hash": "a7517e6",
+  "subject": "Step 0: record true 250 Hz physics and report failed entrainment honestly",
+  "date": "2026-09-05",
+  "files": 7,
+  "added": 16578,
+  "removed": 13
+ },
+ {
+  "hash": "faa5dda",
+  "subject": "Step 1: charge lab effort on total actuator work while preserving legacy reward",
+  "date": "2026-09-05",
+  "files": 5,
+  "added": 276,
+  "removed": 8
+ },
+ {
+  "hash": "992b062",
+  "subject": "Step 2: preserve force and collision-geometry diagnosis before controller edits",
+  "date": "2026-09-05",
+  "files": 7,
+  "added": 33232,
+  "removed": 0
+ },
+ {
+  "hash": "790edd4",
+  "subject": "Step 2: verify historical command reconstruction with 19 force-only tests",
+  "date": "2026-09-05",
+  "files": 3,
+  "added": 247,
+  "removed": 1
+ },
+ {
+  "hash": "ffc7be5",
+  "subject": "Step 3: improve and verify the lab base; stop training on failed support and timing gates",
+  "date": "2026-09-05",
+  "files": 80,
+  "added": 463881,
+  "removed": 25
+ },
+ {
+  "hash": "ad54e9a",
+  "subject": "Record Session 3 geometry baseline and hypothesis protocol",
+  "date": "2026-09-05",
+  "files": 3,
+  "added": 9930,
+  "removed": 0
+ },
+ {
+  "hash": "9eee048",
+  "subject": "Session 3: implement, fix and test hind stance compensation; Gate 2 still fails",
+  "date": "2026-09-05",
+  "files": 8,
+  "added": 1558377,
+  "removed": 3
+ },
+ {
+  "hash": "8153e8b",
+  "subject": "Session 3b: generalise stance compensation to all four limbs; Gate 2 now 4/6",
+  "date": "2026-09-05",
+  "files": 11,
+  "added": 1554407,
+  "removed": 42
+ },
+ {
+  "hash": "552c91b",
+  "subject": "Session 3c: limb phase is late touchdown; stride length is geometrically unreachable by the limbs",
+  "date": "2026-09-05",
+  "files": 4,
+  "added": 1552508,
+  "removed": 0
+ },
+ {
+  "hash": "8c67937",
+  "subject": "Session 3d: stride length is speed; spine refuted as its source; 41% hind foot slip found",
+  "date": "2026-09-05",
+  "files": 1,
+  "added": 71,
+  "removed": 0
+ },
+ {
+  "hash": "49c2e55",
+  "subject": "Session 3e: refute gearing and contact softness; correct my own stride-length framing",
+  "date": "2026-09-05",
+  "files": 1,
+  "added": 79,
+  "removed": 0
+ },
+ {
+  "hash": "7e752e7",
+  "subject": "Session 3f: CMA-ES solves the limb-phase gate; 6/6 appears unreachable",
+  "date": "2026-09-06",
+  "files": 19,
+  "added": 9316691,
+  "removed": 0
+ },
+ {
+  "hash": "9655d79",
+  "subject": "Session 3g: withdraw the CMA-ES limb-phase claim; it optimised the wrong metric",
+  "date": "2026-09-06",
+  "files": 7,
+  "added": 3104060,
+  "removed": 0
+ },
+ {
+  "hash": "8503e04",
+  "subject": "Session 3h: fit harness now scores through realism_metrics; 12s fit rejected as unstable",
+  "date": "2026-09-06",
+  "files": 9,
+  "added": 12601,
+  "removed": 3
+ },
+ {
+  "hash": "ccebd20",
+  "subject": "Session 3i: gate-count objective and the 20 s fit evidence; searches stopped",
+  "date": "2026-09-06",
+  "files": 5,
+  "added": 6504,
+  "removed": 4
+ },
+ {
+  "hash": "2c474f7",
+  "subject": "Add docs/HANDOFF.md: complete record of the research and build phases",
+  "date": "2026-09-06",
+  "files": 1,
+  "added": 106,
+  "removed": 0
+ },
+ {
+  "hash": "8c7000d",
+  "subject": "Session 4: train the walker; the forefoot gate is unreachable on this body",
+  "date": "2026-09-06",
+  "files": 25,
+  "added": 8558,
+  "removed": 38
+ },
+ {
+  "hash": "e184c1e",
+  "subject": "Session 4b: drive the sprawl DOFs, couple the tail to the hindlimb",
+  "date": "2026-09-07",
+  "files": 14,
+  "added": 1552705,
+  "removed": 48
+ },
+ {
+  "hash": "33be60c",
+  "subject": "Session 4c: the no-cheat world, and prey the walker cannot catch",
+  "date": "2026-09-07",
+  "files": 11,
+  "added": 1490,
+  "removed": 9
+ },
+ {
+  "hash": "b573e57",
+  "subject": "Session 4d: finish the no-cheat world in the environment that has eyes",
+  "date": "2026-09-07",
+  "files": 6,
+  "added": 291,
+  "removed": 25
+ },
+ {
+  "hash": "306dd23",
+  "subject": "Session 5: hypothalamus -- hunger from the animal's own metabolism",
+  "date": "2026-09-07",
+  "files": 6,
+  "added": 1100,
+  "removed": 2
+ },
+ {
+  "hash": "8b5f491",
+  "subject": "Session 5b: fatigue from the published endurance curve; fear is on the wrong sense",
+  "date": "2026-09-07",
+  "files": 6,
+  "added": 294,
+  "removed": 3
+ },
+ {
+  "hash": "ef75601",
+  "subject": "Session 6: basal ganglia built from equations; NOT ACCEPTED, sweep fails",
+  "date": "2026-09-07",
+  "files": 5,
+  "added": 891,
+  "removed": 0
+ },
+ {
+  "hash": "af1b08e",
+  "subject": "Session 6b: found the GPR parameters; two of my three errors were structural",
+  "date": "2026-09-07",
+  "files": 5,
+  "added": 340,
+  "removed": 141
+ },
+ {
+  "hash": "4a91782",
+  "subject": "Session 6c: the living failure map, and 6b's parameters were a variant's",
+  "date": "2026-09-07",
+  "files": 7,
+  "added": 942,
+  "removed": 94
+ },
+ {
+  "hash": "cbc42d8",
+  "subject": "Session 6d: the basal-ganglia failure was not a failure",
+  "date": "2026-09-07",
+  "files": 4,
+  "added": 327,
+  "removed": 30
+ },
+ {
+  "hash": "04b43be",
+  "subject": "Session 6e: the winner did not saturate because we were testing the wrong model",
+  "date": "2026-09-07",
+  "files": 8,
+  "added": 2746,
+  "removed": 12
+ },
+ {
+  "hash": "427a845",
+  "subject": "Session 6f: the gecko moved onto the validated selector, and brains 1 and 2 run together",
+  "date": "2026-09-08",
+  "files": 4,
+  "added": 505,
+  "removed": 6
+ },
+ {
+  "hash": "ba460cb",
+  "subject": "Docs: the map gains a flow and a success column",
+  "date": "2026-09-08",
+  "files": 2,
+  "added": 113,
+  "removed": 0
+ },
+ {
+  "hash": "6c99f92",
+  "subject": "Session 7: the cord becomes an oscillator, so a command has somewhere to land",
+  "date": "2026-09-08",
+  "files": 2,
+  "added": 442,
+  "removed": 0
+ },
+ {
+  "hash": "78bcc15",
+  "subject": "Session 7 docs: ledger 99-102, the new state, and the paused marker",
+  "date": "2026-09-08",
+  "files": 1,
+  "added": 47,
+  "removed": 9
+ },
+ {
+  "hash": "683e8f6",
+  "subject": "Session 7b-7c: the dopamine mechanism was wrong the OTHER way, and brain 3 lands",
+  "date": "2026-09-08",
+  "files": 13,
+  "added": 1553,
+  "removed": 575
+ },
+ {
+  "hash": "b9fafcf",
+  "subject": "Session 8: scouting the eye found a detector that could not see its own food",
+  "date": "2026-09-08",
+  "files": 4,
+  "added": 425,
+  "removed": 15
+ },
+ {
+  "hash": "5158d45",
+  "subject": "Session 8b: the retina keeps position, and the published optokinetic asymmetry",
+  "date": "2026-09-08",
+  "files": 6,
+  "added": 978,
+  "removed": 12
+ },
+ {
+  "hash": "e4196d8",
+  "subject": "Session 8c: the tectum, shipped NOT ACCEPTED because it cannot find real prey",
+  "date": "2026-09-08",
+  "files": 6,
+  "added": 576,
+  "removed": 16
+ },
+ {
+  "hash": "034a78d",
+  "subject": "Session 9: the literature refuted the plan, and three checks were guarding nothing",
+  "date": "2026-09-08",
+  "files": 30,
+  "added": 18184,
+  "removed": 53
+ },
+ {
+  "hash": "ead740b",
+  "subject": "Session 9b: the oracle measured, the body hash resolved, and a strike that works",
+  "date": "2026-09-08",
+  "files": 12,
+  "added": 1140,
+  "removed": 13
+ },
+ {
+  "hash": "871f843",
+  "subject": "Session 9c: a clip you can actually watch, and two filming artefacts removed",
+  "date": "2026-09-08",
+  "files": 4,
+  "added": 227,
+  "removed": 2
+ },
+ {
+  "hash": "3148180",
+  "subject": "Session 9d: the gecko was never broken, and the shake was my camera",
+  "date": "2026-09-08",
+  "files": 8,
+  "added": 240,
+  "removed": 3
+ },
+ {
+  "hash": "fb64aa2",
+  "subject": "Session 9e: the replay camera pointed at the animal's face",
+  "date": "2026-09-08",
+  "files": 12,
+  "added": 541,
+  "removed": 5
+ },
+ {
+  "hash": "d017b18",
+  "subject": "Session 9f: the lag was a frame-rate header, not the animal",
+  "date": "2026-09-08",
+  "files": 5,
+  "added": 35,
+  "removed": 10
+ },
+ {
+  "hash": "010f82c",
+  "subject": "Session 9g: rendering the accepted walker side-on, and what the earlier clip was",
+  "date": "2026-09-09",
+  "files": 1,
+  "added": 27,
+  "removed": 0
+ },
+ {
+  "hash": "9a7db0a",
+  "subject": "Session 9h: three findings from trying to reproduce the Session 4 walking clip",
+  "date": "2026-09-09",
+  "files": 5,
+  "added": 228,
+  "removed": 6
+ },
+ {
+  "hash": "3fb0302",
+  "subject": "Session 9i: the gait profile is a parameter now, and I retract #179",
+  "date": "2026-09-09",
+  "files": 3,
+  "added": 98,
+  "removed": 2
+ },
+ {
+  "hash": "db0163f",
+  "subject": "Session 9j: the Session 4 commit and today render the same walk, pixel for pixel",
+  "date": "2026-09-09",
+  "files": 1,
+  "added": 25,
+  "removed": 0
+ },
+ {
+  "hash": "779b03c",
+  "subject": "Session 9k: the shake was the camera watching the trunk bob",
+  "date": "2026-09-09",
+  "files": 1,
+  "added": 3,
+  "removed": 2
+ },
+ {
+  "hash": "7ae5b42",
+  "subject": "Session 9l: measuring the push-then-drag rhythm, and rendering the old commit",
+  "date": "2026-09-09",
+  "files": 1,
+  "added": 15,
+  "removed": 0
+ },
+ {
+  "hash": "73a37c8",
+  "subject": "Session 9m: the user was right -- I filmed the wrong gait profile all session",
+  "date": "2026-09-09",
+  "files": 2,
+  "added": 24,
+  "removed": 3
+ },
+ {
+  "hash": "ed61f25",
+  "subject": "Session 9n: every clip I sent was the walker this project rejected",
+  "date": "2026-09-09",
+  "files": 3,
+  "added": 186,
+  "removed": 3
+ }
+]
