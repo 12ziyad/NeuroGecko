@@ -187,6 +187,7 @@ class GeckoBrainEnv(gym.Env):
         gait_profile: str = "legacy",
         warn_pairing: bool = True,
         hunt_targeting: bool = False,
+        use_policy: bool = True,
         control_mode: str = "cpg_residual",
         residual_scale: float = 0.25,
         front_stance_press: float = 0.40,
@@ -297,6 +298,7 @@ class GeckoBrainEnv(gym.Env):
         # flipping a default silently is how this class of defect gets made in
         # the first place. Measured cost of the difference is in ledger #180.
         # What changes is that it can no longer be silent.
+        self.use_policy = bool(use_policy)
         self.gait_profile = self.walk_env.gait_profile
         # AIM AT THE PREY, NOT ROUGHLY THAT WAY.
         #
@@ -317,7 +319,10 @@ class GeckoBrainEnv(gym.Env):
         # out of two independent defaults and nothing objected -- see
         # common/walker_pairing.py for the measurements.
         if warn_pairing:
-            check_pairing(self.gait_profile, True, context="GeckoBrainEnv")
+            #  rather than a hard True: lab WITHOUT the residual is
+            # the accepted walker, and warning about it would train the reader
+            # to ignore the warning.
+            check_pairing(self.gait_profile, self.use_policy, context="GeckoBrainEnv")
         # THE WALKER'S OWN ORACLE, NOW PASSED RATHER THAN DEFAULTED.
         #
         # GeckoWalkEnv puts five numbers into its 92-long proprioception vector:
@@ -408,7 +413,27 @@ class GeckoBrainEnv(gym.Env):
         if self._nose_sid < 0:
             raise RuntimeError("XML site 'nose_tip' not found; required for mouth-based eating.")
 
-        self.walk_model, self.walk_norm = self._load_frozen_walker(self.walker_run)
+        # THE ACCEPTED WALKER WAS UNREACHABLE FROM HERE, and that is why every
+        # clip this session was filmed with a rejected one.
+        #
+        # This env always loaded the frozen residual and defaulted to
+        # gait_profile="legacy". The walker the gates accepted is `lab` with
+        # ZERO residual, and no combination of arguments could ask for it.
+        # Measured with one consistent method, fraction of the step each foot
+        # carries load, against published targets of 0.70 fore and 0.765 hind:
+        #
+        #     lab + no policy     0.770 0.764 0.787 0.790   even to 0.006
+        #     legacy + policy     0.704 0.601 0.435 0.367   hind feet at half
+        #
+        # The second line is what was on screen. The front pair looked fine,
+        # which is why it survived: the only duty metric being checked was the
+        # front one, and the defect was in the hind feet.
+        #
+        # With use_policy=False the CPG base drives the legs directly. Under
+        # `lab` the base steers off the target bearing itself, so the animal
+        # still goes where the brain points it.
+        self.walk_model, self.walk_norm = (
+            self._load_frozen_walker(self.walker_run) if use_policy else (None, None))
         self.walk_obs_dim = int(np.prod(self.walk_env.observation_space.shape))
         self.action_space = spaces.Box(-1.0, 1.0, shape=(4,), dtype=np.float32)
         self.observation_space = spaces.Dict(
@@ -794,9 +819,16 @@ class GeckoBrainEnv(gym.Env):
         steps_run = 0
         for _ in range(self.brain_steps_per_action):
             self._set_walk_target(self._brain_target_xy)
-            norm_obs = self._walker_obs_normalized()
-            walker_action, _ = self.walk_model.predict(norm_obs, deterministic=True)
-            walker_action = np.asarray(walker_action, dtype=np.float32).reshape(-1)
+            if self.walk_model is None:
+                # ZERO RESIDUAL. The hand-written CPG base is the whole
+                # controller -- which is the configuration the 4/6 gates
+                # accepted, and the one this env could not previously express.
+                walker_action = np.zeros(
+                    self.walk_env.action_space.shape, dtype=np.float32)
+            else:
+                norm_obs = self._walker_obs_normalized()
+                walker_action, _ = self.walk_model.predict(norm_obs, deterministic=True)
+                walker_action = np.asarray(walker_action, dtype=np.float32).reshape(-1)
             _, _, terminated, truncated, info = self.walk_env.step(walker_action)
             last_walker_info = info
             steps_run += 1
@@ -911,6 +943,8 @@ class GeckoBrainEnv(gym.Env):
             "walker_oracle": self.walker_oracle,
             "gait_profile": self.gait_profile,
             "hunt_targeting": self.hunt_targeting,
+            "use_policy": self.use_policy,
+            "accepted_walker": (not self.use_policy) and self.gait_profile == "lab",
             "gate_validated_profile": self.gait_profile == "lab",
             "strike_active": bool(self.strike.active) if self.strike else False,
             "strike_mode": self.strike.mode if self.strike else None,

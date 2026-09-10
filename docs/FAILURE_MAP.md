@@ -974,6 +974,9 @@ retrieve" into "does not exist."
 | 203 | Aiming the walker AT the prey fixes the approach | **Refuted -- it makes it strictly worse** | 5 seeds, 60 s each: aiming **past** the prey gives **29 strikes, 26 caught**, closest 10.2-18.6 mm. Aiming **at** it gives **0 strikes**, closest 23.4-29.4 mm. Arriving at a goal means stopping at it, and the mouth needs the animal to keep going. Kept as an option, defaulted off, measurement recorded. #202 was wrong about where the blocker was |
 | 204 | The hunt composes end to end | **CONFIRMED** | moving prey, a stalk that collapses the flee radius, an approach to 10-19 mm against a 20.3 mm trigger, a strike, and a capture. **26 of 29 strikes land -- 89.7 % against a published 82.9 %**, within sampling noise at n=29. The first time in this project that the animal has caught anything |
 | 205 | The walker or the targeting was blocking the hunt | **Refuted -- it was the PREY** | what unblocked it was prey motion and the speed-dependent flee radius, both added earlier this session. A stationary cricket that bolts at a fixed 75 mm regardless of approach cannot be hunted by anything. Three separate blockers were diagnosed -- the eye (#134), the walker (#174), the targeting (#202) -- and **all three were downstream of a prey model that made the task impossible** |
+| 206 | The front-foot pair is the right thing to measure | **Refuted -- the defect was in the HIND feet** | measuring all four with one consistent method: the configuration every Session 9 video used (`legacy` + policy) puts the front feet at 0.704/0.601 but the **hind feet at 0.435/0.367 against a published 0.765 -- barely half**. I had only ever measured the front pair, so the defect sat outside the metric I was checking. The user saw it on screen twice before it was measured |
+| 207 | The accepted walker is only slightly better | **Refuted -- it is near-perfect and nothing else is close** | `lab` + **no policy**: **0.770 / 0.764 / 0.787 / 0.790**. All four feet even to within **0.006**, and all four near their published targets (fore 0.70, hind 0.765). Every other combination is visibly worse on at least one pair. This is the 4/6 walker, and it walks like one |
+| 208 | The brain environment can run the accepted walker | **Refuted** | it defaults to `gait_profile="legacy"` and **always** loads the frozen residual. The accepted walker is `lab` + zero residual, and **nothing in `GeckoBrainEnv` could express that combination**. So every clip made from the brain env was filmed with a walker this project had already rejected -- not through a wrong argument, but because the right one was unreachable |
 
 ### #138 and #134 — the two I told the user were true
 
@@ -1071,8 +1074,8 @@ Recorded so the gaps stay visible rather than getting invented later:
 
 | | |
 |---|---|
-| Hypotheses tested | **205** |
-| Refuted | **165** |
+| Hypotheses tested | **208** |
+| Refuted | **168** |
 | Confirmed | **27** |
 | Partly | **12** |
 | My own method errors | **35** |

@@ -128,8 +128,14 @@ def main():
     from brain.vomeronasal import Vomeronasal
     from brain.arousal import Arousal
 
+    # THE ACCEPTED WALKER, and this is the third time getting it wrong here.
+    # gait_profile="lab" with NO policy is what the 4/6 gates measured. The
+    # brain env's defaults are legacy + the trained residual, whose HIND feet
+    # carry load for 0.37-0.44 of the step against a published 0.765 -- barely
+    # half. Filmed twice before anyone measured all four feet.
     env = GeckoBrainEnv(prey_parameters=PreyParameters.from_registry(),
                         walker_xml_path=HABITAT, strike=True,
+                        gait_profile="lab", use_policy=False,
                         render_mode="rgb_array", max_steps=100000, seed=args.seed)
     shot = Shot(env)
     frames, facts = [], {}
@@ -139,7 +145,7 @@ def main():
         frames += title_card("WALKING", [
             "the accepted walker: hand-written base, no policy",
             "4 of 6 published gait checks",
-            "the trained add-on scored 3 of 6, rejected"])
+            "all four feet even: 0.77 0.76 0.79 0.79"])
         env.reset(seed=args.seed)
         start = env._trunk_xy().copy()
         for i in range(500):

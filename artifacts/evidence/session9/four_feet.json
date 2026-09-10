@@ -1,0 +1,41 @@
+{
+ "schema_version": 1,
+ "test": "fraction of the step each of the FOUR feet is on the ground",
+ "method": "foot site within 4 mm of the floor, 800 steps, seed 1, habitat world. One consistent measure across all four configurations -- earlier comparisons used the env's own front-duty metric and only looked at the two front feet.",
+ "published_targets": {
+  "fore": 0.7,
+  "hind": 0.765
+ },
+ "results": {
+  "lab + NO policy": {
+   "foreL": 0.77,
+   "foreR": 0.764,
+   "hindL": 0.787,
+   "hindR": 0.79,
+   "note": "all four even, and all four near target. THE ACCEPTED WALKER."
+  },
+  "legacy + policy": {
+   "foreL": 0.704,
+   "foreR": 0.601,
+   "hindL": 0.435,
+   "hindR": 0.367,
+   "note": "front near target, HIND FEET AT HALF. This is what every video in this session was filmed with."
+  },
+  "legacy + NO policy": {
+   "foreL": 0.66,
+   "foreR": 0.806,
+   "hindL": 0.608,
+   "hindR": 0.644,
+   "note": ""
+  },
+  "lab + policy": {
+   "foreL": 0.603,
+   "foreR": 0.866,
+   "hindL": 0.459,
+   "hindR": 0.256,
+   "note": "worst of the four, front gap 0.264"
+  }
+ },
+ "verdict": "The user said the walking was wrong again and was right again. The clip was filmed with legacy+policy, whose HIND feet carry load for 0.37-0.44 of the step against a published 0.765 -- barely half. I had only ever measured the FRONT pair, so the defect was outside the metric I was checking. lab+no-policy puts all four feet at 0.76-0.79, even to within 0.006.",
+ "why_it_kept_happening": "GeckoBrainEnv defaults to gait_profile='legacy' and always loads the frozen residual. The accepted walker is lab + zero residual. Nothing in the brain env could express that combination until now."
+}

@@ -6,10 +6,10 @@
  "fps": 50,
  "real_time": true,
  "facts": {
-  "walk_m": 0.407,
-  "strikes": 7,
-  "caught": 5,
-  "closest_mm": 14.7
+  "walk_m": 0.377,
+  "strikes": 8,
+  "caught": 6,
+  "closest_mm": 15.2
  },
  "does_not_show": [
   "vision driving the hunt -- the approach bearing is an oracle",
