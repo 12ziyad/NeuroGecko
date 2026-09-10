@@ -67,6 +67,7 @@ class GeckoWalkEnv(gym.Env):
 
     def __init__(self, xml_path=None, frame_skip=25, max_steps=1000,
                  target_radius=0.25, reach_dist=0.04, action_scale=1.0,
+                 approach_site="trunk",
                  action_ema=0.0, reset_noise=0.02, reward_cfg=None,
                  control_mode="raw", residual_scale=0.2, contact_thresh=None,
                  front_stance_press=0.40, front_swing_lift=0.40,
@@ -85,6 +86,35 @@ class GeckoWalkEnv(gym.Env):
         self.max_steps = int(max_steps)
         self.target_radius = float(target_radius)
         self.reach_dist = float(reach_dist)
+        # WHICH PART OF THE ANIMAL HAS TO ARRIVE.
+        #
+        # "trunk" is the historical behaviour and stays the default: distance is
+        # measured from the body centre, and reach_dist 0.04 means the episode
+        # succeeds when the TRUNK is 4 cm from the goal. Every checkpoint in the
+        # repository was trained that way and changing the default would
+        # silently move the ground under all of them.
+        #
+        # It is also why the animal can never eat. A strike launches from
+        # 0.0203 m (Vollin & Higham 2021), the nose sits ~5 cm ahead of the
+        # trunk, and the goal test never mentions the mouth -- so a policy that
+        # has "arrived" is still two strike-lengths short with its head pointing
+        # somewhere else. Measured across 700 steps of a scripted approach with
+        # prey motion, a working stalk and a target aimed past the animal, the
+        # best mouth-to-prey range reached was 34.5 mm against the 20.3 mm
+        # needed (FAILURE_MAP #174).
+        #
+        # "mouth" measures from the nose_tip site instead. It is the goal a
+        # hunting policy actually has to satisfy, and it needs its own training
+        # run -- a policy trained on one cannot be graded on the other.
+        if approach_site not in ("trunk", "mouth"):
+            raise ValueError("approach_site must be 'trunk' or 'mouth'")
+        self.approach_site = approach_site
+        self._approach_sid = (
+            mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_SITE, "nose_tip")
+            if approach_site == "mouth" else -1)
+        if approach_site == "mouth" and self._approach_sid < 0:
+            raise ValueError("This body has no nose_tip site, so the mouth cannot "
+                             "be the thing that arrives.")
         # The five task observations hand the policy the target's bearing and
         # range directly: the animal is told where the food is instead of
         # looking for it, and the lab controller is additionally steered by the
@@ -232,7 +262,9 @@ class GeckoWalkEnv(gym.Env):
             blocks.append(("privileged_target", 5))
         blocks.append(("gait_phase", 2))
         return {"blocks": blocks, "total": sum(n for _, n in blocks),
-                "privileged_target": self.privileged_target}
+                "privileged_target": self.privileged_target,
+                "approach_site": self.approach_site,
+                "reach_dist": self.reach_dist}
 
     @property
     def lab_controller_snapshot(self):
@@ -296,8 +328,15 @@ class GeckoWalkEnv(gym.Env):
         mujoco.mj_forward(self.model, self.data)
 
     def _target_egocentric(self):
-        """direction & distance to target expressed in the trunk frame (yaw)."""
-        root = self.data.xpos[self._trunk][:2]
+        """direction & distance to target expressed in the trunk frame (yaw).
+
+        The DIRECTION is always expressed in the trunk frame -- that is the
+        animal's own heading and the controller steers by it. What
+        `approach_site` changes is the point the distance is measured FROM:
+        the body centre, or the mouth that has to reach the prey.
+        """
+        root = (self.data.site_xpos[self._approach_sid][:2]
+                if self._approach_sid >= 0 else self.data.xpos[self._trunk][:2])
         R = self.data.xmat[self._trunk].reshape(3, 3)
         d_world = np.array([self.target[0] - root[0], self.target[1] - root[1], 0.0])
         dist = float(np.linalg.norm(d_world[:2])) + 1e-9

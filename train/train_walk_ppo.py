@@ -250,7 +250,7 @@ def make_env(seed, control_mode="raw", residual_scale=0.25,
              front_swing_lift=0.40, reward_cfg=None, xml_path=None,
              gait_profile="legacy", hind_stance_compensation=False,
              front_lift_residual_scale=None, privileged_target=True,
-             episode_seconds=None):
+             episode_seconds=None, approach_site="trunk", reach_dist=None):
     def _f():
         return GeckoWalkEnv(
             xml_path=xml_path,
@@ -265,6 +265,8 @@ def make_env(seed, control_mode="raw", residual_scale=0.25,
             hind_stance_compensation=hind_stance_compensation,
             front_lift_residual_scale=front_lift_residual_scale,
             privileged_target=privileged_target,
+            approach_site=approach_site,
+            **({} if reach_dist is None else {"reach_dist": float(reach_dist)}),
             **({} if episode_seconds is None else {"max_steps": int(round(episode_seconds / 0.02))}),
         )
     return _f
@@ -449,6 +451,17 @@ def main():
     p.add_argument("--no-privileged-target", dest="privileged_target", action="store_false",
                    help="drop the five task observations that hand the policy the target's bearing "
                         "and range; the observation becomes 87-D and no saved checkpoint fits it")
+    p.add_argument("--approach-site", choices=["trunk", "mouth"], default="trunk",
+                   help="which part of the animal has to arrive. 'trunk' is the "
+                        "historical goal every checkpoint was trained on. 'mouth' "
+                        "measures from nose_tip, which is the goal a hunting "
+                        "policy actually has to satisfy -- the nose trails the "
+                        "trunk by ~5 cm and a strike launches from 2.03 cm, so a "
+                        "trunk-trained policy stops two strike-lengths short.")
+    p.add_argument("--reach-dist", type=float, default=None,
+                   help="distance counted as arrival. Default 0.04 (trunk). Pair "
+                        "--approach-site mouth with 0.0203, the published strike "
+                        "trigger distance.")
     p.add_argument("--target-kl", type=float, default=None,
                    help="stop each PPO epoch loop when approximate KL exceeds this; the 10 M-step "
                         "precedent diverged to approx_kl 67 and lost 63%% of eval return")
@@ -549,6 +562,8 @@ def main():
                  hind_stance_compensation=compensation,
                  front_lift_residual_scale=args.front_lift_residual_scale,
                  privileged_target=args.privileged_target,
+            approach_site=args.approach_site,
+            reach_dist=args.reach_dist,
                  episode_seconds=args.episode_seconds)
         for i in range(args.envs)
     ]
@@ -579,6 +594,8 @@ def main():
                  hind_stance_compensation=compensation,
                  front_lift_residual_scale=args.front_lift_residual_scale,
                  privileged_target=args.privileged_target,
+            approach_site=args.approach_site,
+            reach_dist=args.reach_dist,
                  episode_seconds=args.episode_seconds)
     ])
     eval_env = VecMonitor(eval_env)
