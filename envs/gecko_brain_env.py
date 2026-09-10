@@ -11,6 +11,7 @@ from stable_baselines3 import PPO
 from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize
 
 from brain.drives import DriveState
+from common.walker_pairing import check_pairing
 from brain.strike import Strike
 from envs.gecko_walk_env import GeckoWalkEnv
 
@@ -183,6 +184,7 @@ class GeckoBrainEnv(gym.Env):
         walker_oracle: bool = True,
         strike: bool = False,
         gait_profile: str = "legacy",
+        warn_pairing: bool = True,
         control_mode: str = "cpg_residual",
         residual_scale: float = 0.25,
         front_stance_press: float = 0.40,
@@ -283,6 +285,12 @@ class GeckoBrainEnv(gym.Env):
         # the first place. Measured cost of the difference is in ledger #180.
         # What changes is that it can no longer be silent.
         self.gait_profile = self.walk_env.gait_profile
+        # This env always loads a frozen residual, so `using_policy` is True.
+        # The guard exists because Session 9 assembled the one broken pairing
+        # out of two independent defaults and nothing objected -- see
+        # common/walker_pairing.py for the measurements.
+        if warn_pairing:
+            check_pairing(self.gait_profile, True, context="GeckoBrainEnv")
         # THE WALKER'S OWN ORACLE, NOW PASSED RATHER THAN DEFAULTED.
         #
         # GeckoWalkEnv puts five numbers into its 92-long proprioception vector:

@@ -952,6 +952,7 @@ retrieve" into "does not exist."
 | 182 | The push-then-drag is in the Session 4 walk too | **Refuted -- I filmed the wrong profile** | the user said their demo does not drag, and they were right. Front-foot duty factor against a 0.70 target: **lab FL 0.203 / FR 0.591** -- asymmetric by nearly threefold, one front foot loaded a fifth of the step and the other over half, which IS the limp. **legacy FL 0.483 / FR 0.500** -- balanced, and it reads as a walk. Every A/B render I made this session used `lab`; the Session 4 demo is `legacy`. So #9j's pixel-identical result stands as a statement about the CODE and answers a question nobody asked. **The uncomfortable part: `lab` is the gate-validated profile and it is the one that limps.** Whether the gate battery scored front-foot symmetry at all, or scored it and accepted the failure as one of its two unmet checks, is the next thing to establish -- looking better is not the same as being right |
 | 183 | The limp is the profile | **Refuted -- it is the POLICY, and the ledger already said so** | #182 blamed `lab` versus `legacy`. Wrong again. With the residual switched OFF -- the hand-written base, no policy -- **both** profiles balance: lab FL 0.432 / FR 0.454, legacy FL 0.463 / FR 0.491. The asymmetry only appears when `models/v4_5b_speed_polish_1m` is loaded on top. **The accepted walker IS the open-loop base** -- #71 states it outright, #11 measured the trained residual at **3/6 against the base's 4/6**, and `lab_zero_residual/report.json` records controller "zero residual with contact reflex" in its own protocol field. I read all three this session and still loaded the checkpoint into every clip. So every video I sent was the REJECTED walker, and I explained its limp away three times -- as a camera artefact, a frame-rate artefact, and then as an under-actuated forelimb the user would have to accept. The forelimb IS under-actuated (#18) and that is real; it is not what made the animal limp on screen |
 | 184 | The limp is the policy | **Partly -- it is the PAIRING, and #183 overstated it** | all four combinations measured, 800 steps each, front-foot duty against a 0.70 target: **lab + policy FL 0.203 / FR 0.591, gap 0.388 -- the only one that limps.** lab without policy 0.460/0.433. legacy with policy 0.483/0.500. legacy without policy 0.463/0.491. Three of four are balanced. So the trained residual is fine on `legacy` and wrong on `lab` -- a learned correction applied to a base it does not fit -- rather than a policy that is bad everywhere. #183's conclusion stands (the accepted walker is the zero-residual base, #71, and the trained residual measured 3/6 against it, #11); its stated MECHANISM was too broad, and the one combination I rendered all session happens to be the single broken pairing |
+| 185 | Recording a broken configuration in the ledger prevents it | **Refuted -- it did not, for a whole session** | #71 and #11 both say the accepted walker is the zero-residual base, and `lab_zero_residual/report.json` states its controller in its own protocol field. All three were read this session, two were quoted back, and the checkpoint was still loaded into every render. Written evidence stops nothing on its own: the pairing was assembled out of **two independent defaults** -- `GeckoWalkEnv(gait_profile="legacy")` and a checkpoint path carrying no record of what it was trained against -- so no single line of code looked wrong. `common/walker_pairing.py` now warns at construction with the measured numbers and what to do instead. It **warns rather than raises**, because the broken configuration has to stay runnable or the evidence condemning it becomes unreproducible |
 
 ### #138 and #134 — the two I told the user were true
 
@@ -1049,12 +1050,12 @@ Recorded so the gaps stay visible rather than getting invented later:
 
 | | |
 |---|---|
-| Hypotheses tested | **184** |
-| Refuted | **147** |
+| Hypotheses tested | **185** |
+| Refuted | **148** |
 | Confirmed | **26** |
 | Partly | **10** |
 | My own method errors | **35** |
-| Tests passing | **462 of 462**, one skip. Green for the first time since session 8 |
+| Tests passing | **495 of 495**, one skip |
 
 **Seventy-seven per cent of everything tried was wrong.** That is what the map
 is made of.
