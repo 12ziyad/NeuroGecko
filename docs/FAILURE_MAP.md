@@ -37,7 +37,8 @@ later turned out to be right gets a second row, not an edit.
 | **Brain 4/8 — eye** (retina, pretectum, tectum) | 🟡 gaze reproduces; **prey-finding NOT ACCEPTED** |
 | **Strike** — the thing that actually catches prey | ✅ built, 81 % capture vs published 82.9 %. **The approach cannot reach it** — #174 |
 | **Smell** — the channel this species is documented to gate on | ❌ absent |
-| Brains 5–8 — sleep, memory, and the rest | ❌ |
+| **Brain 6/8 — day/night clock** | ✅ circadian gate. Sleep architecture left open — #198 |
+| Brains 7–8 — memory, learning | ❌ barely measured in this animal |
 | **Proof** — 15-test battery | 🟡 1 run (A3, failed then fixed) |
 | **Gate contracts** | ✅ 16/16. One check compared bytes instead of physics and masked seven others — #167, #168 |
 
@@ -964,6 +965,9 @@ retrieve" into "does not exist."
 | 194 | Safety beats warmth when the animal chooses shelter | **Refuted** | given a safe **cool** shelter against an exposed **heated** open area, geckos "selected heat sources over shelters" (n=8 juveniles). Corroborated in another genus: 9 *Gehyra* species, n=85, used a humid crevice for under 10 % of crevice time whenever the dry alternative was warmer. A measured conflict between two drives, which is what an action-selection model should have to resolve |
 | 195 | Vision is this animal's route to danger | **Refuted** | antipredator reaction probability, **this species, n=42**: **0.21 to snake scent alone, 0.07 to the sight of a live snake**. Factorially only the chemical term is significant -- chemical chi2=8.098 p<0.0044, visual chi2<0.01 p>0.9, mechanosensory chi2<0.01 p>0.9. Authors verbatim: *the initiation of costly defensive action remains strictly gated by chemoreception*. A flee channel wired to the eye is close to modelling the wrong sense |
 | 196 | Smell can be given a gradient | **Refuted -- it would be invention** | the assay behind every published number presents the swab **1 cm from the snout, in plain view**. It shows the animal can TELL cricket chemicals from a control -- 3.0 flicks/min against 14.57, n=7, a 4.9x rise. It shows **nothing about localisation**, and no gecko has ever been shown to find prey by smell alone. Cooper flagged the missing experiment in 1998 and nobody has run it since. `brain/vomeronasal.py` returns a scalar per odour and **no bearing**, and states the refusal in its output so a later reader finds an assertion rather than a missing key |
+| 197 | This animal is simply nocturnal | **Partly -- crepuscular is the better reading** | the literature is split, the same species called nocturnal in one paper and crepuscular in another. The mechanistic result favours the second: **preferred body temperature rises through the light phase and peaks toward its end**, which Angilletta et al. 1999 propose is what initiates evening emergence. So arousal is modelled as already rising before dark rather than switching on at it |
+| 198 | A sleep module can borrow the bearded dragon's cycle period | **Refuted -- and left as a gap** | *E. macularius* IS in the reptile sleep literature (Bergel et al. 2026, seven lizard species, **n=2** leopard geckos, EOG under each eyelid -- it closes them, a tokay cannot). That establishes the animal sleeps and its eye movements are measurable. It does **not** supply a cycle period. A well-known agamid figure exists and borrowing it would take one line, so `sleep_cycle_period_s` is recorded **null** and a test asserts it stays null. `brain/arousal.py` is therefore a **circadian gate, not sleep architecture** |
+| 199 | The activity numbers are solid enough to build on | **Partly** | onset after dark is **81 min, n=1**, with **SD 89 and range 11-247** -- the standard deviation exceeds the mean. The evening peak window is n=18 but **captive**, from a welfare study that scored behaviour during the window it expected activity in, so it partly describes the experimenters. Both are used because they are all that exists, both are tagged `uncertain`, and **no field activity budget for a wild leopard gecko has ever been published** |
 
 ### #138 and #134 — the two I told the user were true
 
@@ -1061,12 +1065,12 @@ Recorded so the gaps stay visible rather than getting invented later:
 
 | | |
 |---|---|
-| Hypotheses tested | **196** |
-| Refuted | **159** |
+| Hypotheses tested | **199** |
+| Refuted | **160** |
 | Confirmed | **26** |
-| Partly | **10** |
+| Partly | **12** |
 | My own method errors | **35** |
-| Tests passing | **511 of 511**, one skip |
+| Tests passing | **524 of 524**, one skip |
 
 **Seventy-seven per cent of everything tried was wrong.** That is what the map
 is made of.

@@ -978,6 +978,27 @@
         "confidence": "uncertain", "recording_temp_C": null,
         "notes": "Digesting a meal costs a large multiple of resting metabolism, so a naive model that adds meal energy without subtracting the cost of processing it overstates the benefit of eating. NOT implemented yet; recorded so the omission is visible."
       },
+      "activity_onset_after_dark_s": {
+        "value": 4860.0,
+        "units": "s after lights-out", "species": "E_macularius", "sample_size": 1,
+        "source": "81 min mean (SD 89, range 11-247) from lights-out to first approach of a running wheel. Digirolamo 2024, WikiJournal of Science 7(1):5. One adult female, ~12 y, 14 nights of 940 nm IR video plus 21 days of wheel counts.",
+        "confidence": "uncertain", "recording_temp_C": null,
+        "notes": "PUBLISHED and THIS SPECIES, and it is n = 1. Treat as a case report, not a population value: the SD of 89 min is larger than the mean and the range spans 11 to 247. It is used because it is the ONLY actograph-style dataset that exists for this animal. No field activity budget for wild E. macularius has ever been published -- no emergence times, no retreat times, no activity/light-level curve."
+      },
+      "activity_peak_window_h": {
+        "value": 5.0,
+        "units": "hours after lights-out", "species": "E_macularius", "sample_size": 18,
+        "source": "Behaviour scored during 'the evening peak activity period between 6 p.m. and 11 p.m.', lights off about 18:00. Kronke & Xu 2023, Animals 13(23):3595, n=18 adults.",
+        "confidence": "uncertain", "recording_temp_C": null,
+        "notes": "PUBLISHED and THIS SPECIES, but CAPTIVE and the window was chosen by the experimenters as much as measured -- they scored when they expected activity. Corroborating in direction only: activity was higher in the first 60 min after lights-out than in the last 75 min before dawn (n=1, Digirolamo 2024), and preferred body temperature rises through the light phase, which Angilletta et al. 1999 propose as what initiates evening emergence."
+      },
+      "sleep_cycle_period_s": {
+        "value": null,
+        "units": "s", "species": "NOT_IN_CORPUS", "sample_size": null,
+        "source": "No sleep-cycle period has been established for E. macularius. The species appears in Bergel et al. 2026, Nat Neurosci 29:543-550 -- seven lizard species, sleep-dependent infraslow rhythms conserved across reptiles and mammals -- with n = 2 leopard geckos, both male, 72 g. That paper establishes that this animal sleeps and that its eye movements are measurable (EOG electrodes under each eyelid; it closes them, unlike the tokay). It does not give this project a cycle period it can defend.",
+        "confidence": "uncertain", "recording_temp_C": null,
+        "notes": "null ON PURPOSE. A number exists in the reptile sleep literature for the bearded dragon and it would be easy to borrow, but a cycle period transplanted from an agamid to a eublepharid is exactly the kind of substitution this registry exists to make visible. Recorded as absent so that any module depending on a sleep cycle has to declare it is inventing one."
+      },
       "tongue_flick_baseline_per_min": {
         "value": 3.0,
         "units": "flicks per minute", "species": "E_macularius", "sample_size": 7,
