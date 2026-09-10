@@ -899,7 +899,17 @@ class GeckoBrainEnv(gym.Env):
             # The eye supersedes the colour matcher. Its salience is already
             # in [0, 1] and is what the selector consumes; the colour figure
             # stays in info so the two can be compared on the same frames.
-            seen = self.eye.step(obs["image"], total_dt)
+            # EFFERENCE COPY. The eye is handed what the animal's own motor
+            # system is doing, so it can subtract the flow its own walking
+            # explains. Without it the tectum reported the same salience in a
+            # world with prey and a world with none -- d = 0.036.
+            gyro = self.walk_env.data.sensor("gyro_trunk").data                 if hasattr(self.walk_env.data, "sensor") else None
+            vel = self.walk_env._s("vel_trunk")
+            self_motion = {
+                "yaw_rate_deg_s": float(np.degrees(self.walk_env._s("gyro_trunk")[2])),
+                "forward_m_s": float(vel[0]),
+            }
+            seen = self.eye.step(obs["image"], total_dt, self_motion=self_motion)
             food_visible_frac = float(seen["prey_salience"])
             prey_bearing_deg = float(seen["prey_bearing_deg"])
         # The colour matcher reports an AREA FRACTION, so it is rescaled: a

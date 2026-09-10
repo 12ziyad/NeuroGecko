@@ -130,6 +130,24 @@ class Tectum:
         #: Frames of peak-position history the speed estimate is fitted over.
         #: INVENTED. 25 frames is half a second at 50 Hz, which is roughly what
         #: prey at 0.30 m needs to cross one cell.
+        #: Local excess that counts as a fully salient object. DERIVED from
+        #: the retina's own output range rather than chosen: temporal contrast
+        #: is normalised to [0, 1] per cell, so an object standing a quarter of
+        #: full contrast above its surround is unambiguous. The value that
+        #: matters is that it is ABSOLUTE -- fixed across frames -- because a
+        #: per-frame denominator is what made an empty world score 0.40.
+        self.salience_scale = 0.25
+        #: Subtract the flow the animal's own movement predicts, before looking
+        #: for anything. Off means the previous behaviour, which could not
+        #: distinguish a world with prey from a world without.
+        self.efference_copy = True
+        #: How strongly a given turn rate and forward speed translate into
+        #: predicted retinal motion. INVENTED -- no gecko has had its optic-flow
+        #: gain measured -- and fitted to nothing: it is set so that the flow a
+        #: walking animal generates is roughly cancelled, and the residual is
+        #: what matters, not the constant.
+        self.flow_gain_yaw = 0.020
+        self.flow_gain_surge = 1.60
         self.speed_window = 25
         #: Displacement below which the estimate is refused rather than
         #: guessed. ONE FULL CELL, and the value was measured rather than
@@ -140,6 +158,33 @@ class Tectum:
         #: instead of guessed. DERIVED from the map geometry.
         self.min_resolvable_deg = 1.0 * (retina.fovy_deg / retina.cells)
         self._history = []
+
+    def _expected_flow(self, shape, self_motion):
+        """The retinal motion the animal's own movement should produce.
+
+        Two components, both crude and both declared so:
+
+        YAW. Turning slides the whole field sideways by the same amount
+        everywhere. A constant across the map.
+
+        SURGE. Walking forward expands the field from a focus of expansion
+        straight ahead, and the expansion is strongest at the edges and zero at
+        the centre. Modelled as proportional to distance from the middle
+        column, which is the first-order shape of a real expansion field and
+        nothing more.
+
+        This is NOT a calibrated optic-flow model. No gecko has had its flow
+        gains measured. What it has to do is remove most of what the animal's
+        own walking explains, so that what remains is about the world.
+        """
+        rows, cols = shape
+        yaw = abs(float(self_motion.get("yaw_rate_deg_s", 0.0)))
+        surge = abs(float(self_motion.get("forward_m_s", 0.0)))
+        flat = self.flow_gain_yaw * yaw
+        centre = (cols - 1) / 2.0
+        radial = np.abs(np.arange(cols, dtype=float) - centre) / max(centre, 1e-9)
+        expansion = self.flow_gain_surge * surge * radial
+        return np.clip(flat + expansion[None, :], 0.0, None) * np.ones((rows, 1))
 
     def velocity_gain(self, deg_per_s):
         """How much a target moving at this angular speed counts.
@@ -190,13 +235,33 @@ class Tectum:
             return 1.0
         return 1.0 if row >= rows / 2.0 else 0.0
 
-    def step(self, retina_output):
+    def step(self, retina_output, self_motion=None):
         """Returns salience in [0, 1] and the bearing of the best target.
+
+        `self_motion` is an EFFERENCE COPY: how fast the animal is turning and
+        advancing, from its own motor system rather than from the image. It is
+        what makes the difference between an eye that can detect prey and one
+        that cannot.
+
+        A local-versus-surround comparison assumes self-motion is spatially
+        uniform, so subtracting a neighbourhood mean cancels it. Optic flow is
+        not uniform -- it expands from a focus of expansion, and near ground
+        slides faster than far ground -- so the local excess stayed large
+        everywhere. Measured: with prey the eye fired on 72 % of frames at mean
+        salience 0.4161, and with NO PREY IN THE WORLD AT ALL it fired on 72 %
+        at 0.4034. Separation d = 0.036. It was reporting its own walking.
+
+        Given the animal's own motion the expected flow can be PREDICTED and
+        subtracted, which is what an efference copy is for. What survives is
+        what the animal's own movement does not explain.
 
         Bearing is signed degrees from the optical axis, negative to the LEFT,
         which is the convention the brainstem's turn channel expects.
         """
         motion = np.asarray(retina_output["motion"], dtype=float)
+        if self_motion is not None and self.efference_copy:
+            expected = self._expected_flow(motion.shape, self_motion)
+            motion = np.clip(motion - expected, 0.0, None)
         raw_peak = float(motion.max()) if motion.size else 0.0
 
         # ORDER MATTERS, and it was wrong the first time. "Is this a
@@ -321,7 +386,26 @@ class Tectum:
             return 0.0, 0.0
         # Salience is the target's strength relative to the strongest thing the
         # retina can report, so it arrives in [0, 1] as the selector expects.
-        salience = float(min(peak / max(raw_peak, 1e-9), 1.0)) * gain
+        # A RATIO TO THE FRAME'S OWN MAXIMUM CANNOT DETECT ANYTHING, and this
+        # is the fault under "99 % hit rate, correlation zero".
+        #
+        # The previous line was `peak / raw_peak`: the local excess divided by
+        # the largest motion anywhere in the frame. When the whole field slides
+        # -- a walking animal, every frame -- raw_peak is large and whatever the
+        # surround filter leaves behind scales with it, so the quotient parks at
+        # a constant. Measured over 700 frames in the habitat world:
+        #
+        #     prey in the world   mean salience 0.4161   fires 72 % of frames
+        #     NO PREY AT ALL      mean salience 0.4034   fires 72 % of frames
+        #     separation d = 0.036
+        #
+        # The eye reported the same thing whether or not there was anything to
+        # see. It was measuring its own optic flow and dividing it by itself.
+        #
+        # Salience is now the ABSOLUTE local excess against a fixed scale, so an
+        # empty world scores near zero and a real object has to actually stand
+        # out from its surroundings to score at all.
+        salience = float(min(peak / self.salience_scale, 1.0)) * gain
         self.last = {"salience": round(salience, 6),
                      "bearing_deg": round(bearing, 4),
                      "elevation_cell": int(row),
@@ -407,7 +491,7 @@ class Eye:
         self.retina.reset()
         return self
 
-    def step(self, image, dt_s):
+    def step(self, image, dt_s, self_motion=None):
         """One frame through the whole eye."""
         retina_output = self.retina.step(image)
         # The tectum's velocity rule needs to know how long a frame was, and
@@ -416,7 +500,7 @@ class Eye:
         # while doing nothing -- which is the exact shape of the no-op this
         # module already shipped once (the scalar field subtraction).
         retina_output = dict(retina_output, dt_s=float(dt_s))
-        salience, bearing = self.tectum.step(retina_output)
+        salience, bearing = self.tectum.step(retina_output, self_motion=self_motion)
         gaze = self.pretectum.step(retina_output, dt_s)
         self.last = {
             "prey_salience": salience,

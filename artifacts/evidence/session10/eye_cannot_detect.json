@@ -1,0 +1,27 @@
+{
+ "schema_version": 1,
+ "test": "can the eye tell a world WITH prey from a world with NO PREY AT ALL",
+ "method": "habitat world, accepted walker (lab, no policy), eye=True, 700 steps each, walking straight. The prey-absent run has no prey body in the environment whatsoever -- not a hidden one, not a distant one.",
+ "before_absolute_salience": {
+  "prey_present_mean": 0.4161,
+  "no_prey_mean": 0.4034,
+  "fires_pct": 72,
+  "cohens_d": 0.036
+ },
+ "after_absolute_salience": {
+  "prey_present_mean": 0.3623,
+  "no_prey_mean": 0.4058,
+  "fires_pct": 70,
+  "cohens_d": -0.128
+ },
+ "bearing_accuracy": {
+  "frames_fired": "1500 of 1500",
+  "correlation_with_true": 0.02,
+  "mean_abs_error_deg": 48.7,
+  "within_15cm_correlation": -0.034
+ },
+ "verdict": "THE EYE REPORTS THE SAME THING WHETHER OR NOT THERE IS ANYTHING TO SEE. It fires on 70-72 % of frames at a salience near 0.40 in both conditions, and its reported bearing correlates +0.02 with the true one. It is measuring the animal's own optic flow.",
+ "what_was_tried_and_did_not_work": "Salience was `local_peak / raw_peak` -- a ratio to the frame's own maximum, which can never score an empty world at zero because the maximum is the denominator. Replacing it with an ABSOLUTE scale was correct in principle and did not fix the detection: d moved 0.036 -> -0.128, still noise.",
+ "why_the_surround_subtraction_fails": "A local-versus-surround comparison assumes self-motion is spatially UNIFORM, so that subtracting a neighbourhood mean removes it. Optic flow is not uniform. A walking animal's flow field expands from a focus of expansion, and near ground slides faster than far ground, so local excess is large everywhere regardless of prey.",
+ "the_published_fix": "Predict the flow field from the animal's OWN motion -- efference copy -- and subtract that, rather than subtracting a spatial neighbourhood. Holmgren et al. 2021 (eLife 10:e70838) found mice hold prey in the retinal region with the LEAST optic flow, which is the same principle used the other way round."
+}

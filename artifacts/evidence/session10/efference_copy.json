@@ -1,0 +1,58 @@
+{
+ "schema_version": 1,
+ "change": "the tectum subtracts the optic flow the animal's OWN motion predicts, from an efference copy of its yaw rate and forward speed, before looking for anything",
+ "false_alarm_rate": {
+  "before": "72 % of frames",
+  "after": "3-7 % of frames"
+ },
+ "detection_vs_range_animal_still": {
+  "method": "animal held stationary, prey wiggling dead ahead, 40 frames per range",
+  "0.04 m": {
+   "subtends_deg": 25.4,
+   "cells": 5.8,
+   "peak_salience": 0.357
+  },
+  "0.08 m": {
+   "subtends_deg": 12.8,
+   "cells": 2.9,
+   "peak_salience": 0.767
+  },
+  "0.12 m": {
+   "subtends_deg": 8.6,
+   "cells": 2.0,
+   "peak_salience": 0.675
+  },
+  "0.20 m": {
+   "subtends_deg": 5.2,
+   "cells": 1.2,
+   "peak_salience": 0.825
+  },
+  "0.30 m": {
+   "subtends_deg": 3.4,
+   "cells": 0.8,
+   "peak_salience": 0.673
+  },
+  "0.45 m": {
+   "subtends_deg": 2.3,
+   "cells": 0.5,
+   "peak_salience": 0.834
+  },
+  "reading": "it responds at EVERY range tested, including where the prey covers half a cell. Resolution was never the limit."
+ },
+ "moving_vs_still_during_a_real_hunt": {
+  "moving_over_0.03_m_s": {
+   "frames": 869,
+   "mean": 0.0076,
+   "fires_pct": 3
+  },
+  "still": {
+   "frames": 731,
+   "mean": 0.0223,
+   "fires_pct": 7
+  },
+  "cohens_d": 0.181,
+  "reading": "the effect finally points the right way -- the eye sees more when the animal is still. Before the efference copy it pointed the wrong way (d = -0.128 and -0.212)."
+ },
+ "what_is_still_wrong": "Detection during a real hunt is weak in absolute terms. The controlled test reaches peak salience 0.67-0.83 with the animal stationary and prey wiggling ahead; in a hunt the same eye averages 0.02. The gap is that prey is often out of view or not moving on a given frame. The oracle has NOT been removed and must not be until this closes.",
+ "the_architecture_this_points_at": "Look while still, move while blind. A stalking predator freezes to look, and the creep this project already implements -- move one step in four -- happens to be exactly that. The detector should be read during the pauses, not continuously."
+}

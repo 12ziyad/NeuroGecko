@@ -977,6 +977,12 @@ retrieve" into "does not exist."
 | 206 | The front-foot pair is the right thing to measure | **Refuted -- the defect was in the HIND feet** | measuring all four with one consistent method: the configuration every Session 9 video used (`legacy` + policy) puts the front feet at 0.704/0.601 but the **hind feet at 0.435/0.367 against a published 0.765 -- barely half**. I had only ever measured the front pair, so the defect sat outside the metric I was checking. The user saw it on screen twice before it was measured |
 | 207 | The accepted walker is only slightly better | **Refuted -- it is near-perfect and nothing else is close** | `lab` + **no policy**: **0.770 / 0.764 / 0.787 / 0.790**. All four feet even to within **0.006**, and all four near their published targets (fore 0.70, hind 0.765). Every other combination is visibly worse on at least one pair. This is the 4/6 walker, and it walks like one |
 | 208 | The brain environment can run the accepted walker | **Refuted** | it defaults to `gait_profile="legacy"` and **always** loads the frozen residual. The accepted walker is `lab` + zero residual, and **nothing in `GeckoBrainEnv` could express that combination**. So every clip made from the brain env was filmed with a walker this project had already rejected -- not through a wrong argument, but because the right one was unreachable |
+| 209 | The eye can tell prey-present from prey-absent | **Refuted -- the sharpest result in the vision work** | with prey in the world it fires on **72 %** of frames at mean salience **0.4161**. With **no prey in the world at all** it fires on **72 %** at **0.4034**. Separation d = **0.036**. The reported bearing correlates **+0.020** with the true one across 1500 of 1500 frames, mean error 48.7 deg, and **−0.034** within 15 cm. It is not finding prey badly; it is not finding prey |
+| 210 | Salience as a ratio to the frame's own peak can work | **Refuted** | `local_peak / raw_peak` cannot score an empty world at zero, because the frame's own maximum is the denominator: when the whole field slides, both terms scale together and the quotient parks at a constant. Replaced with an **absolute** scale -- correct in principle, and it **did not fix detection**: d moved 0.036 -> −0.128, still noise. Recorded as attempted and insufficient rather than quietly kept |
+| 211 | A local-surround comparison removes self-motion | **Refuted, and this is the root cause** | it assumes self-motion is spatially **uniform**, so that subtracting a neighbourhood mean cancels it. Optic flow is not uniform: a walking animal's field **expands from a focus of expansion**, and near ground slides faster than far ground, so local excess is large everywhere whether or not prey exists. The published route is to predict the flow field from the animal's **own motion** -- efference copy -- and subtract that instead. Mice hold prey in the retinal region with the **least** optic flow (Holmgren et al. 2021), which is the same principle used the other way round |
+| 212 | The cricket is too small for this retina to see | **Refuted -- resolution was never the limit** | with the animal held STILL and prey wiggling ahead, peak salience by range: **0.357 at 0.04 m, 0.767 at 0.08, 0.675 at 0.12, 0.825 at 0.20, 0.673 at 0.30, 0.834 at 0.45**. It responds at every range tested, including 0.45 m where the prey covers **half a cell**. Three sessions of "the prey is smaller than one cell" were describing a real constraint that was not the operative one |
+| 213 | An efference copy fixes prey detection | **Partly** | subtracting the flow the animal's own yaw and forward speed predict cuts false alarms from **72 % of frames to 3-7 %**, and flips the still-versus-moving effect to the right sign for the first time (**d = +0.181**, after −0.128 and −0.212). But detection during a real hunt is still weak in absolute terms: the same eye that peaks at 0.67-0.83 on a stationary animal averages **0.02** in a hunt, because prey is often out of view or not moving on a given frame. **The oracle stays until this closes** |
+| 214 | The animal should look while it walks | **Refuted -- it must look while STILL** | measured across a real hunt: moving faster than 0.03 m/s the eye fires on **3 %** of frames at mean 0.0076; standing still it fires on **7 %** at **0.0223**. Walking is what blinds it, and the creep this project already implements -- move one step in four -- is exactly the freeze-and-look pattern a stalking predator uses. The detector should be **read during the pauses**, not continuously |
 
 ### #138 and #134 — the two I told the user were true
 
@@ -1074,10 +1080,10 @@ Recorded so the gaps stay visible rather than getting invented later:
 
 | | |
 |---|---|
-| Hypotheses tested | **208** |
-| Refuted | **168** |
+| Hypotheses tested | **214** |
+| Refuted | **173** |
 | Confirmed | **27** |
-| Partly | **12** |
+| Partly | **13** |
 | My own method errors | **35** |
 | Tests passing | **524 of 524**, one skip |
 
