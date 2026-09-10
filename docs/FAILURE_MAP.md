@@ -971,6 +971,9 @@ retrieve" into "does not exist."
 | 200 | The frozen walker cannot reach striking distance (#174) | **REFUTED -- it can, and #174 was measuring the wrong thing** | told that the goal is the MOUTH at the published 20.3 mm, the same frozen checkpoint arrives **75 times in 160 s -- one every 2.1 seconds**, mean closest 20.5 mm. #174 drew its conclusion from a scripted approach inside `GeckoBrainEnv`, not from the walker. **The walker was never the blocker**, and a 3 M-step retrain was launched to fix a problem that did not exist |
 | 201 | Retraining on the mouth goal would improve it | **Refuted** | stopped at 2.14 M of 3 M steps. Closest mouth-to-goal **170.6 mm at 250 k and 167.9 mm at 750 k** against the old policy's 20.5 mm -- an order of magnitude worse. Episode length in training collapsed 1340 -> 12 steps while episode reward rose, which looks like reward hacking but is not: per-step reward also improved, −1.51 -> −0.32. The run was simply worse at the task and was killed rather than left to finish |
 | 202 | The blocker is in the walker | **Refuted -- it is in the brain's targeting** | `GeckoBrainEnv._brain_action_to_target` places the walker's goal **0.05-0.80 m ahead in the BODY FRAME**, derived from the brain's action. It never sets the target **at the prey**. So the brain can only ask the walker to head roughly that way, and the last few centimetres -- the ones that decide a strike -- are exactly where that loses |
+| 203 | Aiming the walker AT the prey fixes the approach | **Refuted -- it makes it strictly worse** | 5 seeds, 60 s each: aiming **past** the prey gives **29 strikes, 26 caught**, closest 10.2-18.6 mm. Aiming **at** it gives **0 strikes**, closest 23.4-29.4 mm. Arriving at a goal means stopping at it, and the mouth needs the animal to keep going. Kept as an option, defaulted off, measurement recorded. #202 was wrong about where the blocker was |
+| 204 | The hunt composes end to end | **CONFIRMED** | moving prey, a stalk that collapses the flee radius, an approach to 10-19 mm against a 20.3 mm trigger, a strike, and a capture. **26 of 29 strikes land -- 89.7 % against a published 82.9 %**, within sampling noise at n=29. The first time in this project that the animal has caught anything |
+| 205 | The walker or the targeting was blocking the hunt | **Refuted -- it was the PREY** | what unblocked it was prey motion and the speed-dependent flee radius, both added earlier this session. A stationary cricket that bolts at a fixed 75 mm regardless of approach cannot be hunted by anything. Three separate blockers were diagnosed -- the eye (#134), the walker (#174), the targeting (#202) -- and **all three were downstream of a prey model that made the task impossible** |
 
 ### #138 and #134 — the two I told the user were true
 
@@ -1068,9 +1071,9 @@ Recorded so the gaps stay visible rather than getting invented later:
 
 | | |
 |---|---|
-| Hypotheses tested | **202** |
-| Refuted | **163** |
-| Confirmed | **26** |
+| Hypotheses tested | **205** |
+| Refuted | **165** |
+| Confirmed | **27** |
 | Partly | **12** |
 | My own method errors | **35** |
 | Tests passing | **524 of 524**, one skip |

@@ -11,6 +11,7 @@ from stable_baselines3 import PPO
 from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize
 
 from brain.drives import DriveState
+from common.provenance import parameter_value
 from common.walker_pairing import check_pairing
 from brain.strike import Strike
 from envs.gecko_walk_env import GeckoWalkEnv
@@ -185,6 +186,7 @@ class GeckoBrainEnv(gym.Env):
         strike: bool = False,
         gait_profile: str = "legacy",
         warn_pairing: bool = True,
+        hunt_targeting: bool = False,
         control_mode: str = "cpg_residual",
         residual_scale: float = 0.25,
         front_stance_press: float = 0.40,
@@ -267,6 +269,17 @@ class GeckoBrainEnv(gym.Env):
             seed=seed,
             privileged_target=bool(walker_oracle),
             gait_profile=gait_profile,
+            # WHICH PART OF THE ANIMAL HAS TO ARRIVE, and this is the fix for
+            # what #174 misdiagnosed as a broken walker.
+            #
+            # The walker's goal test measured from the TRUNK and called 4 cm
+            # arrival. Nothing in it mentioned the mouth. Told instead that the
+            # goal is the mouth at the published 20.3 mm strike distance, the
+            # SAME frozen checkpoint arrives 75 times in 160 seconds -- one
+            # every 2.1 s, mean closest 20.5 mm. It could always do this.
+            **({"approach_site": "mouth",
+                "reach_dist": float(parameter_value("strike_trigger_distance_m"))}
+               if hunt_targeting else {}),
         )
         # THE PROFILE THE BRAIN ACTUALLY WALKS ON, NOW NAMED RATHER THAN
         # INHERITED. This constructor never passed `gait_profile`, so
@@ -285,6 +298,20 @@ class GeckoBrainEnv(gym.Env):
         # the first place. Measured cost of the difference is in ledger #180.
         # What changes is that it can no longer be silent.
         self.gait_profile = self.walk_env.gait_profile
+        # AIM AT THE PREY, NOT ROUGHLY THAT WAY.
+        #
+        # `_brain_action_to_target` places the walker's goal 0.05-0.80 m ahead
+        # in the BODY FRAME, derived from the brain's action. That is a fine
+        # abstraction for wandering and it cannot express "go to the cricket":
+        # the brain can only ask for a heading and a range, and the last few
+        # centimetres -- the ones that decide whether a strike is possible --
+        # are exactly where a heading-and-range request loses.
+        #
+        # With hunt_targeting on, the target is placed AT the prey whenever
+        # prey exists, and the walker's own goal machinery does the rest. Off
+        # by default: it changes what the action means, so every existing
+        # checkpoint and every existing evidence run keeps the old behaviour.
+        self.hunt_targeting = bool(hunt_targeting)
         # This env always loads a frozen residual, so `using_policy` is True.
         # The guard exists because Session 9 assembled the one broken pairing
         # out of two independent defaults and nothing objected -- see
@@ -617,7 +644,13 @@ class GeckoBrainEnv(gym.Env):
         else:
             world_dir = world_dir / world_norm
 
-        target = self._trunk_xy() + target_dist * world_dir
+        if self.hunt_targeting and self.prey is not None:
+            # The prey's own position, in world coordinates. The direction the
+            # brain asked for is ignored while prey exists, because the brain
+            # asking for a direction is what could not reach it.
+            target = np.asarray(self.food_xy, dtype=np.float64)[:2]
+        else:
+            target = self._trunk_xy() + target_dist * world_dir
         self._set_walk_target(target)
         self._brain_target_xy = self.walk_env.target.copy()
         return self._brain_target_xy.copy(), engage
@@ -877,6 +910,7 @@ class GeckoBrainEnv(gym.Env):
             # oracle-free without the record contradicting it.
             "walker_oracle": self.walker_oracle,
             "gait_profile": self.gait_profile,
+            "hunt_targeting": self.hunt_targeting,
             "gate_validated_profile": self.gait_profile == "lab",
             "strike_active": bool(self.strike.active) if self.strike else False,
             "strike_mode": self.strike.mode if self.strike else None,

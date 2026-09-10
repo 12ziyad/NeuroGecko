@@ -1,0 +1,33 @@
+{
+ "schema_version": 1,
+ "test": "does the full hunt compose -- moving prey, stalk, approach, strike, capture",
+ "world": "morphology/gecko_habitat_v1.xml",
+ "method": "scripted approach driven by the ORACLE bearing (not the eye), creeping 1 step in 4 within 0.15 m, 60 s per seed, 5 seeds",
+ "aim_past_the_prey": {
+  "strikes": 29,
+  "caught": 26,
+  "capture_rate": 0.897,
+  "closest_mm": [
+   14.7,
+   12.2,
+   13.8,
+   10.2,
+   18.6
+  ]
+ },
+ "aim_at_the_prey": {
+  "strikes": 0,
+  "caught": 0,
+  "closest_mm": [
+   23.4,
+   29.4,
+   27.1,
+   26.2,
+   23.1
+  ]
+ },
+ "published_capture_rate": 0.829,
+ "verdict": "THE HUNT COMPOSES. 26 of 29 strikes land, 89.7 % against a published 82.9 % -- within sampling noise at n=29. The animal closes to 10-19 mm against a 20.3 mm trigger, strikes, and eats.",
+ "the_fix_that_was_not_needed": "hunt_targeting -- placing the walker's goal AT the prey rather than past it -- makes it strictly worse: zero strikes across all five seeds, closest 23-29 mm. Aiming at a goal means arriving at it and stopping; the mouth needs the animal to keep going. Kept as an option, defaulted off, with the measurement recorded.",
+ "what_actually_unblocked_it": "prey motion and the speed-dependent flee radius, both added earlier in Session 9. The walker and the targeting were never the blockers -- #174 and #202 were both wrong."
+}
