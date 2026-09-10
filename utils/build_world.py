@@ -59,6 +59,59 @@ PREY_BODY = """
 """
 PREY_MATERIAL = '<material name="prey" rgba="{rgba}"/>'
 
+# THE REST OF THE WORLD. Until now it was a floor and one cricket, so five of
+# the six behaviours the selector can choose had nothing to act on: there was
+# nowhere to shelter, nothing warm, and nothing to flee.
+#
+# SHELTER is a slab raised on two low supports, making a crevice with a gap
+# under it. It is NOT a burrow, and that is the finding rather than a
+# simplification: this species does not dig. The field description has it
+# living in "holes and crevices in gravel-mixed stony terrain", and retreat
+# chambers traced through a demolished stone wall were masonry voids the
+# animals had not modified -- "the lizards apparently had done nothing in the
+# setting of the site". So it gets a gap that already exists.
+#
+# The WARM PATCH is a surface, not a lamp, and that distinction is measured.
+# Body temperature tracks the SUBSTRATE at r2 = 0.97 against air at 0.92 (n=12,
+# Hastings et al. 2023) -- the animal is thigmothermic and takes heat by lying
+# on warm ground. Melanistic pigment had no effect on heating rate, which is
+# further evidence against radiation-driven warming. MuJoCo has no thermal
+# physics, so the patch is geometry the environment reads by position, and it
+# is coloured so the camera can see it; the heat itself lives in the
+# environment, not in the model.
+#
+# The THREAT is a mocap body like the prey, so it can be moved without touching
+# the physics state. Its own honest caveat: for this species a visual predator
+# alone produces a defensive reaction on 0.07 of trials against 0.21 for scent
+# (n=42). A threat the animal can only see is close to modelling the wrong
+# sense, and it exists here so the flee channel has a referent at all.
+SHELTER_BODY = """
+  <body name="shelter" pos="{x:g} {y:g} 0">
+    <geom name="shelter_roof" type="box" size="{half:g} {half:g} 0.004"
+          pos="0 0 {roof:g}" material="shelter"/>
+    <geom name="shelter_post_a" type="box" size="0.006 {half:g} {post:g}"
+          pos="{edge:g} 0 {post:g}" material="shelter"/>
+    <geom name="shelter_post_b" type="box" size="0.006 {half:g} {post:g}"
+          pos="-{edge:g} 0 {post:g}" material="shelter"/>
+  </body>
+"""
+WARM_PATCH = """
+  <body name="warm_patch" pos="{x:g} {y:g} 0">
+    <geom name="warm_geom" type="box" size="{half:g} {half:g} 0.0015"
+          pos="0 0 0.0015" material="warm" contype="0" conaffinity="0"/>
+  </body>
+"""
+THREAT_BODY = """
+  <body name="threat" mocap="true" pos="{x:g} {y:g} {z:g}">
+    <geom name="threat_geom" type="capsule" size="0.012 0.045"
+          euler="0 1.5708 0" material="threat"
+          contype="0" conaffinity="0" density="0"/>
+  </body>
+"""
+SHELTER_MATERIAL = '<material name="shelter" rgba="0.38 0.36 0.34 1"/>'
+WARM_MATERIAL = '<material name="warm" rgba="0.62 0.30 0.20 1"/>'
+THREAT_MATERIAL = '<material name="threat" rgba="0.20 0.18 0.16 1"/>'
+
 
 
 def sha256_text(text):
@@ -79,7 +132,8 @@ def sha256_file(path):
 
 
 def build(source_text, texrepeat=None, fovy=None, offwidth=None, offheight=None,
-          prey_radius=None, prey_rgba="0.55 0.35 0.18 1"):
+          prey_radius=None, prey_rgba="0.55 0.35 0.18 1",
+          shelter=None, warm_patch=None, threat=None):
     """Return (xml_text, edits). Raises if a requested edit has no target."""
     root = ET.fromstring(source_text)
     edits = []
@@ -99,6 +153,47 @@ def build(source_text, texrepeat=None, fovy=None, offwidth=None, offheight=None,
                       "before": "absent", "after": f"mocap sphere r={prey_radius:g} m",
                       "reason": "the animal must see its food rather than be told where it is; "
                                 "mocap keeps nq/nv unchanged and the prey collides with nothing"})
+
+    if shelter is not None:
+        half, x, y = float(shelter[0]), float(shelter[1]), float(shelter[2])
+        if not (half > 0):
+            raise ValueError("shelter half-width must be positive")
+        # The gap has to admit the animal. Trunk height walking is 19-27 mm, so
+        # a 32 mm clearance is enough to enter without being a room. INVENTED:
+        # no crevice-height preference has ever been measured in this species,
+        # and the "tight hide" rule every care sheet states has zero primary
+        # support.
+        post = 0.016
+        assets = root.find("asset")
+        assets.append(ET.fromstring(SHELTER_MATERIAL))
+        worldbody.append(ET.fromstring(SHELTER_BODY.format(
+            half=half, x=x, y=y, roof=post * 2, post=post, edge=half - 0.008)))
+        edits.append({"element": "worldbody", "attribute": "shelter",
+                      "before": "absent",
+                      "after": f"crevice {2*half:g} m wide, {2*post:g} m clearance, "
+                               f"at ({x:g}, {y:g})"})
+
+    if warm_patch is not None:
+        half, x, y = float(warm_patch[0]), float(warm_patch[1]), float(warm_patch[2])
+        if not (half > 0):
+            raise ValueError("warm patch half-width must be positive")
+        assets = root.find("asset")
+        assets.append(ET.fromstring(WARM_MATERIAL))
+        worldbody.append(ET.fromstring(WARM_PATCH.format(half=half, x=x, y=y)))
+        edits.append({"element": "worldbody", "attribute": "warm_patch",
+                      "before": "absent",
+                      "after": f"surface {2*half:g} m across at ({x:g}, {y:g}); "
+                               "GEOMETRY ONLY -- MuJoCo has no thermal physics, "
+                               "the temperature lives in the environment"})
+
+    if threat is not None:
+        x, y, z = (float(v) for v in threat)
+        assets = root.find("asset")
+        assets.append(ET.fromstring(THREAT_MATERIAL))
+        worldbody.append(ET.fromstring(THREAT_BODY.format(x=x, y=y, z=z)))
+        edits.append({"element": "worldbody", "attribute": "threat",
+                      "before": "absent",
+                      "after": f"mocap capsule at ({x:g}, {y:g}, {z:g})"})
 
     if texrepeat is not None:
         found = [m for m in root.iter("material") if m.get("name") == "grid"]
@@ -192,10 +287,32 @@ def assert_body_unchanged(source_text, world_text):
                         raise ValueError(f"World changed the animal: {name}.{field} differs")
         added = [n for n in by_name(b, mujoco.mjtObj.mjOBJ_BODY, b.nbody)
                  if n and n not in by_name(a, mujoco.mjtObj.mjOBJ_BODY, a.nbody)]
+        # WHAT THIS GUARD ACTUALLY CARES ABOUT IS DEGREES OF FREEDOM, and it
+        # used to test a proxy for them. It required every added body to be
+        # mocap, on the reasoning that a mocap body cannot enter qpos -- true,
+        # but so is a STATIC body with no joints, and the guard rejected those
+        # too. Verified directly against this body: adding a jointless box
+        # leaves nq at 39 and nv at 38, unchanged, while nbody goes 24 -> 25.
+        #
+        # That mattered because shelter and a warm surface have to be part of
+        # the world and cannot be mocap: they are scenery the animal walks on
+        # and under. Testing the proxy would have forced them to be fake.
+        #
+        # So the check is now the thing itself: nq and nv must be identical,
+        # and any added body must be mocap OR jointless. A body carrying a
+        # joint changes the animal's state vector and is still refused.
+        if (a.nq, a.nv) != (b.nq, b.nv):
+            raise ValueError(
+                f"World changed the animal's state vector: nq {a.nq} -> {b.nq}, "
+                f"nv {a.nv} -> {b.nv}. Added bodies must add no degrees of freedom.")
         for name in added:
             index = by_name(b, mujoco.mjtObj.mjOBJ_BODY, b.nbody)[name]
-            if not b.body_mocapid[index] >= 0:
-                raise ValueError(f"Added world body {name!r} is not mocap; it would enter qpos.")
+            mocap = b.body_mocapid[index] >= 0
+            jointless = int(b.body_jntnum[index]) == 0
+            if not (mocap or jointless):
+                raise ValueError(
+                    f"Added world body {name!r} carries {int(b.body_jntnum[index])} "
+                    "joint(s) and is not mocap, so it would enter qpos.")
         return added
     finally:
         for path in paths:
@@ -205,6 +322,20 @@ def assert_body_unchanged(source_text, world_text):
 def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+    p.add_argument("--shelter", type=float, nargs=3, default=None,
+                   metavar=("HALF", "X", "Y"),
+                   help="crevice under a raised slab. This species does not dig; "
+                        "it uses voids that already exist.")
+    p.add_argument("--warm-patch", type=float, nargs=3, default=None,
+                   metavar=("HALF", "X", "Y"),
+                   help="warm SURFACE, not a lamp. Body temperature tracks the "
+                        "substrate at r2=0.97 against air at 0.92 -- the animal "
+                        "is thigmothermic and warms by lying on the ground.")
+    p.add_argument("--threat", type=float, nargs=3, default=None,
+                   metavar=("X", "Y", "Z"),
+                   help="a mocap predator. Caveat: for this species a visual "
+                        "threat alone triggers a defensive reaction on 0.07 of "
+                        "trials against 0.21 for scent.")
     p.add_argument("--texrepeat", type=float, default=None,
                    help="checker repeats per metre; the committed body uses 6 (16.7 cm squares)")
     p.add_argument("--fovy", type=float, default=None,
@@ -222,7 +353,9 @@ def main(argv=None):
 
     source_text = a.source.read_text(encoding="utf-8")
     world_text, edits = build(source_text, a.texrepeat, a.fovy, a.offwidth, a.offheight,
-                              a.prey_radius, a.prey_rgba)
+                              a.prey_radius, a.prey_rgba,
+                              shelter=a.shelter, warm_patch=a.warm_patch,
+                              threat=a.threat)
     added = assert_body_unchanged(source_text, world_text)
 
     header = ("<!-- GENERATED by utils/build_world.py from "

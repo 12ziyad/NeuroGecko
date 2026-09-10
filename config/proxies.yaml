@@ -978,6 +978,34 @@
         "confidence": "uncertain", "recording_temp_C": null,
         "notes": "Digesting a meal costs a large multiple of resting metabolism, so a naive model that adds meal energy without subtracting the cost of processing it overstates the benefit of eating. NOT implemented yet; recorded so the omission is visible."
       },
+      "shelter_retreat_type": {
+        "value": 0.0,
+        "units": "categorical, 0 = crevice under a rock", "species": "E_macularius", "sample_size": null,
+        "source": "Field observation, Salt Range and Potohar Plateau, Pakistan: the animal 'inhabits holes and crevices in gravel-mixed stony terrain', and retreat chambers traced through a demolished stone field wall ran from surface openings through narrow passages into chambers. Verbatim on excavation: 'The lizards apparently had done nothing in the setting of the site' -- the voids are masonry artefacts. Khan, M. S. (2009).",
+        "confidence": "uncertain", "recording_temp_C": null,
+        "notes": "GREY-FIELD, and flagged loudly. The source is a non-peer-reviewed manuscript by a career field herpetologist, and it is the richest description of wild habitat that exists for this species -- peer-reviewed papers cite it as the natural-history authority. It has no sample sizes, no protocols and no statistics. THIS SPECIES DOES NOT DIG: it uses voids that already exist. So the world gets a rock with a gap under it, not diggable ground. The often-repeated 'tight hide' rule from care sheets has ZERO primary support in this species and no tightness-of-fit experiment has ever been done."
+      },
+      "warm_surface_temperature_C": {
+        "value": 30.0,
+        "units": "degrees Celsius", "species": "E_macularius", "sample_size": null,
+        "source": "Voluntarily maintained body temperature of 30 C for 13.5 h/day when a heat source was available; geckos held at a constant 25 C grew 0.11 g/day against 0.16 for thermoregulating animals. Autumn & De Nardo 1995, J Herpetol 29(2):157-162.",
+        "confidence": "likely", "recording_temp_C": null,
+        "notes": "PUBLISHED and THIS SPECIES. Two other studies give 28.2 +/- 0.6 (Angilletta et al. 1999) and 25.8 +/- 1.0 (Werner et al. 2005) using different methods, so the honest model is a DIEL RAMP from about 26 C in the morning to 30 C at dusk rather than a single set point -- Angilletta measured exactly that rise and proposed it as what initiates evening emergence. The warm surface is 30 C because that is the top of the ramp and the value the animal chose when it could choose."
+      },
+      "thigmothermy_substrate_correlation": {
+        "value": 0.97,
+        "units": "r-squared", "species": "E_macularius", "sample_size": 12,
+        "source": "Body temperature tracked SUBSTRATE temperature at r2 = 0.97, against terrarium air loggers at 0.92-0.93 and atmospheric at 0.92-0.93. Authors' conclusion verbatim: 'E. macularius relies on absorbing heat from the ground and is thigmothermic.' Hastings et al. 2023, Biology Open 12(10):bio060114. n = 12 adults, IR thermography plus iButton loggers, 25 -> 15 -> 25 C over 7 h.",
+        "confidence": "verified", "recording_temp_C": null,
+        "notes": "PUBLISHED, THIS SPECIES, and it refutes how this project modelled basking. The animal does not take heat from light -- it takes it from the GROUND, by lying on it. Melanistic pigment had no effect on heating rate (r2 = -0.08, P = 0.68), which is further evidence against radiation-driven warming. So the world needs a warm SURFACE, not a lamp, and the 'bask' behaviour channel is named for a mechanism this animal does not use."
+      },
+      "shelter_choice_beats_safety": {
+        "value": 1.0,
+        "units": "boolean, 1 = heat wins", "species": "E_macularius", "sample_size": 8,
+        "source": "Given a choice between safe COOL shelter and an exposed HEATED open area, geckos 'selected heat sources over shelters'. Substrate moisture also emerged as a significant factor in shelter choice, and temperature may act as an activity cue alongside the light cycle. Craioveanu, Craioveanu & Miresan 2017, Zoo Biology 36(4):273-277, n = 8 juveniles.",
+        "confidence": "uncertain", "recording_temp_C": null,
+        "notes": "PUBLISHED and THIS SPECIES, but n = 8 JUVENILES and the paper is paywalled -- the actual temperatures, humidities and time budgets could not be read, only the abstract's conclusion. It matters because it is a measured conflict between two drives, which is exactly what an action-selection model should have to resolve. Corroborating in another genus: 9 Gehyra species, n = 85, used a humid crevice for under 10 % of crevice time whenever the dry alternative was warmer."
+      },
       "prey_velocity_peak_deg_s": {
         "value": 45.0,
         "units": "deg/s", "species": "cross-lineage convergence", "sample_size": null,

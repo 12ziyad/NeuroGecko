@@ -1,0 +1,57 @@
+{
+ "schema_version": 1,
+ "generator": "utils/build_world.py",
+ "source": "morphology/gecko_body_lab_v2.xml",
+ "source_sha256": "db650f6bf55852cb3d1f24a642091024abef2cb55b1bf00380da4e33446049f3",
+ "output": "morphology/gecko_habitat_v1.xml",
+ "output_sha256": "a8d40a2f0d160018fa43e7c4bd34f3af34fdc76c6f811cb62bbd00e133bf54b3",
+ "edits": [
+  {
+   "element": "worldbody",
+   "attribute": "prey",
+   "before": "absent",
+   "after": "mocap sphere r=0.009 m",
+   "reason": "the animal must see its food rather than be told where it is; mocap keeps nq/nv unchanged and the prey collides with nothing"
+  },
+  {
+   "element": "worldbody",
+   "attribute": "shelter",
+   "before": "absent",
+   "after": "crevice 0.11 m wide, 0.032 m clearance, at (-0.3, 0.16)"
+  },
+  {
+   "element": "worldbody",
+   "attribute": "warm_patch",
+   "before": "absent",
+   "after": "surface 0.14 m across at (0.28, -0.2); GEOMETRY ONLY -- MuJoCo has no thermal physics, the temperature lives in the environment"
+  },
+  {
+   "element": "worldbody",
+   "attribute": "threat",
+   "before": "absent",
+   "after": "mocap capsule at (0, 0.45, 0.3)"
+  },
+  {
+   "element": "material grid",
+   "attribute": "texrepeat",
+   "before": "6 6",
+   "after": "50 50",
+   "reason": "optic flow needs features at a scale the animal crosses"
+  },
+  {
+   "element": "camera head_cam",
+   "attribute": "fovy",
+   "before": "120",
+   "after": "70",
+   "reason": "a wider field spends the same pixels on more world"
+  }
+ ],
+ "note": "",
+ "world_bodies_added": [
+  "prey",
+  "shelter",
+  "warm_patch",
+  "threat"
+ ],
+ "asserted": "every named body, geom, site and actuator of the animal verified identical to the source at build time, compared by name; nq/nv/nu/njnt/nsensor unchanged; any added world body verified mocap so it cannot enter qpos"
+}

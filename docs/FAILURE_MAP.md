@@ -29,7 +29,7 @@ later turned out to be right gets a second row, not an edit.
 | **Research** — 167 agents, 276 published measurements, fact-checked | ✅ done |
 | **Body** — 38 g lab morphology, 14/14 static checks | ✅ done |
 | **Walking** — base controller, 4/6 gates, accepted | ✅ done |
-| **World** — no cheat, textured floor, narrowed camera, fleeing prey | ✅ done |
+| **World** — no cheat, textured floor, fleeing prey, **shelter + warm surface + threat** | ✅ done |
 | **Brain 1/8 — hypothalamus** (hunger, energy, fatigue, thermostat) | ✅ done |
 | **Brain 2/8 — basal ganglia** (action selection) | ✅ reproduces the published table, mean error 0.10 pp |
 | **Brain 3a/8 — spinal rhythm** (the leg oscillators) | ✅ drives the walker, every gate unchanged |
@@ -958,6 +958,10 @@ retrieve" into "does not exist."
 | 188 | A single-frame difference can measure prey speed | **Refuted -- the band is finer than the instrument** | real prey moves **0.02-0.12 cells per frame**: at the registry's 0.047 m/s a cricket subtends 26.9 deg/s at 0.10 m and 5.4 at 0.50 m, needing **8 to 41 frames to cross one cell**. Differencing successive frames returned whatever the centroid noise was -- the same 0.3 px/frame stimulus read 110 deg/s and a 0.8 px/frame one read 0.0. Replaced with a windowed estimate that **refuses** rather than guesses below one cell of travel |
 | 189 | The windowed estimate makes the velocity rule usable | **Refuted, and this is the honest limit** | measured over 120 frames of sustained motion: **9 deg/s reads 52 (484 % error), 27 reads 58 (114 %), 60 reads 62 (3 %), 150 reads 155 (3 %), 400 reads 414 (3 %)**. Accurate from ~60 deg/s upward and wrong below it -- and a cricket across the whole working range of 0.10-0.50 m sits at **5-27 deg/s**, entirely inside the unreliable band. **So the rule does not currently discriminate real prey.** It does no harm (the over-estimate lands near the peak, so prey is accepted rather than rejected) and it correctly rejects the genuinely too-fast and too-slow. Raising the resolvability floor from half a cell to a full cell moved the 9 deg/s error from 480 % to 484 %, so the fix is a finer map or a longer window, not a threshold |
 | 190 | Adding a rule cannot break an existing passing test | **Refuted** | `test_it_reports_the_side_the_target_is_on` placed its synthetic cricket at rows 30:34 of a 64 px frame -- the exact vertical midline, which the new rule reads as the **horizon**. The target became ambiguous by design and was rejected. The vertical position was always incidental to a left-versus-right test, and it had never put the target where a cricket actually is, which is on the ground below the horizon. Moved to rows 44:48 and **the edit is documented in the test itself**, because changing a passing test to accommodate new code is exactly the move this project's rules exist to catch |
+| 191 | The gecko basks under a light | **Refuted** | it is **thigmothermic**. Body temperature tracks the **substrate** at r2=0.97 against air at 0.92-0.93, n=12, and melanistic pigment has no effect on heating rate (r2=-0.08, P=0.68) -- so warming is by CONTACT, not radiation. The world therefore gets a warm **surface**, not a lamp, and the `bask` behaviour channel is named for a mechanism this animal does not use |
+| 192 | The animal digs itself a burrow | **Refuted** | it uses voids that **already exist**. Retreat chambers traced through a demolished stone field wall were masonry artefacts -- verbatim, "the lizards apparently had done nothing in the setting of the site". So shelter is a raised slab with a crevice under it rather than diggable ground. GREY-FIELD: the source is a non-peer-reviewed field manuscript, and it is still the best description of wild habitat that exists for this species |
+| 193 | An added world body must be mocap or it enters qpos | **Refuted -- that tests a proxy** | the guard refused any non-mocap addition, which would have forced shelter and a warm surface to be fake objects the animal could walk through. A **jointless static** body adds no degrees of freedom either: verified against this body, adding a jointless box leaves nq at 39 and nv at 38 unchanged while nbody goes 24 -> 25. The check now tests the thing it cares about -- nq and nv identical, and every added body mocap **or** jointless. A body carrying a joint is still refused |
+| 194 | Safety beats warmth when the animal chooses shelter | **Refuted** | given a safe **cool** shelter against an exposed **heated** open area, geckos "selected heat sources over shelters" (n=8 juveniles). Corroborated in another genus: 9 *Gehyra* species, n=85, used a humid crevice for under 10 % of crevice time whenever the dry alternative was warmer. A measured conflict between two drives, which is what an action-selection model should have to resolve |
 
 ### #138 and #134 — the two I told the user were true
 
@@ -1055,8 +1059,8 @@ Recorded so the gaps stay visible rather than getting invented later:
 
 | | |
 |---|---|
-| Hypotheses tested | **190** |
-| Refuted | **153** |
+| Hypotheses tested | **194** |
+| Refuted | **157** |
 | Confirmed | **26** |
 | Partly | **10** |
 | My own method errors | **35** |
