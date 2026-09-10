@@ -306,8 +306,10 @@ def chart_provenance(reg):
 
     ax = fig.add_subplot(gs[2])
     top = spec.most_common(6)[::-1]
-    short = [k.replace("_", " ").replace("PROXY (", "proxy: ").replace(")", "")
-             for k, _ in top]
+    short = []
+    for k, _ in top:
+        t = k.replace("_", " ").replace("PROXY (", "proxy: ").replace(")", "")
+        short.append(t if len(t) <= 22 else t[:21] + "…")
     ax.barh(short, [v for _, v in top],
             color=GREEN, height=.6)
     for i, (_, v) in enumerate(top):

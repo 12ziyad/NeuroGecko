@@ -1175,5 +1175,16 @@
   "removed": 3,
   "data_files": 3,
   "data_added": 1100
+ },
+ {
+  "hash": "a6f4bc8",
+  "full": "a6f4bc81c2212f9659e6c2d89a541b0d8aff2bab",
+  "date": "2026-09-11",
+  "subject": "Session 11: the whole project as one document, and the scoreboard had drifted",
+  "files": 4,
+  "added": 2623,
+  "removed": 5,
+  "data_files": 27,
+  "data_added": 7584
  }
 ]
