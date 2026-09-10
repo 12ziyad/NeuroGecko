@@ -1,0 +1,2259 @@
+{
+ "citations": {
+  "Albeck 2022": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Albeck 2022",
+    "Albeck et al. 2022"
+   ]
+  },
+  "Albeck 2026": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Albeck & Shein-Idelson 2026"
+   ]
+  },
+  "Angilletta 1999": {
+   "cited_by": [
+    "#197",
+    "activity_peak_window_h",
+    "warm_surface_temperature_C"
+   ],
+   "count": 3,
+   "written_as": [
+    "Angilletta et al. 1999"
+   ]
+  },
+  "Antinucci 2019": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Antinucci 2019"
+   ]
+  },
+  "Antinucci 2025": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Antinucci 2025"
+   ]
+  },
+  "Aoi 2017": {
+   "cited_by": [
+    "docs/research/no_gecko_and_appearance.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Aoi et al. 2017"
+   ]
+  },
+  "Arden 1962": {
+   "cited_by": [
+    "docs/research/no_gecko_and_appearance.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Arden & Tansley 1962"
+   ]
+  },
+  "Arnold 2014": {
+   "cited_by": [
+    "hip_rot_max_range_deg"
+   ],
+   "count": 1,
+   "written_as": [
+    "Arnold et al. 2014"
+   ]
+  },
+  "Ausborn 2019": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Ausborn 2019",
+    "Ausborn et al. 2019"
+   ]
+  },
+  "Autumn 1994": {
+   "cited_by": [
+    "cost_of_transport_mL_O2_per_kg_per_m",
+    "docs/research/gecko_scorecard.md"
+   ],
+   "count": 2,
+   "written_as": [
+    "Autumn, Weinstein & Full 1994"
+   ]
+  },
+  "Autumn 1997": {
+   "cited_by": [
+    "cost_of_transport_mL_O2_per_kg_per_m",
+    "docs/research/beyond_statistics_realism.md"
+   ],
+   "count": 2,
+   "written_as": [
+    "Autumn et al. 1997",
+    "Autumn, Farley, Emshwiller & Full 1997"
+   ]
+  },
+  "Barker 2015": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Barker & Baier 2015"
+   ]
+  },
+  "Beiran 2025": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Beiran & Litwin-Kumar 2025"
+   ]
+  },
+  "Bene 2010": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Bene 2010"
+   ]
+  },
+  "Berezhnoi 2024": {
+   "cited_by": [
+    "docs/research/strategy_v1.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Berezhnoi et al. 2024"
+   ]
+  },
+  "Bergel 2026": {
+   "cited_by": [
+    "#155",
+    "#198",
+    "docs/research/best_achievable_brain.md",
+    "sleep_cycle_period_s"
+   ],
+   "count": 4,
+   "written_as": [
+    "Bergel 2026",
+    "Bergel et al. 2026"
+   ]
+  },
+  "Bianco 2015": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Bianco & Engert 2015"
+   ]
+  },
+  "Bolton 2019": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Bolton 2019"
+   ]
+  },
+  "Bovi 2011": {
+   "cited_by": [
+    "docs/research/beyond_statistics_realism.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Bovi et al. 2011"
+   ]
+  },
+  "Bowers 2023": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Bowers 2023"
+   ]
+  },
+  "Brunton 2026": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Brunton & Abe 2026"
+   ]
+  },
+  "Butler 1971": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Butler & Northcutt 1971"
+   ]
+  },
+  "CPG-RL 2022": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "CPG-RL 2022"
+   ]
+  },
+  "Cabelguen 2003": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Cabelguen 2003"
+   ]
+  },
+  "Caggiano 2018": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Caggiano 2018"
+   ]
+  },
+  "Chen 2006": {
+   "cited_by": [
+    "docs/research/strategy_v1.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Chen 2006"
+   ]
+  },
+  "Chong 2022": {
+   "cited_by": [
+    "docs/research/no_gecko_and_appearance.md",
+    "docs/research/strategy_v1.md"
+   ],
+   "count": 2,
+   "written_as": [
+    "Chong 2022",
+    "Chong et al. 2022"
+   ]
+  },
+  "Citron 1973": {
+   "cited_by": [
+    "docs/EYE_SPEC.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Citron & Pinto 1973"
+   ]
+  },
+  "Clark 2011": {
+   "cited_by": [
+    "docs/research/no_gecko_and_appearance.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Clark 2011"
+   ]
+  },
+  "Clark 2021": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Clark et al. 2021",
+    "Clark, Clark & Higham 2021"
+   ]
+  },
+  "Cooper 1995": {
+   "cited_by": [
+    "tongue_flick_baseline_per_min"
+   ],
+   "count": 1,
+   "written_as": [
+    "Cooper 1995"
+   ]
+  },
+  "Cooper 1996": {
+   "cited_by": [
+    "docs/research/gecko_scorecard.md",
+    "docs/research/strategy_v1.md"
+   ],
+   "count": 2,
+   "written_as": [
+    "Cooper 1996",
+    "Cooper, DePerno & Steele 1996"
+   ]
+  },
+  "Craioveanu 2017": {
+   "cited_by": [
+    "shelter_choice_beats_safety"
+   ],
+   "count": 1,
+   "written_as": [
+    "Craioveanu, Craioveanu & Miresan 2017"
+   ]
+  },
+  "Crozier 1939": {
+   "cited_by": [
+    "docs/research/no_gecko_and_appearance.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Crozier & Wolf 1939"
+   ]
+  },
+  "Damme 2001": {
+   "cited_by": [
+    "docs/research/beyond_statistics_realism.md",
+    "docs/research/gecko_scorecard.md"
+   ],
+   "count": 2,
+   "written_as": [
+    "Damme, Herrel & Aerts 2001"
+   ]
+  },
+  "Davies 2017": {
+   "cited_by": [
+    "docs/research/gecko_scorecard.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Davies 2017"
+   ]
+  },
+  "Day 2001": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Day 2001",
+    "Day et al. 2001"
+   ]
+  },
+  "DeWolf 2016": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "DeWolf 2016",
+    "DeWolf et al. 2016"
+   ]
+  },
+  "Delheusy 1995": {
+   "cited_by": [
+    "#150",
+    "#152",
+    "#172",
+    "strike_duration_s",
+    "strike_trigger_distance_m"
+   ],
+   "count": 5,
+   "written_as": [
+    "Delheusy et al. 1995",
+    "Delheusy, Brillet & Bels 1995"
+   ]
+  },
+  "Devetak 2007": {
+   "cited_by": [
+    "#162"
+   ],
+   "count": 1,
+   "written_as": [
+    "Devetak et al. 2007"
+   ]
+  },
+  "Di Nardo 1995": {
+   "cited_by": [
+    "warm_surface_temperature_C"
+   ],
+   "count": 1,
+   "written_as": [
+    "Di Nardo 1995"
+   ]
+  },
+  "Dieringer 1983": {
+   "cited_by": [
+    "docs/EYE_SPEC.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Dieringer 1983"
+   ]
+  },
+  "Digirolamo 2024": {
+   "cited_by": [
+    "activity_onset_after_dark_s",
+    "activity_peak_window_h"
+   ],
+   "count": 2,
+   "written_as": [
+    "Digirolamo 2024"
+   ]
+  },
+  "Dodt 1961": {
+   "cited_by": [
+    "docs/research/no_gecko_and_appearance.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Dodt & Jessen 1961"
+   ]
+  },
+  "Doerig 2023": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Doerig 2023"
+   ]
+  },
+  "Dorkenwald 2024": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Dorkenwald 2024"
+   ]
+  },
+  "Doya 2002": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Doya 2002"
+   ]
+  },
+  "Escontrela 2022": {
+   "cited_by": [
+    "docs/research/strategy_v1.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Escontrela et al. 2022"
+   ]
+  },
+  "Evans 2018": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Evans 2018"
+   ]
+  },
+  "Ewert 1969": {
+   "cited_by": [
+    "prey_velocity_high_cut_deg_s",
+    "prey_velocity_peak_deg_s"
+   ],
+   "count": 2,
+   "written_as": [
+    "Ewert 1969"
+   ]
+  },
+  "Falisse 2019": {
+   "cited_by": [
+    "docs/research/beyond_statistics_realism.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Falisse et al. 2019"
+   ]
+  },
+  "Farrow 2025": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Farrow 2025"
+   ]
+  },
+  "Feather 2025": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Feather et al. 2025"
+   ]
+  },
+  "Fenk 2023": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Fenk 2023"
+   ]
+  },
+  "Fenk 2024": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Fenk 2024",
+    "Fenk, Riquelme & Laurent 2024"
+   ]
+  },
+  "Fernandes 2021": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Fernandes 2021"
+   ]
+  },
+  "Fernandez-Lazaro 2023": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Fernández-Lázaro 2023"
+   ]
+  },
+  "Fleishman 1986": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Fleishman 1986"
+   ]
+  },
+  "Fleishman's 2024": {
+   "cited_by": [
+    "docs/research/no_gecko_and_appearance.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Fleishman's 2024"
+   ]
+  },
+  "Forster 2020": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Förster 2020"
+   ]
+  },
+  "Foster 2012": {
+   "cited_by": [
+    "docs/research/no_gecko_and_appearance.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Foster & Higham 2012"
+   ]
+  },
+  "Fournier 2018": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Fournier 2018"
+   ]
+  },
+  "Fremaux 2013": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Frémaux 2013",
+    "Frémaux, Sprekeler & Gerstner 2013"
+   ]
+  },
+  "Frydlova 2026": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md",
+    "docs/research/gecko_scorecard.md",
+    "docs/research/strategy_v1.md",
+    "predator_reaction_chemical"
+   ],
+   "count": 4,
+   "written_as": [
+    "Frydlova et al. 2026",
+    "Frydlová 2026",
+    "Frýdlová 2026",
+    "Frýdlová et al. 2026"
+   ]
+  },
+  "Fuller 2011": {
+   "cited_by": [
+    "docs/DECISIONS.md",
+    "docs/research/best_achievable_brain.md",
+    "docs/research/no_gecko_and_appearance.md",
+    "femur_tibia_ratio",
+    "fuller_femur_m",
+    "fuller_svl_m",
+    "fuller_tibia_m",
+    "hindlimb_length_svl",
+    "stride_length_svl_range"
+   ],
+   "count": 9,
+   "written_as": [
+    "Fuller 2011",
+    "Fuller et al. 2011",
+    "Fuller, Higham & Clark 2011"
+   ]
+  },
+  "Gahtan 2005": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Gahtan 2005"
+   ]
+  },
+  "Gamble 2012": {
+   "cited_by": [
+    "docs/research/strategy_v1.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Gamble et al. 2012"
+   ]
+  },
+  "Girard 2003": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md",
+    "docs/research/strategy_v1.md"
+   ],
+   "count": 2,
+   "written_as": [
+    "Girard 2003",
+    "Girard et al. 2003"
+   ]
+  },
+  "Girard 2005": {
+   "cited_by": [
+    "#64",
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 2,
+   "written_as": [
+    "Girard 2005"
+   ]
+  },
+  "Girard 2008": {
+   "cited_by": [
+    "docs/BLOCKED.md",
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 2,
+   "written_as": [
+    "Girard et al. 2008"
+   ]
+  },
+  "Gonzalez 1990": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Gonzalez et al. 1990"
+   ]
+  },
+  "Grillner 2013": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Grillner 2013"
+   ]
+  },
+  "Grimbly 2026": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Grimbly et al. 2026"
+   ]
+  },
+  "Gurney 2001": {
+   "cited_by": [
+    "docs/BLOCKED.md",
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 2,
+   "written_as": [
+    "Gurney, Prescott & Redgrave 2001"
+   ]
+  },
+  "Gurney 2015": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Gurney 2015",
+    "Gurney, Humphries & Redgrave 2015"
+   ]
+  },
+  "Ha 2017": {
+   "cited_by": [
+    "resting_metabolic_rate_mL_O2_per_g_per_h"
+   ],
+   "count": 1,
+   "written_as": [
+    "Ha et al. 2017"
+   ]
+  },
+  "Hammel 1967": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Hammel 1967"
+   ]
+  },
+  "Han 2024": {
+   "cited_by": [
+    "#156",
+    "docs/research/gecko_scorecard.md",
+    "docs/research/strategy_v1.md"
+   ],
+   "count": 3,
+   "written_as": [
+    "Han & Carr 2024"
+   ]
+  },
+  "Harischandra 2011": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md",
+    "docs/research/strategy_v1.md"
+   ],
+   "count": 2,
+   "written_as": [
+    "Harischandra 2011"
+   ]
+  },
+  "Hastings 2023": {
+   "cited_by": [
+    "thigmothermy_substrate_correlation"
+   ],
+   "count": 1,
+   "written_as": [
+    "Hastings et al. 2023"
+   ]
+  },
+  "Hatori 2025": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Hatori 2025",
+    "Hatori et al. 2025"
+   ]
+  },
+  "Hausdorff 1996": {
+   "cited_by": [
+    "docs/research/beyond_statistics_realism.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Hausdorff et al. 1996"
+   ]
+  },
+  "Healy 2013": {
+   "cited_by": [
+    "docs/research/no_gecko_and_appearance.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Healy et al. 2013"
+   ]
+  },
+  "Henriques 2019": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Henriques 2019"
+   ]
+  },
+  "Henselmans 1991": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Henselmans 1991"
+   ]
+  },
+  "Higham 2012": {
+   "cited_by": [
+    "docs/research/gecko_scorecard.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Higham & Russell 2012"
+   ]
+  },
+  "Higham 2015": {
+   "cited_by": [
+    "docs/research/beyond_statistics_realism.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Higham, Birn-Jeffery, Collins, Hulsey & Russell 2015"
+   ]
+  },
+  "Higham 2019": {
+   "cited_by": [
+    "docs/EYE_SPEC.md",
+    "docs/research/gecko_scorecard.md"
+   ],
+   "count": 2,
+   "written_as": [
+    "Higham & Schmitz 2019"
+   ]
+  },
+  "Hobson 2012": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Hobson & Friston 2012"
+   ]
+  },
+  "Holmgren 2021": {
+   "cited_by": [
+    "#211"
+   ],
+   "count": 1,
+   "written_as": [
+    "Holmgren et al. 2021"
+   ]
+  },
+  "Hoogland 1993": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Hoogland & Vermeulen-VanderZee 1993"
+   ]
+  },
+  "Hoy 2019": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md",
+    "docs/research/strategy_v1.md"
+   ],
+   "count": 2,
+   "written_as": [
+    "Hoy 2019",
+    "Hoy et al. 2019",
+    "Hoy, Bishop & Niell 2019"
+   ]
+  },
+  "Huebotter 2025": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Huebotter 2025"
+   ]
+  },
+  "Humphries 2002": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Humphries & Gurney 2002"
+   ]
+  },
+  "Iijima 2025": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Iijima, Blob & Hutchinson 2025"
+   ]
+  },
+  "Ijspeert 2007": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md",
+    "docs/research/strategy_v1.md"
+   ],
+   "count": 2,
+   "written_as": [
+    "Ijspeert 2007"
+   ]
+  },
+  "Jagnandan 2014": {
+   "cited_by": [
+    "body_mass_kg",
+    "calibration_temperature_C",
+    "com_intact_svl",
+    "com_study_body_mass_kg",
+    "com_study_svl_m",
+    "com_study_tail_volume_m3",
+    "com_tail_excluded_svl",
+    "docs/research/best_achievable_brain.md",
+    "docs/research/gecko_scorecard.md",
+    "docs/research/no_gecko_and_appearance.md",
+    "hindlimb_length_svl",
+    "hip_height_svl",
+    "shoulder_height_svl",
+    "shoulder_hip_ratio",
+    "stride_length_svl_range",
+    "tail_mass_fraction",
+    "trunk_pitch_deg",
+    "trunk_pitch_sem_deg"
+   ],
+   "count": 18,
+   "written_as": [
+    "Jagnandan 2014",
+    "Jagnandan, Russell & Higham 2014"
+   ]
+  },
+  "Jagnandan 2017": {
+   "cited_by": [
+    "body_mass_kg",
+    "calibration_temperature_C",
+    "docs/DECISIONS.md",
+    "docs/research/beyond_statistics_realism.md",
+    "docs/research/gecko_scorecard.md",
+    "docs/research/no_gecko_and_appearance.md",
+    "docs/research/strategy_v1.md",
+    "fore_duty_factor",
+    "fore_duty_factor_tolerance",
+    "hind_duty_factor",
+    "hind_duty_factor_range",
+    "hip_proret_min_range_deg",
+    "lab_base_parameters",
+    "stride_length_svl_range",
+    "walking_speed_m_s_range"
+   ],
+   "count": 15,
+   "written_as": [
+    "Jagnandan & Higham 2017",
+    "Jagnandan 2017"
+   ]
+  },
+  "Jagnandan 2018": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md",
+    "docs/research/beyond_statistics_realism.md",
+    "docs/research/gecko_scorecard.md",
+    "docs/research/strategy_v1.md",
+    "emg_hindlimb_preautotomy"
+   ],
+   "count": 5,
+   "written_as": [
+    "Jagnandan & Higham 2018"
+   ]
+  },
+  "Johnson 2020": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Johnson 2020"
+   ]
+  },
+  "Kaldenbach 2016": {
+   "cited_by": [
+    "prey_velocity_low_cut_deg_s",
+    "prey_velocity_peak_deg_s"
+   ],
+   "count": 2,
+   "written_as": [
+    "Kaldenbach, Bleckmann & Kohl 2016"
+   ]
+  },
+  "Kanou 1999": {
+   "cited_by": [
+    "docs/research/strategy_v1.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Kanou 1999",
+    "Kanou et al. 1999"
+   ]
+  },
+  "Karakasiliotis 2016": {
+   "cited_by": [
+    "docs/research/strategy_v1.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Karakasiliotis 2016"
+   ]
+  },
+  "Kawamoto 2025": {
+   "cited_by": [
+    "docs/research/no_gecko_and_appearance.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Kawamoto et al. 2025"
+   ]
+  },
+  "Kelber 2006": {
+   "cited_by": [
+    "docs/research/gecko_scorecard.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Kelber & Roth 2006"
+   ]
+  },
+  "Keller 2025": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Keller et al. 2025"
+   ]
+  },
+  "Keramati 2014": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md",
+    "docs/research/strategy_v1.md"
+   ],
+   "count": 2,
+   "written_as": [
+    "Keramati & Gutkin 2014"
+   ]
+  },
+  "Kim 2025": {
+   "cited_by": [
+    "docs/research/beyond_statistics_realism.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Kim & Lee 2025"
+   ]
+  },
+  "Kingsbury 1989": {
+   "cited_by": [
+    "docs/research/gecko_scorecard.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Kingsbury 1989"
+   ]
+  },
+  "Kiuchi 2023": {
+   "cited_by": [
+    "docs/research/strategy_v1.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Kiuchi 2023",
+    "Kiuchi et al. 2023"
+   ]
+  },
+  "Kojima 2021": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Kojima 2021"
+   ]
+  },
+  "Krizan 2024": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Krizan et al. 2024"
+   ]
+  },
+  "Kronke 2023": {
+   "cited_by": [
+    "activity_peak_window_h",
+    "docs/research/strategy_v1.md",
+    "ethogram_rest_s",
+    "ethogram_walk_svl",
+    "prey_flee_speed_reference_m_s"
+   ],
+   "count": 5,
+   "written_as": [
+    "Kronke & Xu 2023",
+    "Krönke & Xu 2023"
+   ]
+  },
+  "Kuhn 2025": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Kühn 2025"
+   ]
+  },
+  "Kundey 2021": {
+   "cited_by": [
+    "#153"
+   ],
+   "count": 1,
+   "written_as": [
+    "Kundey 2021"
+   ]
+  },
+  "Lagorio 2026": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Lagorio et al. 2026"
+   ]
+  },
+  "Landova 2023": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Landová 2023",
+    "Landová et al. 2023"
+   ]
+  },
+  "Landova 2025": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Landová 2025",
+    "Landová et al. 2025"
+   ]
+  },
+  "Lappalainen 2024": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Lappalainen 2024"
+   ]
+  },
+  "Lau 2025": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Lau, Fitzgerald & Bianco 2025"
+   ]
+  },
+  "Laurencon 2024": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Laurençon 2024",
+    "Laurençon et al. 2024"
+   ]
+  },
+  "Leberstein 2026": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Leberstein 2026",
+    "Leberstein et al. 2026"
+   ]
+  },
+  "Legare 2025": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Légaré et al. 2025"
+   ]
+  },
+  "Lindsey 2025": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Lindsey 2025",
+    "Lindsey et al. 2025"
+   ]
+  },
+  "Liu 2006": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Liu et al. 2006"
+   ]
+  },
+  "Lopez 2003": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "López 2003"
+   ]
+  },
+  "MIMIC-MJX 2025": {
+   "cited_by": [
+    "docs/research/strategy_v1.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "MIMIC-MJX 2025"
+   ]
+  },
+  "Malik 2025": {
+   "cited_by": [
+    "docs/research/strategy_v1.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Malik et al. 2025"
+   ]
+  },
+  "Manira 2026": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Manira 2026"
+   ]
+  },
+  "Manley 1996": {
+   "cited_by": [
+    "docs/research/gecko_scorecard.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Manley, Gallo & Köppl 1996"
+   ]
+  },
+  "Maroto-Gomez 2018": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Maroto-Gómez 2018",
+    "Maroto-Gómez et al. 2018"
+   ]
+  },
+  "Masseck 2008": {
+   "cited_by": [
+    "docs/EYE_SPEC.md",
+    "docs/research/best_achievable_brain.md",
+    "docs/research/gecko_scorecard.md",
+    "docs/research/no_gecko_and_appearance.md"
+   ],
+   "count": 4,
+   "written_as": [
+    "Masseck 2008",
+    "Masseck et al. 2008",
+    "Masseck, Roll & Hoffmann 2008",
+    "Masseck, Röll & Hoffmann 2008"
+   ]
+  },
+  "Masseck 2009": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Masseck & Hoffmann 2009"
+   ]
+  },
+  "McDonald 2018": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "McDonald & Vickaryous 2018"
+   ]
+  },
+  "McElroy 2008": {
+   "cited_by": [
+    "docs/research/beyond_statistics_realism.md",
+    "docs/research/no_gecko_and_appearance.md",
+    "hind_duty_factor_range",
+    "lab_gait_touchdown_delays",
+    "limb_phase_range",
+    "prey_arena_radius_m"
+   ],
+   "count": 6,
+   "written_as": [
+    "McElroy 2008",
+    "McElroy et al. 2008",
+    "McElroy, Hickey & Reilly 2008"
+   ]
+  },
+  "McLean 2011": {
+   "cited_by": [
+    "docs/research/gecko_scorecard.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "McLean & Vickaryous 2011"
+   ]
+  },
+  "Mearns 2020": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Mearns 2020"
+   ]
+  },
+  "Medina 1991": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Medina & Smeets 1991"
+   ]
+  },
+  "Meneghini 1967": {
+   "cited_by": [
+    "docs/research/no_gecko_and_appearance.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Meneghini & Hamasaki 1967"
+   ]
+  },
+  "MuscleMimic 2026": {
+   "cited_by": [
+    "docs/research/beyond_statistics_realism.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "MuscleMimic 2026"
+   ]
+  },
+  "Mylonas 2026": {
+   "cited_by": [
+    "docs/research/beyond_statistics_realism.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Mylonas et al. 2026"
+   ]
+  },
+  "Norimoto 2020": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Norimoto 2020"
+   ]
+  },
+  "Nyakatura 2019": {
+   "cited_by": [
+    "docs/research/no_gecko_and_appearance.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Nyakatura et al. 2019"
+   ]
+  },
+  "O'Carroll 2008": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "O'Carroll 2008"
+   ]
+  },
+  "Oe 2013": {
+   "cited_by": [
+    "docs/research/strategy_v1.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Oe & Ogawa 2013"
+   ]
+  },
+  "Opstal 2022": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Opstal 2022"
+   ]
+  },
+  "Owaki 2017": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md",
+    "docs/research/no_gecko_and_appearance.md"
+   ],
+   "count": 2,
+   "written_as": [
+    "Owaki & Ishiguro 2017"
+   ]
+  },
+  "Pazzaglia 2025": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md",
+    "docs/research/strategy_v1.md"
+   ],
+   "count": 2,
+   "written_as": [
+    "Pazzaglia 2025",
+    "Pazzaglia et al. 2025"
+   ]
+  },
+  "Peng 2020": {
+   "cited_by": [
+    "docs/research/strategy_v1.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Peng et al. 2020"
+   ]
+  },
+  "Peng 2021": {
+   "cited_by": [
+    "docs/research/strategy_v1.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Peng 2021"
+   ]
+  },
+  "Phillips-Robinson 2007": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Phillips-Robinson 2007"
+   ]
+  },
+  "Platel 1976": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Platel 1976"
+   ]
+  },
+  "Prescott 2006": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Prescott 2006"
+   ]
+  },
+  "Prescott 2024": {
+   "cited_by": [
+    "#75",
+    "docs/BLOCKED.md",
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 3,
+   "written_as": [
+    "Prescott 2024",
+    "Prescott et al. 2024"
+   ]
+  },
+  "Probst 2023": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Probst 2023"
+   ]
+  },
+  "Qian 2025": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Qian et al. 2025"
+   ]
+  },
+  "Ravi 2020": {
+   "cited_by": [
+    "docs/research/beyond_statistics_realism.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Ravi et al. 2020",
+    "Ravi, Marmelat, Taylor, Newell, Stergiou & Singh 2020"
+   ]
+  },
+  "Rawat 2019": {
+   "cited_by": [
+    "head_width_svl",
+    "interorbital_distance_m",
+    "lab_head_height_svl",
+    "tail_length_svl"
+   ],
+   "count": 4,
+   "written_as": [
+    "Rawat et al. 2019"
+   ]
+  },
+  "Reilly 2006": {
+   "cited_by": [
+    "docs/research/beyond_statistics_realism.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Reilly, McElroy, Odum & Hornyak 2006"
+   ]
+  },
+  "Rodriguez 2002": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Rodríguez 2002"
+   ]
+  },
+  "Roll 2000": {
+   "cited_by": [
+    "docs/research/gecko_scorecard.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Röll 2000"
+   ]
+  },
+  "Ross 2013": {
+   "cited_by": [
+    "docs/research/beyond_statistics_realism.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Ross et al. 2013"
+   ]
+  },
+  "Roth 2004": {
+   "cited_by": [
+    "docs/research/strategy_v1.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Roth & Kelber 2004"
+   ]
+  },
+  "Roth 2009": {
+   "cited_by": [
+    "docs/research/no_gecko_and_appearance.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Roth et al. 2009"
+   ]
+  },
+  "Rueda-Alana 2025": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Rueda-Alaña 2025"
+   ]
+  },
+  "Russchen 1988": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Russchen & Jonker 1988"
+   ]
+  },
+  "Russell 2014": {
+   "cited_by": [
+    "docs/research/gecko_scorecard.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Russell, Lai, Powell & Higham 2014"
+   ]
+  },
+  "Rybak 2006": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Rybak & McCrea 2006"
+   ]
+  },
+  "Rybak 2024": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Rybak 2024",
+    "Rybak et al. 2024"
+   ]
+  },
+  "Ryczko 2024": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Ryczko 2024"
+   ]
+  },
+  "Sakai 2024": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Sakai 2024"
+   ]
+  },
+  "Sato 2019": {
+   "cited_by": [
+    "docs/research/strategy_v1.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Sato 2019",
+    "Sato et al. 2019"
+   ]
+  },
+  "Sato 2022": {
+   "cited_by": [
+    "docs/research/strategy_v1.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Sato et al. 2022"
+   ]
+  },
+  "Schaeffer 2022": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Schaeffer 2022"
+   ]
+  },
+  "Schrimpf 2020": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Schrimpf 2020"
+   ]
+  },
+  "Schumacher 2024": {
+   "cited_by": [
+    "docs/research/beyond_statistics_realism.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Schumacher 2024"
+   ]
+  },
+  "Shafiee 2024": {
+   "cited_by": [
+    "docs/research/no_gecko_and_appearance.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Shafiee et al. 2024"
+   ]
+  },
+  "Sharp 2025": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Sharp et al. 2025"
+   ]
+  },
+  "Shein-Idelson 2016": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Shein-Idelson 2016"
+   ]
+  },
+  "Smeets 1986": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Smeets 1986"
+   ]
+  },
+  "Solomon 2023": {
+   "cited_by": [
+    "prey_elevation_switch"
+   ],
+   "count": 1,
+   "written_as": [
+    "Solomon, Janbon, Bimson & Wheatcroft 2023"
+   ]
+  },
+  "Stein 1981": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Stein & Gaither 1981"
+   ]
+  },
+  "Stephenson-Jones 2011": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Stephenson-Jones 2011"
+   ]
+  },
+  "Storks 2023": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Storks 2023",
+    "Storks et al. 2023"
+   ]
+  },
+  "Suzuki 2021": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md",
+    "docs/research/strategy_v1.md"
+   ],
+   "count": 2,
+   "written_as": [
+    "Suzuki et al. 2021",
+    "Suzuki, Kano, Ijspeert, Ishiguro 2021"
+   ]
+  },
+  "Tschantz 2022": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Tschantz et al. 2022"
+   ]
+  },
+  "Tsutsui 2024": {
+   "cited_by": [
+    "docs/research/strategy_v1.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Tsutsui et al. 2024"
+   ]
+  },
+  "Van Damme 2017": {
+   "cited_by": [
+    "tongue_flick_baseline_per_min"
+   ],
+   "count": 1,
+   "written_as": [
+    "Van Damme & Cooper 2017"
+   ]
+  },
+  "Vaz 2024": {
+   "cited_by": [
+    "docs/research/beyond_statistics_realism.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Vaz 2024",
+    "Vaz et al. 2024",
+    "Vaz, Cortes, Gomes, Jordão & Stergiou 2024"
+   ]
+  },
+  "Vishwanathan 2024": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Vishwanathan 2024"
+   ]
+  },
+  "Vollin 2021": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md",
+    "docs/research/strategy_v1.md",
+    "strike_peak_acceleration_m_s2",
+    "strike_peak_speed_m_s",
+    "strike_trigger_distance_m"
+   ],
+   "count": 5,
+   "written_as": [
+    "Vollin & Higham 2021",
+    "Vollin 2021"
+   ]
+  },
+  "Vollin 2023": {
+   "cited_by": [
+    "docs/research/strategy_v1.md",
+    "strike_capture_success"
+   ],
+   "count": 2,
+   "written_as": [
+    "Vollin & Higham 2023"
+   ]
+  },
+  "Wainwright 1991": {
+   "cited_by": [
+    "#154"
+   ],
+   "count": 1,
+   "written_as": [
+    "Wainwright, Kraklau & Bennett 1991"
+   ]
+  },
+  "Wang 1983": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Wang 1983",
+    "Wang et al. 1983"
+   ]
+  },
+  "Wang 1985": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Wang 1985",
+    "Wang et al. 1985"
+   ]
+  },
+  "Wang 2025": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Wang 2025"
+   ]
+  },
+  "Wang-Chen 2026": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Wang-Chen & Ramdya 2026"
+   ]
+  },
+  "Werner 1998": {
+   "cited_by": [
+    "#159"
+   ],
+   "count": 1,
+   "written_as": [
+    "Werner et al. 1998"
+   ]
+  },
+  "Werner 2005": {
+   "cited_by": [
+    "warm_surface_temperature_C"
+   ],
+   "count": 1,
+   "written_as": [
+    "Werner et al. 2005"
+   ]
+  },
+  "Werner 2008": {
+   "cited_by": [
+    "#159"
+   ],
+   "count": 1,
+   "written_as": [
+    "Werner et al. 2008"
+   ]
+  },
+  "Wever 1964": {
+   "cited_by": [
+    "#159"
+   ],
+   "count": 1,
+   "written_as": [
+    "Wever et al. 1964"
+   ]
+  },
+  "Whitford 2022": {
+   "cited_by": [
+    "strike_distance_speed_correlation_r",
+    "strike_trigger_distance_m"
+   ],
+   "count": 2,
+   "written_as": [
+    "Whitford et al. 2022",
+    "Whitford, Freymiller, Higham & Clark 2022"
+   ]
+  },
+  "Wiseman 2021": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Wiseman 2021",
+    "Wiseman et al. 2021"
+   ]
+  },
+  "Yamaguchi 2024": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Yamaguchi 2024",
+    "Yamaguchi et al. 2024"
+   ]
+  },
+  "Yang 2025": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Yang 2025"
+   ]
+  },
+  "Yilmaz 2013": {
+   "cited_by": [
+    "prey_elevation_switch",
+    "prey_velocity_peak_deg_s"
+   ],
+   "count": 2,
+   "written_as": [
+    "Yilmaz & Meister 2013"
+   ]
+  },
+  "Yoshida 2024": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md",
+    "docs/research/strategy_v1.md"
+   ],
+   "count": 2,
+   "written_as": [
+    "Yoshida 2024",
+    "Yoshida et al. 2024"
+   ]
+  },
+  "Yoshida 2025": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Yoshida & Kuniyoshi 2025"
+   ]
+  },
+  "Zaaf 2001": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md",
+    "docs/research/beyond_statistics_realism.md",
+    "docs/research/no_gecko_and_appearance.md",
+    "docs/research/strategy_v1.md"
+   ],
+   "count": 4,
+   "written_as": [
+    "Zaaf 2001",
+    "Zaaf et al. 2001"
+   ]
+  },
+  "Zanatta 2024": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md"
+   ],
+   "count": 1,
+   "written_as": [
+    "Zanatta 2024",
+    "Zanatta et al. 2024"
+   ]
+  },
+  "Zylbertal 2023": {
+   "cited_by": [
+    "docs/research/best_achievable_brain.md",
+    "docs/research/strategy_v1.md"
+   ],
+   "count": 2,
+   "written_as": [
+    "Zylbertal & Bianco 2023"
+   ]
+  },
+  "van Hemmen 2001": {
+   "cited_by": [
+    "#163"
+   ],
+   "count": 1,
+   "written_as": [
+    "van Hemmen 2001"
+   ]
+  }
+ },
+ "dois": {
+  "10.1007/s00359-011-0635-8": [
+   "docs/research/no_gecko_and_appearance.md"
+  ],
+  "10.1007/s10439-026-04011-1": [
+   "docs/research/beyond_statistics_realism.md"
+  ],
+  "10.1016/0042-6989(67": [
+   "docs/research/no_gecko_and_appearance.md"
+  ],
+  "10.1016/j.celrep.2021.109730": [
+   "docs/research/strategy_v1.md"
+  ],
+  "10.1016/j.gaitpost.2010.08.009": [
+   "docs/research/beyond_statistics_realism.md"
+  ],
+  "10.1016/j.isci.2025.112203": [
+   "docs/research/beyond_statistics_realism.md"
+  ],
+  "10.1016/j.jbiomech.2024.111972": [
+   "docs/research/beyond_statistics_realism.md"
+  ],
+  "10.1016/j.visres.2007.12.004": [
+   "docs/research/no_gecko_and_appearance.md"
+  ],
+  "10.1016/j.xpro.2024.103140": [
+   "docs/research/strategy_v1.md"
+  ],
+  "10.1016/j.zool.2010.11.003": [
+   "femur_tibia_ratio",
+   "hindlimb_length_svl",
+   "stride_length_svl_range"
+  ],
+  "10.1038/s41586-024-07763-9": [
+   "docs/research/best_achievable_brain.md"
+  ],
+  "10.1038/s41586-024-07939-3": [
+   "docs/research/best_achievable_brain.md"
+  ],
+  "10.1038/s41586-024-08162-w": [
+   "docs/research/best_achievable_brain.md"
+  ],
+  "10.1038/s41593-025-02080-4": [
+   "docs/research/best_achievable_brain.md"
+  ],
+  "10.1038/s41593-025-02159-y": [
+   "docs/research/best_achievable_brain.md"
+  ],
+  "10.1038/s41598-017-00348-9": [
+   "docs/research/no_gecko_and_appearance.md"
+  ],
+  "10.1038/s41598-017-11484-7": [
+   "body_mass_kg",
+   "calibration_temperature_C",
+   "docs/research/beyond_statistics_realism.md",
+   "fore_duty_factor",
+   "fore_duty_factor_tolerance",
+   "hind_duty_factor_range",
+   "hip_proret_min_range_deg",
+   "stride_length_svl_range",
+   "walking_speed_m_s_range"
+  ],
+  "10.1038/s42003-022-04261-4": [
+   "docs/research/best_achievable_brain.md"
+  ],
+  "10.1038/s42003-026-10024-2": [
+   "docs/research/best_achievable_brain.md"
+  ],
+  "10.1046/j.1096-3642.2002.00038.x": [
+   "docs/research/beyond_statistics_realism.md"
+  ],
+  "10.1073/pnas.1418979112": [
+   "docs/research/beyond_statistics_realism.md"
+  ],
+  "10.1073/pnas.2317218121": [
+   "docs/research/best_achievable_brain.md"
+  ],
+  "10.1073/pnas.2415929122": [
+   "docs/research/best_achievable_brain.md"
+  ],
+  "10.1085/jgp.22.5.555": [
+   "docs/research/no_gecko_and_appearance.md"
+  ],
+  "10.1086/515880": [
+   "docs/research/beyond_statistics_realism.md"
+  ],
+  "10.1093/biolinnean/blab167": [
+   "strike_distance_speed_correlation_r"
+  ],
+  "10.1093/icb/icab073": [
+   "docs/research/best_achievable_brain.md"
+  ],
+  "10.1093/icb/icab076": [
+   "docs/research/strategy_v1.md",
+   "strike_trigger_distance_m"
+  ],
+  "10.1098/rsif.2019.0402": [
+   "docs/research/beyond_statistics_realism.md"
+  ],
+  "10.1109/ICDL63968.2025.11204447": [
+   "docs/research/best_achievable_brain.md"
+  ],
+  "10.1111/evo.12015": [
+   "docs/research/beyond_statistics_realism.md"
+  ],
+  "10.1111/joa.13431": [
+   "docs/research/best_achievable_brain.md"
+  ],
+  "10.1126/sciadv.adx3811": [
+   "docs/research/best_achievable_brain.md"
+  ],
+  "10.1152/jappl.1996.80.5.1448": [
+   "docs/research/beyond_statistics_realism.md"
+  ],
+  "10.1163/156853895X00361": [
+   "strike_duration_s"
+  ],
+  "10.1167/9.3.27": [
+   "docs/research/no_gecko_and_appearance.md"
+  ],
+  "10.1242/jeb.015503": [
+   "docs/research/beyond_statistics_realism.md"
+  ],
+  "10.1242/jeb.110916": [
+   "body_mass_kg",
+   "calibration_temperature_C",
+   "com_intact_svl",
+   "com_study_body_mass_kg",
+   "com_study_svl_m",
+   "com_study_tail_volume_m3",
+   "com_tail_excluded_svl",
+   "docs/research/beyond_statistics_realism.md",
+   "hindlimb_length_svl",
+   "hip_height_svl",
+   "shoulder_height_svl",
+   "shoulder_hip_ratio",
+   "stride_length_svl_range",
+   "tail_mass_fraction",
+   "trunk_pitch_deg",
+   "trunk_pitch_sem_deg"
+  ],
+  "10.1242/jeb.179564": [
+   "docs/research/best_achievable_brain.md",
+   "docs/research/beyond_statistics_realism.md",
+   "emg_hindlimb_preautotomy"
+  ],
+  "10.1242/jeb.200.16.2177": [
+   "docs/research/beyond_statistics_realism.md"
+  ],
+  "10.1242/jeb.204.7.1233": [
+   "docs/research/beyond_statistics_realism.md"
+  ],
+  "10.1242/jeb.249422": [
+   "docs/research/no_gecko_and_appearance.md"
+  ],
+  "10.1371/journal.pcbi.1012101": [
+   "docs/research/best_achievable_brain.md"
+  ],
+  "10.17161/randa.v26i1.14342": [
+   "head_width_svl",
+   "interorbital_distance_m",
+   "tail_length_svl"
+  ],
+  "10.3389/fnbeh.2023.1173065": [
+   "strike_capture_success"
+  ],
+  "10.3389/fnbot.2017.00039": [
+   "docs/research/no_gecko_and_appearance.md"
+  ],
+  "10.3389/fnbot.2020.607455": [
+   "docs/research/beyond_statistics_realism.md"
+  ],
+  "10.3389/fphys.2020.00562": [
+   "docs/research/beyond_statistics_realism.md"
+  ],
+  "10.5061/dryad.dn822": [
+   "docs/research/beyond_statistics_realism.md"
+  ],
+  "10.5281/zenodo.6614341": [
+   "docs/research/strategy_v1.md"
+  ],
+  "10.6084/m9.figshare.30656000": [
+   "docs/research/strategy_v1.md"
+  ]
+ }
+}

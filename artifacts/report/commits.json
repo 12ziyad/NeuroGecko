@@ -1,738 +1,1179 @@
 [
  {
   "hash": "11f6cf7",
-  "subject": "Initial commit",
+  "full": "11f6cf76fc96114148ab2fa23814c884c342ccd7",
   "date": "2026-06-08",
+  "subject": "Initial commit",
   "files": 1,
   "added": 201,
-  "removed": 0
+  "removed": 0,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "53face5",
-  "subject": "Initial NeuroGecko code release",
+  "full": "53face5fcbc36867f209338ff4a74c6e579a6939",
   "date": "2026-06-08",
+  "subject": "Initial NeuroGecko code release",
   "files": 24,
   "added": 2330,
-  "removed": 0
+  "removed": 0,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "bc91977",
-  "subject": "Merge branch 'main' of https://github.com/12ziyad/NeuroGecko",
+  "full": "bc919774d99d7a901aac358671f22501c3197138",
   "date": "2026-06-08",
-  "files": 1,
-  "added": 201,
-  "removed": 0
+  "subject": "Merge branch 'main' of https://github.com/12ziyad/NeuroGecko",
+  "files": 0,
+  "added": 0,
+  "removed": 0,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "481a226",
-  "subject": "Add V4.2.2 front-foot correction and dual-view rendering",
+  "full": "481a22617c80e98d349b8baafc4c7cc46bd3edf4",
   "date": "2026-06-09",
+  "subject": "Add V4.2.2 front-foot correction and dual-view rendering",
   "files": 5,
   "added": 163,
-  "removed": 25
+  "removed": 25,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "e1404c6",
-  "subject": "Add V4.2.3 front-loading controller",
+  "full": "e1404c61990f6ab3c7f95b08f3899c3f8c5bb55a",
   "date": "2026-06-09",
+  "subject": "Add V4.2.3 front-loading controller",
   "files": 2,
   "added": 123,
-  "removed": 96
+  "removed": 96,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "c486d90",
-  "subject": "Add V4.2.4 escape-proof front-load gate",
+  "full": "c486d90b73b196cec347da6e7111b5e061b69bfb",
   "date": "2026-06-09",
+  "subject": "Add V4.2.4 escape-proof front-load gate",
   "files": 2,
   "added": 68,
-  "removed": 57
+  "removed": 57,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "152fefc",
-  "subject": "Add V4.2.6 front-load polish and knee residual cap",
+  "full": "152fefc540c54d8e15d58d6e6b235b95e136aca2",
   "date": "2026-06-09",
+  "subject": "Add V4.2.6 front-load polish and knee residual cap",
   "files": 2,
   "added": 6,
-  "removed": 4
+  "removed": 4,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "6770779",
-  "subject": "Add V4.2.7 front duty reward gate",
+  "full": "6770779afeb508d843855dca289f146d94a24dff",
   "date": "2026-06-10",
+  "subject": "Add V4.2.7 front duty reward gate",
   "files": 1,
   "added": 51,
-  "removed": 1
+  "removed": 1,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "e522bb5",
-  "subject": "Add V4.2.8 contact tracking reflex curriculum",
+  "full": "e522bb58e6dcd51cddc1f1a6911ecf7e1dce2b2b",
   "date": "2026-06-11",
+  "subject": "Add V4.2.8 contact tracking reflex curriculum",
   "files": 4,
   "added": 95,
-  "removed": 8
+  "removed": 8,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "eff902e",
-  "subject": "Tune V4.2.9 reflex wean controller",
+  "full": "eff902eb3a0fb82c9601aba78c0eb4fed8356906",
   "date": "2026-06-11",
+  "subject": "Tune V4.2.9 reflex wean controller",
   "files": 1,
   "added": 2,
-  "removed": 2
+  "removed": 2,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "fdccbc6",
-  "subject": "Add V4.3 velocity tracking experiment",
+  "full": "fdccbc62d1df8f45790de484346636224432d4ae",
   "date": "2026-06-12",
+  "subject": "Add V4.3 velocity tracking experiment",
   "files": 2,
   "added": 56,
-  "removed": 1
+  "removed": 1,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "570bd01",
-  "subject": "Add V4.5 matched stance cadence experiment",
+  "full": "570bd0120aac72eeec26739b792afa014b230496",
   "date": "2026-06-12",
+  "subject": "Add V4.5 matched stance cadence experiment",
   "files": 3,
   "added": 22,
-  "removed": 15
+  "removed": 15,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "d2e845b",
-  "subject": "Add V4.6 front de-stick experiment",
+  "full": "d2e845bb2b15de200e3a8034813dbaf2820c24e5",
   "date": "2026-06-12",
+  "subject": "Add V4.6 front de-stick experiment",
   "files": 2,
   "added": 4,
-  "removed": 4
+  "removed": 4,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "0f6c7ca",
-  "subject": "Add V4.5 final locomotion base",
+  "full": "0f6c7ca8caf7fe06cc86ccdaa4f5bd9540a8609d",
   "date": "2026-06-12",
+  "subject": "Add V4.5 final locomotion base",
   "files": 2,
   "added": 4,
-  "removed": 4
+  "removed": 4,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "0e7858c",
-  "subject": "Record V4 locomotion final results",
+  "full": "0e7858c2aa3667a938d19b5b042d04ffae5b7d64",
   "date": "2026-06-12",
+  "subject": "Record V4 locomotion final results",
   "files": 1,
   "added": 37,
-  "removed": 0
+  "removed": 0,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "1c6e2ef",
-  "subject": "Accept V4.5B as final locomotion champion",
+  "full": "1c6e2efdcd4d236b5050944359f5000ed0ba1d84",
   "date": "2026-06-12",
+  "subject": "Accept V4.5B as final locomotion champion",
   "files": 1,
   "added": 20,
-  "removed": 9
+  "removed": 9,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "aad003a",
-  "subject": "starting brain",
+  "full": "aad003a481e9224fc14a8d52ac04f21fcdbd4f43",
   "date": "2026-06-13",
+  "subject": "starting brain",
   "files": 5,
   "added": 693,
-  "removed": 0
+  "removed": 0,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "cb93609",
-  "subject": "Add AGWM brain environment wiring",
+  "full": "cb93609e656fa212a60f9e2ee6140b298c292fbb",
   "date": "2026-06-13",
+  "subject": "Add AGWM brain environment wiring",
   "files": 2,
   "added": 29,
-  "removed": 7
+  "removed": 7,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "9541f8f",
-  "subject": "Add trainable visual brain policy",
+  "full": "9541f8f13fa19da0aeb86c97ae82f054eb0f9e7a",
   "date": "2026-06-13",
+  "subject": "Add trainable visual brain policy",
   "files": 7,
   "added": 424,
-  "removed": 1
+  "removed": 1,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "f72ca1c",
-  "subject": "Add brain curriculum and stable viewer controls",
+  "full": "f72ca1cb5d1707761233c4b14963fbbde646d62c",
   "date": "2026-06-13",
+  "subject": "Add brain curriculum and stable viewer controls",
   "files": 4,
   "added": 244,
-  "removed": 17
+  "removed": 17,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "2b5c158",
-  "subject": "Add privileged food taper curriculum",
+  "full": "2b5c15803e7da08b8c202a4e95a556432e4a33c5",
   "date": "2026-06-13",
+  "subject": "Add privileged food taper curriculum",
   "files": 3,
   "added": 165,
-  "removed": 7
+  "removed": 7,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "d0f9deb",
-  "subject": "Make brain camera see food and add privileged dropout curriculum",
+  "full": "d0f9deb4387cfac56692a08379f8a56256839ae5",
   "date": "2026-06-13",
+  "subject": "Make brain camera see food and add privileged dropout curriculum",
   "files": 4,
   "added": 235,
-  "removed": 7
+  "removed": 7,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "d60f33f",
-  "subject": "Use mouth distance and add brain resume support",
+  "full": "d60f33f6567bbfb4bab7bab588609e4a4ff8dc93",
   "date": "2026-06-14",
+  "subject": "Use mouth distance and add brain resume support",
   "files": 3,
   "added": 139,
-  "removed": 27
+  "removed": 27,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "a505ade",
-  "subject": "Fix brain food reward scaling",
+  "full": "a505ade518ef98248f63d2b1427a8456f41c216e",
   "date": "2026-06-14",
+  "subject": "Fix brain food reward scaling",
   "files": 3,
   "added": 22,
-  "removed": 5
+  "removed": 5,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "cd014fe",
-  "subject": "Add brain watcher stochastic diagnostics",
+  "full": "cd014fe2ded7e271c07d82663c0f2a192021b3e8",
   "date": "2026-06-15",
+  "subject": "Add brain watcher stochastic diagnostics",
   "files": 1,
   "added": 59,
-  "removed": 3
+  "removed": 3,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "342eaa1",
-  "subject": "Rebalance brain food reward",
+  "full": "342eaa149df7537d606a8cc72b041255fcd842d5",
   "date": "2026-06-15",
+  "subject": "Rebalance brain food reward",
   "files": 1,
   "added": 11,
-  "removed": 7
+  "removed": 7,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "0a57988",
-  "subject": "Add brain visual lock reward and checkpoints",
+  "full": "0a57988c09beedf058e802f9915b437e59ab0353",
   "date": "2026-06-16",
+  "subject": "Add brain visual lock reward and checkpoints",
   "files": 3,
   "added": 55,
-  "removed": 21
+  "removed": 21,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "3460cb0",
-  "subject": "Use visual delta reward and fix brain checkpoints",
+  "full": "3460cb04728fe730338e8a56c28f13bd90c76fba",
   "date": "2026-06-16",
+  "subject": "Use visual delta reward and fix brain checkpoints",
   "files": 3,
   "added": 34,
-  "removed": 8
+  "removed": 8,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "7e90df7",
-  "subject": "Add brain food cue radius curriculum",
+  "full": "7e90df7c0ca9bc55602e951f9d7ed1fac45a638f",
   "date": "2026-06-16",
+  "subject": "Add brain food cue radius curriculum",
   "files": 3,
   "added": 97,
-  "removed": 9
+  "removed": 9,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "6953dcf",
-  "subject": "Add oracle action eval mode",
+  "full": "6953dcfda67cb3bfaa33aeab4d45119e279cb6fe",
   "date": "2026-06-17",
+  "subject": "Add oracle action eval mode",
   "files": 1,
   "added": 10,
-  "removed": 1
+  "removed": 1,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "11d0a08",
-  "subject": "Add recurrent PPO brain support",
+  "full": "11d0a08e011d11643f92507ff92fb381e579aadd",
   "date": "2026-06-17",
+  "subject": "Add recurrent PPO brain support",
   "files": 2,
   "added": 130,
-  "removed": 20
+  "removed": 20,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "a3de4ee",
-  "subject": "Add privileged oracle behavior cloning",
+  "full": "a3de4ee58b8b39591bb103580db1894c2fdf77e2",
   "date": "2026-06-18",
+  "subject": "Add privileged oracle behavior cloning",
   "files": 4,
   "added": 485,
-  "removed": 7
+  "removed": 7,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "9efac13",
-  "subject": "Fix BC diagnostics timing",
+  "full": "9efac13d076ea109aaaf03dcae497dbc1063f6ad",
   "date": "2026-06-18",
+  "subject": "Fix BC diagnostics timing",
   "files": 2,
   "added": 4,
-  "removed": 2
+  "removed": 2,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "c8c616e",
-  "subject": "Add BC policy debug script",
+  "full": "c8c616e26cc4c4a2db089a0d109a26259c7f5dc1",
   "date": "2026-06-18",
+  "subject": "Add BC policy debug script",
   "files": 1,
   "added": 396,
-  "removed": 0
+  "removed": 0,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "b370892",
-  "subject": "Add Patch37B DAgger recovery BC",
+  "full": "b370892787fe58ec14207823dd93cb663419da95",
   "date": "2026-06-18",
+  "subject": "Add Patch37B DAgger recovery BC",
   "files": 2,
   "added": 366,
-  "removed": 10
+  "removed": 10,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "407e5d5",
-  "subject": "Add Patch38A visual distillation preflight",
+  "full": "407e5d55e2ad45142bed6cd6272449e1123afd52",
   "date": "2026-06-18",
+  "subject": "Add Patch38A visual distillation preflight",
   "files": 5,
   "added": 1117,
-  "removed": 6
+  "removed": 6,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "c05ca81",
-  "subject": "Add Patch38C visual DAgger recovery",
+  "full": "c05ca813b7f70d483e5e8776afbda9d20b1a13ab",
   "date": "2026-06-18",
+  "subject": "Add Patch38C visual DAgger recovery",
   "files": 4,
   "added": 823,
-  "removed": 15
+  "removed": 15,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "2681c9e",
-  "subject": "Add Patch39A visual search baseline",
+  "full": "2681c9e06fb1f1cdbb4fcbd9de14fc7ccdcec0e1",
   "date": "2026-06-20",
+  "subject": "Add Patch39A visual search baseline",
   "files": 3,
   "added": 703,
-  "removed": 0
+  "removed": 0,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "ddbb105",
-  "subject": "Add Patch40A drive-based GeckoBrain controller",
+  "full": "ddbb105ff40afa7736916750243e282bafd22b98",
   "date": "2026-06-20",
+  "subject": "Add Patch40A drive-based GeckoBrain controller",
   "files": 2,
   "added": 961,
-  "removed": 0
+  "removed": 0,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "44a921c",
-  "subject": "Recover and verify the cloud model lineage before implementation",
+  "full": "44a921ca06d7844de85a0174044cfa099b0eba84",
   "date": "2026-09-05",
+  "subject": "Recover and verify the cloud model lineage before implementation",
   "files": 6,
   "added": 1308,
-  "removed": 1
+  "removed": 1,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "0c9f639",
-  "subject": "Add measured baselines, camera isolation and verified checkpoint recovery",
+  "full": "0c9f639ce070427ffbe35afdfd7067eff61c051e",
   "date": "2026-09-05",
-  "files": 25,
-  "added": 3966,
-  "removed": 24
+  "subject": "Add measured baselines, camera isolation and verified checkpoint recovery",
+  "files": 23,
+  "added": 3542,
+  "removed": 24,
+  "data_files": 2,
+  "data_added": 424
  },
  {
   "hash": "9960117",
-  "subject": "Add constrained lab morphology, shared gait calibration and verified recovery evidence",
+  "full": "9960117a7cd815947293a4d8c7c9de43b6ae06ff",
   "date": "2026-09-05",
-  "files": 41,
-  "added": 184185,
-  "removed": 63
+  "subject": "Add constrained lab morphology, shared gait calibration and verified recovery evidence",
+  "files": 27,
+  "added": 3094,
+  "removed": 54,
+  "data_files": 14,
+  "data_added": 181091
  },
  {
   "hash": "3efa2f6",
-  "subject": "Verify candidate motion and cross-platform reproducibility without altering legacy models",
+  "full": "3efa2f6d2d4c9294495a89b81b0dacdb1eb29a2c",
   "date": "2026-09-05",
-  "files": 15,
-  "added": 26271,
-  "removed": 19
+  "subject": "Verify candidate motion and cross-platform reproducibility without altering legacy models",
+  "files": 8,
+  "added": 415,
+  "removed": 19,
+  "data_files": 7,
+  "data_added": 25856
  },
  {
   "hash": "a7517e6",
-  "subject": "Step 0: record true 250 Hz physics and report failed entrainment honestly",
+  "full": "a7517e6ad20ad8769f791d2a4ad5512d2d34d942",
   "date": "2026-09-05",
-  "files": 7,
-  "added": 16578,
-  "removed": 13
+  "subject": "Step 0: record true 250 Hz physics and report failed entrainment honestly",
+  "files": 5,
+  "added": 205,
+  "removed": 13,
+  "data_files": 2,
+  "data_added": 16373
  },
  {
   "hash": "faa5dda",
-  "subject": "Step 1: charge lab effort on total actuator work while preserving legacy reward",
+  "full": "faa5ddaee6e0138ad4509041b7a9dab6dd2a6cd5",
   "date": "2026-09-05",
+  "subject": "Step 1: charge lab effort on total actuator work while preserving legacy reward",
   "files": 5,
   "added": 276,
-  "removed": 8
+  "removed": 8,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "992b062",
-  "subject": "Step 2: preserve force and collision-geometry diagnosis before controller edits",
+  "full": "992b062420850d5a3bdf9fb2bbd35abc93fabf29",
   "date": "2026-09-05",
-  "files": 7,
-  "added": 33232,
-  "removed": 0
+  "subject": "Step 2: preserve force and collision-geometry diagnosis before controller edits",
+  "files": 3,
+  "added": 759,
+  "removed": 0,
+  "data_files": 4,
+  "data_added": 32473
  },
  {
   "hash": "790edd4",
-  "subject": "Step 2: verify historical command reconstruction with 19 force-only tests",
+  "full": "790edd4f67d7fd5fc1805d118dcb394895104186",
   "date": "2026-09-05",
-  "files": 3,
-  "added": 247,
-  "removed": 1
+  "subject": "Step 2: verify historical command reconstruction with 19 force-only tests",
+  "files": 2,
+  "added": 245,
+  "removed": 1,
+  "data_files": 1,
+  "data_added": 2
  },
  {
   "hash": "ffc7be5",
-  "subject": "Step 3: improve and verify the lab base; stop training on failed support and timing gates",
+  "full": "ffc7be562482030b5d50ab3fdde6f54e79d800fd",
   "date": "2026-09-05",
-  "files": 80,
-  "added": 463881,
-  "removed": 25
+  "subject": "Step 3: improve and verify the lab base; stop training on failed support and timing gates",
+  "files": 16,
+  "added": 1136,
+  "removed": 25,
+  "data_files": 64,
+  "data_added": 462745
  },
  {
   "hash": "ad54e9a",
-  "subject": "Record Session 3 geometry baseline and hypothesis protocol",
+  "full": "ad54e9abb85498ac8768db0a266353a1a4989a38",
   "date": "2026-09-05",
-  "files": 3,
-  "added": 9930,
-  "removed": 0
+  "subject": "Record Session 3 geometry baseline and hypothesis protocol",
+  "files": 2,
+  "added": 41,
+  "removed": 0,
+  "data_files": 1,
+  "data_added": 9889
  },
  {
   "hash": "9eee048",
-  "subject": "Session 3: implement, fix and test hind stance compensation; Gate 2 still fails",
+  "full": "9eee0482c32639d9fdec978ac9663672be0c90d9",
   "date": "2026-09-05",
-  "files": 8,
-  "added": 1558377,
-  "removed": 3
+  "subject": "Session 3: implement, fix and test hind stance compensation; Gate 2 still fails",
+  "files": 5,
+  "added": 404,
+  "removed": 3,
+  "data_files": 3,
+  "data_added": 1557973
  },
  {
   "hash": "8153e8b",
-  "subject": "Session 3b: generalise stance compensation to all four limbs; Gate 2 now 4/6",
+  "full": "8153e8b110e4da212327ff3cfd28d5d355176668",
   "date": "2026-09-05",
-  "files": 11,
-  "added": 1554407,
-  "removed": 42
+  "subject": "Session 3b: generalise stance compensation to all four limbs; Gate 2 now 4/6",
+  "files": 9,
+  "added": 2440,
+  "removed": 42,
+  "data_files": 2,
+  "data_added": 1551967
  },
  {
   "hash": "552c91b",
-  "subject": "Session 3c: limb phase is late touchdown; stride length is geometrically unreachable by the limbs",
+  "full": "552c91b3f3849f5364dc688326026f27d947b852",
   "date": "2026-09-05",
-  "files": 4,
-  "added": 1552508,
-  "removed": 0
+  "subject": "Session 3c: limb phase is late touchdown; stride length is geometrically unreachable by the limbs",
+  "files": 2,
+  "added": 576,
+  "removed": 0,
+  "data_files": 2,
+  "data_added": 1551932
  },
  {
   "hash": "8c67937",
-  "subject": "Session 3d: stride length is speed; spine refuted as its source; 41% hind foot slip found",
+  "full": "8c679375a12fd54b034c43a1f9bfef6527b12e4a",
   "date": "2026-09-05",
+  "subject": "Session 3d: stride length is speed; spine refuted as its source; 41% hind foot slip found",
   "files": 1,
   "added": 71,
-  "removed": 0
+  "removed": 0,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "49c2e55",
-  "subject": "Session 3e: refute gearing and contact softness; correct my own stride-length framing",
+  "full": "49c2e55926dd55c6a8811009cc838cba66695bf4",
   "date": "2026-09-05",
+  "subject": "Session 3e: refute gearing and contact softness; correct my own stride-length framing",
   "files": 1,
   "added": 79,
-  "removed": 0
+  "removed": 0,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "7e752e7",
-  "subject": "Session 3f: CMA-ES solves the limb-phase gate; 6/6 appears unreachable",
+  "full": "7e752e7f3261e32cf22fda6a684e287040dc8e14",
   "date": "2026-09-06",
-  "files": 19,
-  "added": 9316691,
-  "removed": 0
+  "subject": "Session 3f: CMA-ES solves the limb-phase gate; 6/6 appears unreachable",
+  "files": 2,
+  "added": 372,
+  "removed": 0,
+  "data_files": 17,
+  "data_added": 9316319
  },
  {
   "hash": "9655d79",
-  "subject": "Session 3g: withdraw the CMA-ES limb-phase claim; it optimised the wrong metric",
+  "full": "9655d79390d8e9c68603a51b9a094f3ef34860db",
   "date": "2026-09-06",
-  "files": 7,
-  "added": 3104060,
-  "removed": 0
+  "subject": "Session 3g: withdraw the CMA-ES limb-phase claim; it optimised the wrong metric",
+  "files": 3,
+  "added": 86,
+  "removed": 0,
+  "data_files": 4,
+  "data_added": 3103974
  },
  {
   "hash": "8503e04",
-  "subject": "Session 3h: fit harness now scores through realism_metrics; 12s fit rejected as unstable",
+  "full": "8503e04b2821cc905ce1de37e8f9c5b03fa08c49",
   "date": "2026-09-06",
-  "files": 9,
-  "added": 12601,
-  "removed": 3
+  "subject": "Session 3h: fit harness now scores through realism_metrics; 12s fit rejected as unstable",
+  "files": 4,
+  "added": 303,
+  "removed": 3,
+  "data_files": 5,
+  "data_added": 12298
  },
  {
   "hash": "ccebd20",
-  "subject": "Session 3i: gate-count objective and the 20 s fit evidence; searches stopped",
+  "full": "ccebd20ae58db6afaa0dcb9fd707f7b3f94dca06",
   "date": "2026-09-06",
-  "files": 5,
-  "added": 6504,
-  "removed": 4
+  "subject": "Session 3i: gate-count objective and the 20 s fit evidence; searches stopped",
+  "files": 1,
+  "added": 17,
+  "removed": 4,
+  "data_files": 4,
+  "data_added": 6487
  },
  {
   "hash": "2c474f7",
-  "subject": "Add docs/HANDOFF.md: complete record of the research and build phases",
+  "full": "2c474f7f6c3be84a980a283804e0abdbc79f84f5",
   "date": "2026-09-06",
+  "subject": "Add docs/HANDOFF.md: complete record of the research and build phases",
   "files": 1,
   "added": 106,
-  "removed": 0
+  "removed": 0,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "8c7000d",
-  "subject": "Session 4: train the walker; the forefoot gate is unreachable on this body",
+  "full": "8c7000d6f0f8f6685ec01294eca3239e35b095db",
   "date": "2026-09-06",
-  "files": 25,
-  "added": 8558,
-  "removed": 38
+  "subject": "Session 4: train the walker; the forefoot gate is unreachable on this body",
+  "files": 18,
+  "added": 6342,
+  "removed": 38,
+  "data_files": 7,
+  "data_added": 2216
  },
  {
   "hash": "e184c1e",
-  "subject": "Session 4b: drive the sprawl DOFs, couple the tail to the hindlimb",
+  "full": "e184c1efe53526a1ec585096eeb664c30728b6ea",
   "date": "2026-09-07",
-  "files": 14,
-  "added": 1552705,
-  "removed": 48
+  "subject": "Session 4b: drive the sprawl DOFs, couple the tail to the hindlimb",
+  "files": 11,
+  "added": 630,
+  "removed": 48,
+  "data_files": 3,
+  "data_added": 1552075
  },
  {
   "hash": "33be60c",
-  "subject": "Session 4c: the no-cheat world, and prey the walker cannot catch",
+  "full": "33be60ce15c3662f206aa4d61018e37fd8801b47",
   "date": "2026-09-07",
+  "subject": "Session 4c: the no-cheat world, and prey the walker cannot catch",
   "files": 11,
   "added": 1490,
-  "removed": 9
+  "removed": 9,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "b573e57",
-  "subject": "Session 4d: finish the no-cheat world in the environment that has eyes",
+  "full": "b573e57d4001112b103df5c935993595ac650cd2",
   "date": "2026-09-07",
+  "subject": "Session 4d: finish the no-cheat world in the environment that has eyes",
   "files": 6,
   "added": 291,
-  "removed": 25
+  "removed": 25,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "306dd23",
-  "subject": "Session 5: hypothalamus -- hunger from the animal's own metabolism",
+  "full": "306dd2377573c48a24c73e1fab25950f50c02fc5",
   "date": "2026-09-07",
+  "subject": "Session 5: hypothalamus -- hunger from the animal's own metabolism",
   "files": 6,
   "added": 1100,
-  "removed": 2
+  "removed": 2,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "8b5f491",
-  "subject": "Session 5b: fatigue from the published endurance curve; fear is on the wrong sense",
+  "full": "8b5f491a8c4d6491e8fb3f3ee550079ece239a2e",
   "date": "2026-09-07",
+  "subject": "Session 5b: fatigue from the published endurance curve; fear is on the wrong sense",
   "files": 6,
   "added": 294,
-  "removed": 3
+  "removed": 3,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "ef75601",
-  "subject": "Session 6: basal ganglia built from equations; NOT ACCEPTED, sweep fails",
+  "full": "ef75601f8b5555a8de2e974979ce0d72ad3916c0",
   "date": "2026-09-07",
-  "files": 5,
-  "added": 891,
-  "removed": 0
+  "subject": "Session 6: basal ganglia built from equations; NOT ACCEPTED, sweep fails",
+  "files": 4,
+  "added": 774,
+  "removed": 0,
+  "data_files": 1,
+  "data_added": 117
  },
  {
   "hash": "af1b08e",
-  "subject": "Session 6b: found the GPR parameters; two of my three errors were structural",
+  "full": "af1b08ee7e9adced417ef54b27b6e64680f28359",
   "date": "2026-09-07",
-  "files": 5,
-  "added": 340,
-  "removed": 141
+  "subject": "Session 6b: found the GPR parameters; two of my three errors were structural",
+  "files": 4,
+  "added": 289,
+  "removed": 78,
+  "data_files": 1,
+  "data_added": 51
  },
  {
   "hash": "4a91782",
-  "subject": "Session 6c: the living failure map, and 6b's parameters were a variant's",
+  "full": "4a9178234ac6f7ebfbc4c4276b27d7e61844f1b8",
   "date": "2026-09-07",
-  "files": 7,
-  "added": 942,
-  "removed": 94
+  "subject": "Session 6c: the living failure map, and 6b's parameters were a variant's",
+  "files": 6,
+  "added": 891,
+  "removed": 47,
+  "data_files": 1,
+  "data_added": 51
  },
  {
   "hash": "cbc42d8",
-  "subject": "Session 6d: the basal-ganglia failure was not a failure",
+  "full": "cbc42d82dc2807fd380e3c93092657d935216817",
   "date": "2026-09-07",
+  "subject": "Session 6d: the basal-ganglia failure was not a failure",
   "files": 4,
   "added": 327,
-  "removed": 30
+  "removed": 30,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "04b43be",
-  "subject": "Session 6e: the winner did not saturate because we were testing the wrong model",
+  "full": "04b43be0c6ca7c9594692896d1329d2ed462e79b",
   "date": "2026-09-07",
-  "files": 8,
-  "added": 2746,
-  "removed": 12
+  "subject": "Session 6e: the winner did not saturate because we were testing the wrong model",
+  "files": 6,
+  "added": 987,
+  "removed": 12,
+  "data_files": 2,
+  "data_added": 1759
  },
  {
   "hash": "427a845",
-  "subject": "Session 6f: the gecko moved onto the validated selector, and brains 1 and 2 run together",
+  "full": "427a8450ac40771f8d76c7479e811841943524d0",
   "date": "2026-09-08",
+  "subject": "Session 6f: the gecko moved onto the validated selector, and brains 1 and 2 run together",
   "files": 4,
   "added": 505,
-  "removed": 6
+  "removed": 6,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "ba460cb",
-  "subject": "Docs: the map gains a flow and a success column",
+  "full": "ba460cb24b8c35af1527cd83bea87014484eb7a1",
   "date": "2026-09-08",
+  "subject": "Docs: the map gains a flow and a success column",
   "files": 2,
   "added": 113,
-  "removed": 0
+  "removed": 0,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "6c99f92",
-  "subject": "Session 7: the cord becomes an oscillator, so a command has somewhere to land",
+  "full": "6c99f92d2bc9505cfa71b70b873440d75a534148",
   "date": "2026-09-08",
+  "subject": "Session 7: the cord becomes an oscillator, so a command has somewhere to land",
   "files": 2,
   "added": 442,
-  "removed": 0
+  "removed": 0,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "78bcc15",
-  "subject": "Session 7 docs: ledger 99-102, the new state, and the paused marker",
+  "full": "78bcc1587510edf12d2dceb26b0865679c01574e",
   "date": "2026-09-08",
+  "subject": "Session 7 docs: ledger 99-102, the new state, and the paused marker",
   "files": 1,
   "added": 47,
-  "removed": 9
+  "removed": 9,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "683e8f6",
-  "subject": "Session 7b-7c: the dopamine mechanism was wrong the OTHER way, and brain 3 lands",
+  "full": "683e8f6c970d87ecf7901fcdb45339651b758b0f",
   "date": "2026-09-08",
-  "files": 13,
-  "added": 1553,
-  "removed": 575
+  "subject": "Session 7b-7c: the dopamine mechanism was wrong the OTHER way, and brain 3 lands",
+  "files": 11,
+  "added": 898,
+  "removed": 77,
+  "data_files": 2,
+  "data_added": 655
  },
  {
   "hash": "b9fafcf",
-  "subject": "Session 8: scouting the eye found a detector that could not see its own food",
+  "full": "b9fafcf2420657b14d9e12896f78cae1be9a8c40",
   "date": "2026-09-08",
+  "subject": "Session 8: scouting the eye found a detector that could not see its own food",
   "files": 4,
   "added": 425,
-  "removed": 15
+  "removed": 15,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "5158d45",
-  "subject": "Session 8b: the retina keeps position, and the published optokinetic asymmetry",
+  "full": "5158d45b67d1f3eda043857bc4199e9ab9943127",
   "date": "2026-09-08",
-  "files": 6,
-  "added": 978,
-  "removed": 12
+  "subject": "Session 8b: the retina keeps position, and the published optokinetic asymmetry",
+  "files": 5,
+  "added": 852,
+  "removed": 12,
+  "data_files": 1,
+  "data_added": 126
  },
  {
   "hash": "e4196d8",
-  "subject": "Session 8c: the tectum, shipped NOT ACCEPTED because it cannot find real prey",
+  "full": "e4196d801b490cb4185104490248722880daae7a",
   "date": "2026-09-08",
-  "files": 6,
-  "added": 576,
-  "removed": 16
+  "subject": "Session 8c: the tectum, shipped NOT ACCEPTED because it cannot find real prey",
+  "files": 5,
+  "added": 514,
+  "removed": 16,
+  "data_files": 1,
+  "data_added": 62
  },
  {
   "hash": "034a78d",
-  "subject": "Session 9: the literature refuted the plan, and three checks were guarding nothing",
+  "full": "034a78df30626afc7e3619cf79e94a626e255dcc",
   "date": "2026-09-08",
-  "files": 30,
-  "added": 18184,
-  "removed": 53
+  "subject": "Session 9: the literature refuted the plan, and three checks were guarding nothing",
+  "files": 19,
+  "added": 2013,
+  "removed": 53,
+  "data_files": 11,
+  "data_added": 16171
  },
  {
   "hash": "ead740b",
-  "subject": "Session 9b: the oracle measured, the body hash resolved, and a strike that works",
+  "full": "ead740b8e759d1794ce8218bf009609e7a09d774",
   "date": "2026-09-08",
-  "files": 12,
-  "added": 1140,
-  "removed": 13
+  "subject": "Session 9b: the oracle measured, the body hash resolved, and a strike that works",
+  "files": 9,
+  "added": 1101,
+  "removed": 13,
+  "data_files": 3,
+  "data_added": 39
  },
  {
   "hash": "871f843",
-  "subject": "Session 9c: a clip you can actually watch, and two filming artefacts removed",
+  "full": "871f8438b34c83909c3ca624d74f49193545112b",
   "date": "2026-09-08",
-  "files": 4,
-  "added": 227,
-  "removed": 2
+  "subject": "Session 9c: a clip you can actually watch, and two filming artefacts removed",
+  "files": 2,
+  "added": 198,
+  "removed": 2,
+  "data_files": 2,
+  "data_added": 29
  },
  {
   "hash": "3148180",
-  "subject": "Session 9d: the gecko was never broken, and the shake was my camera",
+  "full": "314818079335f573965c3ee6d0528e7483b3b134",
   "date": "2026-09-08",
-  "files": 8,
-  "added": 240,
-  "removed": 3
+  "subject": "Session 9d: the gecko was never broken, and the shake was my camera",
+  "files": 2,
+  "added": 206,
+  "removed": 3,
+  "data_files": 6,
+  "data_added": 34
  },
  {
   "hash": "fb64aa2",
-  "subject": "Session 9e: the replay camera pointed at the animal's face",
+  "full": "fb64aa297edf5f804411c104935bbf6fb2002305",
   "date": "2026-09-08",
-  "files": 12,
-  "added": 541,
-  "removed": 5
+  "subject": "Session 9e: the replay camera pointed at the animal's face",
+  "files": 1,
+  "added": 26,
+  "removed": 5,
+  "data_files": 11,
+  "data_added": 515
  },
  {
   "hash": "d017b18",
-  "subject": "Session 9f: the lag was a frame-rate header, not the animal",
+  "full": "d017b180dd1528f61a189ebb58d43cfd1900f7c9",
   "date": "2026-09-08",
-  "files": 5,
-  "added": 35,
-  "removed": 10
+  "subject": "Session 9f: the lag was a frame-rate header, not the animal",
+  "files": 4,
+  "added": 32,
+  "removed": 7,
+  "data_files": 1,
+  "data_added": 3
  },
  {
   "hash": "010f82c",
-  "subject": "Session 9g: rendering the accepted walker side-on, and what the earlier clip was",
+  "full": "010f82c315653847d344b7869411d82b20455e4a",
   "date": "2026-09-09",
-  "files": 1,
-  "added": 27,
-  "removed": 0
+  "subject": "Session 9g: rendering the accepted walker side-on, and what the earlier clip was",
+  "files": 0,
+  "added": 0,
+  "removed": 0,
+  "data_files": 1,
+  "data_added": 27
  },
  {
   "hash": "9a7db0a",
-  "subject": "Session 9h: three findings from trying to reproduce the Session 4 walking clip",
+  "full": "9a7db0a8ca6b13d4d883c1bd55dabd620979dcef",
   "date": "2026-09-09",
-  "files": 5,
-  "added": 228,
-  "removed": 6
+  "subject": "Session 9h: three findings from trying to reproduce the Session 4 walking clip",
+  "files": 3,
+  "added": 186,
+  "removed": 6,
+  "data_files": 2,
+  "data_added": 42
  },
  {
   "hash": "3fb0302",
-  "subject": "Session 9i: the gait profile is a parameter now, and I retract #179",
+  "full": "3fb0302b65d0b6b6801af53569fd056a81cb7861",
   "date": "2026-09-09",
+  "subject": "Session 9i: the gait profile is a parameter now, and I retract #179",
   "files": 3,
   "added": 98,
-  "removed": 2
+  "removed": 2,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "db0163f",
-  "subject": "Session 9j: the Session 4 commit and today render the same walk, pixel for pixel",
+  "full": "db0163f4f3d5f45523da0eb701c684cf57d4fc15",
   "date": "2026-09-09",
-  "files": 1,
-  "added": 25,
-  "removed": 0
+  "subject": "Session 9j: the Session 4 commit and today render the same walk, pixel for pixel",
+  "files": 0,
+  "added": 0,
+  "removed": 0,
+  "data_files": 1,
+  "data_added": 25
  },
  {
   "hash": "779b03c",
-  "subject": "Session 9k: the shake was the camera watching the trunk bob",
+  "full": "779b03ca551b87710ea7f3263e58770c2577aef4",
   "date": "2026-09-09",
+  "subject": "Session 9k: the shake was the camera watching the trunk bob",
   "files": 1,
   "added": 3,
-  "removed": 2
+  "removed": 2,
+  "data_files": 0,
+  "data_added": 0
  },
  {
   "hash": "7ae5b42",
-  "subject": "Session 9l: measuring the push-then-drag rhythm, and rendering the old commit",
+  "full": "7ae5b42bb65f85504a2d277bf1ede0132f881ef1",
   "date": "2026-09-09",
-  "files": 1,
-  "added": 15,
-  "removed": 0
+  "subject": "Session 9l: measuring the push-then-drag rhythm, and rendering the old commit",
+  "files": 0,
+  "added": 0,
+  "removed": 0,
+  "data_files": 1,
+  "data_added": 15
  },
  {
   "hash": "73a37c8",
-  "subject": "Session 9m: the user was right -- I filmed the wrong gait profile all session",
+  "full": "73a37c8463ac7623a2989282eae79f5830f7231b",
   "date": "2026-09-09",
-  "files": 2,
-  "added": 24,
-  "removed": 3
+  "subject": "Session 9m: the user was right -- I filmed the wrong gait profile all session",
+  "files": 1,
+  "added": 4,
+  "removed": 3,
+  "data_files": 1,
+  "data_added": 20
  },
  {
   "hash": "ed61f25",
-  "subject": "Session 9n: every clip I sent was the walker this project rejected",
+  "full": "ed61f25e9a4428d6921fffb7b7dde8d1beff296b",
   "date": "2026-09-09",
+  "subject": "Session 9n: every clip I sent was the walker this project rejected",
+  "files": 2,
+  "added": 173,
+  "removed": 3,
+  "data_files": 1,
+  "data_added": 13
+ },
+ {
+  "hash": "e07a4a1",
+  "full": "e07a4a1bcb27ef556f190bda5a1c0846a7810e17",
+  "date": "2026-09-09",
+  "subject": "Session 9o: the map as a printable document, generated from the repository",
+  "files": 2,
+  "added": 748,
+  "removed": 0,
+  "data_files": 10,
+  "data_added": 2204
+ },
+ {
+  "hash": "1a3ab31",
+  "full": "1a3ab318c446d53166b967b6914deca54c92643b",
+  "date": "2026-09-10",
+  "subject": "Session 9p: it is the PAIRING, not the policy -- #183 was too broad",
+  "files": 1,
+  "added": 3,
+  "removed": 2,
+  "data_files": 1,
+  "data_added": 42
+ },
+ {
+  "hash": "e744d08",
+  "full": "e744d08b7283cef70149b69a6077a5145562dff7",
+  "date": "2026-09-10",
+  "subject": "Session 9q: rhythm alone beside rhythm plus the add-on",
+  "files": 1,
+  "added": 182,
+  "removed": 0,
+  "data_files": 1,
+  "data_added": 26
+ },
+ {
+  "hash": "da2b651",
+  "full": "da2b651cd2a3058e84850a4ccead0421208eced1",
+  "date": "2026-09-10",
+  "subject": "Session 9r: a guard so the broken pairing cannot assemble silently again",
+  "files": 4,
+  "added": 241,
+  "removed": 3,
+  "data_files": 0,
+  "data_added": 0
+ },
+ {
+  "hash": "8aadf3a",
+  "full": "8aadf3a2015fcd23ce180dcc9fb2b8b47ef7d9ba",
+  "date": "2026-09-10",
+  "subject": "Session 9s: the goal never mentioned the mouth, so the animal never reached it",
   "files": 3,
-  "added": 186,
-  "removed": 3
+  "added": 63,
+  "removed": 6,
+  "data_files": 1,
+  "data_added": 13
+ },
+ {
+  "hash": "d74bdd2",
+  "full": "d74bdd28b3f89d3615c9607397c172cb704df161",
+  "date": "2026-09-10",
+  "subject": "Session 9t: two published prey rules, one of which cannot do its job yet",
+  "files": 4,
+  "added": 293,
+  "removed": 10,
+  "data_files": 1,
+  "data_added": 452
+ },
+ {
+  "hash": "8a34220",
+  "full": "8a3422097df1718ac6cee8493b05d2f19d9be9f1",
+  "date": "2026-09-10",
+  "subject": "Session 9u: a world with somewhere to shelter, something warm, and something to flee",
+  "files": 5,
+  "added": 722,
+  "removed": 7,
+  "data_files": 1,
+  "data_added": 243
+ },
+ {
+  "hash": "feaa171",
+  "full": "feaa171f7603416fa3cc6f518e23ceace7370e7e",
+  "date": "2026-09-10",
+  "subject": "Session 9v: brain 5, smell -- and the line it refuses to cross",
+  "files": 4,
+  "added": 316,
+  "removed": 3,
+  "data_files": 1,
+  "data_added": 22
+ },
+ {
+  "hash": "5004a38",
+  "full": "5004a388370d67cdc9c3d3bc43c429f468540c19",
+  "date": "2026-09-10",
+  "subject": "Session 9w: brain 6, the day/night clock -- and the gap it refuses to fill",
+  "files": 4,
+  "added": 300,
+  "removed": 5,
+  "data_files": 1,
+  "data_added": 318
+ },
+ {
+  "hash": "39bdcbf",
+  "full": "39bdcbf758f035d82f126263337bf614f12c29b5",
+  "date": "2026-09-10",
+  "subject": "Session 9x: the walker could always reach -- I retrained it to fix nothing",
+  "files": 1,
+  "added": 5,
+  "removed": 2,
+  "data_files": 2,
+  "data_added": 945
+ },
+ {
+  "hash": "d0755a5",
+  "full": "d0755a560635bbd8e68aa0f0f6d14aaef0f52436",
+  "date": "2026-09-10",
+  "subject": "Session 9y: the hunt composes -- and the fix I proposed would have broken it",
+  "files": 2,
+  "added": 41,
+  "removed": 4,
+  "data_files": 2,
+  "data_added": 827
+ },
+ {
+  "hash": "658255b",
+  "full": "658255be818912d37f4a7106df1d8bf174e94177",
+  "date": "2026-09-10",
+  "subject": "Session 9z: one long clip of everything, with its numbers on screen",
+  "files": 1,
+  "added": 299,
+  "removed": 0,
+  "data_files": 1,
+  "data_added": 19
+ },
+ {
+  "hash": "7de4ceb",
+  "full": "7de4ceb907e0345fec01e3c4585fd4f8c30d233c",
+  "date": "2026-09-10",
+  "subject": "Session 10: the video was filmed with the wrong walker, and the right one was unreachable",
+  "files": 3,
+  "added": 51,
+  "removed": 8,
+  "data_files": 2,
+  "data_added": 45
+ },
+ {
+  "hash": "02dd69f",
+  "full": "02dd69fa74ec9e3f5d909b65474cbccd956c55b2",
+  "date": "2026-09-10",
+  "subject": "Session 10b: the eye was watching its own walking, and resolution was never the limit",
+  "files": 3,
+  "added": 108,
+  "removed": 8,
+  "data_files": 2,
+  "data_added": 85
+ },
+ {
+  "hash": "06301e6",
+  "full": "06301e6d4a4f9c194fd86d0d6a3e9608c54947f8",
+  "date": "2026-09-11",
+  "subject": "Session 10c: the deferred modules were the buildable ones, and I invented a citation",
+  "files": 3,
+  "added": 322,
+  "removed": 3,
+  "data_files": 3,
+  "data_added": 1100
  }
 ]
