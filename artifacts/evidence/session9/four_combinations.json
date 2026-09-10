@@ -1,0 +1,42 @@
+{
+ "schema_version": 1,
+ "test": "front-foot duty factor across every combination of gait profile and policy",
+ "method": "800 steps each, seed 0, same body, same world, target pushed 5 m ahead, front duty read from the env's own fl_duty / fr_duty",
+ "published_target": 0.7,
+ "results": [
+  {
+   "profile": "lab",
+   "policy": true,
+   "fl": 0.203,
+   "fr": 0.591,
+   "gap": 0.388,
+   "limps": true
+  },
+  {
+   "profile": "lab",
+   "policy": false,
+   "fl": 0.46,
+   "fr": 0.433,
+   "gap": 0.027,
+   "limps": false
+  },
+  {
+   "profile": "legacy",
+   "policy": true,
+   "fl": 0.483,
+   "fr": 0.5,
+   "gap": 0.017,
+   "limps": false
+  },
+  {
+   "profile": "legacy",
+   "policy": false,
+   "fl": 0.463,
+   "fr": 0.491,
+   "gap": 0.028,
+   "limps": false
+  }
+ ],
+ "verdict": "ONE of the four limps, and it is the one I rendered all session. The trained policy is fine on legacy and wrong on lab -- a mismatch between a learned residual and a base it does not fit -- not a policy that is bad everywhere. #183 said 'the limp is the policy', which is too broad.",
+ "still_true_from_183": "The accepted 4/6 walker is the zero-residual base (#71), and the trained residual measured 3/6 against it (#11). Those are unchanged; only the mechanism of the on-screen limp is corrected."
+}
