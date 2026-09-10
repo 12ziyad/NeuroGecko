@@ -186,11 +186,26 @@ class TheTectumOnSyntheticStimuli(unittest.TestCase):
         retina = Retina(fovy_deg=70.0, pixels=64, cells=16)
         return retina, _t.Tectum(retina, **kw)
 
-    def _cricket(self, column, shift=0):
+    #: Rows the synthetic cricket occupies. MOVED DOWN from 30:34, and the
+    #: move is a real change to an existing passing test, so it is explained
+    #: rather than made quietly.
+    #:
+    #: 30:34 sits on the vertical midline of a 64 px frame -- which is the
+    #: HORIZON. Session 9 added the published elevation rule (the same stimulus
+    #: means prey below the horizon and threat above it), so a target balanced
+    #: exactly on the boundary became ambiguous by design and the tectum began
+    #: rejecting it. The vertical position was always incidental to this test,
+    #: whose subject is left-versus-right reporting; what it was never doing
+    #: was placing the target where a cricket actually is. A cricket sits on
+    #: the ground, which is below the horizon, and that is where it goes now.
+    CRICKET_ROWS = slice(44, 48)
+
+    def _cricket(self, column, shift=0, rows=None):
         frame = np.full((64, 64, 3), 60, np.uint8)
         c = int(column + shift)
-        frame[30:34, c:c + 3, 1] = 210
-        frame[30:34, c:c + 3, 2] = 180
+        rows = self.CRICKET_ROWS if rows is None else rows
+        frame[rows, c:c + 3, 1] = 210
+        frame[rows, c:c + 3, 2] = 180
         return frame
 
     def test_it_reports_the_side_the_target_is_on(self):
@@ -202,6 +217,35 @@ class TheTectumOnSyntheticStimuli(unittest.TestCase):
             self.assertGreater(salience, 0.5)
             self.assertEqual(bearing < 0, expect_negative,
                              f"column {column} -> bearing {bearing}")
+
+    def test_the_same_target_above_the_horizon_is_refused(self):
+        """The published elevation switch, which is the point of moving the
+        cricket down. Identical stimulus, opposite verdict by height: mice
+        escape a looming disc overhead 75 % of the time and only 53 % from the
+        side, and APPROACH a small sweeping disc to the side on 80 % of trials
+        while freezing at the same thing overhead. Floor-mounted looms produced
+        zero escapes. Anatomically grounded -- medial colliculus carries the
+        upper field to the escape pathways, lateral carries the lower field to
+        the hunting pathway.
+
+        No reptile has been tested, and the module says so."""
+        retina, tectum = self._eye()
+        high = slice(12, 16)
+        retina.reset()
+        tectum.step(retina.step(self._cricket(30, rows=high)))
+        salience, _ = tectum.step(retina.step(self._cricket(30, 2, rows=high)))
+        self.assertEqual(salience, 0.0)
+        self.assertEqual(tectum.state().get("rejected"), "above the horizon")
+
+    def test_the_elevation_switch_can_be_turned_off(self):
+        """It is unproven in reptiles, so it must be possible to run without
+        it and see what changes."""
+        retina, tectum = self._eye(elevation_switch=False)
+        high = slice(12, 16)
+        retina.reset()
+        tectum.step(retina.step(self._cricket(30, rows=high)))
+        salience, _ = tectum.step(retina.step(self._cricket(30, 2, rows=high)))
+        self.assertGreater(salience, 0.5)
 
     def test_a_still_world_is_silent(self):
         retina, tectum = self._eye()

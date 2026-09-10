@@ -978,6 +978,34 @@
         "confidence": "uncertain", "recording_temp_C": null,
         "notes": "Digesting a meal costs a large multiple of resting metabolism, so a naive model that adds meal energy without subtracting the cost of processing it overstates the benefit of eating. NOT implemented yet; recorded so the omission is visible."
       },
+      "prey_velocity_peak_deg_s": {
+        "value": 45.0,
+        "units": "deg/s", "species": "cross-lineage convergence", "sample_size": null,
+        "source": "Four independent lineages land in the same band. Bufo bufo prey-catching turning peaks 30-60 deg/s and falls to zero above ~200 (Ewert 1969). Crotalus atrox IR tectal units: almost no response at 5 deg/s, maximum ~50, declining by 120 (Kaldenbach, Bleckmann & Kohl 2016). Mouse looming escape is released only at 35 deg/s (Yilmaz & Meister 2013). Zebrafish hunting uses 30-60 deg/s.",
+        "confidence": "likely", "recording_temp_C": null,
+        "notes": "PUBLISHED in four separate clades, and the pit viper is the closest -- a squamate, same tectum. This is the single most robust cross-species number found in the whole vision search. It is NOT measured in any gecko: no lizard tectum has ever had its velocity tuning recorded. The midpoint of the toad band is used because the pit viper peak sits inside it."
+      },
+      "prey_velocity_low_cut_deg_s": {
+        "value": 5.0,
+        "units": "deg/s", "species": "Crotalus atrox", "sample_size": null,
+        "source": "IR-sensitive tectal units respond almost not at all at 5 deg/s. Kaldenbach, Bleckmann & Kohl 2016, J Comp Physiol A 202(6):389-398.",
+        "confidence": "likely", "recording_temp_C": null,
+        "notes": "PUBLISHED, squamate, and the authors draw the behavioural conclusion themselves: a motionless snake cannot detect a stationary or slowly moving object, and must reveal it with scanning head movements. That is the honest justification for a low cut, and also the reason a tectum alone is correctly blind to frozen prey."
+      },
+      "prey_velocity_high_cut_deg_s": {
+        "value": 200.0,
+        "units": "deg/s", "species": "Bufo bufo", "sample_size": null,
+        "source": "Prey-catching turning response falls to zero above ~200 deg/s. Ewert 1969, Pflugers Archiv 308:225-243.",
+        "confidence": "uncertain", "recording_temp_C": null,
+        "notes": "PUBLISHED but recovered through secondary sources -- Springer blocked direct retrieval of the 1969 paper, so the figure is transcribed rather than read. An amphibian, and the upper cut is the least transferable end of the curve: gecko critical flicker fusion is reported around 20 Hz, which would put a much lower ceiling on what this animal can resolve, but that figure could not be traced to a primary source either. Treat as an engineering ceiling, not a gecko measurement."
+      },
+      "prey_elevation_switch": {
+        "value": 0.0,
+        "units": "degrees from the horizon", "species": "Mus musculus", "sample_size": 20,
+        "source": "Identical stimulus, opposite behaviour by elevation. Overhead loom: escape 42/56 = 75%, latency 0.45 s. Same loom to the side: 53%, latency 1.79 s. Overhead sweep: freeze 56%. Same sweep to the side: escape 5%, and the mouse APPROACHED the screen on 80% of trials. Solomon, Janbon, Bimson & Wheatcroft 2023, R Soc Open Sci 10(4):230034. Yilmaz & Meister 2013 found floor-mounted looms produced ZERO escapes.",
+        "confidence": "likely", "recording_temp_C": null,
+        "notes": "PUBLISHED, mammal, and anatomically grounded: medial superior colliculus carries the upper visual field and projects to the escape and freeze pathways, lateral SC carries the lower field and projects to zona incerta for hunting. The ecological logic -- raptors above, insects below -- applies at least as strongly to a small nocturnal terrestrial insectivore, but NO reptile has been tested. The switch sits at the horizon because that is where the anatomy divides, not because a boundary was measured."
+      },
       "strike_trigger_distance_m": {
         "value": 0.0203,
         "units": "m", "species": "Coleonyx variegatus", "sample_size": 5,

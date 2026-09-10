@@ -74,13 +74,50 @@ MOTION_FLOOR = 1e-4
 MAX_TARGET_FRACTION = 0.25
 
 
+def _published(name):
+    from common.provenance import parameter_value
+    return float(parameter_value(name))
+
+
 class Tectum:
     """Retinotopic map in; bearing and salience out."""
 
     def __init__(self, retina, motion_floor=MOTION_FLOOR,
                  max_target_fraction=MAX_TARGET_FRACTION,
-                 subtract_field=True, surround_cells=3):
+                 subtract_field=True, surround_cells=3,
+                 velocity_band=True, elevation_switch=True):
         self.retina = retina
+        # TWO PUBLISHED RULES THE DETECTOR DID NOT HAVE.
+        #
+        # It asked only "small?" and "moving differently from its background?".
+        # Two of the six filters the literature describes, and the four missing
+        # ones are why it fires on anything that moves. These add the two with
+        # the strongest evidence behind them. The other two are deliberately
+        # NOT added, and the reasons are in the module docstring.
+        #
+        # VELOCITY BAND. Four independent lineages converge on the same order:
+        # toad prey-catching peaks 30-60 deg/s and dies above ~200; pit viper
+        # tectal units are near-silent at 5 deg/s and peak near 50; mouse
+        # looming escape is released only at 35 deg/s. The pit viper is a
+        # squamate -- the same tectum this module is a model of -- and it is
+        # the closest species anyone has recorded. No lizard has ever had its
+        # visual tectal velocity tuning measured, so this is a transfer, and it
+        # says so.
+        #
+        # ELEVATION SWITCH. The same stimulus means opposite things above and
+        # below the horizon. Identical looming disc: 75 % escape overhead
+        # against 53 % and much slower to the side. Identical small sweeping
+        # disc: freeze overhead, and 80 % APPROACH to the side. Floor-mounted
+        # looms produced zero escapes. It is anatomically grounded -- medial
+        # colliculus carries the upper field to the escape pathways, lateral
+        # carries the lower field to the hunting pathway -- and the ecology
+        # (raptors above, insects below) applies to this animal at least as
+        # strongly. No reptile has been tested.
+        self.velocity_band = bool(velocity_band)
+        self.elevation_switch = bool(elevation_switch)
+        self.v_peak = _published("prey_velocity_peak_deg_s")
+        self.v_low = _published("prey_velocity_low_cut_deg_s")
+        self.v_high = _published("prey_velocity_high_cut_deg_s")
         self.motion_floor = float(motion_floor)
         self.max_target_fraction = float(max_target_fraction)
         #: Leave this on. Off only in the test that measures what it is worth,
@@ -90,6 +127,68 @@ class Tectum:
         #: INVENTED.
         self.surround_cells = int(surround_cells)
         self.last = {"salience": 0.0, "bearing_deg": 0.0, "elevation_cell": None}
+        #: Frames of peak-position history the speed estimate is fitted over.
+        #: INVENTED. 25 frames is half a second at 50 Hz, which is roughly what
+        #: prey at 0.30 m needs to cross one cell.
+        self.speed_window = 25
+        #: Displacement below which the estimate is refused rather than
+        #: guessed. ONE FULL CELL, and the value was measured rather than
+        #: picked. At half a cell the estimator returned answers it could not
+        #: support: a 9 deg/s target read 52 (480 % error) and a 27 deg/s one
+        #: read 58 (114 %). At one cell the surviving estimates are accurate to
+        #: about 3 % from 60 deg/s upward, and slower targets are refused
+        #: instead of guessed. DERIVED from the map geometry.
+        self.min_resolvable_deg = 1.0 * (retina.fovy_deg / retina.cells)
+        self._history = []
+
+    def velocity_gain(self, deg_per_s):
+        """How much a target moving at this angular speed counts.
+
+        1.0 at the peak, falling to zero at both published cuts. The SHAPE
+        between them is INVENTED -- no tuning curve has been published for any
+        lizard -- but the peak and the two cuts are not.
+
+        WHAT THIS RULE CANNOT DO AT THE CURRENT MAP RESOLUTION, measured over
+        120 frames of sustained motion:
+
+            true 9 deg/s    measured 52    484 % error
+            true 27         measured 58    114 %
+            true 60         measured 62      3 %
+            true 150        measured 155     3 %
+            true 400        measured 414     3 %
+
+        Accurate from roughly 60 deg/s upward and wrong below it. A cricket at
+        the registry's ambient speed subtends 5-27 deg/s across the working
+        range of 0.10-0.50 m, which is entirely inside the unreliable band, so
+        THIS RULE DOES NOT CURRENTLY DISCRIMINATE REAL PREY. It rejects things
+        that are genuinely far too fast or too slow and passes everything in
+        between.
+
+        It does no harm -- the over-estimate lands near the peak, so prey is
+        accepted rather than wrongly rejected -- but it is not doing the job
+        the literature describes. Fixing that needs a finer retinotopic map or
+        a longer window, not a different threshold: raising the resolvability
+        floor from half a cell to a full cell changed the 9 deg/s error from
+        480 % to 484 %.
+        """
+        v = abs(float(deg_per_s))
+        if not (self.v_low < v < self.v_high):
+            return 0.0
+        if v <= self.v_peak:
+            return float((v - self.v_low) / max(self.v_peak - self.v_low, 1e-9))
+        return float((self.v_high - v) / max(self.v_high - self.v_peak, 1e-9))
+
+    def elevation_gain(self, row, rows):
+        """Below the horizon is food; above it is not.
+
+        Returns 1.0 in the lower half of the visual field and 0.0 in the upper.
+        A hard switch rather than a soft weight, because that is what was
+        measured: the same stimulus produced escape overhead and approach to
+        the side, not a graded blend.
+        """
+        if rows < 2:
+            return 1.0
+        return 1.0 if row >= rows / 2.0 else 0.0
 
     def step(self, retina_output):
         """Returns salience in [0, 1] and the bearing of the best target.
@@ -149,18 +248,120 @@ class Tectum:
 
         row, column = np.unravel_index(int(np.argmax(local)), local.shape)
         bearing = self.retina.azimuth_of(int(column))
+
+        rejected = None
+        gain = 1.0
+        # How fast the peak moved across the retina since the last frame, in
+        # degrees per second. Measured between successive peak azimuths rather
+        # than from the motion magnitude, because the magnitude is contrast and
+        # this rule is about angular speed.
+        speed = None
+        dt = float(retina_output.get("dt_s") or 0.0)
+        # SUB-CELL, and the first version was not. Taking the peak CELL and
+        # differencing its azimuth quantises speed to one cell width per frame:
+        # on a 16-cell map across 70 degrees at 50 Hz that is 219 deg/s per
+        # step, so the estimate could only ever read 0, 219, 438... and the
+        # whole velocity band -- 5 to 200 -- fell between two of its values.
+        # The rule would have looked present and been arithmetic noise.
+        #
+        # A brightness-weighted centroid of the cells around the peak gives a
+        # position between cells, which is what makes a 9 deg/s cricket
+        # distinguishable from a stationary one at all.
+        centre = _centroid_column(local, int(column))
+        fine_bearing = self.retina.azimuth_of(centre)
+        # A WINDOW, BECAUSE ONE FRAME CANNOT POSSIBLY MEASURE THIS.
+        #
+        # Real prey moves a small fraction of one cell per frame. At the
+        # registry's 0.047 m/s ambient speed, on a 16-cell map across 70
+        # degrees at 50 Hz:
+        #
+        #     0.10 m   26.9 deg/s   0.123 cells/frame    8 frames per cell
+        #     0.30 m    9.0 deg/s   0.041 cells/frame   24 frames per cell
+        #     0.50 m    5.4 deg/s   0.025 cells/frame   41 frames per cell
+        #
+        # Differencing successive frames therefore reads whatever the centroid
+        # noise happens to be: measured, the same 0.3 px/frame stimulus gave
+        # 110 deg/s and a 0.8 px/frame one gave 0.0. The band it feeds -- 5 to
+        # 200 deg/s -- is finer than the instrument, which is precisely the
+        # kind of rule that looks present and is arithmetic noise. This module
+        # has shipped one of those already.
+        #
+        # So displacement is measured across the longest window held, and the
+        # estimate is REFUSED rather than guessed when the target has not yet
+        # moved far enough to be resolvable.
+        self._history.append((fine_bearing, dt))
+        if len(self._history) > self.speed_window:
+            self._history.pop(0)
+        if len(self._history) >= 2:
+            span = sum(d for _, d in self._history[1:])
+            travelled = abs(self._history[-1][0] - self._history[0][0])
+            if span > 0 and travelled >= self.min_resolvable_deg:
+                speed = travelled / span
+
+        # A refused estimate does not veto the target. The rule can only
+        # reject what it has actually measured; treating "not yet resolvable"
+        # as "too slow" would blind the animal for the first half-second of
+        # every encounter.
+        if self.velocity_band and speed is not None:
+            g = self.velocity_gain(speed)
+            gain *= g
+            if g <= 0.0:
+                rejected = ("too slow" if speed <= self.v_low else "too fast")
+
+        if self.elevation_switch:
+            g = self.elevation_gain(int(row), int(local.shape[0]))
+            gain *= g
+            if g <= 0.0:
+                rejected = "above the horizon"
+
+        if gain <= 0.0:
+            self.last = {"salience": 0.0, "bearing_deg": 0.0,
+                         "elevation_cell": int(row), "rejected": rejected,
+                         "peak_speed_deg_s": speed}
+            return 0.0, 0.0
         # Salience is the target's strength relative to the strongest thing the
         # retina can report, so it arrives in [0, 1] as the selector expects.
-        salience = float(min(peak / max(raw_peak, 1e-9), 1.0))
+        salience = float(min(peak / max(raw_peak, 1e-9), 1.0)) * gain
         self.last = {"salience": round(salience, 6),
                      "bearing_deg": round(bearing, 4),
                      "elevation_cell": int(row),
-                     "field_subtracted": self.subtract_field}
+                     "field_subtracted": self.subtract_field,
+                     "velocity_gain": round(gain, 4),
+                     "peak_speed_deg_s": (round(speed, 2) if speed is not None
+                                          else None)}
         return salience, bearing
 
     def state(self):
         return dict(self.last,
-                    invented=["MOTION_FLOOR", "MAX_TARGET_FRACTION"])
+                    invented=["MOTION_FLOOR", "MAX_TARGET_FRACTION",
+                              "the shape of the velocity curve between its "
+                              "published peak and cuts"],
+                    published=["prey_velocity_peak_deg_s",
+                               "prey_velocity_low_cut_deg_s",
+                               "prey_velocity_high_cut_deg_s",
+                               "prey_elevation_switch"],
+                    rules={"small": True, "moves differently": True,
+                           "velocity band": self.velocity_band,
+                           "below the horizon": self.elevation_switch,
+                           "shape vs direction": False,
+                           "smell confirms": False})
+
+
+def _centroid_column(plane, peak_column, width=1):
+    """Brightness-weighted column of the peak and its immediate neighbours.
+
+    Returns a FRACTIONAL column index. Without this the reported position moves
+    in whole-cell jumps and any speed derived from it is quantised far coarser
+    than the band it is being compared against.
+    """
+    lo = max(peak_column - width, 0)
+    hi = min(peak_column + width + 1, plane.shape[1])
+    weights = plane[:, lo:hi].sum(axis=0)
+    total = float(weights.sum())
+    if total <= 0:
+        return float(peak_column)
+    columns = np.arange(lo, hi, dtype=float)
+    return float((weights * columns).sum() / total)
 
 
 def _surround(plane, width):
@@ -209,6 +410,12 @@ class Eye:
     def step(self, image, dt_s):
         """One frame through the whole eye."""
         retina_output = self.retina.step(image)
+        # The tectum's velocity rule needs to know how long a frame was, and
+        # the retina does not carry a clock. Without this the rule would find
+        # no dt, silently skip itself, and the whole filter would look present
+        # while doing nothing -- which is the exact shape of the no-op this
+        # module already shipped once (the scalar field subtraction).
+        retina_output = dict(retina_output, dt_s=float(dt_s))
         salience, bearing = self.tectum.step(retina_output)
         gaze = self.pretectum.step(retina_output, dt_s)
         self.last = {
