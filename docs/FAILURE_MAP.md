@@ -968,6 +968,9 @@ retrieve" into "does not exist."
 | 197 | This animal is simply nocturnal | **Partly -- crepuscular is the better reading** | the literature is split, the same species called nocturnal in one paper and crepuscular in another. The mechanistic result favours the second: **preferred body temperature rises through the light phase and peaks toward its end**, which Angilletta et al. 1999 propose is what initiates evening emergence. So arousal is modelled as already rising before dark rather than switching on at it |
 | 198 | A sleep module can borrow the bearded dragon's cycle period | **Refuted -- and left as a gap** | *E. macularius* IS in the reptile sleep literature (Bergel et al. 2026, seven lizard species, **n=2** leopard geckos, EOG under each eyelid -- it closes them, a tokay cannot). That establishes the animal sleeps and its eye movements are measurable. It does **not** supply a cycle period. A well-known agamid figure exists and borrowing it would take one line, so `sleep_cycle_period_s` is recorded **null** and a test asserts it stays null. `brain/arousal.py` is therefore a **circadian gate, not sleep architecture** |
 | 199 | The activity numbers are solid enough to build on | **Partly** | onset after dark is **81 min, n=1**, with **SD 89 and range 11-247** -- the standard deviation exceeds the mean. The evening peak window is n=18 but **captive**, from a welfare study that scored behaviour during the window it expected activity in, so it partly describes the experimenters. Both are used because they are all that exists, both are tagged `uncertain`, and **no field activity budget for a wild leopard gecko has ever been published** |
+| 200 | The frozen walker cannot reach striking distance (#174) | **REFUTED -- it can, and #174 was measuring the wrong thing** | told that the goal is the MOUTH at the published 20.3 mm, the same frozen checkpoint arrives **75 times in 160 s -- one every 2.1 seconds**, mean closest 20.5 mm. #174 drew its conclusion from a scripted approach inside `GeckoBrainEnv`, not from the walker. **The walker was never the blocker**, and a 3 M-step retrain was launched to fix a problem that did not exist |
+| 201 | Retraining on the mouth goal would improve it | **Refuted** | stopped at 2.14 M of 3 M steps. Closest mouth-to-goal **170.6 mm at 250 k and 167.9 mm at 750 k** against the old policy's 20.5 mm -- an order of magnitude worse. Episode length in training collapsed 1340 -> 12 steps while episode reward rose, which looks like reward hacking but is not: per-step reward also improved, −1.51 -> −0.32. The run was simply worse at the task and was killed rather than left to finish |
+| 202 | The blocker is in the walker | **Refuted -- it is in the brain's targeting** | `GeckoBrainEnv._brain_action_to_target` places the walker's goal **0.05-0.80 m ahead in the BODY FRAME**, derived from the brain's action. It never sets the target **at the prey**. So the brain can only ask the walker to head roughly that way, and the last few centimetres -- the ones that decide a strike -- are exactly where that loses |
 
 ### #138 and #134 — the two I told the user were true
 
@@ -1065,8 +1068,8 @@ Recorded so the gaps stay visible rather than getting invented later:
 
 | | |
 |---|---|
-| Hypotheses tested | **199** |
-| Refuted | **160** |
+| Hypotheses tested | **202** |
+| Refuted | **163** |
 | Confirmed | **26** |
 | Partly | **12** |
 | My own method errors | **35** |

@@ -1,0 +1,21 @@
+{
+ "schema_version": 1,
+ "question": "can the frozen walker put its mouth on a target at the published strike distance",
+ "method": "GeckoWalkEnv, gait_profile=legacy, control_mode=cpg_residual, approach_site='mouth', reach_dist=0.0203. Frozen checkpoint v4_5b_speed_polish_1m, deterministic, 8 episodes.",
+ "result": {
+  "goals_reached": 75,
+  "steps": 8000,
+  "seconds": 160.0,
+  "one_every_seconds": 2.1,
+  "mean_closest_mm": 20.5,
+  "target_mm": 20.3
+ },
+ "retrained_walker_for_comparison": {
+  "checkpoint": "models/walker_mouth_v1 (stopped at ~2.14 M of 3 M steps)",
+  "closest_mm_at_250k": 170.6,
+  "closest_mm_at_750k": 167.9,
+  "verdict": "far worse than the policy it was meant to replace"
+ },
+ "verdict": "THE WALKER WAS NEVER THE BLOCKER. Ledger #174 concluded it could not deliver the animal to striking distance, and that conclusion was drawn from a scripted approach inside GeckoBrainEnv rather than from the walker itself. Given a target and told the goal is the mouth, it arrives once every 2.1 seconds.",
+ "where_the_real_blocker_is": "GeckoBrainEnv._brain_action_to_target places the walker's target 0.05-0.80 m ahead IN THE BODY FRAME from the brain's action. It never sets the target at the prey. So the brain cannot ask the walker to go to the cricket -- only to go roughly that way -- and the last few centimetres are exactly where that loses."
+}
