@@ -1,0 +1,26 @@
+{
+ "schema_version": 1,
+ "generated_by": "tools/rhythm_vs_addon.py",
+ "video": "artifacts/video/rhythm_vs_addon.mp4",
+ "gait_profile": "lab",
+ "only_difference": "whether models/v4_5b_speed_polish_1m is loaded on top of the CPG",
+ "rhythm_alone": {
+  "front_left": 0.457,
+  "front_right": 0.437,
+  "gap": 0.021,
+  "path_m": 0.908,
+  "speed_m_s": 0.0454
+ },
+ "rhythm_plus_addon": {
+  "front_left": 0.205,
+  "front_right": 0.581,
+  "gap": 0.376,
+  "path_m": 1.95,
+  "speed_m_s": 0.0975
+ },
+ "gates": {
+  "rhythm_alone": "4 of 6 (accepted, ledger #71)",
+  "rhythm_plus_addon": "3 of 6 (rejected, ledger #11, after 2 x 3.01 M training steps)"
+ },
+ "caveat": "The add-on is only this bad when paired with `lab`. On `legacy` its front duty is 0.483/0.500, balanced (#184). The gate result -- 3/6 against 4/6 -- is the durable reason it was rejected; the visible limp needs this specific pairing."
+}
