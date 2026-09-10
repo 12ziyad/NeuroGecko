@@ -1,0 +1,542 @@
+{
+ "headline": "Memory and learning can be built on evidence, and the deferral should end. In the last eighteen months three papers on the actual target species produced usable numbers: leopard geckos improve about 9 percent per trial on a simple beacon task, reach a ceiling of roughly 3x faster and 4.6x straighter after 20 spaced trials, keep a learned location for 2 to 4 months, and are back to naive by 6 to 14 months. That is enough to build both modules honestly. But the numbers come with a timescale problem the project must face head on: the memory evidence lives at months, and a hunt lives at seconds. Nothing has ever been measured in any lizard at intervals shorter than two months, so a working-memory or within-session buffer is invention no matter how reasonable it looks. The irony is that the urgent module is the unsupported one. There is no size tuning, no speed tuning, no contrast threshold, and no acuity figure for any gecko, ever. The prey detector must be assembled from a fish larva, a mouse and a toad, with one exception: the strike itself. A gecko in the same family has published lunge numbers, and that covers the last two centimetres. Expect the animal to get much worse at hunting when the oracle is removed, and build the measuring apparatus before building the eye.",
+ "memory": {
+  "buildable": true,
+  "what_the_animal_actually_does": "A leopard gecko learns where one goal is and keeps that knowledge for a couple of months, then loses it. Detail goes first: after four months the animal still gets to the goal but by a longer, sloppier route. After six to fourteen months it performs like an animal that never learned anything and has to be retrained from scratch. It does not carry a map. Only about one third of individuals orient by the relationship between several cues; the rest lock onto one landmark or fall back on a search pattern the authors themselves say may involve no spatial knowledge at all. It does notice when an object it knows has moved, so it holds what-and-where information about objects even without a map. Individual differences are real but tiny and they fade with age.",
+  "parameters": [
+   {
+    "name": "Retention at 2 months (adult-trained), spatial goal location",
+    "value": "No significant loss. Latency at 2 months vs end of training: t=-0.71, df=536, p=0.9537. Path length: p=0.7011.",
+    "provenance": "PUBLISHED, target species, single lab",
+    "species": "Eublepharis macularius",
+    "citation": "Landova E, Chomik A, Vobrubova B, Hruska Hasova T, Vonavkova M, Frynta D, Frydlova P (2025) Animals 15(14):2014. doi:10.3390/ani15142014. n=42 (41F, 1M), 3 test trials, max 8 min."
+   },
+   {
+    "name": "Loss at 6 months (adult-trained)",
+    "value": "Path length statistically identical to naive baseline (Tukey p=0.9999; LME coefficient p=0.8903). Latency significantly LONGER than naive (p=0.0087). Required 30 retraining trials to recover.",
+    "provenance": "PUBLISHED, target species",
+    "species": "Eublepharis macularius",
+    "citation": "Landova et al. (2025) Animals 15(14):2014, Tables 1-3. n=28 (27F, 1M). NOTE: the paper's Results prose says path length p<0.1, which is a typo for p>0.1; the tables give p=0.89. Quote the tables, not the prose."
+   },
+   {
+    "name": "Retention at 4 months and loss at 14 months (juvenile-trained)",
+    "value": "4 months: latency HR=0.596 (95% CI 0.35-1.03, p=0.068, not significant) but path length HR=0.49 (0.28-0.85, p=0.0044, already degraded). 14 months: latency HR=0.27 (0.14-0.54, p<0.001), path HR=0.19 (0.09-0.38, p<0.0001); indistinguishable from the very first naive trials (latency p=0.917, path p=0.950).",
+    "provenance": "PUBLISHED, target species",
+    "species": "Eublepharis macularius",
+    "citation": "Chomik A, Psenickova E, Frydlova P, Frynta D, Janovcova M, Landova E (2026) Animals 16(8):1153. doi:10.3390/ani16081153. n=38 at 4 months, 37 at 14 months."
+   },
+   {
+    "name": "Two-component decay: precision decays before existence",
+    "value": "Route efficiency (path length) degrades significantly at 4 months while the ability to reach the goal at all (latency) does not. Model at least two components with different rates, not one scalar.",
+    "provenance": "PUBLISHED, target species",
+    "species": "Eublepharis macularius",
+    "citation": "Chomik et al. (2026) Animals 16(8):1153, Results section 3, stated by the authors as 'In contrast to the latency results'."
+   },
+   {
+    "name": "Exponential decay time constant (no published constant exists for any reptile)",
+    "value": "Path length: 34.8 percent of the learned gain remaining at 4 months, giving tau = 3.79 months (115 days), half-life 2.63 months (80 days). Latency: 39.6 percent remaining, tau = 4.32 months (131 days), half-life 2.99 months (91 days). Use the path-length figure. Valid only over 2 to 14 months.",
+    "provenance": "DERIVED by interpolation from two published papers. No reptile study has ever fitted a forgetting function. Assumes an exponential form that was never tested and treats a hazard ratio as a linear index of memory strength.",
+    "species": "Eublepharis macularius",
+    "citation": "Derived from Chomik et al. (2026) doi:10.3390/ani16081153 and cross-checked against Landova et al. (2025) doi:10.3390/ani15142014. Label as derived in the code comment; do not present as published."
+   },
+   {
+    "name": "Fraction of individuals using allothetic (multi-cue, relational) orientation",
+    "value": "About one third. The rest locked onto a single cue or may have used a non-cognitive motor search the authors could not rule out. Under progressive cue removal only 7 of 20 individuals were measurably disrupted at any stage (2 at one cue removed, 2 at three removed, 3 at all removed).",
+    "provenance": "PUBLISHED, target species, single low-visibility journal, no DOI, not PubMed indexed",
+    "species": "Eublepharis macularius",
+    "citation": "Landova E et al. (2022 [2023]) Acta Societatis Zoologicae Bohemicae 86:97-117, Discussion p.112. n=42 total (20 in the cue-removal arm, 22 in the arena-moved arm). Framing caveat: this is a Discussion statement about individual variability; the same paper's abstract is more upbeat and concludes the geckos show flexible cue use."
+   },
+   {
+    "name": "Cost of invalidating the near-field cue set",
+    "value": "Displacing the whole arena lengthened path by beta=0.4556 on log path length (95% CI 0.149-0.762, t=2.9173, p=0.0036), roughly a 58 percent increase. Moving the single most prominent distal cue (a 60 W light) had no group-level effect (beta=0.1235, p=0.4361). Removing proximal cues one at a time had no group-level effect at all.",
+    "provenance": "PUBLISHED, target species",
+    "species": "Eublepharis macularius",
+    "citation": "Landova E et al. (2022 [2023]) Acta Soc. Zool. Bohem. 86:97-117, Table 1. n=22 females, 669 model df."
+   },
+   {
+    "name": "Individual repeatability of spatial success (between-individual consistency)",
+    "value": "R=0.192 (95% CI 0.073-0.312) juvenile pre-training; R=0.071 (0.012-0.13) juvenile training; R=0.092 (0-0.189) subadult; R=0.03 (0-0.122, p=0.236, not significant) adult. So 81 to 97 percent of variance is within-individual noise.",
+    "provenance": "PUBLISHED, target species",
+    "species": "Eublepharis macularius",
+    "citation": "Chomik et al. (2026) Animals 16(8):1153, Table 1, 1000 bootstrap iterations, n=37-39."
+   },
+   {
+    "name": "Object-location change detection (what-and-where without a map)",
+    "value": "Geckos habituated to three objects spent more time near an object that had been moved to a new location, and more time near a familiar object that had been swapped for a novel one. Direction only; no effect size available.",
+    "provenance": "PUBLISHED, target species, paywalled, sample size not obtainable",
+    "species": "Eublepharis macularius",
+    "citation": "Kundey SMA, Phillips M (2021) Behavioural Processes 184:104320. doi:10.1016/j.beproc.2021.104320. n NOT OBTAINED - do not invent one."
+   },
+   {
+    "name": "Anatomical substrate and its timescales",
+    "value": "The medial cortex is the hippocampal homologue and is neurogenic in this species. Neuroblast migration from the ventricular zone to the medial cortex takes about 30 days; new neurons survive at least 140 days.",
+    "provenance": "PUBLISHED, target species, anatomy only",
+    "species": "Eublepharis macularius",
+    "citation": "McDonald RP, Vickaryous MK (2018) Scientific Reports 8:9648. doi:10.1038/s41598-018-27880-6. The timescale similarity to behavioural decay is a coincidence of magnitude, not a demonstrated mechanism."
+   }
+  ],
+  "must_be_invented": [
+   "Any decay at hours, days or weeks. Nothing has ever been measured in any lizard shorter than two months, and that is exactly the window a hunt occupies. If the module remembers where a cricket was five minutes ago, that rule is invented.",
+   "Working memory, a short-term buffer, or any capacity limit on how many items are held.",
+   "Place cells, grid cells, head-direction cells, or any metric map. Zero spatially tuned single units have ever been recorded in any reptile.",
+   "Path integration, dead reckoning, or a homeward vector. Never demonstrated in any reptile, and explicitly rejected in the one lizard tested for it (Ellis-Quinn and Simon 1989, Sceloporus jarrovi, n=108).",
+   "Retreat-site fidelity, nightly return-to-shelter probability, or home range size. No field study of this species exists at all.",
+   "Memory consolidation or replay during sleep. The word consolidation appears zero times in the only paper that ever recorded a sleeping leopard gecko.",
+   "Interference, retroactive or proactive, and any reversal cost for this species.",
+   "A savings coefficient for relearning after full forgetting.",
+   "Any coupling between body temperature and forgetting rate. The single closest experiment argues against it: fire salamanders held 100 days at 4 C forgot no more than controls at 20 C (Wilkinson et al. 2017, Sci Rep 7:40079, n=9)."
+  ],
+  "what_the_model_must_not_claim": [
+   "That decay is being modelled, if the simulation clock never reaches months. A tau of 115 days inside an episode measured in minutes is a term whose value is numerically indistinguishable from zero. This is the same class of defect as the scalar subtraction that could not move an argmax: the code runs, the parameter is real, the behaviour is unchanged. If the clock does not reach months, either run a compressed clock and say so, or do not ship the decay term.",
+   "That the gecko has a cognitive map or allocentric place memory. About two thirds of individuals showed no evidence of it, and the authors explicitly cannot rule out a non-cognitive motor search.",
+   "That memory duration is a reptile property. It is a species property. Tortoises retain for up to nine years, monitors for twenty months, this animal for two months. Fast forgetting is the ecologically correct default for a semi-arid seasonal habitat, not a deficiency to engineer away.",
+   "That the medial cortex module causes the memory behaviour. The anatomy is described in this species and the function has never been tested in it. The only two reptile lesion studies contradict each other and neither is a gecko.",
+   "That the retention numbers are replicated. Both papers come from one lab, one captive colony descended from about 90 wild-caught Pakistani founders, one apparatus, and one forced-swim task, with an overlapping author list. Treat them as a single evidence stream.",
+   "That any of this generalises across sexes. The 2023 and 2025 cohorts are 41 females to 1 male."
+  ]
+ },
+ "learning": {
+  "buildable": true,
+  "what_the_animal_actually_does": "A leopard gecko gets better at finding a fixed goal, slowly and unevenly. On the simplest version of the task, with one landmark right next to the goal, its chance of getting there rises about 9 percent per trial. Over 20 trials it ends up roughly three times quicker and takes a route about four and a half times more efficient, and then it stops improving. Roughly a quarter of individuals never engage with the task at all. In every published analysis, how motivated the animal was on that trial predicted performance more strongly than how much it had learned. It learns places and boundary shapes far more cheaply than it learns arbitrary visual patterns. Its defensive behaviour is not learned at all: an overt threat display in this species is triggered only by smell, with vision and touch able to raise sampling but never to fire the display on their own.",
+  "parameters": [
+   {
+    "name": "Per-trial acquisition rate, beacon task",
+    "value": "Hazard ratio 1.09 per trial (chi-square=16.43, df=1, p<0.0001), about a 9 percent rise per trial in the per-unit-time probability of reaching the goal. On a log-hazard scale, 0.086 per trial.",
+    "provenance": "PUBLISHED, target species. This is the single most directly usable learning number in the whole corpus, and it is unreplicated.",
+    "species": "Eublepharis macularius",
+    "citation": "Chomik A et al. (2026) Animals 16(8):1153. doi:10.3390/ani16081153. n=39 juveniles, 12 pre-training trials, ONE cue adjacent to the goal, fixed start position. This measures beacon approach, not place learning."
+   },
+   {
+    "name": "Training length to asymptotic improvement",
+    "value": "20 spaced trials produce a measurable group-level improvement. This is NOT a trials-to-criterion figure; 20 was the designed length of training.",
+    "provenance": "PUBLISHED, target species",
+    "species": "Eublepharis macularius",
+    "citation": "Landova E et al. (2025) Animals 15(14):2014; Chomik A et al. (2026) Animals 16(8):1153. Learning was defined as a significant contrast between trials 1-3 and trials 18-20."
+   },
+   {
+    "name": "Trial spacing regime the rate was measured in",
+    "value": "Adults: maximum one 8-minute trial per WEEK, so 20 trials spanned about 20 weeks. Juveniles: 2 to 4 trials per week, so about 5 to 10 weeks.",
+    "provenance": "PUBLISHED, target species",
+    "species": "Eublepharis macularius",
+    "citation": "Landova E et al. (2025) Animals 15(14):2014, Methods; Chomik A et al. (2026) Animals 16(8):1153, Methods."
+   },
+   {
+    "name": "Ceiling on how much experience reshapes behaviour",
+    "value": "Latency hazard ratio 3.02 (95% CI 1.67-5.49, p<0.001). Path length hazard ratio 4.59 (95% CI 2.54-8.27, p<0.0001). Final three trials versus first three trials of 20.",
+    "provenance": "PUBLISHED, target species",
+    "species": "Eublepharis macularius",
+    "citation": "Chomik A et al. (2026) Animals 16(8):1153. Cox mixed models adjusted for start position and motivation. HR is a hazard ratio, not a literal ratio of seconds or centimetres."
+   },
+   {
+    "name": "Correct learning readout",
+    "value": "Path length is significant across training phase (F=24.157, df=538, p<0.0001; also F=12.727, df=207, p<0.0001 in the 2023 cohort). Latency is NOT (F=0.326, df=208, p=0.5686 in adults).",
+    "provenance": "PUBLISHED, target species",
+    "species": "Eublepharis macularius",
+    "citation": "Landova E et al. (2022 [2023]) Acta Soc. Zool. Bohem. 86:97-117; Landova E et al. (2025) Animals 15(14):2014."
+   },
+   {
+    "name": "Motivation gates performance more strongly than learning does",
+    "value": "Number of motivational prods: F=682.884 (2023 cue-removal model), F=280.490 and F=350.221 (2025 path and latency models), chi-square=197.134 (2026 latency model), all p<0.0001. Compare the training-phase term in the same models: F=10.228 to 24.157, chi-square=33.853.",
+    "provenance": "PUBLISHED, target species",
+    "species": "Eublepharis macularius",
+    "citation": "Landova E et al. (2022 [2023]) Acta Soc. Zool. Bohem. 86:97-117; Landova E et al. (2025) Animals 15(14):2014; Chomik A et al. (2026) Animals 16(8):1153."
+   },
+   {
+    "name": "Engagement failure rate",
+    "value": "42 of 56 (75 percent) completed training. Upstream of that, only 56 of 140 screened animals (40 percent) swam actively enough to enter the study at all.",
+    "provenance": "PUBLISHED, target species",
+    "species": "Eublepharis macularius",
+    "citation": "Landova E et al. (2022 [2023]) Acta Soc. Zool. Bohem. 86:97-117; Landova E et al. (2025) Animals 15(14):2014. The published population is a self-selected active-swimming subset."
+   },
+   {
+    "name": "Spatial reference frame: boundary geometry beats landmark features",
+    "value": "Trained with both available, geckos followed arena geometry and ignored the feature when the two conflicted. With geometry alone they chose the trained corner or its rotationally opposite twin. Direction only; no sample size, arena size, trial count or percentage is recoverable.",
+    "provenance": "PUBLISHED, target species, single author, paywalled, never replicated",
+    "species": "Eublepharis macularius",
+    "citation": "Kundey SMA (2021) Behavioural Processes 188:104412. doi:10.1016/j.beproc.2021.104412. n NOT OBTAINED. Attach no number to this finding."
+   },
+   {
+    "name": "Spatial learning is cheap, arbitrary visual learning is expensive",
+    "value": "About 20 trials for a place in a leopard gecko, versus 477-486 trials for an arbitrary visual pattern in a skink, where 4 of 6 animals never reached criterion at all.",
+    "provenance": "PUBLISHED, proxy (distant, Scincidae), corroborated in direction by the target-species geometry result",
+    "species": "Egernia stokesii",
+    "citation": "Szabo B, Whiting MJ (2022) Animal Cognition 25(4):935-950. doi:10.1007/s10071-022-01603-x. n=6 (main test) plus n=2 (pilot)."
+   },
+   {
+    "name": "Serial reversal improves with practice, in the same family",
+    "value": "Banded geckos improved significantly across eight successive spatial reversals: errors to criterion F(8,32)=3.12, p<.025; trials to criterion F(8,32)=2.67, p<.025; linear negative slope by Duncan post hoc. Mean cumulative error 122. Reversal index .84 errors, .75 trials. Criterion 80 percent correct (16 of 20), 5 trials per day, inter-trial interval about 7 minutes, 60 pre-training trials.",
+    "provenance": "PUBLISHED, proxy (same family, Eublepharidae). Single three-page note, n=5, never replicated, and two earlier unpublished studies on the same species found NO reversal improvement.",
+    "species": "Coleonyx variegatus",
+    "citation": "Kirkish PM, Fobes JL, Richardson AM (1979) Bulletin of the Psychonomic Society 13(4):265-267. doi:10.3758/BF03335078. n=5 (3M, 2F), mean SVL 6.5 cm. The df of (8,32) spans nine levels because acquisition is included, so the omnibus test covers acquisition plus eight reversals."
+   },
+   {
+    "name": "Reversal cost bracket, from distant lizards",
+    "value": "Low end 1.3x: skink spatial task 8.16 +/- 0.69 trials to criterion, reversal 10.74 +/- 0.98, with only 19 of 59 individuals (32 percent) learning both. High end about 10x: anole discrimination 6-7 trials, reversal 64-65 trials, with 2 of 4 failing outright.",
+    "provenance": "PUBLISHED, two distant proxies that disagree by roughly eightfold. Neither is a gecko.",
+    "species": "Eulamprus quoyii (Scincidae) and Anolis evermanni (Dactyloidae)",
+    "citation": "Noble DWA, Carazo P, Whiting MJ (2012) Biology Letters 8(6):946-948. doi:10.1098/rsbl.2012.0813. Leal M, Powell BJ (2012) Biology Letters 8(1):28-30. doi:10.1098/rsbl.2011.0480."
+   },
+   {
+    "name": "Defensive display is hard-wired and chemosensory-gated, not learned",
+    "value": "Tongue flicks: control 2.79 (95% CI 1.87-3.70), snake shed skin 7.65 (5.56-9.74), all three modalities 13.18 (10.57-16.44). Antipredator response probability: chemical alone 0.20 (0.09-0.40), chemical plus visual 0.40 (0.21-0.62), all three 0.29 (0.14-0.51). Visual and mechanical cues alone never triggered a display; integration was additive, not multiplicative.",
+    "provenance": "PUBLISHED, target species",
+    "species": "Eublepharis macularius",
+    "citation": "Frydlova P, Hirschler D, Chomik A, Psenickova E, Landova E, Frynta D (2026) Behavioral Ecology 37(4):arag062. doi:10.1093/beheco/arag062. n=42 adults (9M, 33F), 90 s trials."
+   }
+  ],
+  "must_be_invented": [
+   "Any learning rate for an appetitive, food-rewarded, or prey-capture task. Every learning number for this species comes from an aversive forced-swim escape task in which the animal was prodded with a swab to keep it moving. A hunting simulation is a different motivational world and no number crosses that gap.",
+   "Any learning rate in a fast-clock regime. The 9 percent per trial figure was measured with trials spaced a week apart. If the simulation runs many trials per simulated day, it is outside the regime the number was measured in.",
+   "A per-individual trials-to-criterion rule. None exists for this species in any task.",
+   "Reversal cost for this species. If reversal is needed, expose it as a tunable multiplier bounded by 1.3x and 10x and state that no target-species measurement exists.",
+   "Extinction rate, trials-to-extinction, or spontaneous recovery. Zero studies in any lizard.",
+   "A habituation decay constant. This is the biggest single gap. No fitted habituation curve or time constant exists for ANY lizard or ANY reptile. The only trial-indexed data in any gecko is a Tokay study (Szabo and Ringler 2025, n=20) showing habituation to a novel SPACE within about 4 exposures, NO habituation to a novel OBJECT next to food across 30 trials, and antipredator immobility staying repeatable (R=0.41-0.56) across monthly repeats. Those three facts are constraints; the rate is invention.",
+   "Latent or unreinforced map building rate. Directionally permitted by one lacertid study whose sample size could not be obtained; no rate anywhere.",
+   "Social learning, gaze following as a mechanism, and tool use. Gaze following rests on one study with six observers, one demonstrator, and a movement-versus-gaze confound the authors themselves could not resolve. Tool use has zero hits in any lizard.",
+   "Sex-specific learning parameters. A meta-analysis of 11 lizard species found essentially no sex effect, and the target species found none either (p=0.9626 latency, p=0.487 path). Building them would be inventing a difference that was looked for and not found.",
+   "Any coupling of learning rate to body temperature. A Q10 of 3.1 and 2.3 exists for maze acquisition in a diurnal desert iguana from 1968, whose full text and sample size could not be obtained and whose thermal optimum is nothing like a nocturnal gecko's."
+  ],
+  "what_the_model_must_not_claim": [
+   "That the learning rate is calibrated to this species' hunting. It is calibrated to this species' swimming away from water. Say so in the code comment.",
+   "That 20 trials is a trials-to-criterion. It is the length the experimenters chose. The only defensible statement is that 20 spaced trials produce a measurable group-level improvement.",
+   "That a learning curve measured in time-to-goal is a learning curve. In this species it is largely a motivation curve, and in the dark it goes the wrong way entirely: geckos reached the goal faster while swimming longer, faster paths. This is the direct analogue of the velocity rule finer than its own instrument. A metric that improves when the animal is doing worse is not a metric.",
+   "That a learning module which improves path efficiency by more than about 5x over 20 trials is modelling this animal. That outruns the published ceiling.",
+   "That learning is deterministic. Between-individual consistency is R=0.03 to 0.19, so roughly 81 to 97 percent of the variance is within-individual noise, and about a quarter of animals never engage. A clean monotonic learner is the wrong shape.",
+   "That a gain term which is always smaller than the drive term is doing anything. Motivation outweighed training phase by roughly an order of magnitude in F in every published model. If drive is modelled as a multiplier and learning as a small additive term, the learning term will never move the behaviour, and the module will look present and do nothing.",
+   "That an egocentric turn rule is the evidence-backed default. The claim that whiptail lizards reverse position cues faster than feature cues did not survive verification: a specialist review reports the spatial advantage held during acquisition only and NOT during reversal, and the reading of position as an egocentric response rule is an interpolation the paper does not support.",
+   "That vision can trigger a defensive display. In this species it cannot. If the simulated gecko has no chemical channel, it should be unable to mount an overt display at all."
+  ]
+ },
+ "sleep": {
+  "cycle_period_available": false,
+  "nearest_published": "No sleep-cycle period has ever been printed for Eublepharis macularius. The animal has been recorded asleep exactly once in the history of the field, in two males, and the paper reports per-species periods only as a violin plot, with raw data available from the authors on request. What IS published is a bounded interval that contains the gecko's value by construction: median periodicities of 84 to 134.5 seconds across all individuals of the seven lizard species studied, with a mean across species of 113.2 +/- 6.8 seconds, all measured at 20 to 27 degrees C ambient. The same paper's figure legend gives a rounded visual anchor of about 100 seconds in lizards against about 50 seconds in mammals and birds. Use 100 to 113 seconds as the default and run sensitivity across 84 to 134.5 seconds. Do not state a single gecko-specific value as published, because the paper does not print one.",
+  "parameters": [
+   {
+    "name": "Infraslow sleep-cycle period, lizard bracket containing the gecko",
+    "value": "84 to 134.5 s across individuals; mean across seven lizard species 113.2 +/- 6.8 s; ambient 20-27 C. Figure legend anchor about 100 s in lizards versus about 50 s in mammals and birds.",
+    "provenance": "PUBLISHED, target species included in the pooled sample, but no per-species value printed",
+    "species": "Seven lizard species including Eublepharis macularius",
+    "citation": "Bergel A, Schmidt JM, Barrillot B, et al. (2026) Nature Neuroscience 29(3):543-550. doi:10.1038/s41593-025-02159-y. Leopard gecko n=2, both male, 72 g. The plus-minus is not identified as SD or SEM in the source; do not assert one."
+   },
+   {
+    "name": "Sleep occurs in the light phase",
+    "value": "Sustained inactivity and sleep occurred during the LIGHT phase in the nocturnal/crepuscular gecko, and during the dark phase in the diurnal species.",
+    "provenance": "PUBLISHED, target species, main text statement; the supporting quantification is NOT significant",
+    "species": "Eublepharis macularius",
+    "citation": "Bergel A et al. (2026) Nat Neurosci 29(3):543-550, main text and Extended Data Fig. 1. Two corrections: the study had FIVE diurnal lizards, not six, because two of the seven species were nocturnal geckos; and in Extended Data Fig. 1 the gecko's light-versus-dark infraslow occupancy is about 23 percent versus 21 percent with no significance marker. Treat the light-phase timing as descriptive, not as a quantified circadian result."
+   },
+   {
+    "name": "Behavioural sleep-scoring rule actually applied to the gecko",
+    "value": "Sleeping equals head lying on its support (floor, branch or terrarium wall) for at least 30 minutes, usually with eyes closed; brief eye-openings under 5 seconds not excluded; everything else is wake. Minimum bout admitted to analysis 15 minutes; analysis in 1-hour bouts.",
+    "provenance": "PUBLISHED, target species",
+    "species": "Eublepharis macularius",
+    "citation": "Bergel A et al. (2026) Nat Neurosci 29(3):543-550, Methods, 'Sleep identification and scoring'. The 30-minute figure is the scoring criterion and the 15-minute figure is an analysis cutoff; they are not measured bout durations and must not be reported as such."
+   },
+   {
+    "name": "Temperature scaling of cycle rate",
+    "value": "Q10 = 2.3 for oscillation rate, fitted as R_T = R_T0 * 2.3^((T-T0)/10) with T0 = 17 C, across 17 to 35 C. Measured endpoints: 34 C gives 48 s, 26-28 C gives 92.8 +/- 9.5 s, 21 C gives 158 s. A separate Q10 of 2.0 for phase-transition frequency.",
+    "provenance": "PUBLISHED, proxy (distant, Agamidae). Corroborated in direction only, by the gecko-inclusive finding that period versus body temperature gives R-squared = 0.88 across species.",
+    "species": "Laudakia vulgaris",
+    "citation": "Albeck N, Udi DI, Eyal R, Shvartsman A, Shein-Idelson M (2022) Communications Biology 5:1310. doi:10.1038/s42003-022-04261-4. n=9 adults, 14,999 cycles over 50 nights. One lab, one fit, never replicated."
+   },
+   {
+    "name": "Sleep pressure changes intensity, not period",
+    "value": "After 7 hours of sleep deprivation there was a significant delta-power rebound, but cycle period, slow-wave bout length and REM-like bout length were all statistically unchanged (bootstrap p=0.55, 0.86), and sleep quantity did not increase. Baseline period in that dataset was 81 s.",
+    "provenance": "PUBLISHED, proxy (distant, Agamidae)",
+    "species": "Pogona vitticeps",
+    "citation": "Hatori S, Yamaguchi ST, Kobayashi R, et al. (2025) PNAS 122:e2415929122. doi:10.1073/pnas.2415929122. N=5 sessions from 3 and 5 animals. Model sleep pressure as an amplitude variable; hold the period fixed."
+   },
+   {
+    "name": "Spectral bands for a scoreable synthetic signal",
+    "value": "Delta below 4 Hz, beta 10-30 Hz, transition frequency about 4 Hz. Score by autocorrelation of the delta-over-beta power ratio. No sleep spindles and no clear theta were observed.",
+    "provenance": "PUBLISHED, target species used the 10-30 Hz beta band; band definitions shared across three papers",
+    "species": "Eublepharis macularius, Pogona vitticeps, Laudakia vulgaris",
+    "citation": "Bergel A et al. (2026) doi:10.1038/s41593-025-02159-y; Shein-Idelson M et al. (2016) Science 352:590-595. doi:10.1126/science.aaf3621; Albeck N et al. (2022) doi:10.1038/s42003-022-04261-4. The absence of spindles is a hard negative constraint: do not add mammalian spindles."
+   },
+   {
+    "name": "Physiological correlates of the cycle phase",
+    "value": "Heart rate is significantly modulated by the infraslow phase in 7 of 7 lizard species; breathing rate and muscle tone in 5 of 7; eye-movement density is higher in the high-beta phase in 6 of 7. The SIGN of heart-rate coupling differs between species and is not reported for the gecko.",
+    "provenance": "PUBLISHED, target species included; no per-species modulation depths or phase angles printed",
+    "species": "Seven lizard species including Eublepharis macularius",
+    "citation": "Bergel A et al. (2026) Nat Neurosci 29(3):543-550, Fig. 2. Modulate simulated heart rate, breathing and muscle tone with cycle phase, but do not guess the gecko's sign."
+   },
+   {
+    "name": "Architecture: one oscillator with two phases, not two sleep states",
+    "value": "The only paper that ever recorded a leopard gecko argues the two phases are the phases of a single infraslow rhythm, similar to mammalian NREM, and states its findings are inconsistent with the claim that high-beta periods in lizards indicate REM sleep. No sustained limb or tail twitching was seen in any of the seven species.",
+    "provenance": "PUBLISHED, target species, but a minority interpretation in active disagreement with two other groups",
+    "species": "Eublepharis macularius and six other lizards",
+    "citation": "Bergel A et al. (2026) Nat Neurosci 29(3):543-550, Discussion. Contradicted by the SWS/REM framing of Shein-Idelson et al. (2016) Science 352:590-595 and Albeck et al. (2022) Commun Biol 5:1310."
+   },
+   {
+    "name": "Sleep-state proportions and total sleep time",
+    "value": "NOT FOUND for any gecko. No total sleep time, no state proportion, no bout duration, no cycle count has ever been published for any gekkotan. The nearest lizard figures disagree with each other by a factor of three (about 50 percent REM-like per cycle in Pogona versus 17.2 +/- 2.3 percent of total sleep time in Salvator).",
+    "provenance": "NOT_FOUND",
+    "species": "Eublepharis macularius",
+    "citation": "Absence established against Libourel PA, Herrel A (2016) Biological Reviews 91(3):833-866, doi:10.1111/brv.12197, whose full text contains the strings gecko, Gekko, Gekkonidae and Eublepharis zero times, plus Europe PMC queries returning zero hits for leopard gecko sleep duration."
+   }
+  ]
+ },
+ "prey_detector": {
+  "two_channel_split": "Build two parallel detector channels over the same visual input, both tuned to small moving objects, differing only in receptive-field size and in what they are wired to. Channel A, wide-field: one unit per patch of roughly 30 to 34 degrees across (published receptive fields of 700 to 900 square degrees), tuned to objects of about 4 to 5 degrees, NOT direction-selective, and with no fine localisation. Its only output is 'something small is moving somewhere in this patch'. Channel B, narrow-field: a dense retinotopic array of units covering under 16 degrees each (under 200 square degrees), tuned to the same 4 to 5 degree object size, direction-selective, and precisely localised. Its output is a continuous bearing error. Wire them differently, because the published lesion result is a clean double dissociation: silencing wide-field cells stopped approaches being INITIATED from beyond 22 cm without hurting accuracy once an approach began, while silencing narrow-field cells degraded targeting accuracy, cut the probability of interception given an approach, made the animal pause within 5 cm of the prey, and stopped it re-initiating after a failed contact. A third class (parvalbumin cells, tuned to larger and darker stimuli) had no role in prey capture at all. So: Channel A gates whether a hunt starts and at what range; Channel B supplies the steering signal during pursuit and the terminal commitment. An independent two-channel size split is published in a fish larva with a crossover at 6 degrees: the prey-feeding retinal channel peaks at 2 to 3 degrees and falls off above 6, while a sibling channel does not respond below 6 degrees at all. Use 6 degrees as the small-versus-large crossover, route small to approach and large to avoid, and reproduce the published sign reversal: a 1 degree spot evokes a turn of about 20 degrees TOWARD, a 10 degree spot a turn of about 60 degrees AWAY. Finally, the detector is not one filter across the whole hunt. The same cricket grows from roughly 5 degrees at detection to roughly 45 degrees at the strike (a 1.8 cm cricket at the published 2.03 cm lunge distance), and separate cell populations own each end, so build a small-object detection filter and a large-object strike-commit filter as different units.",
+  "parameters": [
+   {
+    "name": "Wide-field receptive field size",
+    "value": "700 to 900 square degrees, equivalent to about 30 to 34 degrees diameter. Responds to small light or dark objects moving anywhere within that region.",
+    "provenance": "PUBLISHED, proxy (mouse superior colliculus). No gecko equivalent exists.",
+    "species": "Mus musculus",
+    "citation": "Hoy JL, Bishop HI, Niell CM (2019) Current Biology 29(23):4130-4138.e5. doi:10.1016/j.cub.2019.10.017. Receptive-field fits from n=14 wide-field cells, 10 mice."
+   },
+   {
+    "name": "Narrow-field receptive field size and direction selectivity",
+    "value": "Under 200 square degrees, equivalent to under about 16 degrees diameter. Direction-selective, responds to small light or dark spots.",
+    "provenance": "PUBLISHED, proxy (mouse superior colliculus)",
+    "species": "Mus musculus",
+    "citation": "Hoy JL, Bishop HI, Niell CM (2019) Curr Biol 29(23):4130-4138.e5. n=7 narrow-field cells, 8 mice."
+   },
+   {
+    "name": "Preferred object size, both channels",
+    "value": "4 to 5 degrees. IMPORTANT CAVEAT: the size ladder tested was 2, 4, 8, 16, 32 degrees for flashed spots and only 4, 8, 16 degrees for moving spots, so the reported optimum is the argmax over a coarse discrete ladder and the true optimum may be smaller than the smallest size tested. Use a broad kernel, not a sharp 4.5 degree peak.",
+    "provenance": "PUBLISHED, proxy, with a known sampling limitation",
+    "species": "Mus musculus",
+    "citation": "Hoy JL, Bishop HI, Niell CM (2019) Curr Biol 29(23):4130-4138.e5, STAR Methods. Size-selective units n=21, 11, 14 across the three cell types."
+   },
+   {
+    "name": "Behavioural double dissociation, for validating a simulated lesion",
+    "value": "Wide-field suppression reduces the probability of initiating approaches from beyond 22 cm, without harming accuracy once started. Narrow-field suppression degrades targeting accuracy, reduces interception given approach, produces pauses within 5 cm of the prey, and reduces re-initiation after a failed contact. Parvalbumin suppression has no effect on any prey-capture measure. Firing-rate suppression was about 35 percent per cell in all three groups.",
+    "provenance": "PUBLISHED, proxy",
+    "species": "Mus musculus",
+    "citation": "Hoy JL, Bishop HI, Niell CM (2019) Curr Biol 29(23):4130-4138.e5. n=10 control, 10 wide-field, 11-12 narrow-field, 9 parvalbumin mice. Reproducing this dissociation under simulated lesion is the correctness test for the two-channel split."
+   },
+   {
+    "name": "Small-versus-large channel crossover",
+    "value": "6 degrees. The prey channel peaks at 2 to 3 degrees and responds much less above 6 degrees; the sibling channel does not respond to small dots and only begins responding above 6 degrees. Non-overlapping.",
+    "provenance": "PUBLISHED, proxy (zebrafish larva retinal arborization fields AF7 and AF9)",
+    "species": "Danio rerio",
+    "citation": "Semmelhack JL, Donovan JC, Thiele TR, Kuehn E, Laurell E, Baier H (2014) eLife 3:e04878. doi:10.7554/eLife.04878. n=10 larvae for imaging."
+   },
+   {
+    "name": "Behavioural size tuning",
+    "value": "Optimum 3 degrees over a tested range of 0.5 to 30 degrees; response 'strikingly reduced' by 10 degrees.",
+    "provenance": "PUBLISHED, proxy",
+    "species": "Danio rerio",
+    "citation": "Semmelhack JL et al. (2014) eLife 3:e04878, Fig. 2A. n=16 head-fixed larvae, tested at 8 dpf."
+   },
+   {
+    "name": "Speed bandpass",
+    "value": "Peak 90 degrees per second; minimal response below 12 or above 360 degrees per second. Same tuning in the behaviour and in the retinal channel that drives it. Implement as a bandpass gate with a 90 deg/s peak and roughly 1.5-decade skirts.",
+    "provenance": "PUBLISHED, proxy. This is the most complete published speed band available for any prey detector.",
+    "species": "Danio rerio",
+    "citation": "Semmelhack JL et al. (2014) eLife 3:e04878, Fig. 2B. n=9 larvae for the speed curve."
+   },
+   {
+    "name": "Sign reversal with size, and per-presentation response probability",
+    "value": "A 1 degree moving spot evokes a low-amplitude turn of about 20 degrees TOWARD; a 10 degree spot evokes a high-amplitude turn of about 60 degrees AWAY (1 versus 5 degrees p<0.001; 1 versus 10 degrees p<0.001). Response rate was 22 percent for small stimuli and 24 percent for large.",
+    "provenance": "PUBLISHED, proxy",
+    "species": "Danio rerio",
+    "citation": "Bianco IH, Kampff AR, Engert F (2011) Frontiers in Systems Neuroscience 5:101. doi:10.3389/fnsys.2011.00101. Trials n=705, 690, 646, 615 at 1, 3, 5, 10 degrees. The detector must NOT be deterministic: even an optimal stimulus released the behaviour on about one presentation in five."
+   },
+   {
+    "name": "Approach-state entry gate",
+    "value": "Enter approach when all three hold: range is decreasing, absolute prey bearing is under 90 degrees, and self-speed exceeds threshold (5 cm/s in the 2016 study, 3 cm/s in 2019, to be scaled to body size). Contact defined as range under 3 to 4 cm. This conjunction predicted 100 percent of interceptions.",
+    "provenance": "PUBLISHED, proxy. A validated operational definition, directly reusable both as the policy gate and as the scoring rule.",
+    "species": "Mus musculus",
+    "citation": "Hoy JL, Yavorska I, Wehr M, Niell CM (2016) Current Biology 26(22):3046-3052. doi:10.1016/j.cub.2016.09.009. n=47, 100, 46, 119 approaches across sensory conditions."
+   },
+   {
+    "name": "Angular size at which vision starts guiding approach",
+    "value": "6 to 8 degrees, from a 2 cm cricket at 15 to 20 cm range. The authors themselves call this a rough estimate.",
+    "provenance": "DERIVED (geometric), proxy. The single most load-bearing number in any 'what counts as prey' rule and also the weakest. Order-of-magnitude anchor only.",
+    "species": "Mus musculus",
+    "citation": "Hoy JL et al. (2016) Curr Biol 26(22):3046-3052. n=13 and 13 mice, 29 and 35 trials."
+   },
+   {
+    "name": "Terminal bearing accuracy target",
+    "value": "11.4 +/- 1.4 degrees residual bearing error at the end of a visually guided approach, versus 41.1 +/- 1.2 degrees with vision removed (near chance, given bearing must be under 90 degrees to count as an approach). Bearing decreases sharply once range falls below 15 to 20 cm.",
+    "provenance": "PUBLISHED, proxy",
+    "species": "Mus musculus",
+    "citation": "Hoy JL et al. (2016) Curr Biol 26(22):3046-3052. n=16, 10, 8, 8 mice across four sensory conditions. Use about 40 degrees as the blind baseline to confirm the simulated vision is actually doing work."
+   },
+   {
+    "name": "Bimodal approach initiation",
+    "value": "Approach-start distance peaks at 9.6 +/- 1.5 cm and at 31.8 +/- 9.4 cm; 86 +/- 5 percent of approaches started beyond 22 cm. Approach-start bearing is also bimodal, at 12 +/- 10 degrees or 75 +/- 16 degrees.",
+    "provenance": "PUBLISHED, proxy",
+    "species": "Mus musculus",
+    "citation": "Hoy JL, Bishop HI, Niell CM (2019) Curr Biol 29(23):4130-4138.e5. n=10 control mice. A single-threshold detector cannot reproduce this; two distinct release conditions can."
+   },
+   {
+    "name": "Strike release distance and kinematics, TARGET FAMILY",
+    "value": "Lunge released at 2.03 +/- 0.08 cm range. Peak strike velocity 85.1 +/- 2.19 cm/s. Peak acceleration 46.6 +/- 1.97 m/s squared. Peak acceleration occurs 16.34 ms before contact, peak velocity 9.03 ms before contact. Strike success 77.0 to 78.6 percent overall.",
+    "provenance": "PUBLISHED, proxy (same family, Eublepharidae, different genus). The best-transferring numbers in the entire corpus, and the only quantitative prey-capture data anywhere near this animal.",
+    "species": "Coleonyx variegatus",
+    "citation": "Vollin MF, Higham TE (2021) Integrative and Comparative Biology 61(2):538-549. doi:10.1093/icb/icab076. n=5 juvenile geckos. Single lab, tiny sample."
+   },
+   {
+    "name": "Strike release scales with prey escape capability",
+    "value": "Strike distance is significantly greater for evasive prey (crickets) than non-evasive prey (mealworms). Whole-body lunge for crickets versus head, neck and forelimb movement only for mealworms. Cricket capture success 116 of 140 trials (82.9 percent); mealworm 53 of 53 (100 percent). Subjugation shake frequency 12.30 +/- 2.06 per second, peak shake velocity 1.18 +/- 0.17 m/s, amplitude 10.78 +/- 1.57 mm.",
+    "provenance": "PUBLISHED, proxy (same family). Sign of the effect only; the modulation function is not published.",
+    "species": "Coleonyx variegatus",
+    "citation": "Vollin MF, Higham TE (2023) Frontiers in Behavioral Neuroscience 17:1173065. doi:10.3389/fnbeh.2023.1173065. n=5 geckos, 3.23-4.03 g, SVL 48.94-56.91 mm, 140 cricket and 53 mealworm trials."
+   },
+   {
+    "name": "Multiple targets, neural mechanism",
+    "value": "Divisive normalisation across the target map, with global (not lateral) inhibition. The strongest competitor suppressed responses by 61 +/- 7 percent on average. About half the population (48 percent, n=51) signalled the strongest stimulus with a near-binary switch whose transition range was 4 deg/s or less in competitor loom-speed units; the rest (52 percent, n=56) were gradual. Discriminability at a 2 deg/s strength difference: d-prime 2.48 +/- 0.38 switch-like versus 0.8 +/- 0.18 gradual.",
+    "provenance": "PUBLISHED, proxy (barn owl optic tectum)",
+    "species": "Tyto alba",
+    "citation": "Mysore SP, Asadollahi A, Knudsen EI (2011) Journal of Neuroscience 31(14):5186-5196. doi:10.1523/JNEUROSCI.4592-10.2011. 169 units, 9 owls. Mechanism paper: Mysore et al. (2010) J Neurosci 30(5):1727-1738. doi:10.1523/JNEUROSCI.3740-09.2010."
+   },
+   {
+    "name": "Multiple targets, selection policy",
+    "value": "With two equal-strength competitors: 80 percent winner-take-all, 20 percent vector averaging. With unequal competitors, the stronger is chosen 70 percent of the time. Tectal cells are more switch-like than retinal cells (R=0.72 versus 0.47).",
+    "provenance": "PUBLISHED, proxy, AND MEASURED ON THE WRONG BEHAVIOUR. The 80/20 split and the 0.7 bias come from escape responses to competing looming stimuli, not from prey selection. The same paper shows the competition mechanism extends to prey-like stimuli only at the imaging level.",
+    "species": "Danio rerio",
+    "citation": "Fernandes AM, Mearns DS, Donovan JC, et al. (2021) Neuron 109(5):805-822.e6. doi:10.1016/j.neuron.2020.12.002. N=117 fish."
+   },
+   {
+    "name": "Target choice in a dense prey field, and the strike acceptance window",
+    "value": "With about 100 prey items present, the animal almost invariably chose the CLOSEST one, subject to an acceptance window. Hunt-initiation prey position: azimuth mean 0.7 deg, SD 48.4 deg; altitude mean 19.9 deg, SD 19.7 deg; distance mean 3.4 mm, SD 1.6 mm. Strike zone (95 percent CI during successful strikes): azimuth 0.9 deg, altitude 17.4 deg, distance 0.870 mm. Note the acceptance window is WIDE in azimuth and NARROW in elevation.",
+    "provenance": "PUBLISHED, proxy. The nearest-target rule is stated qualitatively, without a probability.",
+    "species": "Danio rerio",
+    "citation": "Bolton AD, Haesemeyer M, Jordi J, et al. (2019) eLife 8:e51975. doi:10.7554/eLife.51975. N=46 fish."
+   },
+   {
+    "name": "Motion is a gain term, not a hard gate",
+    "value": "In a mammal, immobile fresh-frozen crickets were contacted in times indistinguishable from live crickets: 8.06 +/- 1.08 s versus 7.6 +/- 1.34 s, n=8, p>0.05. In toad and fish larva, motion is obligatory. No gecko data settles which regime applies.",
+    "provenance": "PUBLISHED, proxies that disagree",
+    "species": "Mus musculus versus Bufo bufo and Danio rerio",
+    "citation": "Hoy JL et al. (2016) Curr Biol 26(22):3046-3052. Make motion a strong multiplicative gain rather than a boolean gate."
+   },
+   {
+    "name": "Configural rule: elongation axis relative to motion axis",
+    "value": "A moving stripe whose long axis lies along the direction of motion is prey; perpendicular is not. The discrimination is described as 'largely invariant, thus far investigated' to movement direction in the plane, contrast polarity, and stripe velocity. Compute the configural score independently of, and before, the speed and contrast gains, and make it blind to the sign of contrast.",
+    "provenance": "PUBLISHED, proxy (toad). Qualitative only; no response ratio, no stimulus dimensions, no sample size is obtainable.",
+    "species": "Bufo bufo",
+    "citation": "Ewert JP, Arend B, Becker V, Borchers HW (1979) Brain, Behavior and Evolution 16(1):38-51. doi:10.1159/000121822, PMID 106924. Do not drop the source's hedges: it says LARGELY invariant, over the conditions tested."
+   },
+   {
+    "name": "Form of the toad response law, corrected",
+    "value": "Turning activity R-bar (turning reactions per minute) is characterised by THREE SEPARATE univariate relations, each measured with the others held constant: R-bar = f(angular velocity), R-bar = f'(background contrast), R-bar = f''(angular size). It is NOT a single joint function of the three. The source also says the dependence is on these 'among other things', so three is not an exhaustive parameter list. The tuning curves themselves are in paywalled figures and were not obtained.",
+    "provenance": "PUBLISHED form, proxy; numeric curves NOT_FOUND",
+    "species": "Bufo bufo",
+    "citation": "Ewert J-P (1969) Pflugers Archiv 308(3):225-243. doi:10.1007/BF00586556, PMID 5813952, in German. Correction to an earlier project note: writing this law as R=f(v,C,A) implies interaction terms the paper never measured. A related correction: the claim that all Ewert papers are paywalled is false - at least two Bufo primary papers are freely readable, including Buxbaum-Conradi and Ewert (1999) Brain Behav Evol, doi:10.1159/000006633, which reports 104 single neurons with configural-motion selectivity."
+   },
+   {
+    "name": "Motion front end for a lizard",
+    "value": "Correlation-type elementary motion detector array with 0.3 degrees of visual angle spacing and a 0.1 second time constant. The authors state the model is sensitive to local contrast and viewer-object distance and that additional processing is needed to separate relevant from irrelevant motion under natural conditions.",
+    "provenance": "PUBLISHED, proxy (distant lizard) and OPTICALLY MISMATCHED. Anolis is diurnal and foveate; a leopard gecko is nocturnal and afoveate with a large pupil and short focal length. Use the architecture, invent the constants, and say so.",
+    "species": "Anolis sagrei",
+    "citation": "Pallus AC, Fleishman LJ, Castonguay PM (2010) Journal of Comparative Physiology A 196(1):1-13. doi:10.1007/s00359-009-0487-7."
+   },
+   {
+    "name": "Outcome statistics to calibrate against (NOT detector parameters)",
+    "value": "Eublepharid strike success 77 to 83 percent (82.9 percent on crickets, 100 percent on mealworms). Mammalian capture given contact 38 +/- 16 percent. Fish larva response rate to an optimal small stimulus 22 percent. Time to capture in a 45 x 38 cm arena: 11 +/- 2 s with vision, 36 +/- 9 s in darkness, improving about fourfold to 13 +/- 1.1 s over four days of experience.",
+    "provenance": "PUBLISHED, mixed proxies",
+    "species": "Coleonyx variegatus, Mus musculus, Danio rerio",
+    "citation": "Vollin and Higham (2021, 2023); Hoy JL et al. (2016, 2019); Bianco IH et al. (2011). Note that none of these is a false-positive rate."
+   },
+   {
+    "name": "False positive rate",
+    "value": "NOT FOUND anywhere. No published measurement exists, for toad, mouse, fish larva, or any lizard, of how often a predator strikes at a non-prey object.",
+    "provenance": "NOT_FOUND",
+    "species": "none",
+    "citation": "Negative result across Europe PMC, OpenAlex, Crossref and web search. Any false-positive rate in the model is pure invention."
+   }
+  ],
+  "must_be_invented": [
+   "Every gecko-specific tuning value. No size tuning, speed tuning, contrast tuning, elevation tuning, or detection latency has ever been measured for prey detection in ANY gecko, ANY nocturnal lizard, or any squamate other than the Anolis motion model. The whole size-and-speed specification is imported from a fish larva, a rodent and a toad.",
+   "Visual acuity for this species. No value in cycles per degree exists for Eublepharis macularius or any eublepharid. The only guidance is a comparative statement, itself unverified in full text, that nocturnal geckos have lower acuity than diurnal geckos. So whatever angular threshold is imported from mouse (6 to 8 degrees) or fish (3 degrees), the gecko's should probably be LARGER, and the size of that correction is unmeasured.",
+   "Contrast threshold and absolute-luminance dependence at low light. Nothing exists for any nocturnal lizard.",
+   "A false positive rate, and any distractor-rejection statistic.",
+   "A below-the-horizon prey prior. The two published elevation figures point the other way in eye coordinates: prey is held at about +5 degrees relative to the mouse's eye and at about +20 degrees altitude in the fish larva. Both are consequences of head posture, not a world-frame rule.",
+   "Any capacity limit on how many prey items can be tracked at once.",
+   "A prey-selection version of the 80/20 winner-take-all split. The published number is from escape from looming stimuli.",
+   "The Ewert worm-versus-anti-worm tuning curves and any worm-to-anti-worm response ratio. The figures are unreachable; the invariance rule is the only citable part.",
+   "The modulation function linking measured target speed to strike release distance. Only its sign is published.",
+   "Whether the leopard gecko hunts visually at all in the first place. The only quantitative sensory study on this species is about PREDATOR detection and found chemical cues dominant with vision merely modulatory. A vision-first prey detector is an explicit modelling choice, not something the target-species literature supports."
+  ]
+ },
+ "build_order": [
+  {
+   "what": "Change the success metric before changing the animal. Score hunting by path efficiency (distance travelled divided by straight-line distance to the prey at the moment of detection), not by time to capture. This is a change to the logging and fitness code, not to the brain, and it should land before the oracle is disconnected.",
+   "why_now": "When the oracle goes, time to capture will get worse for two different reasons at once, and time to capture cannot tell them apart. In this species the point is settled: path length tracked learning (F=24.157, p<0.0001) while latency did not (F=0.326, p=0.5686), because latency is dominated by motivation. Worse, geckos in total darkness reached the goal FASTER while swimming LONGER paths at twice the speed. A fast random search beats a slow correct one on the clock. Judging the post-oracle animal on time will reward flailing.",
+   "evidence_strength": "published for this species"
+  },
+  {
+   "what": "Add an approach-state detector and log it every step: approaching when absolute prey bearing is under 90 degrees AND range is decreasing AND self-speed exceeds threshold. Log approach starts, approach-start range, approach-start bearing, terminal bearing error, contacts, and captures-given-contact as separate counters.",
+   "why_now": "This is instrumentation, not capability, and it is what makes everything after it debuggable. Without it, a broken detector and a broken controller produce the identical symptom (no crickets caught) and you cannot tell which one you are fixing. Build it while the oracle is still connected so it can be validated against ground truth, then keep it after.",
+   "evidence_strength": "published for a proxy"
+  },
+  {
+   "what": "Keep the oracle running as a shadow signal after disconnecting it from the policy. Feed it only to the logger. Report per episode the angular error between what the eye reports and where the cricket actually is.",
+   "why_now": "This is the only way to tell 'the eye cannot see the cricket' apart from 'the eye sees it and the body cannot get there'. It costs almost nothing and it converts the expected collapse in performance from a mystery into a measurement. It is also the guard against shipping a detector that looks present and does nothing: if the eye's error is at chance, no downstream module can be working, whatever the behaviour looks like.",
+   "evidence_strength": "mostly invented"
+  },
+  {
+   "what": "Build the strike gate: release the lunge at about 2 cm range, peak velocity 0.85 m/s, peak acceleration 47 m/s squared, with peak acceleration about 16 ms before contact and peak velocity about 9 ms before contact. Scale the release distance up for faster-moving targets. Check against a strike success rate of 77 to 83 percent.",
+   "why_now": "This is the only part of the hunt with numbers from a gecko in the same family, and it is the part that turns a successful approach into food. It is also cheap to validate: the success rate is a published number the simulation can be scored against directly. Do it before the detector, because a working detector feeding a broken strike still catches nothing, and you will blame the detector.",
+   "evidence_strength": "published for a proxy"
+  },
+  {
+   "what": "Build the two-channel wide-field / narrow-field detector as specified: a coarse 30 degree patch array that only says 'small thing moving here' and gates whether a hunt starts, plus a dense sub-16-degree direction-selective array that supplies the bearing error during pursuit. Both tuned to small objects with a 6 degree small-versus-large crossover, a 90 deg/s speed peak with near-zero response below 12 and above 360 deg/s, a probabilistic release of about one in five for an optimal stimulus, and a separate large-object filter for the strike commit.",
+   "why_now": "This is the module that makes the oracle removable. Build it after the metric, the scoring rule and the strike gate so that its failures are visible and attributable. Its correctness test is the published lesion dissociation: silencing the wide-field channel should stop long-range approaches while leaving accuracy intact, and silencing the narrow-field channel should degrade accuracy and cause pauses close to the prey. If a simulated lesion does not reproduce that, the two channels are decorative.",
+   "evidence_strength": "published for a proxy"
+  },
+  {
+   "what": "Add target selection for multiple prey: filter candidates by a wide-in-azimuth, narrow-in-elevation acceptance window, take the nearest survivor, and implement competition as divisive normalisation across the target map with global inhibition and roughly 60 percent suppression by the strongest competitor, with a thresholded switch on top.",
+   "why_now": "Only worth doing once one cricket can reliably be caught. Adding competition to a detector that cannot find a single target just produces a more elaborate failure. Note the selection split (80 percent winner-take-all, 20 percent averaging) was measured on escape from looming stimuli, not on prey, so treat that number as a starting value rather than a constraint.",
+   "evidence_strength": "published for a proxy"
+  },
+  {
+   "what": "Give the animal a chemosensory channel, and gate the defensive display behind it as a hard AND, with vision and substrate vibration allowed to raise tongue-flick rate and arousal but never to fire the display alone. Combine modalities additively.",
+   "why_now": "This is the only quantitative sensory-hierarchy result that exists for the target species, and removing the oracle is exactly the moment it matters: if the simulated gecko has no chemical channel, it should be unable to mount a defensive display at all, and it will be missing the sensory modality this species actually leads with. A self-deposited scent field is also the only evidence-backed way for a nocturnal animal to get home in the dark. Caution: the target-species result is about detecting predators, not finding prey.",
+   "evidence_strength": "published for this species"
+  },
+  {
+   "what": "Build learning: update on path efficiency, at about 9 percent gain per reinforced trial, with a hard ceiling of roughly 3x on speed and 4.6x on route efficiency over 20 trials, gated multiplicatively on a drive or arousal state, with about a quarter of individuals never engaging and a per-individual competence offset explaining only 7 to 19 percent of success variance.",
+   "why_now": "Learning cannot be evaluated until there is a metric that tracks it, a detector that gives it something to learn about, and a strike that turns learning into reward. It comes seventh for that reason, not because the evidence is weak. Make drive an explicit state rather than folding it into the learning rate, because in every published model motivation outweighed learning phase by roughly an order of magnitude, and a learning term smaller than the drive term will never move the behaviour.",
+   "evidence_strength": "published for this species"
+  },
+  {
+   "what": "Build memory decay as two components with different rates: route precision decaying with a time constant of about 115 days and coarse goal knowledge with about 131 days. Ship it ONLY if the simulation clock actually reaches months; otherwise ship the store without the decay and say so.",
+   "why_now": "Last, because it is the module most likely to be present and inert. Every measured retention point in this species is at 2 months or beyond, and inside an episode measured in minutes a 115-day time constant is numerically indistinguishable from zero. That is the same defect as a subtraction that cannot move an argmax. Decide the clock question first, then either run a compressed clock deliberately or leave the term out.",
+   "evidence_strength": "published for this species"
+  },
+  {
+   "what": "Add sleep as a single two-phase oscillator with a period of about 100 to 113 seconds at 20 to 27 C, scaled by body temperature with Q10 = 2.3, timed to the LIGHT phase, with sleep pressure driving slow-wave amplitude and never the period. Modulate heart rate, breathing and muscle tone with cycle phase. Leave it completely uncoupled from memory.",
+   "why_now": "Cheap, well specified, and low risk as long as it stays disconnected from the memory module. It goes near the end because it changes nothing about hunting. The one thing that would make it wrong is wiring it to consolidation: no reptile has ever been shown to consolidate memory during sleep, and the word consolidation appears zero times in the only paper that ever recorded a sleeping leopard gecko.",
+   "evidence_strength": "published for this species"
+  }
+ ],
+ "do_not_build": [
+  "Place cells, grid cells, or head-direction cells. Zero spatially tuned single units have ever been recorded in any reptile, and the search returned nothing. Such a layer would be a rodent import wearing a gecko label.",
+  "Path integration, dead reckoning, or a homeward vector. Never demonstrated in any reptile. The one lizard tested for outbound-route information had it explicitly rejected in favour of familiar-area landmark recognition.",
+  "A sun or sky compass. The only demonstrated reptilian outbound-course mechanism runs through the parietal eye in daylight, in diurnal lizards. A crepuscular gecko active after sunset cannot run it.",
+  "Long-range homing. The only gecko translocation experiment ever run found the opposite: 10 of 11 geckos displaced 1 km simply stayed where they were released.",
+  "A nightly loop in which the gecko leaves a shared retreat at sunset and returns before dawn. This is the most tempting navigation claim for this project and it traces to a hobbyist magazine article recirculated through Wikipedia and care sheets. No sample size, no method, no peer review. If a return-to-shelter behaviour is implemented, it must be labelled invention.",
+  "Sleep-dependent memory consolidation or replay. Not demonstrated in any reptile. Do not cite the 2026 gecko sleep paper as support: it runs no learning task and never mentions consolidation.",
+  "A habituation module with a numeric decay constant. No fitted habituation curve or time constant exists for any lizard or any reptile. The three qualitative constraints that do exist (fast habituation to a novel place, none to a novel object near food, and none at all for the antipredator response) also rule out a single global habituation rule.",
+  "Any coupling of memory decay to body temperature. It has never been studied in any reptile, and the one ectotherm experiment that exists points the other way.",
+  "A defensive display that can be triggered by vision or vibration. In this species those modalities never fired a display on their own; only chemical cues did.",
+  "Sex-specific learning or spatial parameters. A meta-analysis of 11 lizard species and the target species itself both looked and found nothing.",
+  "A per-individual trials-to-criterion learning curve presented as published. Every learning result in this species is a group-level contrast between the first three and last three trials.",
+  "The Ewert response law written as a single joint function of velocity, contrast and size. The source defines three separate univariate relations measured with the others held constant; writing it as one surface invents interaction terms nobody measured. And do not invent the worm versus anti-worm tuning numbers to fill the gap.",
+  "An egocentric turn-rule architecture justified by the whiptail position-versus-feature study. That claim failed verification: a specialist review with full-text access reports the spatial advantage held during acquisition only and not during reversal, and the reading of position as an egocentric rule is an interpolation the paper does not support.",
+  "Allocentric place learning justified by the turtle medial cortex lesion result. It is the cleanest place-versus-cue dissociation in any reptile and it is a turtle, outside Squamata entirely, and it is directly contradicted by the only lizard lesion study. Do not pick whichever of the two supports the design you already wanted.",
+  "Any home range, daily movement distance, or foraging loop geometry for this species. No field study of wild leopard geckos exists at all. Set the enclosure scale from the physics and the task and call it a design choice.",
+  "A below-the-horizon prey prior in world coordinates. The published elevation figures are positive in eye coordinates and are consequences of head posture.",
+  "A prey detector calibrated with mammalian or fish acuity numbers taken at face value. Nocturnal geckos have systematically lower spatial acuity, so any imported angular threshold is probably too fine, and the correction size is unmeasured. If the threshold is imported unchanged, say so."
+ ],
+ "surprises": [
+  "The brief's founding citation was a species confusion. Day, Crews and Wilczynski never studied leopard geckos. Their entire lizard output is three papers on two other families. The confusion is understandable, because David Crews did work extensively on Eublepharis macularius, but on temperature-dependent sex determination, not spatial cognition. A memory module built on 'the Day et al. leopard gecko numbers' would have been built on nothing.",
+  "The modules that were deferred as too thin turned out to be the buildable ones, and the module needed most urgently turned out to be the unsupported one. Memory and learning now have real target-species numbers. The prey detector has none, for any gecko, ever.",
+  "Only about one third of leopard geckos orient by the relationship between cues. The authors state plainly that the rest may have used a non-cognitive motor search and that they cannot rule it out. The default for a single simulated animal should therefore be the majority strategy, not the flattering one.",
+  "Geckos found the hidden platform FASTER in complete darkness than at the end of normal training, while swimming LONGER paths at roughly twice the speed. A fast undirected search solves the task without any spatial memory at all. Any learning curve measured in time is contaminated by exactly this.",
+  "In every published statistical model of this species, the number of prods needed to keep the animal moving predicted performance more strongly than the training phase did, often by an order of magnitude in F. The published leopard gecko learning curves are partly motivation curves.",
+  "Fast forgetting is the correct answer for this animal, not a defect. Two months, against nine years in giant tortoises and twenty months in monitors. The authors' own explanation is the seasonal semi-arid Pakistani habitat: the landscape gets rearranged, so an old map is worse than no map.",
+  "The defensive display in this species is chemosensory AND-gated. Vision and touch can raise sampling but never fire the display. If the simulated gecko has no chemical channel, the honest consequence is that it should be unable to display at all.",
+  "The two reptile lesion studies of the hippocampal homologue directly contradict each other. Turtles lost place learning and kept cue learning; whiptail lizards never used a place strategy at all, lesioned or intact. Neither animal is a gecko, and the gecko's own medial cortex has never been lesioned, inactivated or recorded from.",
+  "Zero place cells, grid cells or head-direction cells have ever been recorded in any reptile. That search returned nothing at all, which is unusual and worth stating plainly rather than softening.",
+  "Three items from the verification pass should be carried forward as corrections. The Ewert response law is three separate univariate relations, not one joint function of velocity, contrast and size. The whiptail position-over-feature reversal advantage is contradicted by a specialist review with full-text access. And the claim that every Ewert paper is paywalled is false: at least two Bufo primary papers with quantitative neuronal tuning data are freely readable, one of them with 104 single neurons showing configural-motion selectivity.",
+  "The single best-transferring quantitative data for this animal's hunting covers only the last two centimetres. A gecko in the same family has published lunge distance, velocity, acceleration and success rate. Everything upstream of that lunge, all the finding and approaching, has to be imported from a fish larva, a mouse and a toad.",
+  "The entire target-species literature on memory and learning is one laboratory, one captive colony descended from about 90 wild-caught Pakistani founders, one apparatus, one aversive task, and an overlapping author list. Three papers, but a single evidence stream."
+ ]
+}

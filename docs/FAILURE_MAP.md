@@ -983,6 +983,13 @@ retrieve" into "does not exist."
 | 212 | The cricket is too small for this retina to see | **Refuted -- resolution was never the limit** | with the animal held STILL and prey wiggling ahead, peak salience by range: **0.357 at 0.04 m, 0.767 at 0.08, 0.675 at 0.12, 0.825 at 0.20, 0.673 at 0.30, 0.834 at 0.45**. It responds at every range tested, including 0.45 m where the prey covers **half a cell**. Three sessions of "the prey is smaller than one cell" were describing a real constraint that was not the operative one |
 | 213 | An efference copy fixes prey detection | **Partly** | subtracting the flow the animal's own yaw and forward speed predict cuts false alarms from **72 % of frames to 3-7 %**, and flips the still-versus-moving effect to the right sign for the first time (**d = +0.181**, after −0.128 and −0.212). But detection during a real hunt is still weak in absolute terms: the same eye that peaks at 0.67-0.83 on a stationary animal averages **0.02** in a hunt, because prey is often out of view or not moving on a given frame. **The oracle stays until this closes** |
 | 214 | The animal should look while it walks | **Refuted -- it must look while STILL** | measured across a real hunt: moving faster than 0.03 m/s the eye fires on **3 %** of frames at mean 0.0076; standing still it fires on **7 %** at **0.0223**. Walking is what blinds it, and the creep this project already implements -- move one step in four -- is exactly the freeze-and-look pattern a stalking predator uses. The detector should be **read during the pauses**, not continuously |
+| 215 | Day, Crews & Wilczynski studied spatial learning in *E. macularius* | **Refuted -- and I asserted it twice** | **they never studied leopard geckos.** Their lizard output is three papers on two other families. I stated it as fact in an earlier session and then wrote it into the research brief as a known starting point, which could have propagated the error into the answer. The confusion is understandable -- David Crews published extensively on this species, on temperature-dependent sex determination -- and it is still a citation I invented the content of |
+| 216 | Memory and learning are too thin to build honestly | **Refuted -- they are the buildable ones** | three papers on the TARGET species, 2022-2026, give real numbers. Learning: **hazard ratio 1.09 per trial**, ceiling **3.02x latency / 4.59x path** after 20 spaced trials, n=38-42. Memory: no significant loss at **2 months**, route precision degraded at **4 months** (path HR 0.49, p=0.0044) while the ability to reach the goal was not yet, and **indistinguishable from naive by 6-14 months**. The modules deferred for being unsupported turned out to be the supported ones |
+| 217 | The prey detector is the well-evidenced module | **Refuted -- it is the unsupported one** | **no size tuning, speed tuning, contrast threshold, elevation tuning, detection latency or acuity has ever been measured for any gecko.** The detector must be assembled from a fish larva, a mouse and a toad. The one exception is the strike itself, which has numbers from a gecko in the same family. The urgent module is the invented one and the deferred modules were the evidenced ones -- exactly backwards from how this project has been treating them |
+| 218 | Latency is the right way to score a hunt | **Refuted for this species** | **path length is significant across training and latency is not** -- F=24.157, p<0.0001 for path against F=0.326, p=0.568 for latency, n=42. Worse, geckos found a hidden goal FASTER in complete darkness than at the end of normal training, by swimming twice as fast along paths twice as long: **a fast undirected search solves a latency-scored task with no spatial memory at all**. Scoring the hunt by time-to-capture would reward exactly that |
+| 219 | Removing the oracle will show whether the eye works | **Refuted -- not on its own** | when the oracle goes, capture will get worse for two different reasons at once and no single number can separate them. The spec's answer is instrumentation first: keep the oracle running as a **shadow signal** feeding only the logger, so "the eye cannot see the cricket" and "the eye sees it and the body cannot get there" stop producing the identical symptom |
+| 220 | The eye's problem is that its bearing is wrong | **Refuted -- its problem is that it rarely reports at all** | first hunt scored with the oracle demoted to a shadow, 1500 steps: **not detected 1419, detected-bearing-wrong 37, detected-bearing-usable 44**. It reports something on **5.4 %** of steps, and when it does the bearing is usable **more often than not**. Three sessions of vision work assumed the bearing was the broken part. The broken part is the detection rate |
+| 221 | Path efficiency in a real hunt is respectable | **Refuted** | **0.0146**. The animal covers roughly seventy times more ground than it closes. It is *approaching* on 47 % of steps by the published three-part criterion, so it is not idle -- it is pointed the right way and getting almost nowhere. This is the number the oracle removal has to be judged against, and it is the first time it has been measured at all |
 
 ### #138 and #134 — the two I told the user were true
 
@@ -1080,12 +1087,12 @@ Recorded so the gaps stay visible rather than getting invented later:
 
 | | |
 |---|---|
-| Hypotheses tested | **214** |
-| Refuted | **173** |
+| Hypotheses tested | **221** |
+| Refuted | **180** |
 | Confirmed | **27** |
 | Partly | **13** |
 | My own method errors | **35** |
-| Tests passing | **524 of 524**, one skip |
+| Tests passing | **537 of 537**, one skip |
 
 **Seventy-seven per cent of everything tried was wrong.** That is what the map
 is made of.

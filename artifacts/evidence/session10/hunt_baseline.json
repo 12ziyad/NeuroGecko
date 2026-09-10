@@ -1,0 +1,16 @@
+{
+ "schema_version": 1,
+ "test": "the hunt scored the published way, with the oracle demoted to a shadow",
+ "run": "habitat world, accepted walker (lab, no policy), eye on, scripted creep, 1500 steps, seed 1",
+ "mean_path_efficiency": 0.0146,
+ "approaching_fraction": 0.474,
+ "eye_detected_fraction": 0.054,
+ "eye_mean_bearing_error_deg": 36.74,
+ "failure_modes": {
+  "not detected": 1419,
+  "detected, bearing wrong": 37,
+  "detected, bearing usable": 44
+ },
+ "reading": "The dominant failure is DETECTION RATE, not detection quality. The eye reports something on 5.4 % of steps, and when it does the bearing is usable more often than not -- 44 usable against 37 wrong. That is a different problem from the one this project has been working on for three sessions, which assumed the bearing was the broken part.",
+ "why_this_run_matters": "It is the first hunt scored by path efficiency rather than capture, and the first where a failure can be attributed. Before this, 'the eye cannot see the cricket' and 'the eye sees it and the body cannot get there' produced the same number."
+}
