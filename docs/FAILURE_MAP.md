@@ -962,6 +962,8 @@ retrieve" into "does not exist."
 | 192 | The animal digs itself a burrow | **Refuted** | it uses voids that **already exist**. Retreat chambers traced through a demolished stone field wall were masonry artefacts -- verbatim, "the lizards apparently had done nothing in the setting of the site". So shelter is a raised slab with a crevice under it rather than diggable ground. GREY-FIELD: the source is a non-peer-reviewed field manuscript, and it is still the best description of wild habitat that exists for this species |
 | 193 | An added world body must be mocap or it enters qpos | **Refuted -- that tests a proxy** | the guard refused any non-mocap addition, which would have forced shelter and a warm surface to be fake objects the animal could walk through. A **jointless static** body adds no degrees of freedom either: verified against this body, adding a jointless box leaves nq at 39 and nv at 38 unchanged while nbody goes 24 -> 25. The check now tests the thing it cares about -- nq and nv identical, and every added body mocap **or** jointless. A body carrying a joint is still refused |
 | 194 | Safety beats warmth when the animal chooses shelter | **Refuted** | given a safe **cool** shelter against an exposed **heated** open area, geckos "selected heat sources over shelters" (n=8 juveniles). Corroborated in another genus: 9 *Gehyra* species, n=85, used a humid crevice for under 10 % of crevice time whenever the dry alternative was warmer. A measured conflict between two drives, which is what an action-selection model should have to resolve |
+| 195 | Vision is this animal's route to danger | **Refuted** | antipredator reaction probability, **this species, n=42**: **0.21 to snake scent alone, 0.07 to the sight of a live snake**. Factorially only the chemical term is significant -- chemical chi2=8.098 p<0.0044, visual chi2<0.01 p>0.9, mechanosensory chi2<0.01 p>0.9. Authors verbatim: *the initiation of costly defensive action remains strictly gated by chemoreception*. A flee channel wired to the eye is close to modelling the wrong sense |
+| 196 | Smell can be given a gradient | **Refuted -- it would be invention** | the assay behind every published number presents the swab **1 cm from the snout, in plain view**. It shows the animal can TELL cricket chemicals from a control -- 3.0 flicks/min against 14.57, n=7, a 4.9x rise. It shows **nothing about localisation**, and no gecko has ever been shown to find prey by smell alone. Cooper flagged the missing experiment in 1998 and nobody has run it since. `brain/vomeronasal.py` returns a scalar per odour and **no bearing**, and states the refusal in its output so a later reader finds an assertion rather than a missing key |
 
 ### #138 and #134 — the two I told the user were true
 
@@ -1059,12 +1061,12 @@ Recorded so the gaps stay visible rather than getting invented later:
 
 | | |
 |---|---|
-| Hypotheses tested | **194** |
-| Refuted | **157** |
+| Hypotheses tested | **196** |
+| Refuted | **159** |
 | Confirmed | **26** |
 | Partly | **10** |
 | My own method errors | **35** |
-| Tests passing | **497 of 497**, one skip |
+| Tests passing | **511 of 511**, one skip |
 
 **Seventy-seven per cent of everything tried was wrong.** That is what the map
 is made of.

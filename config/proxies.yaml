@@ -978,6 +978,34 @@
         "confidence": "uncertain", "recording_temp_C": null,
         "notes": "Digesting a meal costs a large multiple of resting metabolism, so a naive model that adds meal energy without subtracting the cost of processing it overstates the benefit of eating. NOT implemented yet; recorded so the omission is visible."
       },
+      "tongue_flick_baseline_per_min": {
+        "value": 3.0,
+        "units": "flicks per minute", "species": "E_macularius", "sample_size": 7,
+        "source": "Tongue-flicks in 60 s directed at an odourless control swab, 3.0 +/- 1.0, n=7. Cooper 1995, Herpetological Monographs 9:120-129, compiled in Table 1 of Baeckens, Van Damme & Cooper 2017, J Evol Biol 30(4):627-640.",
+        "confidence": "verified", "recording_temp_C": null,
+        "notes": "PUBLISHED and THIS SPECIES. One of very few behavioural numbers that exists for E. macularius at all. The same study found two gekkonids showed neither elevated flicking nor attack to prey chemicals, while this eublepharid did -- the difference is the point."
+      },
+      "tongue_flick_prey_per_min": {
+        "value": 14.57,
+        "units": "flicks per minute", "species": "E_macularius", "sample_size": 7,
+        "source": "Tongue-flicks in 60 s directed at a swab carrying cricket chemicals, 14.57, n=7. Same source as the baseline.",
+        "confidence": "verified", "recording_temp_C": null,
+        "notes": "PUBLISHED and THIS SPECIES. A 4.9x rise over baseline. THE CRITICAL LIMIT: the assay presents the swab about 1 cm from the snout, IN PLAIN VIEW. It demonstrates that the animal can TELL cricket chemicals from a control. It does NOT demonstrate localisation, and no gecko has ever been shown to find prey by smell alone -- Cooper flagged the missing experiment in 1998 and nobody has done it since. So smell may raise arousal; it must not hand out a direction."
+      },
+      "predator_reaction_chemical": {
+        "value": 0.21,
+        "units": "probability", "species": "E_macularius", "sample_size": 42,
+        "source": "Antipredator reaction probability to snake scent alone, 0.21. Live-snake test, n=42. Frydlova et al. 2026, Behavioral Ecology 37(4):arag062.",
+        "confidence": "verified", "recording_temp_C": null,
+        "notes": "PUBLISHED and THIS SPECIES. Factorially: chemical chi2 = 8.098, p < 0.0044; visual chi2 < 0.01, p > 0.9; mechanosensory chi2 < 0.01, p > 0.9. Authors verbatim: the initiation of costly defensive action remains strictly gated by chemoreception."
+      },
+      "predator_reaction_visual": {
+        "value": 0.07,
+        "units": "probability", "species": "E_macularius", "sample_size": 42,
+        "source": "Antipredator reaction probability to the SIGHT of a live snake alone, 0.07 (95% CI 0.02-0.20). Same study.",
+        "confidence": "verified", "recording_temp_C": null,
+        "notes": "PUBLISHED and THIS SPECIES, and it is the number that indicts a vision-first threat model. Three times lower than scent. Visual and mechanosensory stimuli modulated attention and amplified chemical sampling; neither independently elicited overt defensive behaviour."
+      },
       "shelter_retreat_type": {
         "value": 0.0,
         "units": "categorical, 0 = crevice under a rock", "species": "E_macularius", "sample_size": null,

@@ -706,3 +706,25 @@ New best mean reward!
 |    std                  | 1.01        |
 |    value_loss           | 0.154       |
 -----------------------------------------
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 66.7        |
+|    ep_rew_mean          | -73.1       |
+| time/                   |             |
+|    fps                  | 760         |
+|    iterations           | 33          |
+|    time_elapsed         | 1065        |
+|    total_timesteps      | 811008      |
+| train/                  |             |
+|    approx_kl            | 0.016953038 |
+|    clip_fraction        | 0.222       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -35.8       |
+|    explained_variance   | 0.27        |
+|    learning_rate        | 0.0003      |
+|    loss                 | -0.155      |
+|    n_updates            | 320         |
+|    policy_gradient_loss | -0.0458     |
+|    std                  | 1.01        |
+|    value_loss           | 0.132       |
+-----------------------------------------
