@@ -33,10 +33,14 @@ const CH_COLOUR = {
 // light. Dimensions are a stage, not a measurement.
 function withRoom(xml) { return xml; }   // the enclosure is gone, see views.js
 
-//: How much of the animal's hunger one cricket removes. INVENTED as a display
-//: choice: the project's energetics live in brain/hypothalamus.py and are not
-//: ported here, so rather than half-port them this is declared as what it is.
-const MEAL_FRACTION = 0.45;
+//: How much of the animal's hunger one cricket removes.
+//: 0.18, not the 0.45 it was. At 0.45 two crickets took hunger to zero and the
+//: animal then wanted NOTHING -- `explore` needs hunger above 0.571 to clear the
+//: release floor, so 523 of 1600 steps had no behaviour released at all. A 9 mm
+//: cricket is not half a meal for a 38 g gecko; the model's meal is
+//: `meal_energy_J` at the animal's own mass and this is a small fraction of it.
+//: The fraction is still INVENTED, because the energetics are not ported.
+const MEAL_FRACTION = 0.18;
 //: Control steps of head-shaking after a swallow. INVENTED. The behaviour is
 //: real and named in the published ethogram for this species; its duration is
 //: not measured anywhere and this number is a drawing.
@@ -64,7 +68,11 @@ const SLEEP_FAST_FORWARD = 14;
 // eublepharid. What is published is that the joints exist and how far they go,
 // and that is the morphology, not this. The SHAPE is from photographs of the
 // animal; the timings are a controller.
-const TRUNK_BEND_SHARE = 0.55;    // of a turn carried by the trunk, not the neck
+const TURN_THRESHOLD_DEG = 14.0;  // below this it just walks; above it, it turns
+const REORIENT_DEG = 22.0;        // how far the target must move to trigger a turn
+const TURN_HOLD_STEPS = 34;       // control steps planted while it swings round
+const SCAN_BEND_SHARE = 0.75;     // how much of a head sweep the trunk follows
+const TRUNK_BEND_SHARE = 0.62;    // of a turn carried by the trunk, not the neck
 const TRUNK_BEND_MAX = 0.85;      // rad, inside the tendon's own +-1.2
 const TRUNK_BEND_RATE = 2.6;      // rad/s toward the commanded bend
 const NECK_LAG_STEPS = 14;        // the neck starts after the trunk has begun
@@ -90,6 +98,14 @@ const JAW_RATE = 5.0;             // rad/s
 //: slower, so this number is INVENTED and says so. It slows the stride clock
 //: only -- the gait, the compensator and the accepted walker are untouched.
 const CREEP_GAIT_SCALE = 0.34;
+//: A CRICKET IS NOT ALWAYS THERE. The published mean inter-meal interval for
+//: this species is 2.33 days, so an animal that meets prey every few seconds is
+//: wrong about its own life -- and a page where it hunts constantly shows one
+//: behaviour instead of six. After a meal the world has no cricket in it for a
+//: while, and the animal does what it spends most of its time doing: looking.
+//: The interval is compressed like everything else on this page, and the
+//: compression is INVENTED; what it is compressing is published.
+const PREY_GONE_STEPS = 2600;     // control steps with no cricket after a meal
 
 export class LiveGecko {
   constructor(cfg, mj, model, data) {
@@ -152,7 +168,12 @@ export class LiveGecko {
     this.jawWant = JAW_SHUT;
     this.gapeT = 0;
     this.posture = "settled";
-    this.assist = true;         // see `assisted()` -- declared on the page
+    this.assist = true;         // see the guided switch -- declared on the page
+    this.preyGone = 0;          // control steps until another cricket turns up
+    this.turnHold = 0;
+    this._lastAim = 0;
+    this.aimDeg = 0;
+    this.headAim = 0;
     this.distance = 0;         // ground actually covered, metres
     this._prevXY = [0, 0];
 
@@ -277,6 +298,8 @@ export class LiveGecko {
       const px = this.renderRetina();
       this.lastEyeFrame = px;      // kept so the page can show the raw frame
       if (px) {
+        // nothing special to do when the cricket is absent: it is not drawn, so
+        // the eye simply does not find it, which is the honest version
         const out = this.eye.step(px, dt, {
           yaw_rate_deg_s: ((this.heading - this._prevHeading) / dt) * 180 / Math.PI,
           forward_m_s: this.speed,
@@ -314,8 +337,21 @@ export class LiveGecko {
     // knows this exists, the conformance suite runs against the unguided path,
     // and nothing measured anywhere in this project was measured with it on.
     // It is a rendering aid for a web page and it says so everywhere it shows.
+    if (this.preyGone > 0) this.preyGone -= 1;
+    this.preyPresent = this.preyGone <= 0;
+    if (!this.preyPresent) {
+      // NOTHING TO HUNT MEANS NOTHING COMMITTED. Without this the accumulator
+      // kept holding the bearing of a cricket that had already been swallowed,
+      // so `hunt` stayed released over an empty world -- measured, 1386 of 2500
+      // steps hunting while prey was present on 11 % of them, and `explore`
+      // never ran once. An animal that has eaten goes looking.
+      this.preyBearing = null;
+      this.evidence.reset();
+      this.committed = null;
+    }
+
     this.guided = false;
-    if (this.assist) {
+    if (this.assist && this.preyPresent) {
       // STRONG. Inside the arena the animal simply knows where the cricket is,
       // the commitment is handed to it rather than accumulated, and the cricket
       // does not bolt. That is three oracles stacked and the page says so.
@@ -399,37 +435,78 @@ export class LiveGecko {
     const steer = (cmd.heading_deg * Math.PI) / 180;
     this.drive = drive;
 
-    // ---- POSTURE. Bend, then look, then go. ---------------------------
-    // The heading the program wants is split: the trunk takes most of it and
-    // the neck takes the rest. While the trunk is still swinging into place the
-    // animal does not walk -- that gate is the whole difference between a
-    // lizard turning and a person pivoting.
-    const wantDeg = Math.max(-90, Math.min(90, cmd.heading_deg));
-    this.wantBend = Math.max(-TRUNK_BEND_MAX, Math.min(TRUNK_BEND_MAX,
-      (wantDeg * Math.PI / 180) * TRUNK_BEND_SHARE));
-    const bendErr = this.wantBend - this.trunkBend;
-    const bending = Math.abs(bendErr) > SETTLE_BEND_RAD;
+    // ---- POSTURE. Stop, bend, look, THEN go. --------------------------
+    //
+    // ONE PLACE OWNS WHERE THE ANIMAL IS POINTING, and the version before this
+    // had three: the walker steered, the orienting reflex aimed the head, and
+    // a separate bend ran the trunk. They disagreed. The visible result was an
+    // animal walking at a cricket with its head pointed somewhere else --
+    // because the orienting reflex only fires while the body is STILL (its
+    // `allow` gate), so once the chase started the head froze at whatever angle
+    // its last saccade left it at and stayed there.
+    //
+    // Now: `aim` is the one direction the animal wants to face, trunk-relative,
+    // straight off the motor program. If it is more than a few degrees off, the
+    // animal STOPS and turns -- trunk first through `spine_bend`, the neck
+    // taking what the trunk cannot reach, and the head always ends up pointing
+    // along `aim`. Only when it is lined up does it walk. That is the whole
+    // difference between a lizard and a person on a turntable.
+    //
+    // EVERY NUMBER HERE IS INVENTED and says so; see the constants above.
+    let aim = ((cmd.heading_deg + 540) % 360) - 180;
+    this.aimDeg = aim;
 
-    if (drive > 0 && bending && this.bendHold < BEND_HOLD_MIN) {
-      drive = 0;                       // stand and turn the body first
-      this.bendHold += 1;
-      this.posture = "bending";
-    } else if (drive > 0) {
-      this.posture = "walking";
-      // Once it is moving, the walker owns the spine -- it needs it for the
-      // gait's own lateral undulation -- so the postural bend unwinds.
-      this.wantBend = 0;
-    } else {
-      this.bendHold = bending ? this.bendHold + 1 : 0;
-      this.posture = bending ? "bending" : "settled";
+    // A BOUNDED PAUSE, NOT A CONDITION. The first version held the animal
+    // still until it was lined up, and it never moved again: bending
+    // `spine_bend` curves the body but does NOT rotate the trunk root, so the
+    // trunk-relative bearing it was waiting on could not change while it stood
+    // there. Measured: 2000 of 2000 control steps in `turning`, zero metres
+    // walked, and `bask` held for 1582 of them because the animal never warmed
+    // up. The animal turns by STEPPING -- that is what the walker's steer is --
+    // so the pause is a fixed number of steps at the moment the target moves,
+    // and then it walks the turn out.
+    const reorient = Math.abs(((aim - this._lastAim + 540) % 360) - 180);
+    if (reorient > REORIENT_DEG && this.turnHold <= 0) {
+      this.turnHold = TURN_HOLD_STEPS;
+      this._lastAim = aim;
     }
-    this.drive = drive;
+    const needTurn = this.turnHold > 0 && Math.abs(aim) > TURN_THRESHOLD_DEG;
+    if (needTurn) {
+      drive = 0;                      // planted while it swings round
+      this.turnHold -= 1;
+      this.posture = "turning";
+    } else {
+      this.turnHold = 0;
+      this._lastAim = aim;
+      this.posture = drive > 0 ? "walking" : "settled";
+    }
+
+    // The trunk takes its share of the angle. It keeps a little of it while
+    // walking too, which is what a sprawling lizard's body actually does.
+    // THE BODY FOLLOWS THE HEAD, INCLUDING DURING A SCAN. brain/search.py sweeps
+    // the head alone -- that is its saccadic coverage pattern and it is not
+    // changed here -- but a real lizard does not hold its trunk rigid while its
+    // head swings 44 deg. The trunk takes a share of wherever the head has gone,
+    // whatever put it there. Conformance is untouched: the pattern still returns
+    // exactly what Python's does, and this reads it rather than altering it.
+    const bendAim = this.program === "search" ? this.headYaw : aim;
+    const share = needTurn ? TRUNK_BEND_SHARE
+                : this.program === "search" ? SCAN_BEND_SHARE
+                : TRUNK_BEND_SHARE * 0.35;
+    this.wantBend = Math.max(-TRUNK_BEND_MAX, Math.min(TRUNK_BEND_MAX,
+      (bendAim * Math.PI / 180) * share));
     const bendStep = TRUNK_BEND_RATE * dt;
     this.trunkBend += Math.max(-bendStep, Math.min(bendStep, this.wantBend - this.trunkBend));
-    // The neck follows the trunk rather than leading it.
-    this.neckLag = bending ? Math.min(NECK_LAG_STEPS, this.neckLag + 1)
-                           : Math.max(0, this.neckLag - 2);
-    const neckShare = this.neckLag / NECK_LAG_STEPS;
+
+    // The neck carries whatever the trunk could not, so the head ends up on the
+    // target however far round it is -- clamped to the neck's real travel.
+    const trunkDeg = (this.trunkBend * 180) / Math.PI;
+    const neckWant = Math.max(-65, Math.min(65, aim - trunkDeg));
+    this.neckLag = needTurn ? Math.min(NECK_LAG_STEPS, this.neckLag + 1)
+                            : Math.max(0, this.neckLag - 1);
+    const neckShare = Math.max(0.35, this.neckLag / NECK_LAG_STEPS);
+    this.headAim = neckWant * neckShare;
+    this.drive = drive;
 
     // Creep while closing on something it has committed to.
     this.creeping = this.program === "chase" && this.committed !== null && !this.guided;
@@ -476,10 +553,12 @@ export class LiveGecko {
       // being asked to do rather than overriding it.
       const shake = this.chewT > 0
         ? 26 * Math.sin(this.simT * 34) * (this.chewT / CHEW_STEPS) : 0;
-      // The neck takes whatever the trunk did not, and only once the trunk has
-      // started -- `neckShare` ramps in over NECK_LAG_STEPS.
-      const carry = (cmd.heading_deg - (this.trunkBend * 180 / Math.PI)) * 0.45 * neckShare;
-      const want = ((this.headYaw + shake + carry) * Math.PI) / 180;
+      // `headAim` is the posture layer's answer and it is the only one. During a
+      // search the scan pattern owns it instead, because a coverage sweep is
+      // supposed to look away from where the body is going.
+      const base = this.program === "search" ? this.headYaw : this.headAim;
+      const want = ((base + shake) * Math.PI) / 180;
+      this.headYaw = base;
       const hi = this.cfg.walker.ctrl_high, lo = this.cfg.walker.ctrl_low;
       for (let k = 0; k < 2; k++) {
         const i = this._neckIds[k];
@@ -539,8 +618,9 @@ export class LiveGecko {
     // nearer -- which is what makes a creep different from a charge and a stalk
     // possible at all.
     const sn = this._snoutXY();
-    const pr = this.prey.step(dt, sn);
+    const pr = this.preyPresent ? this.prey.step(dt, sn) : { captured: false };
     if (pr.captured) {
+      this.preyGone = PREY_GONE_STEPS;
       this.captures += 1;
       this.lastCapture = this.simT;
       this.chewT = CHEW_STEPS;

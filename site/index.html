@@ -68,6 +68,22 @@
   .btn.on{border-color:var(--cyan);color:var(--cyan);background:#0f1a22}
   .foot{padding:12px 16px;color:var(--muted);font-family:"IBM Plex Mono",monospace;font-size:9px;line-height:1.7}
 
+  .links{display:flex;flex-direction:column;gap:6px}
+  .lnk{display:flex;align-items:center;gap:9px;padding:9px 10px;border:1px solid var(--rule);
+    border-radius:3px;background:var(--sunk);text-decoration:none;transition:.14s}
+  .lnk:hover{border-color:var(--cyan);background:#0f1a22}
+  .lnk .ic{width:22px;height:22px;flex:none;display:flex;align-items:center;justify-content:center;
+    border-radius:3px;background:#0a0e13;border:1px solid var(--rule);color:var(--muted);
+    font-family:"IBM Plex Mono",monospace;font-size:10px}
+  .lnk:hover .ic{color:var(--cyan);border-color:var(--cyan)}
+  .lnk span span,.lnk>span:last-child{display:block}
+  .lnk b{display:block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;font-weight:500;
+    color:var(--ink);letter-spacing:.02em}
+  .lnk>span:last-child{font-size:9px;color:var(--muted);line-height:1.5;margin-top:1px}
+  .lnk#adopt b{color:var(--bask)}
+  .lnk#adopt:hover{border-color:var(--bask);background:#1c1608}
+  .lnk#adopt:hover .ic{color:var(--bask);border-color:var(--bask)}
+
   /* Controls live ON the picture, and there is exactly one of them in the
      middle: play. Everything else is a corner. */
   .view canvas{cursor:grab}
@@ -295,112 +311,95 @@
   <aside class="side">
     <div class="hero">
       <h1>A leopard gecko, and the brain running it.</h1>
-      <p>Both panels below are one animal, stepping live in your browser at 500&nbsp;Hz.
-      Its body was built from real measurements of living <i>Eublepharis macularius</i>;
-      its walk, its basal ganglia, its day/night clock and its eye are the same code
-      that runs in the lab, checked against it to fifteen decimal places.</p>
+      <p>Both panels are one animal, stepping live in your browser. Its body came from
+      real measurements of living <i>Eublepharis macularius</i>; its walk, its basal
+      ganglia, its day/night clock and its eye are the same code that runs in the lab.</p>
       <div class="tags">
-        <span class="tag ok">MuJoCo WASM &middot; live</span>
+        <span class="tag ok">live physics</span>
         <span class="tag ok">10/10 conformance</span>
-        <span class="tag ok">14/14 anatomy gates</span>
-        <span class="tag">386 ledger rows</span>
+        <span class="tag ok">14/14 anatomy</span>
       </div>
     </div>
 
     <div class="block">
-      <div class="lbl">What is actually checked</div>
-      <div class="res">
-        <div class="k">walker, 30 actuators</div><div class="v">7.3e&minus;15</div>
-        <div class="k">basal ganglia gates</div><div class="v">exactly 0</div>
-        <div class="k">day/night clock</div><div class="v">exactly 0</div>
-        <div class="k">search, 4000 steps</div><div class="v">exactly 0</div>
-        <div class="k">eye, 140 frames</div><div class="v">8.9e&minus;16</div>
-        <div class="k">web body vs full body</div><div class="v">exactly 0</div>
-      </div>
-      <details class="why">
-        <summary><span class="q">?</span> What those numbers mean</summary>
-        <div class="body">
-          The browser is not a re-implementation that looks similar. The same inputs go
-          into the Python model and into this page, and the outputs are subtracted.
-          <b>7.3e&minus;15</b> is the largest disagreement across a whole gait cycle of
-          thirty actuators &mdash; floating-point dust. <b>Exactly 0</b> means bit-identical.
-          <br><br>
-          <em>Where it is weakest:</em> the eye. It detects motion honestly and it is
-          not good at it &mdash; see the note on the render.
-        </div>
-      </details>
-    </div>
-
-    <div class="block">
-      <div class="lbl">Day / night clock</div>
-      <div class="clock"><b id="hour">09.50</b><span class="mono" style="color:var(--muted)">h</span>
-        <span class="pill sleep" id="pill">asleep</span></div>
-      <div class="row">
-        <button class="btn" id="day">Jump to day</button>
-        <button class="btn" id="night">Jump to night</button>
-      </div>
-      <div class="lbl" style="margin-top:10px;letter-spacing:.06em;text-transform:none;font-size:9px;line-height:1.6">
-        Drag either picture to swing the camera, scroll to zoom. Space plays and pauses.
-      </div>
-    </div>
-
-    <div class="block">
-      <div class="lbl">Released behaviour</div>
+      <div class="lbl">Doing now</div>
       <div class="beh" id="beh">&mdash;</div>
-      <div id="chan" style="margin-top:8px"></div>
-      <div class="lbl" style="margin-top:8px;letter-spacing:.06em;text-transform:none;font-size:9px;line-height:1.55">
-        Red line: the measured release floor, 0.1999. Nothing below it is released.
+      <div id="chan" style="margin-top:9px"></div>
+      <div class="lbl" style="margin-top:8px;letter-spacing:.05em;text-transform:none;font-size:9px;line-height:1.5">
+        The red line is the measured release floor, 0.1999. Nothing under it is released.
       </div>
-      <div class="sw on" id="assist" style="margin-top:11px">
+    </div>
+
+    <div class="block">
+      <div class="grid2">
+        <div class="kv"><div class="k">Time</div><div class="v" id="hour">09.50</div></div>
+        <div class="kv"><div class="k">State</div><div class="v" id="pill">asleep</div></div>
+        <div class="kv"><div class="k">Body temp</div><div class="v" id="temp">30.5</div></div>
+        <div class="kv"><div class="k">Hunger</div><div class="v" id="hun">0.90</div></div>
+        <div class="kv"><div class="k">Walked m</div><div class="v" id="dist">0.00</div></div>
+        <div class="kv"><div class="k">Crickets</div><div class="v" id="eaten">0</div></div>
+      </div>
+      <div class="row">
+        <button class="btn" id="day">Day</button>
+        <button class="btn" id="night">Night</button>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="sw on" id="assist">
         <span class="track"><i></i></span><span id="assistLbl">Guided hunting</span>
       </div>
       <details class="why">
         <summary><span class="q">?</span> What guided means</summary>
         <div class="body">
-          <b>On</b> &mdash; four things are handed to the animal, and this is all of them:
-          it knows where the cricket is anywhere inside the arena; the commitment is given
+          <b>On</b> &mdash; four things are given to the animal, and this is all of them:
+          it knows where the cricket is inside the arena; the commitment is handed over
           rather than accumulated; the cricket does not bolt; and wanting it outranks
           everything else. The physics, the walk, the body and the 4.07&nbsp;cm it has to
-          close are untouched &mdash; it still has to get there on its own legs.
+          close are untouched &mdash; it still gets there on its own legs.
           <br><br>
-          <b>Off</b> &mdash; the animal as it actually is. Measured over 3000 steps: the
-          cricket was in view on 215 frames, the eye fired on 487, and 18 of those
-          overlapped. It hunts by persistence, not by acuity, and catches are rare.
+          <b>Off</b> &mdash; the animal as it is. Measured over 3000 steps: the cricket was
+          in view on 215 frames, the eye fired on 487, and 18 of those overlapped. It
+          hunts by persistence, not acuity, and catches are rare.
           <br><br>
-          Nothing in the lab model knows this switch exists. Every number quoted on this
-          page was measured with it <em>off</em>.
+          Nothing in the lab model knows this switch exists. Every number quoted here was
+          measured with it <em>off</em>.
+        </div>
+      </details>
+      <details class="why">
+        <summary><span class="q">?</span> What is actually checked</summary>
+        <div class="body">
+          The same inputs go into the Python model and into this page, and the outputs are
+          subtracted.
+          <div class="res">
+            <div class="k">walker, 30 actuators</div><div class="v">7.3e&minus;15</div>
+            <div class="k">basal ganglia gates</div><div class="v">exactly 0</div>
+            <div class="k">day/night clock</div><div class="v">exactly 0</div>
+            <div class="k">search, 4000 steps</div><div class="v">exactly 0</div>
+            <div class="k">eye, 140 frames</div><div class="v">8.9e&minus;16</div>
+            <div class="k">web body vs full body</div><div class="v">exactly 0</div>
+          </div>
+          <em>Exactly 0</em> means bit-identical. The rest is floating-point dust.
+          391 hypotheses are on the record, refutations included.
         </div>
       </details>
     </div>
 
-    <div class="block">
-      <div class="lbl" style="margin-bottom:8px">Arousal &amp; rest salience</div>
-      <canvas id="trace" width="560" height="150"></canvas>
-    </div>
-
-    <div class="block">
-      <div class="grid2">
-        <div class="kv"><div class="k">Arousal</div><div class="v" id="ar">0.000</div></div>
-        <div class="kv"><div class="k">Eyelid</div><div class="v" id="lid">0&deg;</div></div>
-        <div class="kv"><div class="k">Body temp</div><div class="v" id="temp">30.5</div></div>
-        <div class="kv"><div class="k">Hunger</div><div class="v" id="hun">0.90</div></div>
-        <div class="kv"><div class="k">Speed m/s</div><div class="v" id="spd">0.000</div></div>
-        <div class="kv"><div class="k">Walked m</div><div class="v" id="dist">0.00</div></div>
-        <div class="kv"><div class="k">Program</div><div class="v" id="sst">&mdash;</div></div>
-        <div class="kv"><div class="k">Head yaw</div><div class="v" id="hy">0&deg;</div></div>
-        <div class="kv"><div class="k">Impulses</div><div class="v" id="imp">0</div></div>
-        <div class="kv"><div class="k">Crickets eaten</div><div class="v" id="eaten">0</div></div>
-        <div class="kv"><div class="k">Eye fires</div><div class="v" id="seen">&mdash;</div></div>
-        <div class="kv"><div class="k">Posture</div><div class="v" id="post">&mdash;</div></div>
-        <div class="kv"><div class="k">Mouth</div><div class="v" id="jaw">shut</div></div>
-        <div class="kv"><div class="k">Frames</div><div class="v" id="fps">&mdash;</div></div>
-      </div>
+    <div class="block links">
+      <a class="lnk" id="adopt" href="#">
+        <span class="ic">&#10022;</span><span><b>Adopt this gecko</b>tell me you want one</span>
+      </a>
+      <a class="lnk" href="https://github.com/12ziyad/NeuroGecko" target="_blank" rel="noopener">
+        <span class="ic">&lt;/&gt;</span><span><b>Open source</b>the whole thing, ledger and all</span>
+      </a>
+      <a class="lnk" id="contact" href="#">
+        <span class="ic">&#9993;</span><span><b>Contact</b>questions, collaboration, press</span>
+      </a>
     </div>
 
     <div class="foot">
-      MuJoCo WebAssembly &middot; 500 Hz physics, 50 Hz control &middot; accepted walker, zero residual<br>
-      brain checked against the original: walker 7.3e&minus;15, gates and clock exactly 0<br>
-      <span style="color:var(--muted)">nerve route and impulse timing are measured; conduction speed is a drawing</span>
+      MuJoCo WebAssembly &middot; 500 Hz physics, 50 Hz control &middot; accepted walker<br>
+      nerve route and impulse timing are measured; conduction speed is a drawing
     </div>
   </aside>
 </div>
@@ -408,9 +407,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
 <script type="module">
 import load from "./media/mujoco.js";
-import { LiveGecko, withRoom } from "./live.js?v=2c1c3badda";
-import { RoomView, NerveView } from "./views.js?v=2c1c3badda";
-import { loadSkin } from "./skin.js?v=2c1c3badda";
+import { LiveGecko, withRoom } from "./live.js?v=5a75a0799e";
+import { RoomView, NerveView } from "./views.js?v=5a75a0799e";
+import { loadSkin } from "./skin.js?v=5a75a0799e";
 
 const CH_CSS = {hunt:"--hunt",flee:"--flee",explore:"--explore",bask:"--bask",rest:"--rest",groom:"--groom"};
 const T = id => document.getElementById(id);
@@ -462,21 +461,7 @@ try {
     bars[c].f.style.background = css(CH_CSS[c]);
   }
 
-  const tc = T("trace"), tx = tc.getContext("2d"), hist = [];
-  function trace(){
-    const W = tc.width, H = tc.height, P = 4;
-    tx.fillStyle = css("--sunk"); tx.fillRect(0,0,W,H);
-    const fy = H-P - 0.199878*(H-2*P);
-    tx.save(); tx.setLineDash([4,3]); tx.strokeStyle = css("--floor"); tx.globalAlpha=.8;
-    tx.beginPath(); tx.moveTo(0,fy); tx.lineTo(W,fy); tx.stroke(); tx.restore();
-    if (!hist.length) return;
-    const dx = W/Math.max(1,hist.length-1);
-    for (const [k,col] of [["a","--bask"],["r","--rest"]]) {
-      tx.strokeStyle = css(col); tx.lineWidth = 1.8; tx.beginPath();
-      hist.forEach((h,i)=>{ const y = H-P-h[k]*(H-2*P); i?tx.lineTo(i*dx,y):tx.moveTo(i*dx,y); });
-      tx.stroke();
-    }
-  }
+  const hist = [];
 
   // THE EYE IS PLUGGED IN HERE. The sim asks for pixels; the room renders one
   // frame from a camera on the animal's head and hands back bytes. That is the
@@ -512,7 +497,6 @@ try {
   for (const li of T("cams").querySelectorAll("li")) li.onclick = () => {
     for (const o of T("cams").querySelectorAll("li")) o.classList.remove("on");
     li.classList.add("on");
-    T("camLabel").textContent = li.textContent;
     mode = li.dataset.m;
     dd.classList.remove("open");
     spin = mode === "orbit";
@@ -559,6 +543,20 @@ try {
   };
   T("max1").onclick = () => solo("solo1");
   T("max2").onclick = () => solo("solo2");
+
+  // ---- the three links ----------------------------------------------------
+  // mailto, because it works today and needs no key and no third party. A
+  // silent form would need an email provider's API key on the Cloudflare side,
+  // which is the owner's to add, not mine.
+  const MAIL = "kayotenetwork" + "@" + "gmail.com";
+  T("adopt").href = "mailto:" + MAIL
+    + "?subject=" + encodeURIComponent("I want a NeuroGecko")
+    + "&body=" + encodeURIComponent(
+        "Hi,\n\nI just watched the gecko at neurogecko.pages.dev and I would like one.\n\n"
+      + "A little about what I would use it for:\n\n\n"
+      + "-- sent from the Adopt button");
+  T("contact").href = "mailto:" + MAIL
+    + "?subject=" + encodeURIComponent("NeuroGecko");
 
   // ---- show only the nervous system --------------------------------------
   let iso = false;
@@ -656,25 +654,16 @@ try {
     room.update(sim);
     nerve.update(sim);
 
-    T("hour").textContent = sim.timeOfDayH.toFixed(2);
+    T("hour").textContent = sim.timeOfDayH.toFixed(2) + " h";
     const asleep = sim.arousal < 0.1;
     T("pill").textContent = asleep ? "asleep" : "awake";
-    T("pill").className = "pill " + (asleep ? "sleep" : "wake");
+    T("pill").style.color = asleep ? css("--rest") : css("--bask");
     T("beh").textContent = sim.behaviour || "none";
     T("beh").style.color = sim.behaviour ? css(CH_CSS[sim.behaviour]) : css("--muted");
-    T("ar").textContent = sim.arousal.toFixed(3);
-    T("lid").textContent = Math.round(sim.eyelid)+"°";
     T("temp").textContent = sim.bodyC.toFixed(1);
     T("hun").textContent = sim.hunger.toFixed(2);
-    T("spd").textContent = sim.speed.toFixed(3);
     T("dist").textContent = sim.distance.toFixed(2);
-    T("sst").textContent = sim.program === "search" ? (sim.searchState || "-")
-                          : (sim.program || "-");
-    T("hy").textContent = Math.round(sim.headYaw) + "\u00b0";
-    T("imp").textContent = nerve.liveDots || 0;
     T("eaten").textContent = sim.captures;
-    T("seen").textContent = sim.eyeFrames
-      ? (100 * sim.sawCricket / sim.eyeFrames).toFixed(1) + "%" : "\u2014";
     T("guidedBadge").textContent = sim.guided
       ? "guided \u00b7 cricket in view" : "guided \u00b7 oracle on";
     T("hud1").innerHTML = `${sim.timeOfDayH.toFixed(2)} h &middot; `
@@ -683,8 +672,6 @@ try {
       + ` &middot; ${sim.distance.toFixed(2)} m walked &middot; `
       + `<b>${sim.captures}</b> eaten`
       + (sim.timeScale > 1 ? ` &middot; clock ×${sim.timeScale} through the sleep` : "");
-    T("post").textContent = sim.posture || "\u2014";
-    T("jaw").textContent = (sim.jaw > 0.25 ? "open" : sim.jaw > 0.05 ? "parting" : "shut");
     T("hud2").innerHTML = `<b>${nerve.liveDots || 0}</b> impulses in flight &middot; `
       + `${nerve.nerves.length} fibres &middot; head ${Math.round(sim.headYaw)}&deg;`
       + ` &middot; ${sim.program}`
@@ -723,7 +710,7 @@ try {
       bars[c].v.textContent = g.toFixed(2);
       bars[c].n.className = "nm"+(sim.behaviour===c?" on":"");
     });
-    trace(); gates();
+    gates();
     cfg.bg.channels.forEach((c, i) => {
       const g = sim.gates[i] || 0;
       const li = legendRows[c];
@@ -733,7 +720,7 @@ try {
     });
     if (now - epsT > 400) { epsT = now; eyeSteps(); }
     frames++;
-    if (now-fpsT > 1000) { T("fps").textContent = frames; frames = 0; fpsT = now; }
+    if (now-fpsT > 1000) { frames = 0; fpsT = now; }
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);

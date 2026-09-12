@@ -74,7 +74,11 @@ function makeCricket(cfg, sc, dark) {
 
 // Put a cricket mesh where the simulated cricket actually is.
 function placeCricket(mesh, sim) {
-  if (!mesh || !sim.prey) return;
+  if (!mesh) return;
+  // No cricket in the world for a stretch after a meal, so there is none on
+  // screen either -- and the eye therefore cannot find one, which is the point.
+  mesh.visible = !!sim.preyPresent;
+  if (!sim.prey || !sim.preyPresent) return;
   const r = mesh.userData.r || 0.009;
   mesh.position.x = sim.prey.x;
   mesh.position.y = sim.prey.y;
@@ -323,7 +327,7 @@ export class RoomView {
     this.eyeCam.position.set(ex, ey, ez);
     this.eyeCam.up.set(ux, uy, uz);
     this.eyeCam.lookAt(ex + fx * 0.4, ey + fy * 0.4, ez + fz * 0.4);
-    this.cricket.visible = true;
+    this.cricket.visible = !!sim.preyPresent;
     const prevTarget = this.renderer.getRenderTarget();
     this.renderer.setRenderTarget(this.eyeTarget);
     this.renderer.render(this.scene, this.eyeCam);
@@ -460,7 +464,7 @@ export class NerveView {
   setIsolate(on) {
     this.isolate = !!on;
     for (const m of this.meshes) m.visible = !this.isolate;
-    if (this.cricket) this.cricket.visible = !this.isolate;
+    if (this.cricket && this.isolate) this.cricket.visible = false;
     return this;
   }
 
