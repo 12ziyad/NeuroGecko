@@ -1,3 +1,4 @@
+import { poseEyes } from "./eyes.js";
 // The two views: the animal in its enclosure, and the same animal as a body
 // of joints. Both draw the SAME physics state at the SAME instant.
 //
@@ -243,6 +244,14 @@ export class RoomView {
     this.skin = null;
     this._m4 = new THREE.Matrix4();
   }
+  // The eyes ride the head as their own rigid meshes. See site/eyes.js.
+  attachEyes(eyes, headBody) {
+    this.eyes = eyes;
+    this.eyeHeadBody = headBody;
+    this.scene.add(eyes.group);
+    return this;
+  }
+
   attachSkin(skin) {
     this.skin = skin;
     skin.mesh.castShadow = true;
@@ -362,6 +371,8 @@ export class RoomView {
       this.floor.position.set(Math.round(t[0] / TILE) * TILE,
                               Math.round(t[1] / TILE) * TILE, 0);
     }
+    if (this.eyes) poseEyes(this.eyes, d, this.eyeHeadBody, this._m4);
+
     if (this.mode === "eye" && this.eyeCam) {
       // THE SAME CAMERA THE RETINA USES, at screen resolution rather than 64
       // pixels. Not a reconstruction of it: `renderEye` has already placed it

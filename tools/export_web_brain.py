@@ -208,8 +208,17 @@ def main():
             warm_half = _f(habitat.geom_size[g][0])
             break
 
+    _meal_g = (parameter_value("meal_offering_fraction_bodyweight")
+               * parameter_value("body_mass_kg") * 1000.0
+               * parameter_value("meal_consumed_fraction_of_offering"))
+    _cricket_g = parameter_value("prey_item_wet_mass_kg") * 1000.0
+
     world = {
         "programs": dict(PROGRAMS),
+        # One cricket as a fraction of one meal. DERIVED, not invented: 0.35 g
+        # of cricket against 5 % of a 38 g animal's bodyweight offered and
+        # 54.7 % of that actually eaten.
+        "cricket_meal_fraction": _f(_cricket_g / max(_meal_g, 1e-9)),
         "locomotor": dict(LOCOMOTOR),
         "drive_threshold": _f(DRIVE_THRESHOLD),
         "ambient_substrate_C": _f(GeckoBrainEnv.AMBIENT_SUBSTRATE_C),
@@ -311,9 +320,61 @@ def main():
         "resume_search_on_lost": bool(RESUME_SEARCH_ON_LOST),
     }
 
+    # THE ANIMAL ITSELF, for the panel that sits beside the render. Every one of
+    # these is pulled from config/proxies.yaml by key, so the page cannot quote a
+    # number this project does not hold, and each carries the provenance tag the
+    # registry gives it -- published, derived or invented. A value and its label
+    # travel together or neither travels.
+    def _bio(key, label, unit, scale=1.0, fmt="%.3g"):
+        entry = REGISTRY[key]
+        val = entry["value"]
+        note = (entry.get("notes") or "")
+        tag = ("PUBLISHED" if note.strip().upper().startswith("PUBLISHED")
+               else "INVENTED" if str(entry.get("species", "")).upper() == "INVENTED"
+               else "DERIVED" if str(entry.get("species", "")).lower() == "derived"
+               else "PUBLISHED")
+        return {"key": key, "label": label, "unit": unit, "tag": tag,
+                "value": fmt % (float(val) * scale),
+                "species": entry.get("species"),
+                "n": entry.get("sample_size"),
+                "source": (entry.get("source") or "")[:240]}
+
+    import json as _json
+    REGISTRY = _json.loads(
+        (REPO / "config" / "proxies.yaml").read_text(encoding="utf-8"))["entries"]
+
+    biology = []
+    for args in (
+        ("body_mass_kg", "Body mass", "g", 1000.0, "%.0f"),
+        ("fuller_svl_m", "Snout-vent length", "mm", 1000.0, "%.1f"),
+        ("tail_mass_fraction", "Tail, share of mass", "%", 100.0, "%.0f"),
+        ("tail_length_svl", "Tail length", "x SVL", 1.0, "%.2f"),
+        ("hindlimb_length_svl", "Hind limb", "x SVL", 1.0, "%.3f"),
+        ("head_width_svl", "Head width", "x SVL", 1.0, "%.3f"),
+        ("hip_height_svl", "Hip height", "x SVL", 1.0, "%.2f"),
+        ("com_intact_svl", "Centre of mass", "x SVL from snout", 1.0, "%.3f"),
+        ("lab_gait_frequency_hz", "Leg rhythm", "Hz", 1.0, "%.3f"),
+        ("hind_duty_factor", "Hind foot on ground", "of each stride", 1.0, "%.2f"),
+        ("fore_duty_factor", "Fore foot on ground", "of each stride", 1.0, "%.2f"),
+        ("warm_surface_temperature_C", "Preferred warm ground", "C", 1.0, "%.0f"),
+        ("inter_meal_interval_days", "Between meals", "days", 1.0, "%.2f"),
+        ("prey_item_wet_mass_kg", "One cricket", "g", 1000.0, "%.2f"),
+        ("prey_escape_speed_m_s", "Cricket escape speed", "m/s", 1.0, "%.3f"),
+        ("strike_peak_speed_m_s", "Strike peak speed", "m/s", 1.0, "%.3f"),
+        ("capture_head_drop_m", "Head drop at capture", "mm", 1000.0, "%.0f"),
+        ("lower_jaw_length_m", "Lower jaw", "mm", 1000.0, "%.0f"),
+    ):
+        try:
+            biology.append(_bio(*args))
+        except Exception as exc:
+            print(f"  ! biology {args[0]}: {exc}")
+
+    # One cricket as a fraction of one meal, DERIVED rather than invented:
+    # 0.35 g of cricket against 5 % of a 38 g animal's bodyweight offered and
+    # 54.7 % of that actually consumed.
     payload = {
         "geoms": geoms, "joints": jnt, "search": search, "world": world,
-        "eye": eye, "prey": prey, "hunt": hunt,
+        "eye": eye, "prey": prey, "hunt": hunt, "biology": biology,
         # The body tree itself. The nerve view routes every fibre along this
         # chain -- head to trunk to girdle to limb -- instead of drawing a
         # straight line from a brain to a joint through the middle of the
@@ -337,6 +398,9 @@ def main():
     print(f"  warm patch: {warm_half*2:.3f} m across at "
           f"({warm_xy[0]:g}, {warm_xy[1]:g}), surface {world['warm_surface_C']} C")
     print(f"  programs: {world['programs']}")
+    print(f"  biology: {len(biology)} registry values on the page")
+    print(f"  one cricket = {_cricket_g:.2f} g of a {_meal_g:.2f} g meal "
+          f"= {_cricket_g/_meal_g:.3f} meals (DERIVED)")
     print(f"  eye: render {eye['render_pixels']} -> receptors {eye['pixels']} "
           f"-> {eye['cells']} cells, blur {eye['optical_limit_px']:.2f} px, "
           f"band {eye['v_low']}-{eye['v_peak']}-{eye['v_high']} deg/s")

@@ -1,0 +1,16 @@
+# Cloudflare Pages configuration for the NeuroGecko site.
+#
+# The KV namespace holds two things: every message the contact form receives,
+# and a count of how many distinct people have asked for a gecko of their own.
+# The id below is not a secret -- it names a namespace, it does not grant access
+# to it. The one thing that IS a secret, the mail provider key, is never in this
+# file: it is set in the dashboard under Settings -> Environment variables as
+# RESEND_API_KEY, and functions/api/contact.js reports honestly when it is absent
+# rather than pretending a message was sent.
+name = "neurogecko"
+compatibility_date = "2025-09-01"
+pages_build_output_dir = "site"
+
+[[kv_namespaces]]
+binding = "NG"
+id = "da2e8fd91867456e8d9e299f4b116721"

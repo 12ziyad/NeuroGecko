@@ -159,7 +159,9 @@ export class Skin {
   }
 }
 
-export async function loadSkin(base = "media/") {
+export async function loadSkin(base = "media/", v = "") {
+  const tag = v ? "?v=" + v : "";
+
   const header = await (await fetch(base + "skin.json")).json();
   const buffer = await (await fetch(base + "skin.bin")).arrayBuffer();
   let texture = null;

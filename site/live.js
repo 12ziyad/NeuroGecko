@@ -40,7 +40,8 @@ function withRoom(xml) { return xml; }   // the enclosure is gone, see views.js
 //: cricket is not half a meal for a 38 g gecko; the model's meal is
 //: `meal_energy_J` at the animal's own mass and this is a small fraction of it.
 //: The fraction is still INVENTED, because the energetics are not ported.
-const MEAL_FRACTION = 0.18;
+// Replaced by a DERIVED value read from brain.json -- see `world.cricket_meal_fraction`.
+const MEAL_FRACTION_FALLBACK = 0.337;
 //: Control steps of head-shaking after a swallow. INVENTED. The behaviour is
 //: real and named in the published ethogram for this species; its duration is
 //: not measured anywhere and this number is a drawing.
@@ -625,7 +626,8 @@ export class LiveGecko {
       this.lastCapture = this.simT;
       this.chewT = CHEW_STEPS;
       // A meal. Hunger falls and the cricket that replaced it is somewhere new.
-      this.hunger = Math.max(0, this.hunger - MEAL_FRACTION);
+      this.hunger = Math.max(0, this.hunger
+        - (this.cfg.world.cricket_meal_fraction ?? MEAL_FRACTION_FALLBACK));
       this.evidence.reset();
       this.eye.reset();
     }

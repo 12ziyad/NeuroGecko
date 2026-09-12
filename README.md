@@ -1,6 +1,25 @@
 # NeuroGecko
 
-A biologically grounded virtual leopard gecko trained with neural control and biomechanical measurements.
+### ▶ [Watch it live — neurogecko.pages.dev](https://neurogecko.pages.dev)
+
+The whole animal runs in your browser: MuJoCo physics at 500 Hz, a basal-ganglia
+selector choosing between six behaviours, a retina and optic tectum looking for a
+cricket in its own rendered pixels, and 27 nerves carrying each command from the
+brain to the joint it drives. No video, no playback — it is solved while you watch.
+
+A biologically grounded virtual leopard gecko (*Eublepharis macularius*) built from
+published measurements, with neural control and a ledger of every hypothesis tested.
+
+| | |
+|---|---|
+| **Live** | https://neurogecko.pages.dev |
+| **Browser port vs the Python model** | walker `7.3e-15`, eye `8.9e-16`, gates / clock / search **exactly 0** |
+| **Anatomy** | 14 / 14 gates against the literature |
+| **Ledger** | [`docs/FAILURE_MAP.md`](docs/FAILURE_MAP.md) — every hypothesis, refutations kept |
+
+Every number in this project is **published**, **derived** or **invented**, and says
+which, next to itself, in the source. A plausible number wearing a published
+number's clothes is the worst defect available.
 
 ## Overview
 
