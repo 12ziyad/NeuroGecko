@@ -119,6 +119,62 @@
   /* Maximise: one pane fills the stage, the other gets out of the way. */
   .stage.solo1 .view:nth-child(2),.stage.solo2 .view:nth-child(1){display:none}
   .stage.solo1,.stage.solo2{grid-template-rows:1fr}
+
+  .hero{padding:16px 16px 13px;border-bottom:1px solid var(--rule)}
+  .hero h1{margin:0;font-family:"IBM Plex Mono",monospace;font-size:16px;font-weight:600;
+    letter-spacing:-.01em;color:var(--ink);line-height:1.3}
+  .hero p{margin:7px 0 0;font-size:11.5px;line-height:1.62;color:var(--body)}
+  .hero .tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+  .tag{font-family:"IBM Plex Mono",monospace;font-size:8.5px;letter-spacing:.09em;
+    text-transform:uppercase;padding:3px 6px;border:1px solid var(--rule);
+    color:var(--muted);border-radius:2px}
+  .tag.ok{color:#7fc4a0;border-color:#2b4a3c}
+  .tag.no{color:var(--flee);border-color:#4a2b2b}
+
+  details.why{margin-top:7px}
+  details.why summary{cursor:pointer;list-style:none;font-family:"IBM Plex Mono",monospace;
+    font-size:9px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);
+    display:flex;align-items:center;gap:5px}
+  details.why summary::-webkit-details-marker{display:none}
+  details.why summary:hover{color:var(--cyan)}
+  details.why summary .q{display:inline-flex;width:13px;height:13px;border-radius:50%;
+    border:1px solid currentColor;align-items:center;justify-content:center;font-size:8px}
+  details.why[open] summary{color:var(--cyan)}
+  details.why .body{font-size:10.5px;line-height:1.65;color:var(--body);margin-top:7px;
+    padding-left:2px;border-left:1px solid var(--rule);padding-left:9px}
+  details.why .body b{color:var(--ink);font-weight:500}
+  details.why .body em{color:var(--bask);font-style:normal}
+
+  .eyebox details.why{pointer-events:auto;max-width:150px}
+  .eyebox details.why .body{font-size:9px;line-height:1.55;max-height:180px;overflow-y:auto}
+
+  .res{display:grid;grid-template-columns:1fr auto;gap:2px 10px;margin-top:3px}
+  .res div{font-family:"IBM Plex Mono",monospace;font-size:9.5px;padding:3px 0;
+    border-bottom:1px solid rgba(30,39,51,.6)}
+  .res .k{color:var(--muted)}
+  .res .v{color:var(--ink);text-align:right;white-space:nowrap}
+
+  .sw{display:flex;align-items:center;gap:7px;cursor:pointer;user-select:none}
+  .sw .track{width:26px;height:14px;border-radius:8px;background:var(--sunk);
+    border:1px solid var(--rule);position:relative;transition:.15s}
+  .sw .track i{position:absolute;top:1px;left:1px;width:10px;height:10px;border-radius:50%;
+    background:var(--muted);transition:.15s}
+  .sw.on .track{border-color:var(--bask);background:#2a1f0c}
+  .sw.on .track i{left:13px;background:var(--bask)}
+  .sw span{font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:.09em;
+    text-transform:uppercase;color:var(--muted)}
+  .sw.on span{color:var(--bask)}
+
+  .badge{position:absolute;left:12px;top:38px;z-index:4;font-family:"IBM Plex Mono",monospace;
+    font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;padding:4px 7px;
+    color:var(--bask);border:1px solid #4a3a17;background:rgba(30,22,8,.82);border-radius:2px}
+  .badge.hid{display:none}
+
+  canvas#gates{width:100%;display:block;background:var(--sunk);border:1px solid var(--rule)}
+  .panegraph{position:absolute;right:11px;top:46px;z-index:3;padding:7px;width:178px}
+  .panegraph canvas{width:164px;height:56px;display:block}
+  .panegraph .lbl{margin-bottom:5px;font-size:8.5px}
+  @media (max-width:760px){.panegraph{display:none}}
 </style>
 
 <div class="app">
@@ -152,13 +208,41 @@
       <div class="eyebox glass" id="eyebox">
         <canvas id="eyecv" width="64" height="64"></canvas>
         <span id="eyelab">eye &middot; nothing</span>
+        <details class="why">
+          <summary><span class="q">?</span> Why so dark</summary>
+          <div class="body">
+            Mostly because of <b>my renderer, not the gecko</b>. Three separate things,
+            and only one of them is the animal:
+            <br><br>
+            <b>1.</b> The scene is lit for a night animal and the sky is near black, so
+            the top half of the frame is background.
+            <br><br>
+            <b>2.</b> <em>This part is real.</em> The red channel is thrown away before
+            the brain sees anything. This species' longest-wavelength pigment sits near
+            521&nbsp;nm &mdash; spectrally green &mdash; so warm sand reads dimmer to it
+            than to you. What you are looking at is green and blue only.
+            <br><br>
+            <b>3.</b> <em>What is missing makes it darker than truth.</em> The third
+            opsin peaks near 364&nbsp;nm and this renderer has no ultraviolet. There is
+            no low-light gain either: a nocturnal gecko's eye gathers far more light than
+            this. A real leopard gecko at dusk sees a great deal more than this square.
+            <br><br>
+            So: darker than the animal, not brighter. Red on the square is where the
+            tectum's motion peak is sitting this frame.
+          </div>
+        </details>
       </div>
+      <div class="badge" id="guidedBadge">guided &middot; oracle on</div>
       <div class="boot" id="boot">starting the physics engine&hellip;</div>
     </div>
     <div class="view">
       <canvas id="cNerve"></canvas>
       <div class="vtag"><b>The same animal, its nervous system</b>
         <span>48 solids the physics integrates &middot; 27 fibres, each routed along the real body tree &middot; a dot leaves the head when that joint&rsquo;s command actually moves</span></div>
+      <div class="panegraph glass">
+        <div class="lbl">Channel gates &middot; last 12 s</div>
+        <canvas id="gates" width="328" height="112"></canvas>
+      </div>
       <div class="corner">
         <div class="icon glass" id="max2" title="Maximise this view">
           <svg viewBox="0 0 14 14"><path d="M1 5V1h4M13 9v4H9M13 5V1H9M1 9v4h4"/></svg>
@@ -169,6 +253,44 @@
   </div>
 
   <aside class="side">
+    <div class="hero">
+      <h1>A leopard gecko, and the brain running it.</h1>
+      <p>Both panels below are one animal, stepping live in your browser at 500&nbsp;Hz.
+      Its body was built from real measurements of living <i>Eublepharis macularius</i>;
+      its walk, its basal ganglia, its day/night clock and its eye are the same code
+      that runs in the lab, checked against it to fifteen decimal places.</p>
+      <div class="tags">
+        <span class="tag ok">MuJoCo WASM &middot; live</span>
+        <span class="tag ok">10/10 conformance</span>
+        <span class="tag ok">14/14 anatomy gates</span>
+        <span class="tag">383 ledger rows</span>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="lbl">What is actually checked</div>
+      <div class="res">
+        <div class="k">walker, 30 actuators</div><div class="v">7.3e&minus;15</div>
+        <div class="k">basal ganglia gates</div><div class="v">exactly 0</div>
+        <div class="k">day/night clock</div><div class="v">exactly 0</div>
+        <div class="k">search, 4000 steps</div><div class="v">exactly 0</div>
+        <div class="k">eye, 140 frames</div><div class="v">8.9e&minus;16</div>
+        <div class="k">web body vs full body</div><div class="v">exactly 0</div>
+      </div>
+      <details class="why">
+        <summary><span class="q">?</span> What those numbers mean</summary>
+        <div class="body">
+          The browser is not a re-implementation that looks similar. The same inputs go
+          into the Python model and into this page, and the outputs are subtracted.
+          <b>7.3e&minus;15</b> is the largest disagreement across a whole gait cycle of
+          thirty actuators &mdash; floating-point dust. <b>Exactly 0</b> means bit-identical.
+          <br><br>
+          <em>Where it is weakest:</em> the eye. It detects motion honestly and it is
+          not good at it &mdash; see the note on the render.
+        </div>
+      </details>
+    </div>
+
     <div class="block">
       <div class="lbl">Day / night clock</div>
       <div class="clock"><b id="hour">09.50</b><span class="mono" style="color:var(--muted)">h</span>
@@ -189,6 +311,27 @@
       <div class="lbl" style="margin-top:8px;letter-spacing:.06em;text-transform:none;font-size:9px;line-height:1.55">
         Red line: the measured release floor, 0.1999. Nothing below it is released.
       </div>
+      <div class="sw on" id="assist" style="margin-top:11px">
+        <span class="track"><i></i></span><span id="assistLbl">Guided hunting</span>
+      </div>
+      <details class="why">
+        <summary><span class="q">?</span> What guided means</summary>
+        <div class="body">
+          <b>On</b> &mdash; when the cricket is genuinely inside the animal's own 70&deg;
+          field of view, the brain is handed the true bearing instead of its eye's guess.
+          That is an <em>oracle</em>, and it is the only one on this page. Everything else
+          still has to happen: the evidence has to reach quorum, the stalk still stops to
+          look, the cricket still runs, and the catch still has to land inside 4.07&nbsp;cm.
+          It cannot see behind itself or through its own body.
+          <br><br>
+          <b>Off</b> &mdash; the animal as it actually is. Measured over 3000 steps: the
+          cricket was in view on 215 frames, the eye fired on 487, and 18 of those
+          overlapped. It hunts by persistence, not by acuity, and catches are rare.
+          <br><br>
+          Nothing in the lab model knows this switch exists. Every number quoted on this
+          page was measured with it <em>off</em>.
+        </div>
+      </details>
     </div>
 
     <div class="block">
@@ -209,6 +352,8 @@
         <div class="kv"><div class="k">Impulses</div><div class="v" id="imp">0</div></div>
         <div class="kv"><div class="k">Crickets eaten</div><div class="v" id="eaten">0</div></div>
         <div class="kv"><div class="k">Eye fires</div><div class="v" id="seen">&mdash;</div></div>
+        <div class="kv"><div class="k">Posture</div><div class="v" id="post">&mdash;</div></div>
+        <div class="kv"><div class="k">Mouth</div><div class="v" id="jaw">shut</div></div>
         <div class="kv"><div class="k">Frames</div><div class="v" id="fps">&mdash;</div></div>
       </div>
     </div>
@@ -224,9 +369,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
 <script type="module">
 import load from "./media/mujoco.js";
-import { LiveGecko, withRoom } from "./live.js?v=57839a393b";
-import { RoomView, NerveView } from "./views.js?v=57839a393b";
-import { loadSkin } from "./skin.js?v=57839a393b";
+import { LiveGecko, withRoom } from "./live.js?v=ca12947e7d";
+import { RoomView, NerveView } from "./views.js?v=ca12947e7d";
+import { loadSkin } from "./skin.js?v=ca12947e7d";
 
 const CH_CSS = {hunt:"--hunt",flee:"--flee",explore:"--explore",bask:"--bask",rest:"--rest",groom:"--groom"};
 const T = id => document.getElementById(id);
@@ -376,6 +521,40 @@ try {
   T("max1").onclick = () => solo("solo1");
   T("max2").onclick = () => solo("solo2");
 
+  // ---- the one oracle on this page, and its switch -----------------------
+  const sw = T("assist");
+  const setAssist = (v) => {
+    sim.assist = v;
+    sw.classList.toggle("on", v);
+    T("assistLbl").textContent = v ? "Guided hunting" : "Its own eye only";
+    T("guidedBadge").classList.toggle("hid", !v);
+  };
+  sw.onclick = () => setAssist(!sim.assist);
+  setAssist(true);
+
+  // ---- channel gates over time, in the nerve pane ------------------------
+  // Six real numbers a second, the same converged fixed point the bars read.
+  const gc = T("gates"), gx = gc.getContext("2d"), ghist = [];
+  function gates() {
+    const W = gc.width, H = gc.height, P = 3;
+    gx.fillStyle = css("--sunk"); gx.fillRect(0, 0, W, H);
+    const fy = H - P - 0.199878 * (H - 2 * P);
+    gx.save(); gx.setLineDash([3, 3]); gx.strokeStyle = css("--floor"); gx.globalAlpha = .55;
+    gx.beginPath(); gx.moveTo(0, fy); gx.lineTo(W, fy); gx.stroke(); gx.restore();
+    if (ghist.length < 2) return;
+    const dx = W / Math.max(1, ghist.length - 1);
+    cfg.bg.channels.forEach((c, k) => {
+      gx.strokeStyle = css(CH_CSS[c]); gx.lineWidth = 1.4; gx.globalAlpha = .95;
+      gx.beginPath();
+      ghist.forEach((h, i) => {
+        const y = H - P - Math.min(1, h[k]) * (H - 2 * P);
+        i ? gx.lineTo(i * dx, y) : gx.moveTo(i * dx, y);
+      });
+      gx.stroke();
+    });
+    gx.globalAlpha = 1;
+  }
+
   function frame(now){
     const dt = Math.min(.1,(now-last)/1000); last = now;
     if (spin) sim.camAngle += dt * 0.16;
@@ -384,6 +563,8 @@ try {
       while (acc > 1/50 && n < 5) { sim.controlStep(); acc -= 1/50; n++; }
       if (hist.length > 260) hist.shift();
       hist.push({a: sim.arousal, r: 1 - sim.arousal});
+      if (ghist.length > 600) ghist.shift();     // 12 s at 50 Hz
+      ghist.push(Array.from(sim.gates));
     }
     room.update(sim);
     nerve.update(sim);
@@ -407,12 +588,16 @@ try {
     T("eaten").textContent = sim.captures;
     T("seen").textContent = sim.eyeFrames
       ? (100 * sim.sawCricket / sim.eyeFrames).toFixed(1) + "%" : "\u2014";
+    T("guidedBadge").textContent = sim.guided
+      ? "guided \u00b7 cricket in view" : "guided \u00b7 oracle on";
     T("hud1").innerHTML = `${sim.timeOfDayH.toFixed(2)} h &middot; `
       + `<b style="color:${sim.behaviour?css(CH_CSS[sim.behaviour]):css("--muted")}">`
       + `${sim.behaviour || "none"}</b> &middot; ${asleep?"asleep":"awake"}`
       + ` &middot; ${sim.distance.toFixed(2)} m walked &middot; `
       + `<b>${sim.captures}</b> eaten`
       + (sim.timeScale > 1 ? ` &middot; clock ×${sim.timeScale} through the sleep` : "");
+    T("post").textContent = sim.posture || "\u2014";
+    T("jaw").textContent = (sim.jaw > 0.25 ? "open" : sim.jaw > 0.05 ? "parting" : "shut");
     T("hud2").innerHTML = `<b>${nerve.liveDots || 0}</b> impulses in flight &middot; `
       + `${nerve.nerves.length} fibres &middot; head ${Math.round(sim.headYaw)}&deg;`
       + ` &middot; ${sim.program}`
@@ -451,7 +636,7 @@ try {
       bars[c].v.textContent = g.toFixed(2);
       bars[c].n.className = "nm"+(sim.behaviour===c?" on":"");
     });
-    trace();
+    trace(); gates();
     frames++;
     if (now-fpsT > 1000) { T("fps").textContent = frames; frames = 0; fpsT = now; }
     requestAnimationFrame(frame);

@@ -48,6 +48,49 @@ const CHEW_STEPS = 90;
 //: its own hours as it did before.
 const SLEEP_FAST_FORWARD = 14;
 
+// ---------------------------------------------------------------- posture --
+// HOW A GECKO TURNS TO LOOK AT SOMETHING, and it is not how a person does it.
+// A person keeps the trunk still and rotates the neck. A lizard bends: the
+// pelvis stays planted, the trunk curves through `spine_bend` -- which in this
+// morphology is a tendon over spine_lat_1, spine_lat_2 and spine_lat_3 at
+// coefficients 1.0, 1.0 and 0.8, so the bend is strongest at the front -- and
+// the neck and head carry the last of the angle. Then it walks.
+//
+// The ORDER is the thing: bend, then look, then go. Walking while the trunk is
+// still swinging is what made the old render read as a person with a long neck.
+//
+// EVERY NUMBER IN THIS BLOCK IS INVENTED. No lateral trunk excursion, bend
+// rate, or bend-before-step latency has been published for this species or any
+// eublepharid. What is published is that the joints exist and how far they go,
+// and that is the morphology, not this. The SHAPE is from photographs of the
+// animal; the timings are a controller.
+const TRUNK_BEND_SHARE = 0.55;    // of a turn carried by the trunk, not the neck
+const TRUNK_BEND_MAX = 0.85;      // rad, inside the tendon's own +-1.2
+const TRUNK_BEND_RATE = 2.6;      // rad/s toward the commanded bend
+const NECK_LAG_STEPS = 14;        // the neck starts after the trunk has begun
+const SETTLE_BEND_RAD = 0.12;     // bend is "done" below this much error
+const BEND_HOLD_MIN = 18;         // control steps held still before walking on
+//: Jaw. Closed is 0 and the morphology's neutral is 0.349 -- half open, which
+//: is why it stood there with its mouth ajar forever. A resting gecko's mouth
+//: is SHUT. It gapes to swallow and it gapes occasionally at rest, and both the
+//: amplitude and the interval here are INVENTED: the published ethogram names
+//: the behaviour and measures neither.
+const JAW_SHUT = 0.0;
+const JAW_GAPE = 0.62;
+const JAW_RATE = 5.0;             // rad/s
+//: THE CREEP. `flee_radius_for` in envs/prey.py exists for exactly this: the
+//: cricket's flight distance scales with how fast the threat is CLOSING, from
+//: 7.5 cm at a charge down to a 1.2 cm floor. Measured here, the animal walked
+//: at its full stride, the cricket read that as a charge and bolted at 6.8 cm,
+//: and the gecko -- which is outrun 2:1 -- could never close the last 3 cm.
+//:
+//: The behaviour that answers it is PUBLISHED and named in the ethogram for
+//: this species: `walk slow motion`, "walking with a strongly reduced speed,
+//: mostly in context of prey capture". What is NOT published is how much
+//: slower, so this number is INVENTED and says so. It slows the stride clock
+//: only -- the gait, the compensator and the accepted walker are untouched.
+const CREEP_GAIT_SCALE = 0.34;
+
 export class LiveGecko {
   constructor(cfg, mj, model, data) {
     this.cfg = cfg; this.mj = mj; this.m = model; this.d = data;
@@ -101,6 +144,15 @@ export class LiveGecko {
     this.lastCapture = -1e9;
     this.chewT = 0;             // the head-shake after a swallow
     this._prevHeading = 0;
+    this.trunkBend = 0;         // rad, what the spine tendon is actually at
+    this.wantBend = 0;
+    this.bendHold = 0;
+    this.neckLag = 0;
+    this.jaw = JAW_SHUT;
+    this.jawWant = JAW_SHUT;
+    this.gapeT = 0;
+    this.posture = "settled";
+    this.assist = true;         // see `assisted()` -- declared on the page
     this.distance = 0;         // ground actually covered, metres
     this._prevXY = [0, 0];
 
@@ -122,12 +174,42 @@ export class LiveGecko {
     if (this._headBody === undefined) {
       this._headBody = Math.max(1, this.cfg.body_names.indexOf("head"));
     }
-    const b = this._headBody * 3;
-    return [this.d.xpos[b], this.d.xpos[b + 1]];
+    // THE SNOUT TIP, not the head body's origin. The origin sits inside the
+    // skull, about 3 cm behind the mouth, and `prey_capture_distance_m` is
+    // 4.07 cm -- so measuring from the origin made the animal effectively three
+    // centimetres shorter than it is and put most of its own head inside the
+    // capture radius it could never reach. Same offset the eye uses, out of the
+    // morphology's `head_cam`.
+    const b = this._headBody * 3, m = this._headBody * 9;
+    return [this.d.xpos[b] + this.d.xmat[m] * 0.02958,
+            this.d.xpos[b + 1] + this.d.xmat[m + 3] * 0.02958];
   }
 
   // Hand the sim something that renders one head-camera frame as RGBA bytes.
   setRetinaSource(fn) { this.renderRetina = fn; return this; }
+
+  // The true bearing to the cricket, but ONLY when it is really inside the
+  // animal's own field of view and range. Returns null otherwise, which is most
+  // of the time -- measured, the cricket is in frame on about 11 % of steps.
+  // Used only by guided mode, which the page labels.
+  _trueBearingIfVisible() {
+    const d = this.d, hb = this.headBodyId ?? 4, p = hb * 3, m = hb * 9;
+    const fx = d.xmat[m], fy = d.xmat[m + 3], fz = d.xmat[m + 6];
+    const ux = d.xmat[m + 2], uy = d.xmat[m + 5], uz = d.xmat[m + 8];
+    const ex = d.xpos[p] + fx * 0.02958 + ux * 0.00682;
+    const ey = d.xpos[p + 1] + fy * 0.02958 + uy * 0.00682;
+    const ez = d.xpos[p + 2] + fz * 0.02958 + uz * 0.00682;
+    const dx = this.prey.x - ex, dy = this.prey.y - ey, dz = 0.007 - ez;
+    const L = Math.hypot(dx, dy, dz);
+    if (L > this.prey.arenaRadius) return null;                 // out of the arena
+    const off = Math.acos(Math.max(-1, Math.min(1, (dx * fx + dy * fy + dz * fz) / L)));
+    if (off > (this.cfg.eye.fovy_deg / 2) * Math.PI / 180) return null;   // off screen
+    // signed bearing about the head's own up axis, the convention the tectum uses
+    const lx = d.xmat[m + 1], ly = d.xmat[m + 4], lz = d.xmat[m + 7];
+    const fwd = dx * fx + dy * fy + dz * fz;
+    const lat = dx * lx + dy * ly + dz * lz;
+    return (Math.atan2(-lat, fwd) * 180) / Math.PI;
+  }
 
   // One 50 Hz control step: eye -> drives -> selector -> motor program -> body.
   controlStep() {
@@ -167,6 +249,16 @@ export class LiveGecko {
     this.bodyC += (substrate - this.bodyC) * (1 - Math.exp(-dt / tau));
     const cold = Math.max(0, Math.min(1, (prefLow - this.bodyC) / 6));
 
+    // GETTING HUNGRY AGAIN. Not an invented decay: hunger in this model is a
+    // deficit measured in MEALS, and the published mean inter-meal interval for
+    // this species is 2.33 days, over which brain/hypothalamus.py has the animal
+    // burn about 71 % of one meal's energy. So the rate is 0.71 meals per 2.33
+    // days and it is read off the registry, not chosen. Without it the animal
+    // ate once and then had nothing it wanted for the rest of its life --
+    // `explore` needs hunger above 0.571 to clear the release floor at all.
+    this.hunger = Math.min(1, this.hunger + dt * this.compression * fast
+      * (W.meal_burn_fraction / (W.inter_meal_interval_days * 86400)));
+
     // ---- THE EYE. One rendered frame, and whatever it can find in it.
     // Nothing here is handed the cricket's position: `renderRetina` returns
     // pixels, and `Eye.step` either finds a moving thing below the horizon or
@@ -184,9 +276,39 @@ export class LiveGecko {
         this.preyBearing = out.prey_bearing_deg;
         this.eyeFrames++;
         if (out.prey_salience > 0) this.sawCricket++;
+        this.eyeSaidSomething = out.prey_bearing_deg !== null;
       }
     }
     this._prevHeading = this.heading;
+
+    // ---------------------------------------------------------------------
+    // GUIDED MODE. This is an ORACLE and it is labelled as one on the page,
+    // in the readout, and here.
+    //
+    // WHAT IT DOES. When the cricket is genuinely inside the animal's own 70
+    // degree field of view, the bearing handed to the evidence accumulator is
+    // the true one instead of the tectum's guess. Everything else is untouched:
+    // the accumulator still has to reach quorum, the orienting reflex still has
+    // its blind window, the stalk still stops to look, the cricket still runs
+    // away, and the capture still has to happen inside 4.07 cm. It does NOT see
+    // through its own body, it does NOT see behind itself, and it is not moved
+    // one millimetre closer to anything.
+    //
+    // WHY IT EXISTS. The real detector fires at roughly its background rate
+    // whether or not there is a cricket there (#374) -- that is the model's own
+    // documented weakness, measured, and the honest version of this page is
+    // unwatchable because of it. So there is a switch. The other position of
+    // that switch is the animal as it actually is, and it is one click away.
+    //
+    // WHAT IT IS NOT. It is not in `brain/`. Not one line of the Python model
+    // knows this exists, the conformance suite runs against the unguided path,
+    // and nothing measured anywhere in this project was measured with it on.
+    // It is a rendering aid for a web page and it says so everywhere it shows.
+    this.guided = false;
+    if (this.assist && this.renderRetina) {
+      const g = this._trueBearingIfVisible();
+      if (g !== null) { this.preyBearing = g; this.guided = true; }
+    }
 
     this.salience = salienceFromDrives(this.cfg, {
       hunger: this.hunger, cold, warm: 0, threat: 0,
@@ -233,13 +355,47 @@ export class LiveGecko {
     this.committed = cmd.committed_bearing_deg;
     this.believedEye = cmd.believed_eye;
     this.headYaw = cmd.head_yaw_deg;
-    const drive = cmd.locomotor_drive;
+    let drive = cmd.locomotor_drive;
     const steer = (cmd.heading_deg * Math.PI) / 180;
     this.drive = drive;
 
+    // ---- POSTURE. Bend, then look, then go. ---------------------------
+    // The heading the program wants is split: the trunk takes most of it and
+    // the neck takes the rest. While the trunk is still swinging into place the
+    // animal does not walk -- that gate is the whole difference between a
+    // lizard turning and a person pivoting.
+    const wantDeg = Math.max(-90, Math.min(90, cmd.heading_deg));
+    this.wantBend = Math.max(-TRUNK_BEND_MAX, Math.min(TRUNK_BEND_MAX,
+      (wantDeg * Math.PI / 180) * TRUNK_BEND_SHARE));
+    const bendErr = this.wantBend - this.trunkBend;
+    const bending = Math.abs(bendErr) > SETTLE_BEND_RAD;
+
+    if (drive > 0 && bending && this.bendHold < BEND_HOLD_MIN) {
+      drive = 0;                       // stand and turn the body first
+      this.bendHold += 1;
+      this.posture = "bending";
+    } else if (drive > 0) {
+      this.posture = "walking";
+      // Once it is moving, the walker owns the spine -- it needs it for the
+      // gait's own lateral undulation -- so the postural bend unwinds.
+      this.wantBend = 0;
+    } else {
+      this.bendHold = bending ? this.bendHold + 1 : 0;
+      this.posture = bending ? "bending" : "settled";
+    }
+    this.drive = drive;
+    const bendStep = TRUNK_BEND_RATE * dt;
+    this.trunkBend += Math.max(-bendStep, Math.min(bendStep, this.wantBend - this.trunkBend));
+    // The neck follows the trunk rather than leading it.
+    this.neckLag = bending ? Math.min(NECK_LAG_STEPS, this.neckLag + 1)
+                           : Math.max(0, this.neckLag - 2);
+    const neckShare = this.neckLag / NECK_LAG_STEPS;
+
+    // Creep while closing on something it has committed to.
+    this.creeping = this.program === "chase" && this.committed !== null;
     let ctrl;
     if (drive > 0) {
-      this.gaitT += dt;
+      this.gaitT += dt * (this.creeping ? CREEP_GAIT_SCALE : 1);
       ctrl = this.walker.baseCtrl(this.gaitT, steer);
     } else {
       ctrl = Float64Array.from(this.cfg.walker.standing_ctrl);
@@ -280,13 +436,56 @@ export class LiveGecko {
       // being asked to do rather than overriding it.
       const shake = this.chewT > 0
         ? 26 * Math.sin(this.simT * 34) * (this.chewT / CHEW_STEPS) : 0;
-      const want = ((this.headYaw + shake) * Math.PI) / 180;
+      // The neck takes whatever the trunk did not, and only once the trunk has
+      // started -- `neckShare` ramps in over NECK_LAG_STEPS.
+      const carry = (cmd.heading_deg - (this.trunkBend * 180 / Math.PI)) * 0.45 * neckShare;
+      const want = ((this.headYaw + shake + carry) * Math.PI) / 180;
       const hi = this.cfg.walker.ctrl_high, lo = this.cfg.walker.ctrl_low;
       for (let k = 0; k < 2; k++) {
         const i = this._neckIds[k];
         if (i < 0) continue;
         dd.ctrl[i] = Math.min(hi[i], Math.max(lo[i], want * (this._neckSpan[k] / total)));
       }
+    }
+
+    // THE TRUNK BENDS. Standing still, the postural bend is added straight on
+    // to the spine tendon; walking, the walker's own gait undulation is left
+    // exactly as it is, because that is the accepted walker and it is not
+    // something to improvise over.
+    if (this._spineId === undefined) {
+      this._spineId = this.cfg.walker.actuator_names.indexOf("spine_bend");
+      this._jawId = this.cfg.walker.actuator_names.indexOf("jaw");
+      this._tailIds = ["tail_bend_L", "tail_bend_R"].map(
+        (n) => this.cfg.walker.actuator_names.indexOf(n));
+    }
+    if (this._spineId >= 0 && drive <= 0) {
+      const lo = this.cfg.walker.ctrl_low[this._spineId];
+      const hi = this.cfg.walker.ctrl_high[this._spineId];
+      dd.ctrl[this._spineId] = Math.max(lo, Math.min(hi, this.trunkBend));
+      // The tail counterbalances the bend, which is what a tail that is a third
+      // of the animal's mass is for. Sign and share are INVENTED.
+      for (let k = 0; k < 2; k++) {
+        const i = this._tailIds[k];
+        if (i < 0) continue;
+        const tl = this.cfg.walker.ctrl_low[i], th = this.cfg.walker.ctrl_high[i];
+        dd.ctrl[i] = Math.max(tl, Math.min(th, -this.trunkBend * (k ? -0.45 : 0.45)));
+      }
+    }
+
+    // THE MOUTH. Shut, unless it is swallowing or taking a breath-gape.
+    if (this._jawId >= 0) {
+      if (this.chewT > 0) this.jawWant = JAW_GAPE;
+      else if (this.gapeT > 0) { this.jawWant = JAW_GAPE * 0.55; this.gapeT -= 1; }
+      else {
+        this.jawWant = JAW_SHUT;
+        // an occasional gape while awake. Interval INVENTED.
+        if (!this.asleep && Math.random() < 0.0009) this.gapeT = 40;
+      }
+      const js = JAW_RATE * dt;
+      this.jaw += Math.max(-js, Math.min(js, this.jawWant - this.jaw));
+      const jl = this.cfg.walker.ctrl_low[this._jawId];
+      const jh = this.cfg.walker.ctrl_high[this._jawId];
+      dd.ctrl[this._jawId] = Math.max(jl, Math.min(jh, this.jaw));
     }
 
     for (let i = 0; i < this.nAct; i++) {

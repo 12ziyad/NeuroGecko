@@ -218,6 +218,12 @@ def main():
         "warm_surface_C": _f(parameter_value("warm_surface_temperature_C")),
         "warm_patch_xy": warm_xy,
         "warm_patch_half_m": warm_half,
+        # How fast the animal gets hungry again after a meal. PUBLISHED,
+        # this species: mean inter-meal interval 2.33 days, over which
+        # brain/hypothalamus.py has it burn about 71 % of one meal. So the
+        # browser is not inventing a recovery rate, it is reading one.
+        "inter_meal_interval_days": _f(parameter_value("inter_meal_interval_days")),
+        "meal_burn_fraction": 0.71,
     }
 
     # THE EYE. Every constant read off the live Retina and Tectum, and off the
