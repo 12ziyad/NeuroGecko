@@ -77,7 +77,7 @@
     <div class="view">
       <canvas id="cNerve"></canvas>
       <div class="vtag"><b>The same animal, its skeleton</b>
-        <span>bone lengths fitted to the body &middot; shapes and vertebral counts invented &middot; joint markers are measured</span></div>
+        <span>the 48 solids the physics integrates &middot; joint markers at each real anchor and axis</span></div>
     </div>
   </div>
 
@@ -100,8 +100,7 @@
         <button class="btn cam" data-m="top">Top</button>
         <button class="btn cam" data-m="low">Low</button>
       </div>
-      <div class="row"><button class="btn" id="shell">Hide body</button></div>
-    </div>
+          </div>
 
     <div class="block">
       <div class="lbl">Released behaviour</div>
@@ -141,10 +140,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
 <script type="module">
 import load from "./media/mujoco.js";
-import { LiveGecko, withRoom } from "./live.js?v=f78676d0";
-import { RoomView, NerveView } from "./views.js?v=f78676d0";
-import { loadSkin } from "./skin.js?v=f78676d0";
-import { loadSkeleton } from "./skeleton.js?v=f78676d0";
+import { LiveGecko, withRoom } from "./live.js?v=9d3fda40";
+import { RoomView, NerveView } from "./views.js?v=9d3fda40";
+import { loadSkin } from "./skin.js?v=9d3fda40";
 
 const CH_CSS = {hunt:"--hunt",flee:"--flee",explore:"--explore",bask:"--bask",rest:"--rest",groom:"--groom"};
 const T = id => document.getElementById(id);
@@ -178,9 +176,6 @@ try {
   const room = new RoomView(T("cRoom"), cfg);
   room.attachSkin(skin);
   const nerve = new NerveView(T("cNerve"), cfg);
-  boot.textContent = "loading the skeleton…";
-  const skel = await loadSkeleton("media/");
-  nerve.attachSkeleton(skel);
   const fit = () => {
     for (const [v, id] of [[room,"cRoom"],[nerve,"cNerve"]]) {
       const c = T(id);
@@ -220,9 +215,6 @@ try {
   T("day").onclick   = () => { sim.clock.t = 9.5*3600; };
   T("night").onclick = () => { sim.clock.t = 16*3600; };
   T("spin").onclick  = () => { spin = !spin; };
-  let shellOn = true;
-  T("shell").onclick = () => { shellOn = !shellOn; nerve.setShell(shellOn);
-    T("shell").textContent = shellOn ? "Hide body" : "Show body"; };
   for (const b of document.querySelectorAll(".cam")) b.onclick = () => {
     for (const o of document.querySelectorAll(".cam")) o.classList.remove("on");
     b.classList.add("on");

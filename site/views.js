@@ -188,15 +188,17 @@ export class NerveView {
     const grid = new THREE.GridHelper(1.4, 28, 0x1d2836, 0x141b25);
     grid.rotation.x = Math.PI / 2; sc.add(grid);
 
-    // THE SPECIMEN, SOLID. tools/skeleton_view.py renders these 48 collision
-    // solids opaque and pale, and that is the look worth matching: you can
-    // read the shape of the animal instead of squinting through it.
-    this.baseCol = new THREE.Color(0xccd9e6);
+    // THE 48 SOLIDS ARE THE SKELETON. Not a stand-in for one -- they ARE what
+    // this animal is made of, the shapes MuJoCo integrates and the shapes all
+    // 14 anatomical checks measure. An earlier build drew an invented skull,
+    // invented vertebrae and invented counts over the top of them; it looked
+    // better and was a lie, so it was deleted (#360). Bone colour, solid,
+    // lit -- and every shape in view is one the physics actually uses.
+    this.baseCol = new THREE.Color(0xeae3d4);
     this.meshes = cfg.geoms.map((g) => {
       const mat = new THREE.MeshStandardMaterial({
-        color: this.baseCol.clone(), roughness: 0.34, metalness: 0.02,
-        emissive: new THREE.Color(0x0a1420), emissiveIntensity: 1,
-        transparent: true, opacity: 0.17, depthWrite: false,
+        color: this.baseCol.clone(), roughness: 0.52, metalness: 0.0,
+        emissive: new THREE.Color(0x12100c), emissiveIntensity: 1,
       });
       const mesh = geomMesh(g, mat);
       sc.add(mesh); return mesh;
@@ -217,8 +219,6 @@ export class NerveView {
       hub.visible = false; sc.add(hub);
       this.joints.push({ shaft: m, hub });
     }
-    this.skeleton = null;
-    this.showShell = true;
     this._m4 = new THREE.Matrix4();
     this._up = new THREE.Vector3(0, 1, 0);
     this._ax = new THREE.Vector3();
@@ -239,8 +239,6 @@ export class NerveView {
             t[2] + R * this.tilt];
   }
 
-  attachSkeleton(sk) { this.skeleton = sk; this.scene.add(sk.mesh); }
-  setShell(on) { this.showShell = on; for (const m of this.meshes) m.visible = on; }
 
   resize(w, h) {
     this.renderer.setSize(w, h, false);
@@ -255,7 +253,6 @@ export class NerveView {
 
   update(sim) {
     const d = sim.d, cfg = this.cfg;
-    if (this.skeleton) this.skeleton.update(d.xpos, d.xmat);
 
     // Where each solid sits along the animal, recomputed in its own frame so
     // it holds however the body is turned: project onto the trunk's forward
@@ -288,10 +285,12 @@ export class NerveView {
       let glow = 0;
       if (front >= 0) {
         const dist = Math.abs(this.along[i] - front);
-        glow = Math.max(0, 1 - dist * 6) * sim.signalStrength;
+        glow = Math.max(0, 1 - dist * 9) * sim.signalStrength;
       }
-      m.color.copy(this.baseCol).lerp(chCol, 0.35 * glow);
-      m.emissive.copy(chCol).multiplyScalar(0.85 * glow);
+      // A BLINK, NOT A WASH. The band used to repaint the whole animal in the
+      // channel's colour, which drowned the shape it was supposed to annotate.
+      m.color.copy(this.baseCol).lerp(chCol, 0.10 * glow);
+      m.emissive.copy(chCol).multiplyScalar(0.16 * glow);
     }
 
     for (let i = 0; i < cfg.joints.length; i++) {
