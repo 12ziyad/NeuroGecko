@@ -41,6 +41,51 @@ function poseFromMat(mesh, xpos, xmat, i, m4) {
 }
 
 // ------------------------------------------------------------ the enclosure
+// A CRICKET. Its body is `prey_radius_m` -- 9 mm, from the registry -- so the
+// thing on screen is the size the detector and the capture distance both use.
+function makeCricket(cfg, sc, dark) {
+  const r = (cfg.prey && cfg.prey.prey_radius_m) || 0.009;
+  const g = new THREE.Group();
+  const body = new THREE.Mesh(
+    new THREE.SphereGeometry(r, 12, 9),
+    new THREE.MeshStandardMaterial({ color: dark ? 0x9aa6b4 : 0x3a2d1c,
+                                     roughness: 0.6, metalness: 0.05,
+                                     emissive: dark ? 0x223344 : 0x000000 }));
+  body.scale.set(1.5, 0.75, 0.62);
+  body.castShadow = !dark;
+  g.add(body);
+  const head = new THREE.Mesh(new THREE.SphereGeometry(r * 0.5, 10, 8), body.material);
+  head.position.x = r * 1.35; g.add(head);
+  const legMat = new THREE.MeshStandardMaterial({ color: dark ? 0x7e8b99 : 0x241b10,
+                                                  roughness: 0.8 });
+  const legGeo = new THREE.CylinderGeometry(r * 0.08, r * 0.05, r * 1.5, 4);
+  for (let i = 0; i < 6; i++) {
+    const leg = new THREE.Mesh(legGeo, legMat);
+    const side = i % 2 ? 1 : -1, k = Math.floor(i / 2);
+    leg.position.set((k - 1) * r * 0.7, side * r * 0.55, -r * 0.25);
+    leg.rotation.x = side * 0.9;
+    g.add(leg);
+  }
+  g.position.z = r * 0.75;
+  sc.add(g);
+  return g;
+}
+
+
+// Put a cricket mesh where the simulated cricket actually is.
+function placeCricket(mesh, sim) {
+  if (!mesh || !sim.prey) return;
+  const r = mesh.userData.r || 0.009;
+  mesh.position.x = sim.prey.x;
+  mesh.position.y = sim.prey.y;
+  mesh.rotation.z = sim.prey.heading || 0;
+  // A bob while it is walking. The bout structure is the cricket's, from the
+  // registry; the bob is a drawing, and it is what a temporal-contrast detector
+  // has to work with.
+  mesh.position.z = r * 0.75
+    + (sim.prey.walking ? r * 0.22 * Math.abs(Math.sin(sim.simT * 26)) : 0);
+}
+
 export class RoomView {
   constructor(canvas, cfg) {
     this.cfg = cfg;
@@ -76,15 +121,30 @@ export class RoomView {
     cv.width = cv.height = size;
     const g = cv.getContext("2d");
     g.fillStyle = "#8a7150"; g.fillRect(0, 0, size, size);
-    for (let i = 0; i < 26000; i++) {
-      const v = 120 + Math.random() * 90;
-      g.fillStyle = `rgba(${v | 0},${(v * 0.86) | 0},${(v * 0.64) | 0},0.5)`;
-      g.fillRect(Math.random() * size, Math.random() * size, 1.6, 1.6);
+    // COARSER AND QUIETER THAN IT WAS. The first version speckled 26,000 grains
+    // at 1.6 px and half opacity, which at this scale is sand grain detail a
+    // gecko's eye cannot resolve -- and unresolvable detail does not vanish, it
+    // ALIASES, into false structure that moves when the animal moves. That is
+    // indistinguishable from prey to a motion detector, and brain/retina.py
+    // names it as the error. Bigger, softer grains carry the same impression of
+    // ground at a spatial frequency the eye can actually transmit.
+    for (let i = 0; i < 7000; i++) {
+      const v = 128 + Math.random() * 60;
+      g.fillStyle = `rgba(${v | 0},${(v * 0.86) | 0},${(v * 0.64) | 0},0.28)`;
+      g.fillRect(Math.random() * size, Math.random() * size, 3.4, 3.4);
     }
     const tex = new THREE.CanvasTexture(cv);
-    tex.wrapS = tex.wrapT = THREE.RepeatWrapping; tex.repeat.set(18, 18);
+    tex.wrapS = tex.wrapT = THREE.RepeatWrapping; tex.repeat.set(120, 120);
     tex.colorSpace = THREE.SRGBColorSpace;
-    const floor = new THREE.Mesh(new THREE.PlaneGeometry(6, 6),
+    // 40 m, NOT 6. The eye sees a hard geometric edge where the floor plane
+    // stops, and a straight bright-to-dark edge sliding across the frame as the
+    // animal turns is the single strongest local motion in the scene. Measured:
+    // the tectum's peak landed on cell row 8-9 -- elevation 0 to -2 deg, the
+    // horizon -- on 212 of 212 firings, while the cricket was in frame on 0 of
+    // 900. The animal was hunting the edge of my floor. A desert does not stop
+    // three metres away; the ground now runs past the fog and there is no edge
+    // to find.
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(40, 40),
       new THREE.MeshStandardMaterial({ map: tex, roughness: 1.0, metalness: 0 }));
     floor.receiveShadow = true;
     sc.add(floor);
@@ -116,6 +176,44 @@ export class RoomView {
       sc.add(ring);
       this.warmMat = warm.material;
     }
+
+    // PLANTS. Scenery, and labelled scenery: nothing in this project has ever
+    // measured the vegetation of a leopard gecko's range, and these are not
+    // collidable -- the physics does not know they exist. They are here so the
+    // eye has something to move past and so the ground reads as somewhere
+    // rather than as a plane.
+    const plantMat = new THREE.MeshStandardMaterial({
+      color: 0x5d7040, roughness: 0.85, metalness: 0, side: THREE.DoubleSide });
+    const stemMat = new THREE.MeshStandardMaterial({ color: 0x6b5a36, roughness: 1 });
+    const bladeGeo = new THREE.PlaneGeometry(0.0055, 0.040);
+    bladeGeo.translate(0, 0.020, 0);
+    for (let i = 0; i < 46; i++) {
+      const a = (i * 2.39996), r = 0.30 + (i % 11) * 0.115;
+      const px = Math.cos(a) * r, py = Math.sin(a) * r;
+      if (Math.abs(px - W.warm_patch_xy[0]) < 0.12
+          && Math.abs(py - W.warm_patch_xy[1]) < 0.12) continue;
+      const tuft = new THREE.Group();
+      const n = 5 + (i % 4);
+      for (let b = 0; b < n; b++) {
+        const m = new THREE.Mesh(bladeGeo, plantMat);
+        m.rotation.z = (Math.sin(i * 7.1 + b) * 0.5);
+        m.rotation.y = (b / n) * Math.PI * 2;
+        m.scale.setScalar(0.7 + 0.6 * Math.abs(Math.sin(i * 3.3 + b)));
+        m.castShadow = true;
+        tuft.add(m);
+      }
+      const stem = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.0014, 0.0022, 0.012, 6), stemMat);
+      stem.position.y = 0.006; tuft.add(stem);
+      tuft.position.set(px, py, 0);
+      tuft.rotation.x = Math.PI / 2;
+      sc.add(tuft);
+    }
+
+    // THE CRICKET. Not decoration: this is the object the animal's eye has to
+    // find in its own rendered pixels before `hunt` can release at all.
+    this.cricket = makeCricket(cfg, sc, false);
+    this.cricket.userData.r = (cfg.prey && cfg.prey.prey_radius_m) || 0.009;
 
     // NO WALLS. The enclosure was mine, not the project's, and all it did was
     // stop the animal walking. Open ground, and the floor follows it.
@@ -173,7 +271,78 @@ export class RoomView {
     const hFov = 2 * Math.atan(Math.tan(vFov / 2) * this.camera.aspect);
     this.frameRadius = Math.max(0.16, (0.095 / Math.tan(Math.min(vFov, hFov) / 2)) * this.fill);
   }
+  // ------------------------------------------------------------ head camera --
+  // The animal's own eye. A camera carried on the head body, pointed where the
+  // head points, rendered into an offscreen buffer at the eye's own render
+  // resolution. `site/eye.js` reads these pixels and finds the cricket in them
+  // or does not -- nothing is told where the cricket is.
+  //
+  // Field of view is 70 deg, which is the value brain/retina.py was built
+  // around. The eye height is the head body's own position, so looking down at
+  // the ground is something the animal does with its neck rather than something
+  // arranged for it.
+  attachHeadCamera(cfg) {
+    const px = cfg.eye.render_pixels;
+    this.eyeTarget = new THREE.WebGLRenderTarget(px, px, {
+      minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter,
+      format: THREE.RGBAFormat, type: THREE.UnsignedByteType,
+    });
+    this.eyeCam = new THREE.PerspectiveCamera(cfg.eye.fovy_deg, 1, 0.004, 4);
+    this.eyeCam.up.set(0, 0, 1);
+    this.eyeBuf = new Uint8Array(px * px * 4);
+    this.eyeFlip = new Uint8Array(px * px * 4);
+    this.eyePx = px;
+    return this;
+  }
+
+  // Render one frame from the head and return it as RGBA bytes, top row first.
+  //
+  // WHERE THE EYE IS. Not the head body's origin -- that is inside the skull,
+  // and a camera there looks at the inside of the animal's own face, which is a
+  // large moving textured object filling the frame and is exactly what a motion
+  // detector cannot ignore. It is the position the morphology gives for
+  // `head_cam`: 29.58 mm forward and 6.82 mm up in the head's own frame, which
+  // is the snout.
+  //
+  // WHERE IT POINTS. Along the head's own x-axis, up along the head's z, read
+  // straight out of the head's rotation matrix -- so the neck and head pitch
+  // joints aim it, and nothing here invents a downward tilt. The first version
+  // did invent one and it was the wrong way to do it.
+  renderEye(sim) {
+    if (!this.eyeTarget) return null;
+    const d = sim.d;
+    const hb = (sim.headBodyId ?? 4);
+    const p = hb * 3, m = hb * 9;
+    // columns of the head's rotation matrix: its own x, y and z in world
+    const fx = d.xmat[m],     fy = d.xmat[m + 3], fz = d.xmat[m + 6];   // forward
+    const ux = d.xmat[m + 2], uy = d.xmat[m + 5], uz = d.xmat[m + 8];   // up
+    const EX = 0.02958, EZ = 0.00682;         // morphology, head_cam pos
+    const ex = d.xpos[p] + fx * EX + ux * EZ;
+    const ey = d.xpos[p + 1] + fy * EX + uy * EZ;
+    const ez = d.xpos[p + 2] + fz * EX + uz * EZ;
+    this.eyeCam.position.set(ex, ey, ez);
+    this.eyeCam.up.set(ux, uy, uz);
+    this.eyeCam.lookAt(ex + fx * 0.4, ey + fy * 0.4, ez + fz * 0.4);
+    this.cricket.visible = true;
+    const prevTarget = this.renderer.getRenderTarget();
+    this.renderer.setRenderTarget(this.eyeTarget);
+    this.renderer.render(this.scene, this.eyeCam);
+    this.renderer.readRenderTargetPixels(this.eyeTarget, 0, 0,
+                                         this.eyePx, this.eyePx, this.eyeBuf);
+    this.renderer.setRenderTarget(prevTarget);
+    // WebGL hands back bottom row first; the retina's row 0 is the TOP of the
+    // frame, and the elevation rule depends on that -- row 0 has to be sky or
+    // the "below the horizon" switch has its sign inverted and the animal hunts
+    // the ceiling.
+    const n = this.eyePx, row = n * 4;
+    for (let r = 0; r < n; r++) {
+      this.eyeFlip.set(this.eyeBuf.subarray((n - 1 - r) * row, (n - r) * row), r * row);
+    }
+    return this.eyeFlip;
+  }
+
   update(sim) {
+    placeCricket(this.cricket, sim);
     if (this.warmMat) {
       this.warmMat.opacity = sim.onWarm
         ? 0.22 + 0.08 * Math.sin(sim.simT * 4.0) : 0.14;
@@ -185,9 +354,19 @@ export class RoomView {
     // is exactly why the walk read as a treadmill: nothing ever passed it.
     // It re-centres only in whole texture tiles, so the pattern never slides.
     if (this.floor) {
-      const TILE = 6 / 18;
+      const TILE = 40 / 120;   // one texture tile, so the pattern stays in world space
       this.floor.position.set(Math.round(t[0] / TILE) * TILE,
                               Math.round(t[1] / TILE) * TILE, 0);
+    }
+    if (this.mode === "eye" && this.eyeCam) {
+      // THE SAME CAMERA THE RETINA USES, at screen resolution rather than 64
+      // pixels. Not a reconstruction of it: `renderEye` has already placed it
+      // this step, so what you are looking at is where the animal is actually
+      // pointed, including whatever its neck is doing.
+      this.eyeCam.aspect = this.camera.aspect;
+      this.eyeCam.updateProjectionMatrix();
+      this.renderer.render(this.scene, this.eyeCam);
+      return;
     }
     const c = this.cameraFor(t, sim);
     this.camera.position.set(c[0], c[1], c[2]);
@@ -219,6 +398,25 @@ export class NerveView {
 
     const grid = new THREE.GridHelper(1.4, 28, 0x1d2836, 0x141b25);
     grid.rotation.x = Math.PI / 2; sc.add(grid);
+
+    // THE CRICKET IS IN THIS PANE TOO, because what the animal is hunting is
+    // part of what the animal is doing. Drawn cold rather than warm so it reads
+    // as a target in a diagram and not as a second animal.
+    this.cricket = makeCricket(cfg, sc, true);
+    this.cricket.userData.r = (cfg.prey && cfg.prey.prey_radius_m) || 0.009;
+
+    // WHAT THE EYE IS DOING WITH IT. A line from the head along the bearing the
+    // tectum is reporting this frame -- dim while it is one unconfirmed report,
+    // solid once the evidence accumulator has committed. This is the only
+    // channel from the world into the brain, so it is worth being able to see.
+    this.gazeRay = new THREE.Line(
+      new THREE.BufferGeometry().setAttribute("position",
+        new THREE.BufferAttribute(new Float32Array(6), 3)),
+      new THREE.LineBasicMaterial({ color: 0xffcf5c, transparent: true,
+                                    opacity: 0.0, depthTest: false }));
+    this.gazeRay.frustumCulled = false;
+    this.gazeRay.renderOrder = 12;
+    sc.add(this.gazeRay);
 
     // THE 48 SOLIDS ARE THE SKELETON. Not a stand-in for one -- they ARE what
     // this animal is made of, the shapes MuJoCo integrates and the shapes all
@@ -333,11 +531,34 @@ export class NerveView {
     this.dots.frustumCulled = false;
     this.scene.add(this.dots);
 
+    // THE SELECTOR, IN THE HEAD. Six nodes, one per channel, sitting where the
+    // forebrain is -- which is where a lizard's basal ganglia are. Each carries
+    // its channel's colour and is lit by that channel's REAL gate value, the
+    // same number the bars in the sidebar read, straight off the converged
+    // fixed point. The one the selector released sits open; the five it is
+    // holding down sit dark, which is what the basal ganglia do: they inhibit
+    // everything and release one thing.
+    //
+    // THE ARRANGEMENT IS A DIAGRAM. Six nodes in a ring is a legible picture,
+    // not a claim about where a gecko's striatum sits relative to its pallidum.
+    // What is not a diagram is every number driving it.
+    this.bgNodes = [];
+    const chans = cfg.bg.channels;
+    for (let i = 0; i < chans.length; i++) {
+      const col = new THREE.Color(CH_COLOUR[chans[i]] ?? 0x8fa6bd);
+      const mesh = new THREE.Mesh(
+        new THREE.SphereGeometry(0.00125, 10, 8),
+        new THREE.MeshBasicMaterial({ color: col.clone(), transparent: true,
+                                      opacity: 0.5, depthTest: false }));
+      mesh.renderOrder = 13;
+      this.scene.add(mesh);
+      this.bgNodes.push({ mesh, base: col, ch: chans[i] });
+    }
     // where the impulses start: a marker sitting in the head
     this.brainDot = new THREE.Mesh(
       new THREE.SphereGeometry(0.0030, 12, 10),
       new THREE.MeshBasicMaterial({ color: 0x8fd4ff, transparent: true,
-                                    opacity: 0.55, depthTest: false }));
+                                    opacity: 0.35, depthTest: false }));
     this.brainDot.renderOrder = 11;
     this.scene.add(this.brainDot);
     this._dotCol = new THREE.Color();
@@ -347,9 +568,31 @@ export class NerveView {
     const d = sim.d;
     const chCol = this._dotCol.set(CH_COLOUR[sim.behaviour] ?? 0x6f8296);
     let k = 0;
-    const bp = this.brainBody * 3;
+    const bp = this.brainBody * 3, bm = this.brainBody * 9;
     this.brainDot.position.set(d.xpos[bp], d.xpos[bp + 1], d.xpos[bp + 2]);
-    this.brainDot.material.opacity = 0.35 + 0.35 * Math.min(1, sim.speed * 6);
+    this.brainDot.material.opacity = 0.22 + 0.30 * Math.min(1, sim.speed * 6);
+
+    // the six channels, carried in the head and lit by their own gates
+    if (this.bgNodes) {
+      const fx = d.xmat[bm], fy = d.xmat[bm + 3], fz = d.xmat[bm + 6];   // head x
+      const lx = d.xmat[bm + 1], ly = d.xmat[bm + 4], lz = d.xmat[bm + 7]; // head y
+      const ux = d.xmat[bm + 2], uy = d.xmat[bm + 5], uz = d.xmat[bm + 8]; // head z
+      const R = 0.0062;
+      for (let i = 0; i < this.bgNodes.length; i++) {
+        const n = this.bgNodes[i];
+        const a = (i / this.bgNodes.length) * Math.PI * 2 - Math.PI / 2;
+        const sy = Math.cos(a) * R, sz = Math.sin(a) * R;
+        n.mesh.position.set(
+          d.xpos[bp] + fx * -0.002 + lx * sy + ux * sz,
+          d.xpos[bp + 1] + fy * -0.002 + ly * sy + uy * sz,
+          d.xpos[bp + 2] + fz * -0.002 + lz * sy + uz * sz);
+        const g = Math.max(0, Math.min(1, (sim.gates[i] || 0)));
+        const on = sim.behaviour === n.ch;
+        n.mesh.material.opacity = 0.18 + 0.8 * g;
+        n.mesh.scale.setScalar(0.75 + 1.05 * g);
+        n.mesh.material.color.copy(n.base).multiplyScalar(on ? 1.0 : 0.35 + 0.5 * g);
+      }
+    }
 
     for (const nv of this.nerves) {
       // 1. lay the fibre along the body as it is standing RIGHT NOW
@@ -452,6 +695,36 @@ export class NerveView {
       const m = this.meshes[i].material;
       if (!m.__plain) {
         m.color.copy(this.baseCol); m.emissive.setHex(0x12100c); m.__plain = true;
+      }
+    }
+
+    placeCricket(this.cricket, sim);
+
+    // WHAT THE EYE IS REPORTING, drawn from the head along the bearing. Dim
+    // while it is one unconfirmed report, solid and longer once the evidence
+    // accumulator has committed to it. It is drawn from the tectum's own
+    // number, so when the animal is wrong the line points at nothing -- which
+    // is the useful case to be able to see.
+    {
+      const b = sim.committed !== null && sim.committed !== undefined
+        ? sim.committed : sim.preyBearing;
+      const g = this.gazeRay.geometry.attributes.position;
+      if (b === null || b === undefined) {
+        this.gazeRay.material.opacity = 0;
+      } else {
+        const committed = sim.committed !== null && sim.committed !== undefined;
+        const hb = this.brainBody * 3;
+        // head yaw, then the reported bearing, both relative to the trunk
+        const ang = sim.heading + ((sim.headYaw + b) * Math.PI) / 180;
+        const len = committed ? 0.16 : 0.09;
+        g.array[0] = d.xpos[hb]; g.array[1] = d.xpos[hb + 1]; g.array[2] = d.xpos[hb + 2];
+        g.array[3] = d.xpos[hb] + Math.cos(ang) * len;
+        g.array[4] = d.xpos[hb + 1] + Math.sin(ang) * len;
+        g.array[5] = d.xpos[hb + 2] - 0.012;
+        g.needsUpdate = true;
+        this.gazeRay.geometry.computeBoundingSphere();
+        this.gazeRay.material.opacity = committed ? 0.85 : 0.28;
+        this.gazeRay.material.color.setHex(committed ? 0xffcf5c : 0x8fa6bd);
       }
     }
 

@@ -68,20 +68,57 @@
   .btn.on{border-color:var(--cyan);color:var(--cyan);background:#0f1a22}
   .foot{padding:12px 16px;color:var(--muted);font-family:"IBM Plex Mono",monospace;font-size:9px;line-height:1.7}
 
-  /* Controls live ON the picture. You change the camera while watching the
-     animal, not while looking away from it at a sidebar. */
-  .hud{position:absolute;left:12px;right:12px;bottom:11px;z-index:3;
-    display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-  .hud .btn{background:rgba(9,12,17,.72);border-color:rgba(120,150,180,.28);
-    backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);padding:5px 9px;font-size:9px}
-  .hud .btn:hover{border-color:var(--cyan);color:var(--cyan)}
-  .hud .btn.on{border-color:var(--cyan);color:var(--cyan);background:rgba(15,26,34,.85)}
-  .hud .sep{flex:1 1 auto}
-  .hud .read{font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:.08em;
-    color:#8ea3ba;background:rgba(9,12,17,.72);border:1px solid rgba(120,150,180,.18);
-    padding:5px 8px;border-radius:2px;white-space:nowrap}
-  .hud .read b{color:#dbe6f2;font-weight:500}
-  @media (max-width:560px){.hud .read{display:none}}
+  /* Controls live ON the picture, and there is exactly one of them in the
+     middle: play. Everything else is a corner. */
+  .view canvas{cursor:grab}
+  .view canvas:active{cursor:grabbing}
+  .glass{background:rgba(9,12,17,.74);border:1px solid rgba(120,150,180,.26);
+    backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);border-radius:3px}
+  .play{position:absolute;left:50%;bottom:13px;transform:translateX(-50%);z-index:4;
+    width:38px;height:38px;border-radius:50%;display:flex;align-items:center;
+    justify-content:center;cursor:pointer;color:#dbe6f2;padding:0;
+    border:1px solid rgba(120,150,180,.3);opacity:.55;transition:opacity .15s}
+  .view:hover .play{opacity:1}
+  .play:hover{border-color:var(--cyan);color:var(--cyan)}
+  .play svg{width:13px;height:13px;fill:currentColor}
+  .corner{position:absolute;right:11px;top:11px;z-index:4;display:flex;gap:6px;align-items:flex-start}
+  .icon{width:27px;height:27px;display:flex;align-items:center;justify-content:center;
+    cursor:pointer;color:#9fb0c4;opacity:.6;transition:opacity .15s}
+  .view:hover .icon{opacity:1}
+  .icon:hover{color:var(--cyan);border-color:var(--cyan)}
+  .icon svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.7}
+  .dd{position:relative}
+  .dd>button{font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:.1em;
+    text-transform:uppercase;padding:6px 9px;color:#9fb0c4;cursor:pointer;
+    display:flex;gap:6px;align-items:center;opacity:.6;transition:opacity .15s}
+  .view:hover .dd>button{opacity:1}
+  .dd>button:hover{color:var(--cyan)}
+  .dd menu{position:absolute;right:0;top:calc(100% + 4px);margin:0;padding:4px;
+    min-width:116px;list-style:none;z-index:6;display:none}
+  .dd.open menu{display:block}
+  .dd menu li{font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.08em;
+    text-transform:uppercase;padding:6px 8px;color:var(--body);cursor:pointer;border-radius:2px}
+  .dd menu li:hover{background:rgba(57,198,255,.13);color:var(--cyan)}
+  .dd menu li.on{color:var(--cyan)}
+  .read{position:absolute;left:12px;bottom:13px;z-index:3;
+    font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:.08em;
+    color:#8ea3ba;padding:6px 9px;white-space:nowrap;pointer-events:none}
+  .read b{color:#dbe6f2;font-weight:500}
+  @media (max-width:620px){.read{display:none}}
+
+  /* What the eye is actually receiving, at the resolution it receives it. */
+  .eyebox{position:absolute;right:11px;bottom:13px;z-index:3;padding:6px;
+    display:flex;flex-direction:column;gap:5px;align-items:center;pointer-events:none}
+  .eyebox canvas{width:96px;height:96px;image-rendering:pixelated;display:block;
+    border:1px solid rgba(120,150,180,.22);background:#000}
+  .eyebox span{font-family:"IBM Plex Mono",monospace;font-size:8px;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--muted)}
+  .eyebox span.on{color:var(--hunt)}
+  @media (max-width:620px){.eyebox{display:none}}
+
+  /* Maximise: one pane fills the stage, the other gets out of the way. */
+  .stage.solo1 .view:nth-child(2),.stage.solo2 .view:nth-child(1){display:none}
+  .stage.solo1,.stage.solo2{grid-template-rows:1fr}
 </style>
 
 <div class="app">
@@ -89,21 +126,32 @@
     <div class="view">
       <canvas id="cRoom"></canvas>
       <div class="vtag"><b>The animal</b><span>live physics &middot; 38 g &middot; skin posed by the body</span></div>
-      <div class="hud">
-        <button class="btn" id="play">Pause</button>
-        <button class="btn" id="spin">Orbit</button>
-        <span style="width:6px"></span>
-        <span id="cams" style="display:flex;gap:6px;flex-wrap:wrap">
-          <button class="btn cam on" data-m="follow">Follow</button>
-          <button class="btn cam" data-m="side">Side</button>
-          <button class="btn cam" data-m="front">Front</button>
-          <button class="btn cam" data-m="top">Top</button>
-          <button class="btn cam" data-m="low">Low</button>
-        </span>
-        <span class="sep"></span>
-        <button class="btn" id="day">Day</button>
-        <button class="btn" id="night">Night</button>
-        <span class="read" id="hud1">&mdash;</span>
+      <button class="play glass" id="play" title="Play / pause (space)">
+        <svg viewBox="0 0 12 12" id="playIcon"><rect x="1.5" y="1" width="3" height="10"/><rect x="7.5" y="1" width="3" height="10"/></svg>
+      </button>
+      <div class="corner">
+        <div class="dd glass" id="dd1">
+          <button type="button"><span id="camLabel">Follow</span>
+            <svg viewBox="0 0 10 10" style="width:8px;height:8px;fill:none;stroke:currentColor;stroke-width:1.6"><path d="M2 4l3 3 3-3"/></svg>
+          </button>
+          <menu class="glass" id="cams">
+            <li class="on" data-m="follow">Follow</li>
+            <li data-m="orbit">Orbit</li>
+            <li data-m="side">Side</li>
+            <li data-m="front">Front</li>
+            <li data-m="top">Top</li>
+            <li data-m="low">Low</li>
+            <li data-m="eye">Through its eye</li>
+          </menu>
+        </div>
+        <div class="icon glass" id="max1" title="Maximise this view">
+          <svg viewBox="0 0 14 14"><path d="M1 5V1h4M13 9v4H9M13 5V1H9M1 9v4h4"/></svg>
+        </div>
+      </div>
+      <div class="read glass" id="hud1">&mdash;</div>
+      <div class="eyebox glass" id="eyebox">
+        <canvas id="eyecv" width="64" height="64"></canvas>
+        <span id="eyelab">eye &middot; nothing</span>
       </div>
       <div class="boot" id="boot">starting the physics engine&hellip;</div>
     </div>
@@ -111,9 +159,12 @@
       <canvas id="cNerve"></canvas>
       <div class="vtag"><b>The same animal, its nervous system</b>
         <span>48 solids the physics integrates &middot; 27 fibres, each routed along the real body tree &middot; a dot leaves the head when that joint&rsquo;s command actually moves</span></div>
-      <div class="hud">
-        <span class="read" id="hud2">&mdash;</span>
+      <div class="corner">
+        <div class="icon glass" id="max2" title="Maximise this view">
+          <svg viewBox="0 0 14 14"><path d="M1 5V1h4M13 9v4H9M13 5V1H9M1 9v4h4"/></svg>
+        </div>
       </div>
+      <div class="read glass" id="hud2">&mdash;</div>
     </div>
   </div>
 
@@ -122,8 +173,12 @@
       <div class="lbl">Day / night clock</div>
       <div class="clock"><b id="hour">09.50</b><span class="mono" style="color:var(--muted)">h</span>
         <span class="pill sleep" id="pill">asleep</span></div>
-      <div class="lbl" style="margin-top:11px;letter-spacing:.06em;text-transform:none;font-size:9px;line-height:1.6">
-        Playback, camera and time of day are on the picture itself, bottom left.
+      <div class="row">
+        <button class="btn" id="day">Jump to day</button>
+        <button class="btn" id="night">Jump to night</button>
+      </div>
+      <div class="lbl" style="margin-top:10px;letter-spacing:.06em;text-transform:none;font-size:9px;line-height:1.6">
+        Drag either picture to swing the camera, scroll to zoom. Space plays and pauses.
       </div>
     </div>
 
@@ -131,25 +186,8 @@
       <div class="lbl">Released behaviour</div>
       <div class="beh" id="beh">&mdash;</div>
       <div id="chan" style="margin-top:8px"></div>
-      <div class="lbl" style="margin-top:9px;letter-spacing:.06em;text-transform:none;font-size:9px;line-height:1.6">
-        The red line is the measured release floor, 0.1999. Nothing below it is released,
-        however far ahead of its rivals it is.<br><br>
-        <b style="color:var(--body)">Four of the six can release here.</b>
-        <span style="color:var(--rest)">rest</span> when the clock winds arousal down,
-        <span style="color:var(--bask)">bask</span> when the animal is below its preferred
-        band, <span style="color:var(--explore)">explore</span> once it is warm again,
-        <span style="color:var(--groom)">groom</span> never: its drive is a flat zero,
-        and it is zero on purpose. Grooming in this species does have a published
-        trigger &mdash; licking the lips after a meal, 0.165 licks per second &mdash;
-        and that already runs elsewhere as a reflex, not as a thing this selector
-        competes for. The channel is honestly unreachable rather than quietly
-        propped up, which is what it used to be.
-        <span style="color:var(--hunt)">hunt</span> and
-        <span style="color:var(--flee)">flee</span> stay at zero for a reason, and it is
-        not a bug: hunt needs the eye, and the retina and tectum are not ported to the
-        browser yet; flee needs something to run from and somewhere to run to, and this
-        world has neither. Handing the brain a prey position it never saw would be an
-        oracle, and this project has spent a long time taking those back out.
+      <div class="lbl" style="margin-top:8px;letter-spacing:.06em;text-transform:none;font-size:9px;line-height:1.55">
+        Red line: the measured release floor, 0.1999. Nothing below it is released.
       </div>
     </div>
 
@@ -169,6 +207,8 @@
         <div class="kv"><div class="k">Program</div><div class="v" id="sst">&mdash;</div></div>
         <div class="kv"><div class="k">Head yaw</div><div class="v" id="hy">0&deg;</div></div>
         <div class="kv"><div class="k">Impulses</div><div class="v" id="imp">0</div></div>
+        <div class="kv"><div class="k">Crickets eaten</div><div class="v" id="eaten">0</div></div>
+        <div class="kv"><div class="k">Eye fires</div><div class="v" id="seen">&mdash;</div></div>
         <div class="kv"><div class="k">Frames</div><div class="v" id="fps">&mdash;</div></div>
       </div>
     </div>
@@ -184,9 +224,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
 <script type="module">
 import load from "./media/mujoco.js";
-import { LiveGecko, withRoom } from "./live.js?v=38950d9089";
-import { RoomView, NerveView } from "./views.js?v=38950d9089";
-import { loadSkin } from "./skin.js?v=38950d9089";
+import { LiveGecko, withRoom } from "./live.js?v=57839a393b";
+import { RoomView, NerveView } from "./views.js?v=57839a393b";
+import { loadSkin } from "./skin.js?v=57839a393b";
 
 const CH_CSS = {hunt:"--hunt",flee:"--flee",explore:"--explore",bask:"--bask",rest:"--rest",groom:"--groom"};
 const T = id => document.getElementById(id);
@@ -254,16 +294,87 @@ try {
     }
   }
 
-  let running = true, spin = true, last = performance.now(), acc = 0, frames = 0, fpsT = last;
-  T("play").onclick = () => { running = !running; T("play").textContent = running?"Pause":"Play"; };
+  // THE EYE IS PLUGGED IN HERE. The sim asks for pixels; the room renders one
+  // frame from a camera on the animal's head and hands back bytes. That is the
+  // only channel from the world into the brain.
+  room.attachHeadCamera(cfg);
+  sim.headBodyId = cfg.body_names.indexOf("head");
+  sim.setRetinaSource(() => room.renderEye(sim));
+
+  const eyecv = T("eyecv"), ex = eyecv.getContext("2d");
+  const eyeImg = ex.createImageData(cfg.eye.render_pixels, cfg.eye.render_pixels);
+
+  let running = true, last = performance.now(), acc = 0, frames = 0, fpsT = last;
+  const PLAY = '<path d="M2 1l9 5-9 5z"/>';
+  const PAUSE = '<rect x="1.5" y="1" width="3" height="10"/><rect x="7.5" y="1" width="3" height="10"/>';
+  function setRunning(v) {
+    running = v;
+    T("playIcon").innerHTML = running ? PAUSE : PLAY;
+  }
+  T("play").onclick = () => setRunning(!running);
+  addEventListener("keydown", (e) => {
+    if (e.code === "Space" && !/INPUT|TEXTAREA/.test(e.target.tagName)) {
+      e.preventDefault(); setRunning(!running);
+    }
+  });
   T("day").onclick   = () => { sim.clock.t = 9.5*3600; };
   T("night").onclick = () => { sim.clock.t = 16*3600; };
-  T("spin").onclick  = () => { spin = !spin; };
-  for (const b of document.querySelectorAll(".cam")) b.onclick = () => {
-    for (const o of document.querySelectorAll(".cam")) o.classList.remove("on");
-    b.classList.add("on");
-    room.setMode(b.dataset.m); nerve.setMode(b.dataset.m);
+
+  // ---- camera dropdown ----------------------------------------------------
+  let spin = true, mode = "follow";
+  const dd = T("dd1");
+  dd.querySelector("button").onclick = (e) => { e.stopPropagation(); dd.classList.toggle("open"); };
+  addEventListener("click", () => dd.classList.remove("open"));
+  for (const li of T("cams").querySelectorAll("li")) li.onclick = () => {
+    for (const o of T("cams").querySelectorAll("li")) o.classList.remove("on");
+    li.classList.add("on");
+    T("camLabel").textContent = li.textContent;
+    mode = li.dataset.m;
+    dd.classList.remove("open");
+    spin = mode === "orbit";
+    const m = (mode === "orbit" || mode === "eye") ? "follow" : mode;
+    room.setMode(mode === "eye" ? "eye" : m);
+    nerve.setMode(m);
   };
+
+  // ---- drag to swing, scroll to zoom -------------------------------------
+  // The camera is polar around the animal, so dragging changes the angle it is
+  // viewed from and the wheel changes how far away it sits. Both panes take it
+  // independently; neither touches the physics.
+  for (const [v, id] of [[room,"cRoom"],[nerve,"cNerve"]]) {
+    const c = T(id);
+    let down = false, px = 0, py = 0;
+    c.addEventListener("pointerdown", (e) => {
+      down = true; px = e.clientX; py = e.clientY; c.setPointerCapture(e.pointerId);
+    });
+    c.addEventListener("pointerup", (e) => { down = false; c.releasePointerCapture(e.pointerId); });
+    c.addEventListener("pointermove", (e) => {
+      if (!down) return;
+      const dx = e.clientX - px, dy = e.clientY - py; px = e.clientX; py = e.clientY;
+      if (v === room) spin = false;
+      v.userAzimuth = (v.userAzimuth || 0) - dx * 0.008;
+      v.userTilt = Math.max(-0.25, Math.min(1.35, (v.userTilt ?? v.tilt) + dy * 0.006));
+      v.userDriven = true;
+    }, { passive: true });
+    c.addEventListener("wheel", (e) => {
+      e.preventDefault();
+      v.userZoom = Math.max(0.35, Math.min(3.2, (v.userZoom || 1) * (1 + Math.sign(e.deltaY) * 0.12)));
+    }, { passive: false });
+    c.addEventListener("dblclick", () => {
+      v.userDriven = false; v.userZoom = 1; v.userTilt = undefined; v.userAzimuth = 0;
+    });
+  }
+
+  // ---- maximise -----------------------------------------------------------
+  const stage = document.querySelector(".stage");
+  const solo = (cls) => {
+    stage.classList.toggle(cls, !stage.classList.contains(cls));
+    if (cls === "solo1") stage.classList.remove("solo2");
+    else stage.classList.remove("solo1");
+    requestAnimationFrame(fit);
+  };
+  T("max1").onclick = () => solo("solo1");
+  T("max2").onclick = () => solo("solo2");
 
   function frame(now){
     const dt = Math.min(.1,(now-last)/1000); last = now;
@@ -293,13 +404,47 @@ try {
                           : (sim.program || "-");
     T("hy").textContent = Math.round(sim.headYaw) + "\u00b0";
     T("imp").textContent = nerve.liveDots || 0;
+    T("eaten").textContent = sim.captures;
+    T("seen").textContent = sim.eyeFrames
+      ? (100 * sim.sawCricket / sim.eyeFrames).toFixed(1) + "%" : "\u2014";
     T("hud1").innerHTML = `${sim.timeOfDayH.toFixed(2)} h &middot; `
       + `<b style="color:${sim.behaviour?css(CH_CSS[sim.behaviour]):css("--muted")}">`
       + `${sim.behaviour || "none"}</b> &middot; ${asleep?"asleep":"awake"}`
-      + ` &middot; ${sim.distance.toFixed(2)} m walked`;
+      + ` &middot; ${sim.distance.toFixed(2)} m walked &middot; `
+      + `<b>${sim.captures}</b> eaten`
+      + (sim.timeScale > 1 ? ` &middot; clock ×${sim.timeScale} through the sleep` : "");
     T("hud2").innerHTML = `<b>${nerve.liveDots || 0}</b> impulses in flight &middot; `
       + `${nerve.nerves.length} fibres &middot; head ${Math.round(sim.headYaw)}&deg;`
-      + ` &middot; ${sim.searchState || "-"}${sim.looking ? " &middot; looking" : ""}`;
+      + ` &middot; ${sim.program}`
+      + (sim.committed !== null && sim.committed !== undefined
+          ? ` &middot; <b style="color:${css("--hunt")}">locked ${sim.committed.toFixed(0)}&deg;</b>`
+          : sim.looking ? " &middot; looking" : "");
+
+    // WHAT THE EYE IS RECEIVING, at the resolution it receives it. Not a
+    // prettier second render: these are the same bytes the tectum just read.
+    if (sim.eye && sim.eye.retina && sim.eye.retina.previous) {
+      const P = cfg.eye.pixels, lum = sim.eye.retina.previous, dst = eyeImg.data;
+      const ov = sim.eye.tectum.localMap, C = cfg.eye.cells, k = P / C;
+      for (let r = 0; r < P; r++) for (let c = 0; c < P; c++) {
+        const v = Math.max(0, Math.min(255, Math.round(lum[r * P + c] * 255)));
+        const o = (r * P + c) * 4;
+        let R = v, G = v, B = v;
+        if (ov) {                       // where the tectum is looking, in red
+          const m = ov[Math.floor(r / k) * C + Math.floor(c / k)] / cfg.eye.salience_scale;
+          if (m > 0.15) { R = Math.min(255, v + 150 * Math.min(1, m)); G = v * 0.7; B = v * 0.5; }
+        }
+        dst[o] = R; dst[o+1] = G; dst[o+2] = B; dst[o+3] = 255;
+      }
+      ex.putImageData(eyeImg, 0, 0);
+      const lab = T("eyelab");
+      if (sim.committed !== null && sim.committed !== undefined) {
+        lab.textContent = `locked ${sim.committed.toFixed(0)}\u00b0`; lab.className = "on";
+      } else if (sim.preyBearing !== null && sim.preyBearing !== undefined) {
+        lab.textContent = `sees ${sim.preyBearing.toFixed(0)}\u00b0`; lab.className = "";
+      } else {
+        lab.textContent = sim.believedEye ? "looking" : "eye \u00b7 nothing"; lab.className = "";
+      }
+    }
     cfg.bg.channels.forEach((c,i)=>{
       const g = sim.gates[i]||0;
       bars[c].f.style.width = (g*100).toFixed(1)+"%";

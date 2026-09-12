@@ -14,6 +14,8 @@
 // velocity has ever been measured in this animal, and none is claimed here.
 
 import { Walker, BasalGanglia, Clock, salienceFromDrives, SearchPattern, FEET } from "./gecko.js";
+import { Eye } from "./eye.js";
+import { FixationEvidence, MotorPrograms, Prey } from "./hunt.js";
 
 const THREE = window.THREE;
 const CTRL_HZ = 50, PHYS_PER_CTRL = 10;
@@ -31,6 +33,21 @@ const CH_COLOUR = {
 // light. Dimensions are a stage, not a measurement.
 function withRoom(xml) { return xml; }   // the enclosure is gone, see views.js
 
+//: How much of the animal's hunger one cricket removes. INVENTED as a display
+//: choice: the project's energetics live in brain/hypothalamus.py and are not
+//: ported here, so rather than half-port them this is declared as what it is.
+const MEAL_FRACTION = 0.45;
+//: Control steps of head-shaking after a swallow. INVENTED. The behaviour is
+//: real and named in the published ethogram for this species; its duration is
+//: not measured anywhere and this number is a drawing.
+const CHEW_STEPS = 90;
+//: How much faster the day/night clock runs while the animal is asleep. A
+//: VIEWING choice, applied to the clock and to nothing else. INVENTED, and it
+//: changes no part of the model -- the arousal curve, the release floor and the
+//: selector are untouched, so the animal still sleeps for exactly as many of
+//: its own hours as it did before.
+const SLEEP_FAST_FORWARD = 14;
+
 export class LiveGecko {
   constructor(cfg, mj, model, data) {
     this.cfg = cfg; this.mj = mj; this.m = model; this.d = data;
@@ -38,6 +55,22 @@ export class LiveGecko {
     this.bg = new BasalGanglia(cfg);
     this.clock = new Clock(cfg);
     this.search = new SearchPattern(cfg);
+    // THE EYE, AND THE THING IT HAS TO FIND. `setRetinaSource` hands the sim a
+    // function that renders one head-camera frame; until then the eye is idle
+    // and `hunt` cannot release, which is the honest state rather than a
+    // silently faked one.
+    this.eye = new Eye(cfg);
+    this.evidence = new FixationEvidence(cfg);
+    this.programs = new MotorPrograms(cfg, this.search, this.evidence);
+    this.prey = new Prey(cfg);
+    this.renderRetina = null;
+    this.preySalience = 0;
+    this.preyBearing = null;
+    this.committed = null;
+    this.believedEye = false;
+    this.captures = 0;
+    this.sawCricket = 0;        // frames the tectum reported something
+    this.eyeFrames = 0;
     this.nAct = cfg.walker.n_act;
 
     this.gaitT = 0;            // the walker's own clock, advanced only when walking
@@ -64,6 +97,10 @@ export class LiveGecko {
     this.program = "still";
     this.drive = 0;
     this.onWarm = false;
+    this.headYawDeg = 0;
+    this.lastCapture = -1e9;
+    this.chewT = 0;             // the head-shake after a swallow
+    this._prevHeading = 0;
     this.distance = 0;         // ground actually covered, metres
     this._prevXY = [0, 0];
 
@@ -77,10 +114,40 @@ export class LiveGecko {
     this._prevCtrl = new Float64Array(this.nAct);
   }
 
-  // One 50 Hz control step: clock -> drives -> selector -> motor program -> body.
+  // Where the animal's nose is, in world coordinates. The cricket is measured
+  // against this and not against the trunk: 4 cm of capture distance is most of
+  // a head, and using the body centre would let the animal eat through its own
+  // neck.
+  _snoutXY() {
+    if (this._headBody === undefined) {
+      this._headBody = Math.max(1, this.cfg.body_names.indexOf("head"));
+    }
+    const b = this._headBody * 3;
+    return [this.d.xpos[b], this.d.xpos[b + 1]];
+  }
+
+  // Hand the sim something that renders one head-camera frame as RGBA bytes.
+  setRetinaSource(fn) { this.renderRetina = fn; return this; }
+
+  // One 50 Hz control step: eye -> drives -> selector -> motor program -> body.
   controlStep() {
     const dt = 1 / CTRL_HZ;
-    const c = this.clock.step(dt * this.compression);
+    // FAST-FORWARDING THE NIGHT, AND ONLY THE CLOCK.
+    //
+    // This animal is crepuscular and it really does spend most of a day asleep:
+    // measured over 6.3 simulated days, 19,771 control steps resting against
+    // 5,721 exploring and 4,492 basking. That is the animal, it comes from a
+    // published arousal curve, and it is not going to be edited to make a nicer
+    // web page -- editing it would be tuning a model until it looked good.
+    //
+    // What IS a viewing choice is how fast the viewer's clock runs. While the
+    // animal is asleep the day advances faster, the way a nature film cuts the
+    // night. Nothing else changes: the physics timestep, the walker, the
+    // thermostat, the eye and the cricket all run at the same rate they always
+    // did. The animal sleeps exactly as long; you just do not sit through it.
+    const fast = this.asleep && this.behaviour === "rest" ? SLEEP_FAST_FORWARD : 1;
+    this.timeScale = fast;
+    const c = this.clock.step(dt * this.compression * fast);
     this.arousal = c.arousal; this.asleep = c.asleep; this.timeOfDayH = c.timeOfDayH;
 
     // THE THERMOSTAT, and it is the whole reason this animal has more than one
@@ -100,9 +167,30 @@ export class LiveGecko {
     this.bodyC += (substrate - this.bodyC) * (1 - Math.exp(-dt / tau));
     const cold = Math.max(0, Math.min(1, (prefLow - this.bodyC) / 6));
 
+    // ---- THE EYE. One rendered frame, and whatever it can find in it.
+    // Nothing here is handed the cricket's position: `renderRetina` returns
+    // pixels, and `Eye.step` either finds a moving thing below the horizon or
+    // does not. The efference copy is the animal's own motor state, which is
+    // what lets it tell a cricket from its own walking.
+    if (this.renderRetina) {
+      const px = this.renderRetina();
+      if (px) {
+        const out = this.eye.step(px, dt, {
+          yaw_rate_deg_s: ((this.heading - this._prevHeading) / dt) * 180 / Math.PI,
+          forward_m_s: this.speed,
+          gaze_pitch_deg: 0,
+        }, 4);
+        this.preySalience = out.prey_salience;
+        this.preyBearing = out.prey_bearing_deg;
+        this.eyeFrames++;
+        if (out.prey_salience > 0) this.sawCricket++;
+      }
+    }
+    this._prevHeading = this.heading;
+
     this.salience = salienceFromDrives(this.cfg, {
       hunger: this.hunger, cold, warm: 0, threat: 0,
-      preyVisible: 0, arousal: this.arousal,
+      preyVisible: this.committed !== null ? 1 : 0, arousal: this.arousal,
     });
     this.bg.converge(this.salience);
     this.gates = this.bg.gates();
@@ -116,55 +204,37 @@ export class LiveGecko {
       if (this.signal > 1.15) { this.signal = -1; this.signalStrength = 0; }
     }
 
-    // MOTOR PROGRAM -- brain/programs.py, ported rather than improvised.
-    // A released behaviour is not a gait. The selector says `explore` and the
-    // program that runs is SEARCH, which is not walking in a straight line: the
-    // animal stops, sweeps its head in saccades, turns its body, walks a
-    // little, and scans again. It says `bask` and the program is WARM, which
-    // walks toward warm ground and then LIES DOWN on it, because walking once
-    // you are on it walks you off the other side. It says `rest` or `groom` and
-    // the program is STILL.
-    //
-    // Two of the six programs cannot run in this browser and are not faked:
-    //   chase    needs the eye. The retina and tectum are not ported, so the
-    //            animal here has no prey to see and `hunt` never releases.
-    //   shelter  needs a threat to flee and a refuge to flee to. This world
-    //            has neither, so `flee` never releases.
-    // Handing the brain a prey position it did not see would be an oracle, and
-    // this project spent #270 through #282 taking oracles back out.
-    const P = this.cfg.world.programs, L = this.cfg.world.locomotor;
-    let program = P[next] || "still";
-    let drive = (L[next] || 0) * 1.0;                       // urgency is 1 here
-    if (drive <= this.cfg.world.drive_threshold) drive = 0;
-
-    let steer = 0;
-    this.program = program;
-    if (program === "warm") {
-      // Where the warm ground is. In Python this arrives from the environment
-      // as a stand-in for a spatial memory the project has not built -- brain 7
-      // is absent -- and it is marked as such there. Same here: this is
-      // REMEMBERED, not seen.
+    // MOTOR PROGRAM -- brain/programs.py, ported whole rather than improvised.
+    // A released behaviour is not a gait. `explore` runs SEARCH, which stops
+    // and sweeps the head. `bask` runs WARM, which walks to warm ground and
+    // then lies down on it. `hunt` runs CHASE, which is a stalk: walk a little,
+    // stop and look, walk a little more -- and it only runs at all once the
+    // evidence accumulator has decided that what the eye keeps reporting is one
+    // object rather than noise.
+    const warmBearing = (() => {
       const dx = this.cfg.world.warm_patch_xy[0] - this.d.xpos[3];
       const dy = this.cfg.world.warm_patch_xy[1] - this.d.xpos[4];
-      steer = Math.atan2(dy, dx) - this.heading;
-      steer = ((steer + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI;
-      if (this.onWarm) drive = 0;                           // a basking animal lies down
-      this.headYaw += (0 - this.headYaw) * 0.06;
-      this.looking = false;
-      this.searchState = this.onWarm ? "settled" : "approach";
-    } else if (program === "search") {
-      const sp = this.search.step((this.heading * 180) / Math.PI);
-      this.searchState = sp.state;
-      this.looking = sp.looking;
-      this.headYaw = sp.headYawDeg;
-      if (!sp.moving) drive = 0;
-      steer = (sp.headingDeg * Math.PI) / 180;
-    } else {
-      drive = 0;
-      this.headYaw += (0 - this.headYaw) * 0.06;
-      this.looking = false;
-      this.searchState = "still";
-    }
+      let b = Math.atan2(dy, dx) - this.heading;
+      b = ((b + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI;
+      return (b * 180) / Math.PI;
+    })();
+
+    const cmd = this.programs.step(next, {
+      urgency: 1,
+      bearingDeg: this.preyBearing,
+      trunkYawDeg: (this.heading * 180) / Math.PI,
+      warmBearingDeg: warmBearing,
+      shelterBearingDeg: null,          // no refuge in this world, and none faked
+      onWarmGround: this.onWarm,
+    });
+    this.program = cmd.program;
+    this.searchState = cmd.search_state;
+    this.looking = cmd.believed_eye;
+    this.committed = cmd.committed_bearing_deg;
+    this.believedEye = cmd.believed_eye;
+    this.headYaw = cmd.head_yaw_deg;
+    const drive = cmd.locomotor_drive;
+    const steer = (cmd.heading_deg * Math.PI) / 180;
     this.drive = drive;
 
     let ctrl;
@@ -204,7 +274,13 @@ export class LiveGecko {
     }
     const total = this._neckSpan[0] + this._neckSpan[1];
     if (total > 1e-9) {
-      const want = (this.headYaw * Math.PI) / 180;
+      // THE SHAKE AFTER A SWALLOW. Named in the published ethogram for this
+      // species; its amplitude and duration are not measured anywhere, and both
+      // numbers here are a drawing. It is added to whatever the head was already
+      // being asked to do rather than overriding it.
+      const shake = this.chewT > 0
+        ? 26 * Math.sin(this.simT * 34) * (this.chewT / CHEW_STEPS) : 0;
+      const want = ((this.headYaw + shake) * Math.PI) / 180;
       const hi = this.cfg.walker.ctrl_high, lo = this.cfg.walker.ctrl_low;
       for (let k = 0; k < 2; k++) {
         const i = this._neckIds[k];
@@ -218,6 +294,23 @@ export class LiveGecko {
       this._prevCtrl[i] = dd.ctrl[i];
     }
     this.simT += dt;
+
+    // THE CRICKET. Advanced against the animal's SNOUT, not its centre, and it
+    // reads only the closing speed -- how fast the threat is actually getting
+    // nearer -- which is what makes a creep different from a charge and a stalk
+    // possible at all.
+    const sn = this._snoutXY();
+    const pr = this.prey.step(dt, sn);
+    if (pr.captured) {
+      this.captures += 1;
+      this.lastCapture = this.simT;
+      this.chewT = CHEW_STEPS;
+      // A meal. Hunger falls and the cricket that replaced it is somewhere new.
+      this.hunger = Math.max(0, this.hunger - MEAL_FRACTION);
+      this.evidence.reset();
+      this.eye.reset();
+    }
+    if (this.chewT > 0) this.chewT -= 1;
 
     for (let k = 0; k < PHYS_PER_CTRL; k++) this.mj.mj_step(this.m, this.d);
 

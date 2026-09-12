@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import json
 import pathlib
+import math
 import subprocess
 import sys
 
@@ -95,14 +96,65 @@ def python_side():
     search = {"head": head, "heading": heading, "moving": moving,
               "states": states}
 
+    # THE EYE. The hard one, and the one worth checking hardest: the browser
+    # animal has to FIND the cricket in its own rendered pixels, so if this
+    # port drifts, the animal quietly goes blind and nothing else notices.
+    #
+    # Both sides are fed the SAME image sequence, generated here: a small
+    # bright blob drifting across a textured floor, on a deterministic PRNG, so
+    # the frames are bytes rather than a claim. 140 frames is long enough to
+    # fill the motion ring, fill the 25-frame speed window, cross several
+    # cells, and pass through the velocity gate.
+    from brain.tectum import Eye as PyEye
+
+    def _eye_case(render):
+        rng = np.random.default_rng(20260913)
+        base = (rng.integers(40, 70, size=(render, render, 3))).astype(np.uint8)
+        base[:render // 2] = base[:render // 2] // 2
+        eye = PyEye(fovy_deg=70.0, pixels=64, cells=16, render_pixels=render)
+        fr, sm_all, out_all = [], [], []
+        for k in range(140):
+            img = base.copy()
+            cx = int(render * 0.19 + render * 0.0048 * k)
+            cy = int(render * 0.70 + render * 0.047 * math.sin(k * 0.11))
+            w = max(2, render // 32)
+            img[cy:cy + w, cx:cx + w] = 235
+            hx = (int(render * 0.16) + 2 * k) % (render - w - 1)
+            img[int(render * 0.14):int(render * 0.14) + w, hx:hx + w] = 250
+            fr.append(img.reshape(-1).tolist())
+            sm = {"yaw_rate_deg_s": 4.0 * math.sin(k * 0.07),
+                  "forward_m_s": 0.03 + 0.01 * math.cos(k * 0.05),
+                  "gaze_pitch_deg": 3.0 * math.sin(k * 0.03)}
+            sm_all.append(sm)
+            o = eye.step(img, 0.02, self_motion=sm)
+            out_all.append([
+                float(o["prey_salience"]),
+                float(o["prey_bearing_deg"]) if o["prey_bearing_deg"] is not None else -999.0,
+                float(o["prey_elevation_deg"]) if o["prey_elevation_deg"] is not None else -999.0,
+            ])
+        return {"render": render, "frames": fr, "self_motions": sm_all, "out": out_all}
+
+    RENDER = 64        # what the site actually renders at
+    _c1 = _eye_case(RENDER)
+    frames, self_motions, eye_out = _c1["frames"], _c1["self_motions"], _c1["out"]
+
+    # And again at 128, which exercises the optical low-pass and the 2x2
+    # supersample that a 64 -> 64 eye skips entirely. Two code paths, both
+    # checked, so raising the render resolution later cannot quietly break one.
+    eye2 = _eye_case(128)
+
     return {"times": times, "walk": walk, "steers": steers, "steer": steer,
             "saliences": saliences, "gates": gates, "hours": hours,
-            "arousal": arous, "search": search}
+            "arousal": arous, "search": search,
+            "eye": {"render": RENDER, "frames": frames,
+                    "self_motions": self_motions, "out": eye_out},
+            "eye2": eye2}
 
 
 JS = r"""
 import fs from 'fs';
 import { Walker, BasalGanglia, Clock, SearchPattern } from '../site/gecko.js';
+import { Eye } from '../site/eye.js';
 const cfg = JSON.parse(fs.readFileSync(new URL('../site/media/brain.json', import.meta.url), 'utf8'));
 const ref = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
 
@@ -130,7 +182,26 @@ for (let i = 0; i < ref.search.head.length; i++) {
   if (r.moving && r.headingDeg !== 0) trunk += 1.7;
 }
 
-fs.writeFileSync(process.argv[3], JSON.stringify({ walk, steer, gates, arousal, search }));
+// the eye, on the same bytes Python saw
+function runEye(spec) {
+  const c = JSON.parse(JSON.stringify(cfg));
+  c.eye = { ...cfg.eye, render_pixels: spec.render };
+  // optical_limit_px depends on the render resolution, so recompute it the way
+  // Retina.optical_limit_px does rather than reusing the exported one.
+  const perPx = c.eye.fovy_deg / spec.render;
+  c.eye.optical_limit_px = Math.max(1, (1 / c.eye.acuity_cyc_deg / 2) / perPx);
+  const e = new Eye(c);
+  return spec.frames.map((flat, k) => {
+    const o = e.step(Uint8Array.from(flat), 0.02, spec.self_motions[k], 3);
+    return [o.prey_salience,
+            o.prey_bearing_deg === null ? -999 : o.prey_bearing_deg,
+            o.prey_elevation_deg === null ? -999 : o.prey_elevation_deg];
+  });
+}
+const eye = runEye(ref.eye);
+const eye2 = runEye(ref.eye2);
+
+fs.writeFileSync(process.argv[3], JSON.stringify({ walk, steer, gates, arousal, search, eye, eye2 }));
 """
 
 
@@ -173,6 +244,10 @@ def main():
                                       got["search"]["moving"])),
         ("search: state, step for step",
          0.0 if ref["search"]["states"] == got["search"]["states"] else float("inf")),
+        ("eye: salience / bearing / elevation, 140 frames",
+         worst([r for r in ref["eye"]["out"]], got["eye"])),
+        ("eye: same, supersampled 128 -> 64 through the optics",
+         worst([r for r in ref["eye2"]["out"]], got["eye2"])),
     ]
     print()
     ok = True

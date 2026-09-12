@@ -220,8 +220,94 @@ def main():
         "warm_patch_half_m": warm_half,
     }
 
+    # THE EYE. Every constant read off the live Retina and Tectum, and off the
+    # provenance registry for the three published velocity numbers. The browser
+    # runs the same detector on a real rendered frame -- it is not handed a prey
+    # position. tools/conformance_web.py pushes identical image sequences
+    # through both and compares salience and bearing frame by frame.
+    from brain.retina import Retina, KEPT_CHANNELS, ACUITY_CYC_DEG
+    from brain.tectum import Tectum, MOTION_FLOOR, MAX_TARGET_FRACTION
+
+    # 64 -> 64 -> 16 is exactly how envs/gecko_brain_env.py builds the eye by
+    # default, so the browser animal sees at the resolution every Python
+    # measurement in this project was made at. It is also what keeps the
+    # per-control-step pixel readback cheap enough to run at 50 Hz.
+    # RENDER 128, SAMPLE 64. Rendering at the receptor resolution is not
+    # neutral: it omits the optics entirely, so fine floor texture the eye
+    # could never resolve is ALIASED into false structure that moves when the
+    # animal moves -- which a motion detector cannot tell from a cricket.
+    # brain/retina.py says this in its own docstring and supersampling is its
+    # remedy. Measured in the browser, 64 -> 64 against 128 -> 64, in
+    # FAILURE_MAP #372.
+    EYE_RENDER_PX, EYE_PIXELS, EYE_CELLS, EYE_FOVY = 128, 64, 16, 70.0
+    _ret = Retina(fovy_deg=EYE_FOVY, pixels=EYE_PIXELS, cells=EYE_CELLS,
+                  render_pixels=EYE_RENDER_PX)
+    _tec = Tectum(_ret)
+    eye = {
+        "fovy_deg": _f(_ret.fovy_deg),
+        "render_pixels": int(_ret.render_pixels),
+        "pixels": int(_ret.pixels),
+        "cells": int(_ret.cells),
+        "kept_channels": [int(c) for c in KEPT_CHANNELS],
+        "acuity_cyc_deg": _f(_ret.acuity_cyc_deg),
+        "surround_ratio": _f(_ret.surround_ratio),
+        "motion_window": int(_ret.motion_window),
+        "optical_limit_px": _f(_ret.optical_limit_px()),
+        # tectum
+        "motion_floor": _f(MOTION_FLOOR),
+        "max_target_fraction": _f(MAX_TARGET_FRACTION),
+        "surround_cells": int(_tec.surround_cells),
+        "salience_scale": _f(_tec.salience_scale),
+        "flow_gain_yaw": _f(_tec.flow_gain_yaw),
+        "flow_gain_surge": _f(_tec.flow_gain_surge),
+        "speed_window": int(_tec.speed_window),
+        "min_resolvable_deg": _f(_tec.min_resolvable_deg),
+        "scale_efference_by_span": bool(_tec.scale_efference_by_span),
+        "v_peak": _f(_tec.v_peak),
+        "v_low": _f(_tec.v_low),
+        "v_high": _f(_tec.v_high),
+        # geometry tables, precomputed so the browser cannot re-derive them wrong
+        "azimuth_of_cell": [_f(_ret.azimuth_of(c)) for c in range(_ret.cells)],
+        "elevation_of_cell": [_f(_ret.elevation_of(r)) for r in range(_ret.cells)],
+    }
+
+    # THE CRICKET. Twelve published-or-declared numbers, straight out of the
+    # registry via PreyParameters, plus the strike envelope.
+    from envs.prey import PreyParameters, REGISTRY_KEYS
+    prey = {k: _f(parameter_value(k)) for k in REGISTRY_KEYS}
+
+    # THE CHASE. Evidence accumulator, orienting reflex and the two stalk
+    # durations, read off the live classes exactly as the env builds them --
+    # FixationEvidence with the adaptive quorum on and its fixation length tied
+    # to SearchPattern.FIXATE_STEPS, which is how gecko_brain_env.py wires it.
+    from brain.search import FixationEvidence, OrientingReflex
+    from brain.programs import (STALK_MOVE_STEPS, STALK_LOOK_STEPS,
+                                ORIENT_HOLD_STEPS, RESUME_SEARCH_ON_LOST)
+    _fe = FixationEvidence(adaptive=True,
+                           fixate_steps=SearchPattern.FIXATE_STEPS)
+    _or = OrientingReflex()
+    hunt = {
+        "evidence": {
+            "quorum": int(_fe.quorum), "agree_deg": _f(_fe.agree_deg),
+            "hold_steps": int(_fe.hold_steps), "rate_window": int(_fe.RATE_WINDOW),
+            "fixate_steps": int(_fe.fixate_steps), "p_chance": _f(_fe.p_chance),
+            "field_deg": _f(_fe.field_deg), "adaptive": bool(_fe.adaptive),
+        },
+        "orienting": {
+            "field_deg": 70.0, "cells": 64,
+            "trigger_deg": _f(_or.trigger_deg), "max_deg": _f(_or.max_deg),
+            "move_steps": int(_or.move_steps), "blind_steps": int(_or.blind_steps),
+            "gain": _f(OrientingReflex.GAIN),
+        },
+        "stalk_move_steps": int(STALK_MOVE_STEPS),
+        "stalk_look_steps": int(STALK_LOOK_STEPS),
+        "orient_hold_steps": int(ORIENT_HOLD_STEPS),
+        "resume_search_on_lost": bool(RESUME_SEARCH_ON_LOST),
+    }
+
     payload = {
         "geoms": geoms, "joints": jnt, "search": search, "world": world,
+        "eye": eye, "prey": prey, "hunt": hunt,
         # The body tree itself. The nerve view routes every fibre along this
         # chain -- head to trunk to girdle to limb -- instead of drawing a
         # straight line from a brain to a joint through the middle of the
@@ -245,6 +331,15 @@ def main():
     print(f"  warm patch: {warm_half*2:.3f} m across at "
           f"({warm_xy[0]:g}, {warm_xy[1]:g}), surface {world['warm_surface_C']} C")
     print(f"  programs: {world['programs']}")
+    print(f"  eye: render {eye['render_pixels']} -> receptors {eye['pixels']} "
+          f"-> {eye['cells']} cells, blur {eye['optical_limit_px']:.2f} px, "
+          f"band {eye['v_low']}-{eye['v_peak']}-{eye['v_high']} deg/s")
+    print(f"  prey: {len(prey)} registry values, "
+          f"capture at {prey['prey_capture_distance_m']*100:.1f} cm")
+    print(f"  hunt: quorum {hunt['evidence']['quorum']} in a "
+          f"{hunt['evidence']['fixate_steps']}-step fixation, saccade blind "
+          f"{hunt['orienting']['move_steps']}+{hunt['orienting']['blind_steps']} steps, "
+          f"stalk {hunt['stalk_move_steps']} move / {hunt['stalk_look_steps']} look")
     print(f"  compensated feet: {sorted(comp)}")
     for f in sorted(comp):
         t = np.asarray(comp[f]["table"])
