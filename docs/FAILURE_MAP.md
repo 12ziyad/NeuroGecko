@@ -1516,6 +1516,14 @@ session; measured again here at **545 tests, 8 failures, 1 skip**.
 
 ---
 
+## Ledger — the other tab stopped looking like a button (Session 13q)
+
+| # | Hypothesis | Verdict | Evidence |
+|---|---|---|---|
+| 402 | Styling the active tab is enough to show there are two of them | **No -- the inactive one stopped looking like a button at all** | With only the selected tab filled, the other read as a label rather than a place to go. Both are solid white now and the chosen one is picked out by a ring around it instead of by being the only one with any contrast; the pulse on the unselected one stays. Same correction applied to the nerve switch, which was floating over the middle of the animal: it is a compact button in the top right of that pane, the same width as the channel-gate graph and sitting directly above it, because it belongs with the other thing you read in that pane rather than on top of the subject. **One cascade bug on the way**: the first version of that move lost to a `.panegraph` rule declared further down the same stylesheet, so the button landed ON the graph instead of above it. The override now sits at the end of the sheet, where being last is the whole point |
+
+---
+
 ## Scoreboard
 
 | | |

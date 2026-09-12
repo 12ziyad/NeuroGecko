@@ -396,6 +396,21 @@
   .modal .row2{gap:10px;margin-top:22px}
   .modal .note{font-size:11.5px;margin-top:15px}
 
+  /* BOTH TABS ARE BUTTONS. Only one of them looked pressable before, so the
+     other read as a label rather than a place to go. They are both solid white
+     now and the one you are on is picked out by a ring instead of by being the
+     only one with any contrast. */
+  .tabs{padding:4px;gap:5px;background:#0d1116;border-color:#25313f}
+  .tabs button{background:#fff;color:#0a0d12;font-weight:600;opacity:.72}
+  .tabs button:hover{background:#fff;color:#0a0d12;opacity:1}
+  .tabs button.on{background:#fff;color:#0a0d12;opacity:1;
+    box-shadow:0 0 0 2px var(--bask),0 2px 12px rgba(240,181,82,.28)}
+  .tabs button:not(.on)::after{background:var(--bask);right:8px}
+
+  /* The nerve switch belongs with the other thing you read in that pane, so it
+     sits above the channel-gate graph rather than floating over the animal. */
+
+
   /* Nothing overlaps anything. The captions are left-anchored and the two big
      controls are centred, so the caption has to stop before it reaches them. */
   .vtag{max-width:min(38%,380px);left:15px;top:14px}
@@ -555,6 +570,16 @@
   .panegraph canvas{width:164px;height:56px;display:block}
   .panegraph .lbl{margin-bottom:5px;font-size:8.5px}
   @media (max-width:760px){.panegraph{display:none}}
+
+  /* LAST WORD. These two rules have to come after the originals they replace --
+     an earlier copy of them lost to a `.panegraph` declared further down the
+     file, and the button ended up sitting on top of the graph it was supposed
+     to sit above. */
+  .isobtn{left:auto;right:15px;top:24px;transform:none;width:206px;
+    justify-content:center;padding:10px 14px}
+  .panegraph{top:76px;right:15px;width:206px}
+  .panegraph canvas{width:186px;height:62px}
+  @media (max-width:760px){.isobtn{width:auto;right:15px;top:20px}}
 </style>
 
 <div class="topbar">
@@ -649,7 +674,7 @@
       </div>
       <button class="isobtn" id="iso2" type="button">
         <svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="2.2"/><path d="M7 1v2.6M7 10.4V13M1 7h2.6M10.4 7H13M2.9 2.9l1.8 1.8M9.3 9.3l1.8 1.8M11.1 2.9L9.3 4.7M4.7 9.3l-1.8 1.8"/></svg>
-        <span id="isoLbl">Show only the nerves</span>
+        <span id="isoLbl">Nerves only</span>
       </button>
       <div class="legend glass" id="legend">
         <div class="lbl">Reading the nerve</div>
@@ -750,7 +775,7 @@
             <div class="k">web body vs full body</div><div class="v">exactly 0</div>
           </div>
           <em>Exactly 0</em> means bit-identical. The rest is floating-point dust.
-          401 hypotheses are on the record, refutations included.
+          402 hypotheses are on the record, refutations included.
         </div>
       </details>
     </div>
@@ -1174,7 +1199,7 @@ try {
     iso = !iso;
     nerve.setIsolate(iso);
     T("iso2").classList.toggle("on", iso);
-    T("isoLbl").textContent = iso ? "Show the body again" : "Show only the nerves";
+    T("isoLbl").textContent = iso ? "Show the body" : "Nerves only";
   };
 
   // the biology drawer
