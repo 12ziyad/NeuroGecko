@@ -1400,6 +1400,14 @@ session; measured again here at **545 tests, 8 failures, 1 skip**.
 
 ---
 
+## Ledger — the limb had no joints in it (Session 13g)
+
+| # | Hypothesis | Verdict | Evidence |
+|---|---|---|---|
+| 363 | The limbs look wrong because the skin is too coarse | **Refuted -- the resolution was fine and the PROFILE was monotonic, which is what makes a banana** | `gecko_sculpt.limb_skins` ran 26 stations through a Chaikin-smoothed path with five control radii -- `1.08, 1.05, 0.96, 0.80, 0.62` times each segment's own radius. Those descend monotonically, so **nothing narrows at an articulation**: there is no elbow, no knee, no wrist and no ankle anywhere in the surface, and a smooth curve through a monotonic taper is a banana by construction. Adding rings could never fix it, which is why #342 (knuckle spheres, refuted on the first render) and #341 attacked the wrong thing. The cross-section was also a perfect circle, and a sprawling lizard's limb is wider than it is deep. Replaced with seven control points -- the two segment MIDPOINTS are new -- carrying a muscle belly between two pinched joints (`1.06, 1.02, 1.22, 0.66, 0.98, 0.61, 0.55`), 34 stations, and every offset's world-vertical component squashed to `LIMB_FLATTEN = 0.74`. Rebuilt through `tools/rebuild_body.py` as the rules require: skin 21,663 -> **22,591 vertices**, 41,048 triangles, and the body still passes **14/14 morphology gates**. Physics proven untouched: the stripped web body regenerated from the new source runs 400 steps under identical controls against the full body at a maximum joint difference of **exactly 0.0**, and the browser port still conforms at 7.327e-15. **THE PROFILE NUMBERS ARE INVENTED AND SAY SO** in the source: no limb cross-section has ever been published for this species or any eublepharid, and the 42-agent surface pass (#337) killed 26 of 36 appearance claims. What is fixed is that a limb now has joints in it; what those joints look like is a shape choice that declares itself |
+
+---
+
 ## Scoreboard
 
 | | |

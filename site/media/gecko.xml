@@ -5,7 +5,7 @@
  Exact paired CoM means are geometrically incompatible with the selected tail-density guard.
  Geometry and landmarks are identical to candidate v1; see generated evidence for feasibility/sensitivity. -->
   <!-- LAB COHORT CANDIDATE v2, opt-in only. Legacy GeckoBody-R physics remains unchanged.
- Source body: gecko_body_r.xml canonical-LF SHA256 a20afb7476d861ec120b460acf41a79a4a8ec5d97e6d8f9862adaa0892afc2e3.
+ Source body: gecko_body_r.xml canonical-LF SHA256 989f835f7958d59f222e8e96dfd381fd66f981bb4ebf8357b6abaefdb609f157.
  38 g / ~106 mm SVL population choice; segment masses, neutral inclinations and gains are proxies.
  Femur depression target convention: Jagnandan & Higham 2017 (doi:10.1038/s41598-017-11484-7).
  Raw hip_sprawl is a local hinge angle, NOT the paper's reconstructed 3-D anatomical angle.

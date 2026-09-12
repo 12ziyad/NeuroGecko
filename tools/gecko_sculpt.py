@@ -318,8 +318,27 @@ def joint_spheres(model, data, ring_n, limb_scale):
 # the foot end is closed with a dome that the toes grow out of.
 # --------------------------------------------------------------------------
 
-LIMB_STATIONS = 26
+LIMB_STATIONS = 34
+
+#: How much the limb is flattened top-to-bottom, as a fraction of its width.
+#: INVENTED. A sprawling lizard's limb is not a circular rod -- it is wider
+#: than it is deep -- but NO limb cross-section has ever been published for
+#: this species or any eublepharid, and the 42-agent surface pass (#337) killed
+#: 26 of 36 appearance claims. So this is a shape choice that says it is one.
+LIMB_FLATTEN = 0.74
+
+#: The radius profile along one limb, as multipliers on the segment radius at
+#: five stations: shoulder, mid-upper-arm, ELBOW, mid-forearm, WRIST.
+#: INVENTED, and the whole point of it is the two pinches. The old profile ran
+#: 1.08, 1.05, 0.96, 0.80, 0.62 -- monotonically down -- so nothing narrowed at
+#: an articulation and a smooth curve through it reads as a banana (#342, #341,
+#: #317). Muscle belly proximally, waist at the joint, smaller belly distally
+#: is the shape of a real limb; the NUMBERS are chosen, not measured.
+LIMB_BELLY = 1.22
+LIMB_JOINT_WAIST = 0.66
 LIMB_ROOT_SINK_M = 0.004
+
+_UP = np.array([0.0, 0.0, 1.0])
 
 
 def _chaikin(pts, passes=2):
@@ -370,9 +389,20 @@ def limb_skins(model, data, ring_n, limb_scale, v_band=(0.16, 0.34)):
                 radii.append(r * limb_scale)
             root_dir = joints[0] - joints[1]
             root_dir /= np.linalg.norm(root_dir)
-            ctrl = [joints[0] + root_dir * LIMB_ROOT_SINK_M] + joints + [end]
-            r_ctrl = [radii[0] * 1.08, radii[0] * 1.05, radii[1] * 0.96,
-                      radii[2] * 0.80, radii[2] * 0.62]
+            # Extra control points at the MIDDLE of each long segment, so the
+            # profile can carry a muscle belly between two joint waists rather
+            # than sliding monotonically from shoulder to toe.
+            mid_upper = (joints[0] + joints[1]) * 0.5
+            mid_lower = (joints[1] + joints[2]) * 0.5
+            ctrl = [joints[0] + root_dir * LIMB_ROOT_SINK_M,
+                    joints[0], mid_upper, joints[1], mid_lower, joints[2], end]
+            r_ctrl = [radii[0] * 1.06,                      # where it meets the body
+                      radii[0] * 1.02,                      # shoulder / hip
+                      radii[0] * LIMB_BELLY,                # upper-arm belly
+                      radii[1] * LIMB_JOINT_WAIST,          # ELBOW / KNEE, pinched
+                      radii[1] * (LIMB_BELLY * 0.80),       # forearm / shank belly
+                      radii[2] * LIMB_JOINT_WAIST * 0.92,   # WRIST / ANKLE, pinched
+                      radii[2] * 0.55]                      # foot
 
             pts = _chaikin(ctrl, 2)
             seg = np.linalg.norm(np.diff(pts, axis=0), axis=1)
@@ -406,8 +436,15 @@ def limb_skins(model, data, ring_n, limb_scale, v_band=(0.16, 0.34)):
                 n_prev = n
                 frame = (c, t, n, bn)
                 r = float(np.interp(s / total, cf, r_ctrl))
-                rings.append(np.stack([c + r * (math.cos(a) * n + math.sin(a) * bn)
-                                       for a in ang]))
+                # Flattened cross-section: squash the world-vertical component
+                # of each offset, so the limb is wider than it is deep however
+                # the frame happens to be rolled. INVENTED -- see LIMB_FLATTEN.
+                ring = []
+                for a in ang:
+                    off = r * (math.cos(a) * n + math.sin(a) * bn)
+                    off = off - _UP * ((1.0 - LIMB_FLATTEN) * float(np.dot(off, _UP)))
+                    ring.append(c + off)
+                rings.append(np.stack(ring))
                 uvs.append(np.stack([0.15 + 0.20 * ang / (2.0 * math.pi),
                                      np.full(ring_n + 1, v_band[0]
                                              + (v_band[1] - v_band[0]) * s / total)],
@@ -417,8 +454,12 @@ def limb_skins(model, data, ring_n, limb_scale, v_band=(0.16, 0.34)):
             r_end = r_ctrl[-1]
             for sc, adv in ((0.78, 0.35), (0.45, 0.72), (0.06, 0.96)):
                 cc = c + t * r_end * adv
-                rings.append(np.stack([cc + r_end * sc * (math.cos(a) * n + math.sin(a) * bn)
-                                       for a in ang]))
+                dome = []
+                for a in ang:
+                    off = r_end * sc * (math.cos(a) * n + math.sin(a) * bn)
+                    off = off - _UP * ((1.0 - LIMB_FLATTEN) * float(np.dot(off, _UP)))
+                    dome.append(cc + off)
+                rings.append(np.stack(dome))
                 uvs.append(np.stack([0.15 + 0.20 * ang / (2.0 * math.pi),
                                      np.full(ring_n + 1, v_band[1])], axis=1))
             out.append((bids[0], rings, uvs))
