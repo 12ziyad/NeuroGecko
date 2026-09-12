@@ -1408,6 +1408,14 @@ session; measured again here at **545 tests, 8 failures, 1 skip**.
 
 ---
 
+## Ledger — the path was being smoothed straight (Session 13h)
+
+| # | Hypothesis | Verdict | Evidence |
+|---|---|---|---|
+| 364 | Putting joint waists in the radius profile (#363) is the whole limb fix | **Partly -- the profile was half of it; the PATH was still being smoothed straight** | After #363 the limb had a waist at the elbow and the wrist and still read as a bent tube. The second cause is `_chaikin(ctrl, 2)`: Chaikin subdivision CUTS CORNERS, and the elbow and the knee ARE corners -- the physics puts them there in `joints[]` and two passes rounded them into a single arc. Adding the two segment midpoints in #363 made it worse, because a longer control polygon is smoothed harder. Reduced to ONE pass, which still removes the hard kink without erasing the articulation. Two further shape corrections in the same pass: the foot was a rounded stump, so its flattening now ramps from 0.74 to 0.48 over the distal 30 % of the limb and its end dome went from three rings at 0.78/0.45/0.06 to four at 0.92/0.70/0.28/0.05 -- a gecko stands on a flat sole, not on the end of a rod; and the proximal radius went 1.06 -> 1.14 with the wrist waist tightened 0.92 -> 0.80, so mass sits where muscle is. Rebuilt through `tools/rebuild_body.py`: skin 22,591 -> **22,707 vertices**, 41,272 triangles, **14/14 morphology gates**, web body against full body over 400 steps under identical controls **max |qpos| exactly 0.0**, browser conformance unchanged at 7.327e-15. **EVERY NUMBER IN THIS PROFILE IS INVENTED AND SAYS SO** -- no limb cross-section, joint diameter or sole geometry has been published for this species or any eublepharid. What is now true is that the limb has corners where the animal has joints; what those corners look like is still a declared shape choice |
+
+---
+
 ## Scoreboard
 
 | | |

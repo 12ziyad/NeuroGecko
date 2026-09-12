@@ -396,15 +396,19 @@ def limb_skins(model, data, ring_n, limb_scale, v_band=(0.16, 0.34)):
             mid_lower = (joints[1] + joints[2]) * 0.5
             ctrl = [joints[0] + root_dir * LIMB_ROOT_SINK_M,
                     joints[0], mid_upper, joints[1], mid_lower, joints[2], end]
-            r_ctrl = [radii[0] * 1.06,                      # where it meets the body
-                      radii[0] * 1.02,                      # shoulder / hip
+            r_ctrl = [radii[0] * 1.14,                      # where it meets the body
+                      radii[0] * 1.06,                      # shoulder / hip
                       radii[0] * LIMB_BELLY,                # upper-arm belly
                       radii[1] * LIMB_JOINT_WAIST,          # ELBOW / KNEE, pinched
-                      radii[1] * (LIMB_BELLY * 0.80),       # forearm / shank belly
-                      radii[2] * LIMB_JOINT_WAIST * 0.92,   # WRIST / ANKLE, pinched
-                      radii[2] * 0.55]                      # foot
+                      radii[1] * (LIMB_BELLY * 0.74),       # forearm / shank belly
+                      radii[2] * LIMB_JOINT_WAIST * 0.80,   # WRIST / ANKLE, pinched
+                      radii[2] * 0.78]                      # foot, a paddle not a stump
 
-            pts = _chaikin(ctrl, 2)
+            # ONE pass, not two. Chaikin cuts corners, and the elbow and the
+            # knee ARE corners -- the physics puts them there and two passes
+            # rounded them into a single arc. One pass still kills the hard
+            # kink without erasing the joint (#364).
+            pts = _chaikin(ctrl, 1)
             seg = np.linalg.norm(np.diff(pts, axis=0), axis=1)
             arc = np.concatenate([[0.0], np.cumsum(seg)])
             total = float(arc[-1])
@@ -439,10 +443,15 @@ def limb_skins(model, data, ring_n, limb_scale, v_band=(0.16, 0.34)):
                 # Flattened cross-section: squash the world-vertical component
                 # of each offset, so the limb is wider than it is deep however
                 # the frame happens to be rolled. INVENTED -- see LIMB_FLATTEN.
+                # The foot flattens harder than the rest of the limb: a gecko
+                # stands on a flat sole, not on the end of a rod. INVENTED, and
+                # the ramp is a shape choice like the rest of the profile.
+                u_arc = s / total
+                flat = LIMB_FLATTEN - 0.26 * max(0.0, (u_arc - 0.70) / 0.30)
                 ring = []
                 for a in ang:
                     off = r * (math.cos(a) * n + math.sin(a) * bn)
-                    off = off - _UP * ((1.0 - LIMB_FLATTEN) * float(np.dot(off, _UP)))
+                    off = off - _UP * ((1.0 - flat) * float(np.dot(off, _UP)))
                     ring.append(c + off)
                 rings.append(np.stack(ring))
                 uvs.append(np.stack([0.15 + 0.20 * ang / (2.0 * math.pi),
@@ -452,12 +461,12 @@ def limb_skins(model, data, ring_n, limb_scale, v_band=(0.16, 0.34)):
             # dome at the foot end
             c, t, n, bn = frame
             r_end = r_ctrl[-1]
-            for sc, adv in ((0.78, 0.35), (0.45, 0.72), (0.06, 0.96)):
+            for sc, adv in ((0.92, 0.30), (0.70, 0.66), (0.28, 0.90), (0.05, 1.02)):
                 cc = c + t * r_end * adv
                 dome = []
                 for a in ang:
                     off = r_end * sc * (math.cos(a) * n + math.sin(a) * bn)
-                    off = off - _UP * ((1.0 - LIMB_FLATTEN) * float(np.dot(off, _UP)))
+                    off = off - _UP * ((1.0 - LIMB_FLATTEN * 0.62) * float(np.dot(off, _UP)))
                     dome.append(cc + off)
                 rings.append(np.stack(dome))
                 uvs.append(np.stack([0.15 + 0.20 * ang / (2.0 * math.pi),
