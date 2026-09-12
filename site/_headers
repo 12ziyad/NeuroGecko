@@ -1,4 +1,10 @@
+# THE ROOT PATH WAS NOT COVERED. `/*.html` does not match `/`, which is the URL
+# everyone actually opens, so the index kept being served from the edge cache
+# while every module beside it was current -- three deploys that appeared to do
+# nothing. `/*` catches it.
+/*
+  Cache-Control: public, max-age=60, must-revalidate
 /*.js
   Cache-Control: public, max-age=60, must-revalidate
-/*.html
-  Cache-Control: public, max-age=60, must-revalidate
+/media/*
+  Cache-Control: public, max-age=300, must-revalidate
