@@ -1,0 +1,25 @@
+{
+ "schema_version": 2,
+ "generated_by": "tools/oracle_free_hunt_video.py",
+ "run": "CONTROL: committed bearings replaced by random ones",
+ "still_privileged": [
+  "strike trigger reads true range",
+  "walker retains its five goal slots"
+ ],
+ "seed": 9,
+ "steps": 3000,
+ "motion_window": 8,
+ "gaze_pitch_gain": 2.0,
+ "flow_gain_yaw": 0.006,
+ "motion_floor": 0.08,
+ "eye_raw_reports": 755,
+ "decisions": 8,
+ "decisions_with_prey_really_on_screen": 1,
+ "decision_precision": 0.125,
+ "steps_chasing": 968,
+ "frames_prey_on_screen": 392,
+ "closest_approach_mm": 126.27,
+ "strike_trigger_mm": 20.3,
+ "final_quorum": 12,
+ "final_report_rate": 0.185
+}

@@ -139,6 +139,15 @@ class LegacyFixtureTests(unittest.TestCase):
              .649264,0.,0.,0.,0.,-.20122609345416997,0.,.11808747687600203,-.11808747687600203,0.]
         ])
         actual = np.array([c.base_ctrl(t,front_contact={"FL":True,"FR":False}) for t in times])
+        # THE FIXTURE IS THE WALKER'S 25 COMMANDS, NOT THE ACTUATOR COUNT (#289).
+        # The jaw actuator (MuJoCo group 2) is the brain's and is written by
+        # GeckoWalkEnv._apply_jaw, never by this controller. Comparing only the
+        # group-0 columns keeps the pre-refactor fixture byte-valid and still
+        # proves that every command the walking policy was trained on is
+        # unchanged by a body that has grown a mouth.
+        policy = np.flatnonzero(self.model.actuator_group == 0)
+        self.assertEqual(len(policy), fixture.shape[1])
+        actual = actual[:, policy]
         # Tiny libm tolerance permits cross-platform sin rounding; local arrays
         # and the complete80-step state/reward digest matched bit-for-bit.
         np.testing.assert_allclose(actual, fixture, rtol=0, atol=5e-15)

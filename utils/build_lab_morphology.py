@@ -170,10 +170,10 @@ def bounded_entropy_fit(prior, coordinates, total, target, lower, upper):
     return masses, {"target_feasible": True, "feasible_centroid_range": [minimum, maximum], "solution": "minimum relative-entropy mass change"}
 
 
-def calibrate_com(root: ET.Element, entries: dict) -> dict:
+def calibrate_com(root: ET.Element, entries: dict, assets: dict | None = None) -> dict:
     """Constrained mass-only v2 calibration; never move body/geom/site geometry."""
     val = lambda name: entries[name]["value"]
-    model = mujoco.MjModel.from_xml_string(serialize(root))
+    model = mujoco.MjModel.from_xml_string(serialize(root), assets or {})
     data = mujoco.MjData(model)
     mujoco.mj_resetDataKeyframe(model, data, model.key("neutral").id)
     mujoco.mj_forward(model, data)
@@ -278,6 +278,32 @@ def calibrate_com(root: ET.Element, entries: dict) -> dict:
                             "No geometry, landmarks, segment lengths, total mass, tail fraction, joint topology or actuator settings are moved by the inverse fit."]}
 
 
+def _assets(source: Path) -> dict:
+    """Texture/mesh bytes, keyed by the name the XML asks for.
+
+    `mujoco.MjModel.from_xml_string` resolves `texturedir` against the WORKING
+    DIRECTORY, while `from_xml_path` resolves it against the model file. A
+    generator that compiles from a string therefore cannot find assets that
+    every real consumer finds, and the only honest fix is to hand them over
+    explicitly rather than to bend the paths until one case happens to work.
+    """
+    root = Path(source).resolve().parent
+    out = {}
+    for d in (root / "textures", root / "meshes"):
+        if d.is_dir():
+            for f in sorted(d.iterdir()):
+                if f.is_file():
+                    data = f.read_bytes()
+                    # Keyed BOTH ways. MuJoCo looks an asset up by the path it
+                    # resolved -- which includes `meshdir`/`texturedir` -- and a
+                    # bare-name-only dict silently yields None for meshes.
+                    # Keyed by the DIRECTORY-QUALIFIED name only: MuJoCo
+                    # rejects an assets dict that holds the same bare filename
+                    # twice, which is what keying both ways produced.
+                    out[f"{d.name}/{f.name}"] = data
+    return out
+
+
 def make_candidate(source: Path = DEFAULT_XML, registry_path: Path = DEFAULT_REGISTRY, fit_com: bool = False) -> tuple[str, dict]:
     entries = load_registry(registry_path)["entries"]
     val = lambda name: entries[name]["value"]
@@ -372,7 +398,14 @@ def make_candidate(source: Path = DEFAULT_XML, registry_path: Path = DEFAULT_REG
     head = find(root, "body", "head")
     half_width = float(val("head_width_svl")) * svl / 2
     half_height = float(val("lab_head_height_svl")) * svl / 2
-    main_visual = next(g for g in head.findall("geom") if g.get("class") == "visual" and g.get("material") == "skin")
+    # A MESH IS NOT A PRIMITIVE. The head carries a generated skin mesh whose
+    # material is also `skin`, and a mesh geom has no `size` to rescale: the
+    # dimensions this file sets are carried by the primitive that the morphology
+    # gates measure, and the mesh follows it. Skip anything without a size.
+    is_primitive = lambda g: g.get("type") != "mesh" and g.get("size") is not None
+    main_visual = next(g for g in head.findall("geom")
+                       if g.get("class") == "visual" and g.get("material") == "skin"
+                       and is_primitive(g))
     main_size = vector(main_visual.get("size"))
     main_size[1:] = [half_width, half_height]
     main_visual.set("size", numbers(main_size))
@@ -382,7 +415,7 @@ def make_candidate(source: Path = DEFAULT_XML, registry_path: Path = DEFAULT_REG
     collision.set("pos", main_visual.get("pos"))
     collision.set("size", main_visual.get("size"))
     for geom in head.findall("geom"):
-        if geom is not main_visual and geom.get("material") == "skin":
+        if geom is not main_visual and geom.get("material") == "skin" and is_primitive(geom):
             size = vector(geom.get("size"))
             size[2] *= float(val("lab_snout_height_scale"))
             geom.set("size", numbers(size))
@@ -397,7 +430,7 @@ def make_candidate(source: Path = DEFAULT_XML, registry_path: Path = DEFAULT_REG
         for attribute in ("kp", "kv", "forcerange"):
             if position.get(attribute):
                 position.set(attribute, numbers(vector(position.get(attribute)) * actuator_scale))
-    inverse_fit = calibrate_com(root, entries) if fit_com else None
+    inverse_fit = calibrate_com(root, entries, _assets(source)) if fit_com else None
     if fit_com:
         root.insert(0, ET.Comment(
             " V2 MASS-ONLY INVERSE CALIBRATION. Minimum relative-entropy body fit; density-guarded tail fit.\n"
@@ -406,7 +439,7 @@ def make_candidate(source: Path = DEFAULT_XML, registry_path: Path = DEFAULT_REG
             " Geometry and landmarks are identical to candidate v1; see generated evidence for feasibility/sensitivity. "
         ))
     # Neutral is an initial release pose; stand is regenerated from physics.
-    candidate = mujoco.MjModel.from_xml_string(serialize(root))
+    candidate = mujoco.MjModel.from_xml_string(serialize(root), _assets(source))
     data = mujoco.MjData(candidate)
     mujoco.mj_resetDataKeyframe(candidate, data, candidate.key("neutral").id)
     data.ctrl[:] = 0
@@ -416,7 +449,7 @@ def make_candidate(source: Path = DEFAULT_XML, registry_path: Path = DEFAULT_REG
         raise RuntimeError("Candidate became nonfinite; refusing to generate stand keyframe")
     find(root, "key", "stand").set("qpos", " ".join(format(float(x), ".17g") for x in data.qpos))
     result = serialize(root)
-    checked = mujoco.MjModel.from_xml_string(result)
+    checked = mujoco.MjModel.from_xml_string(result, _assets(source))
     if (checked.nq, checked.nv, checked.nu) != (original.nq, original.nv, original.nu):
         raise RuntimeError("Candidate unexpectedly changed checkpoint dimensions")
     return result, {"source_canonical_lf_sha256": canonical_source_sha256(source),

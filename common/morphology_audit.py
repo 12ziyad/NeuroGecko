@@ -124,6 +124,14 @@ def _support_radius_y(model: mujoco.MjModel, geom_id: int) -> float:
 
 
 def _width_of_geoms(model: mujoco.MjModel, geom_ids: list[int]) -> float:
+    # THE GATE MEASURES THE PRIMITIVE, NOT THE SKIN (#312). The head also
+    # carries a generated visual mesh whose material is `skin`, and
+    # `_support_radius_y` refuses a mesh rather than guessing a width from it --
+    # correctly. The published head width is defined by, and gated on, the
+    # primitive ellipsoid; the mesh is drawn over it and measures nothing. So
+    # mesh geoms are excluded here rather than the refusal being softened.
+    geom_ids = [g for g in geom_ids
+                if model.geom_type[g] != mujoco.mjtGeom.mjGEOM_MESH]
     if not geom_ids:
         raise ValueError("No matching head geometry")
     bounds = [

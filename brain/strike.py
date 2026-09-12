@@ -141,6 +141,47 @@ class Strike:
         """
         return "snap" if distance_m <= 0.5 * self.trigger_distance_m else "bag_jump"
 
+    # ---------------------------------------------------- the physical strike
+    #: PUBLISHED, TARGET SPECIES. Delheusy, Brillet & Bels 1995 (Amphibia-Reptilia
+    #: 16:185-201, opened in full, n = 6 adult males, SVL 120 +/- 4 mm, 64 fps,
+    #: 30 C): the capture is a single open-close cycle of about 80 ms with a
+    #: representative peak gape of ~37 deg, NO slow-open phase, jaws only, and
+    #: the head drops ~27 mm vertically while moving ~8 mm forward (Fig. 2).
+    #: The representative trace is truncated at 78 ms with the mouth still ~8
+    #: deg open, so the closing edge is inferred, not read -- which is why the
+    #: profile below closes by symmetry rather than by a measured value.
+    CAPTURE_PEAK_GAPE_DEG = 37.0
+    CAPTURE_PEAK_AT_S = 0.047
+    CAPTURE_HEAD_DROP_M = 0.027
+    CAPTURE_HEAD_FORWARD_M = 0.008
+
+    def gape_profile(self, fraction):
+        """Gape angle in degrees at a point through the strike.
+
+        Rises to the published peak at 47 ms of an 80 ms cycle and falls back
+        by mirror symmetry. The rise is read from the paper; the fall is
+        inferred (the trace is cut off), and this is the honest statement of
+        that. The shape between the points is INVENTED (raised cosine).
+        """
+        f = float(np.clip(fraction, 0.0, 1.0))
+        peak_at = self.CAPTURE_PEAK_AT_S / self.duration_s
+        if f <= peak_at:
+            x = f / max(peak_at, 1e-6)
+        else:
+            x = (1.0 - f) / max(1.0 - peak_at, 1e-6)
+        return float(self.CAPTURE_PEAK_GAPE_DEG * 0.5 * (1.0 - math.cos(math.pi * x)))
+
+    def head_drop_profile(self, fraction):
+        """Vertical head drop in metres at a point through the strike.
+
+        Published endpoints: 0 at launch, ~27 mm at 78 ms. The published
+        velocity peak sits 9 ms before contact, so the drop is front-loaded:
+        a sine rise, which puts the animal decelerating onto the prey rather
+        than through it.
+        """
+        f = float(np.clip(fraction, 0.0, 1.0))
+        return float(self.CAPTURE_HEAD_DROP_M * (1.0 - math.cos(0.5 * math.pi * f)))
+
     def fire(self, distance_m):
         """Commit to a strike. Returns the plan, or None if out of range.
 

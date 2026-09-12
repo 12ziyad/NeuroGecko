@@ -99,7 +99,27 @@ def resolvable(fovy_deg, pixels, feature_deg):
 class Retina:
     """Turns frames into a retinotopic map of motion and contrast."""
 
-    def __init__(self, fovy_deg=70.0, pixels=64, cells=16,
+    #: INVENTED, but bounded by a measurement. Number of control frames the
+    #: prey-motion map is differenced across. 1 reproduces the single-frame
+    #: behaviour exactly and is the default, so nothing changes unless asked.
+    #:
+    #: WHY THIS EXISTS. Measured over 3200 steps of a real hunt
+    #: (artifacts/evidence/session11/hunt_decomposition.json): on the frames
+    #: where the prey IS on the rendered image and the eye stays silent,
+    #: 92.3 % are rejected as "below motion floor". The prey's image moves a
+    #: median of 1.01 px per control step, which is a QUARTER of a 4x4-pixel
+    #: cell, and a quarter-cell displacement of a ~5 px object survives neither
+    #: the mean-pool nor the surround subtraction. The band is finer than the
+    #: instrument -- which is ledger #188, restated at the cell level.
+    #:
+    #: WHAT BOUNDS IT. The control loop runs at 50 Hz. Scotopic flicker fusion
+    #: in two nocturnal geckos is "up to 18 flashes per sec" (Dodt & Jessen
+    #: 1961, J Gen Physiol 44(6):1143-1158, Hemidactylus turcicus and Tarentola
+    #: mauritanica -- neither is an eublepharid). 50/18 = 2.8, so an animal-
+    #: appropriate integration window is about three control frames. That is a
+    #: bound on the ORDER, not a measurement of this species: no eublepharid
+    #: temporal resolution has ever been published.
+    def __init__(self, fovy_deg=70.0, pixels=64, cells=16, motion_window=3,
                  surround_ratio=3.0, render_pixels=None,
                  acuity_cyc_deg=ACUITY_CYC_DEG):
         """
@@ -134,6 +154,9 @@ class Retina:
         self.cells = int(cells)
         self.surround_ratio = float(surround_ratio)
         self._previous = None
+        self.motion_window = max(1, int(motion_window))
+        #: Luminance frames, oldest first, at most motion_window + 1 of them.
+        self._frames = []
         self.on_axis_deg, self.corner_deg = angular_sampling(fovy_deg, pixels)
         # Azimuth of every pixel column, in degrees. Flow must be differenced
         # against THIS and not against the pixel index: the camera is uniform
@@ -150,8 +173,16 @@ class Retina:
         """Forget the previous frame. Motion is undefined on the first frame
         after a reset, and this returns zeros there rather than a spurious
         transient -- an episode should not begin with the world appearing to
-        explode."""
+        explode.
+
+        THE WINDOW RING IS CLEARED HERE TOO, and the first version of this
+        change forgot to. Frames then leaked across episode boundaries and the
+        windowed difference compared the new episode's first frame against the
+        old episode's last one, so the peak landed on where the target used to
+        be. `test_it_reports_the_side_the_target_is_on` caught it by reporting
+        a left bearing for a right-hand target."""
         self._previous = None
+        self._frames = []
         return self
 
     # ------------------------------------------------------------ the signal
@@ -211,6 +242,22 @@ class Retina:
             temporal = luminance - self._previous
         self._previous = luminance
 
+        # The windowed map is SEPARATE from `temporal` on purpose. The
+        # pretectum's optokinetic reflex reads `pixel_temporal`, and that
+        # result is validated (#123 ratio 1.02 against truth, #124 the
+        # published naso-temporal asymmetry, #126 the published gain). Widening
+        # the window under it would change a reproduced published number, so it
+        # is left exactly alone and prey motion gets its own baseline.
+        self._frames.append(luminance)
+        if len(self._frames) > self.motion_window + 1:
+            self._frames.pop(0)
+        if len(self._frames) < 2:
+            windowed = np.zeros_like(luminance)
+            span = 0
+        else:
+            windowed = luminance - self._frames[0]
+            span = len(self._frames) - 1
+
         centre = self._bin(luminance)
         surround = _blur(centre, self.surround_ratio)
         return {
@@ -222,6 +269,14 @@ class Retina:
             "pixel_temporal": temporal,
             "pixel_luminance": luminance,
             "motion": self._bin(np.abs(temporal)),
+            # Differenced across `span` frames rather than one. Identical to
+            # `motion` when motion_window == 1.
+            "motion_windowed": self._bin(np.abs(windowed)),
+            #: How many frames the windowed map actually spans. Fewer than
+            #: motion_window while the ring fills, so a consumer scaling
+            #: anything by the window uses what was measured, not what was
+            #: asked for.
+            "motion_window_span": int(span),
             "signed_motion": self._bin(temporal),
             "contrast": centre - surround,
             "luminance": centre,
@@ -242,6 +297,31 @@ class Retina:
         focal_px = (self.pixels / 2.0) / math.tan(half)
         centre_px = (column + 0.5) * (self.pixels / self.cells) - self.pixels / 2.0
         return math.degrees(math.atan(centre_px / focal_px))
+
+    def elevation_of(self, row):
+        """Signed vertical angle of a cell row, degrees. Negative is BELOW.
+
+        The same projection as `azimuth_of`, with the image's row order --
+        row 0 is the top of the frame -- so the sign comes out negative for
+        things on the ground, which is where a cricket is.
+
+        WHY THIS EXISTS. Measured over 2400 steps of a real hunt
+        (artifacts/evidence/session11/hunt_decomposition_rows.jsonl), the prey's
+        elevation in camera coordinates falls as the animal closes:
+
+            0.30-0.50 m   -4.2 deg    on image  54 %
+            0.08-0.15 m  -10.8 deg    on image  85 %
+            0.04-0.08 m  -20.2 deg    on image 100 %
+            0.00-0.04 m  -35.1 deg    on image  45 %   <- falls out of frame
+
+        At fovy 70 the frame stops at -35 deg, so the animal goes blind exactly
+        where the strike has to fire. The tectum has always known the target's
+        row; nothing ever converted it to an angle.
+        """
+        half = math.radians(self.fovy_deg) / 2.0
+        focal_px = (self.pixels / 2.0) / math.tan(half)
+        centre_px = (row + 0.5) * (self.pixels / self.cells) - self.pixels / 2.0
+        return -math.degrees(math.atan(centre_px / focal_px))
 
     def hemifields(self, plane):
         """Split a map into (left, right) halves about the optical axis.

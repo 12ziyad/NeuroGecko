@@ -1,0 +1,49 @@
+{
+ "schema_version": 1,
+ "generated_by": "tools/_control_sweep.sh + this analysis",
+ "question": "with the oracle off, is the animal getting close because it SEES, or because it is wandering in a small arena?",
+ "control": "every committed bearing replaced by a uniform random one; search, freezes, fixations and decision rule all identical",
+ "seeds": [
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  8,
+  9
+ ],
+ "steps_per_run": 3000,
+ "closest_approach_mm": {
+  "sees": [
+   30.48,
+   124.62,
+   41.48,
+   134.96,
+   34.81,
+   49.12,
+   128.68,
+   72.06
+  ],
+  "blind": [
+   281.75,
+   87.45,
+   189.93,
+   170.38,
+   135.19,
+   120.88,
+   205.56,
+   126.27
+  ]
+ },
+ "median_mm": {
+  "sees": 60.59,
+  "blind": 152.785
+ },
+ "seeds_where_seeing_got_closer": 7,
+ "seeds_total": 8,
+ "mean_improvement_mm": 87.7,
+ "p_sign_test_two_sided": 0.0703,
+ "p_exact_paired_permutation_two_sided": 0.0234,
+ "verdict": "the eye is doing real work, but at n=8 this is suggestive rather than established at the 5 % level"
+}

@@ -49,7 +49,7 @@ def gate2(trace, result, diagnosis, completed):
             "timing_caveat":"Duty/phase retain operational contact-cycle values; non-entrained cycles cannot certify walking."}
 
 
-def run_trial(name, parameters, *, hind_duty=None, limb_phase=None, duration=20, seed=0, goal_angle=0, save_trace=False):
+def run_trial(name, parameters, *, hind_duty=None, limb_phase=None, duration=20, seed=0, goal_angle=0, save_trace=False, xml=None):
     from eval.base_diagnostics import diagnose_trace
     out = REPO/"artifacts/evidence/session2/trials"/name
     if (out/"report.json").exists():
@@ -62,7 +62,9 @@ def run_trial(name, parameters, *, hind_duty=None, limb_phase=None, duration=20,
         profile = replace(profile, stance_ratios=(hind_duty,profile.stance_for("FL"),hind_duty,profile.stance_for("FR")))
     if limb_phase is not None:
         profile = replace(profile, touchdown_delays_cycle=(0.,limb_phase,.5,(.5+limb_phase)%1))
-    xml = REPO/"morphology/gecko_body_lab_v2.xml"
+    # `xml` lets the SAME gate code score a different body -- the pre-jaw
+    # v2 as a like-for-like control for the jawed one (#290). Default unchanged.
+    xml = Path(xml) if xml else REPO/"morphology/gecko_body_lab_v2.xml"
     env = GeckoWalkEnv(xml_path=xml, gait_profile=profile, control_mode="cpg_residual", reset_noise=0,
                        residual_scale=.25, max_steps=round(duration/.02), lab_parameters=parameters)
     try:
@@ -117,6 +119,7 @@ def main():
     p.add_argument("--limb-phase",type=float)
     p.add_argument("--goal-angle",type=float,default=0)
     p.add_argument("--save-trace",action="store_true")
+    p.add_argument("--xml",type=Path,default=None,help="body to gate (default: morphology/gecko_body_lab_v2.xml)")
     a=p.parse_args()
     if len(a.set)+int(a.hind_duty is not None)+int(a.limb_phase is not None)>1:
         p.error("One change at a time; save each trial before the next.")
@@ -126,7 +129,7 @@ def main():
     for assignment in a.set:
         key,value=assignment.split("=",1)
         values[key]=json.loads(value)
-    run_trial(a.case,values,hind_duty=a.hind_duty,limb_phase=a.limb_phase,goal_angle=a.goal_angle,save_trace=a.save_trace)
+    run_trial(a.case,values,hind_duty=a.hind_duty,limb_phase=a.limb_phase,goal_angle=a.goal_angle,save_trace=a.save_trace,xml=a.xml)
 
 
 if __name__=="__main__":

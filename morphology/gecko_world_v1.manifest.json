@@ -2,9 +2,9 @@
  "schema_version": 1,
  "generator": "utils/build_world.py",
  "source": "morphology/gecko_body_lab_v2.xml",
- "source_sha256": "db650f6bf55852cb3d1f24a642091024abef2cb55b1bf00380da4e33446049f3",
+ "source_sha256": "d173fc4b9ed2a9e4a2a8505ebf8964f24187dff29070e9f82a5fb08787910c49",
  "output": "morphology/gecko_world_v1.xml",
- "output_sha256": "b181b0ef73818e574692f56e7b41d5d0e40ff1d6353071b1d79fd5505afcd6ac",
+ "output_sha256": "d50ddcde0640c0b5d3c7e884ccf9f0082f9d9e240a0c4321b7bfd5435064d07d",
  "edits": [
   {
    "element": "worldbody",
@@ -26,6 +26,20 @@
    "before": "120",
    "after": "70",
    "reason": "a wider field spends the same pixels on more world"
+  },
+  {
+   "element": "global",
+   "attribute": "offwidth",
+   "before": "640",
+   "after": "1280",
+   "reason": "offscreen buffer must cover the requested render size"
+  },
+  {
+   "element": "global",
+   "attribute": "offheight",
+   "before": "480",
+   "after": "960",
+   "reason": "offscreen buffer must cover the requested render size"
   }
  ],
  "note": "",

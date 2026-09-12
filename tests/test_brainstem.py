@@ -133,9 +133,17 @@ class TheSeamWithTheSelector(unittest.TestCase):
         self.assertTrue(cmd["stepping"])
 
     def test_a_chosen_rest_stops_the_legs(self):
+        """Rest is the day/night clock now, not fatigue (#349, #352).
+
+        This used to drive the channel with `fatigue=0.95`, a value the
+        embodied animal never reaches: measured over five seeds, fatigue sits
+        at 0.002 and is entirely the residue of per-step velocity noise. It is
+        driven here the way the animal drives it -- brain 6's arousal at the
+        bottom of the light phase.
+        """
         sel = GeckoSelector()
         for _ in range(25):
-            sel.step(fatigue=0.95)
+            sel.step(arousal=0.0)
         cmd = Brainstem(_cord()).step_from_selector(sel)
         self.assertEqual(cmd["behaviour"], "rest")
         self.assertFalse(cmd["stepping"])

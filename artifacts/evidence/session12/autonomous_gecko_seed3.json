@@ -1,0 +1,39 @@
+{
+ "schema_version": 1,
+ "generated_by": "tools/autonomous_gecko.py",
+ "run": "hunger -> basal ganglia -> motor program -> body; no oracle",
+ "connected": [
+  "hypothalamus",
+  "basal ganglia (Prescott 2024)",
+  "eye",
+  "search + fixation evidence",
+  "vomeronasal",
+  "brainstem",
+  "motor programs"
+ ],
+ "still_privileged": [
+  "strike trigger reads true range",
+  "walker retains its five goal slots"
+ ],
+ "seed": 3,
+ "steps": 3000,
+ "meals_owed_at_start": 1.0,
+ "motion_floor": 0.08,
+ "flow_gain_yaw": 0.006,
+ "behaviours_released": {
+  "explore": 1997,
+  "hunt": 1003
+ },
+ "motor_programs": {
+  "still": 1,
+  "search": 1996,
+  "chase": 1003
+ },
+ "fraction_of_time_moving": 0.2707,
+ "frames_prey_on_screen": 289,
+ "decisions": 276,
+ "decisions_with_prey_really_on_screen": 0,
+ "decision_precision": 0.0,
+ "closest_approach_mm": 251.3,
+ "strike_trigger_mm": 20.3
+}

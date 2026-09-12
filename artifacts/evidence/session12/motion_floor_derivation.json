@@ -1,0 +1,145 @@
+{
+ "schema_version": 1,
+ "generated_by": "tools/motion_floor_derivation.py",
+ "question": "where should Tectum.motion_floor sit?",
+ "shipped_default": 0.0001,
+ "trials": 14,
+ "settle_steps": 70,
+ "walking": {
+  "n_prey_on_image": 1588,
+  "n_prey_off_image": 666,
+  "median_peak_prey_on_image": 0.0589,
+  "median_peak_prey_off_image": 0.0,
+  "sweep": [
+   {
+    "floor": 0.0001,
+    "recall": 0.6889,
+    "false_alarm": 0.3348,
+    "separation": 0.3541
+   },
+   {
+    "floor": 0.01,
+    "recall": 0.6599,
+    "false_alarm": 0.3108,
+    "separation": 0.3491
+   },
+   {
+    "floor": 0.02,
+    "recall": 0.6322,
+    "false_alarm": 0.2703,
+    "separation": 0.362
+   },
+   {
+    "floor": 0.04,
+    "recall": 0.5724,
+    "false_alarm": 0.2027,
+    "separation": 0.3697
+   },
+   {
+    "floor": 0.06,
+    "recall": 0.4975,
+    "false_alarm": 0.1486,
+    "separation": 0.3488
+   },
+   {
+    "floor": 0.08,
+    "recall": 0.4081,
+    "false_alarm": 0.1021,
+    "separation": 0.306
+   },
+   {
+    "floor": 0.1,
+    "recall": 0.3293,
+    "false_alarm": 0.0706,
+    "separation": 0.2588
+   },
+   {
+    "floor": 0.12,
+    "recall": 0.2651,
+    "false_alarm": 0.0495,
+    "separation": 0.2156
+   },
+   {
+    "floor": 0.15,
+    "recall": 0.1612,
+    "false_alarm": 0.0225,
+    "separation": 0.1387
+   },
+   {
+    "floor": 0.2,
+    "recall": 0.0397,
+    "false_alarm": 0.0015,
+    "separation": 0.0382
+   }
+  ]
+ },
+ "standing_still": {
+  "n_prey_on_image": 891,
+  "n_prey_off_image": 369,
+  "median_peak_prey_on_image": 0.1499,
+  "median_peak_prey_off_image": 0.0751,
+  "sweep": [
+   {
+    "floor": 0.0001,
+    "recall": 0.9989,
+    "false_alarm": 0.9377,
+    "separation": 0.0612
+   },
+   {
+    "floor": 0.01,
+    "recall": 0.9978,
+    "false_alarm": 0.6748,
+    "separation": 0.323
+   },
+   {
+    "floor": 0.02,
+    "recall": 0.9921,
+    "false_alarm": 0.6152,
+    "separation": 0.377
+   },
+   {
+    "floor": 0.04,
+    "recall": 0.9663,
+    "false_alarm": 0.5691,
+    "separation": 0.3972
+   },
+   {
+    "floor": 0.06,
+    "recall": 0.9562,
+    "false_alarm": 0.5447,
+    "separation": 0.4115
+   },
+   {
+    "floor": 0.08,
+    "recall": 0.927,
+    "false_alarm": 0.4851,
+    "separation": 0.442
+   },
+   {
+    "floor": 0.1,
+    "recall": 0.8698,
+    "false_alarm": 0.4255,
+    "separation": 0.4443
+   },
+   {
+    "floor": 0.12,
+    "recall": 0.7744,
+    "false_alarm": 0.3821,
+    "separation": 0.3923
+   },
+   {
+    "floor": 0.15,
+    "recall": 0.4994,
+    "false_alarm": 0.1978,
+    "separation": 0.3016
+   },
+   {
+    "floor": 0.2,
+    "recall": 0.0786,
+    "false_alarm": 0.0108,
+    "separation": 0.0677
+   }
+  ]
+ },
+ "note": "The oracle labels frames and walks the animal into range. It steers nothing whose performance is reported here."
+}

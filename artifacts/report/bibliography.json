@@ -295,10 +295,11 @@
   },
   "Cooper 1996": {
    "cited_by": [
+    "#343",
     "docs/research/gecko_scorecard.md",
     "docs/research/strategy_v1.md"
    ],
-   "count": 2,
+   "count": 3,
    "written_as": [
     "Cooper 1996",
     "Cooper, DePerno & Steele 1996"
@@ -366,10 +367,13 @@
     "#150",
     "#152",
     "#172",
+    "#287",
+    "#292",
+    "#298",
     "strike_duration_s",
     "strike_trigger_distance_m"
    ],
-   "count": 5,
+   "count": 8,
    "written_as": [
     "Delheusy et al. 1995",
     "Delheusy, Brillet & Bels 1995"
@@ -393,13 +397,25 @@
     "Di Nardo 1995"
    ]
   },
-  "Dieringer 1983": {
+  "Dial 1996": {
    "cited_by": [
-    "docs/EYE_SPEC.md"
+    "#302"
    ],
    "count": 1,
    "written_as": [
-    "Dieringer 1983"
+    "Dial & Schwenk 1996"
+   ]
+  },
+  "Dieringer 1983": {
+   "cited_by": [
+    "#272",
+    "docs/EYE_SPEC.md",
+    "docs/research/gecko_scorecard.md"
+   ],
+   "count": 3,
+   "written_as": [
+    "Dieringer 1983",
+    "Dieringer, Cochran & Precht 1983"
    ]
   },
   "Digirolamo 2024": {
@@ -414,9 +430,10 @@
   },
   "Dodt 1961": {
    "cited_by": [
+    "#230",
     "docs/research/no_gecko_and_appearance.md"
    ],
-   "count": 1,
+   "count": 2,
    "written_as": [
     "Dodt & Jessen 1961"
    ]
@@ -766,9 +783,11 @@
   },
   "Hastings 2023": {
    "cited_by": [
+    "#327",
+    "#334",
     "thigmothermy_substrate_correlation"
    ],
-   "count": 1,
+   "count": 3,
    "written_as": [
     "Hastings et al. 2023"
    ]
@@ -952,6 +971,9 @@
   },
   "Jagnandan 2017": {
    "cited_by": [
+    "#295",
+    "#299",
+    "#346",
     "body_mass_kg",
     "calibration_temperature_C",
     "docs/DECISIONS.md",
@@ -968,7 +990,7 @@
     "stride_length_svl_range",
     "walking_speed_m_s_range"
    ],
-   "count": 15,
+   "count": 18,
    "written_as": [
     "Jagnandan & Higham 2017",
     "Jagnandan 2017"
@@ -1292,15 +1314,18 @@
   },
   "Masseck 2008": {
    "cited_by": [
+    "#272",
+    "#277",
     "docs/EYE_SPEC.md",
     "docs/research/best_achievable_brain.md",
     "docs/research/gecko_scorecard.md",
     "docs/research/no_gecko_and_appearance.md"
    ],
-   "count": 4,
+   "count": 6,
    "written_as": [
     "Masseck 2008",
     "Masseck et al. 2008",
+    "Masseck, Roell & Hoffmann 2008",
     "Masseck, Roll & Hoffmann 2008",
     "Masseck, Röll & Hoffmann 2008"
    ]
@@ -1373,6 +1398,25 @@
    "count": 1,
    "written_as": [
     "Meneghini & Hamasaki 1967"
+   ]
+  },
+  "Milsom 1984": {
+   "cited_by": [
+    "#302"
+   ],
+   "count": 1,
+   "written_as": [
+    "Milsom 1984"
+   ]
+  },
+  "Minton 1966": {
+   "cited_by": [
+    "#257",
+    "#264"
+   ],
+   "count": 2,
+   "written_as": [
+    "Minton 1966"
    ]
   },
   "MuscleMimic 2026": {
@@ -1448,6 +1492,15 @@
     "Owaki & Ishiguro 2017"
    ]
   },
+  "Owerkowicz 2001": {
+   "cited_by": [
+    "#302"
+   ],
+   "count": 1,
+   "written_as": [
+    "Owerkowicz 2001"
+   ]
+  },
   "Pazzaglia 2025": {
    "cited_by": [
     "docs/research/best_achievable_brain.md",
@@ -1506,11 +1559,12 @@
   },
   "Prescott 2024": {
    "cited_by": [
+    "#326",
     "#75",
     "docs/BLOCKED.md",
     "docs/research/best_achievable_brain.md"
    ],
-   "count": 3,
+   "count": 4,
    "written_as": [
     "Prescott 2024",
     "Prescott et al. 2024"
@@ -1630,10 +1684,12 @@
   },
   "Russell 2014": {
    "cited_by": [
+    "#337",
     "docs/research/gecko_scorecard.md"
    ],
-   "count": 1,
+   "count": 2,
    "written_as": [
+    "Russell et al. 2014",
     "Russell, Lai, Powell & Higham 2014"
    ]
   },
@@ -1756,6 +1812,15 @@
     "Smeets 1986"
    ]
   },
+  "Smith 1935": {
+   "cited_by": [
+    "#337"
+   ],
+   "count": 1,
+   "written_as": [
+    "Smith 1935"
+   ]
+  },
   "Solomon 2023": {
    "cited_by": [
     "prey_elevation_switch"
@@ -1853,13 +1918,14 @@
   },
   "Vollin 2021": {
    "cited_by": [
+    "#305",
     "docs/research/best_achievable_brain.md",
     "docs/research/strategy_v1.md",
     "strike_peak_acceleration_m_s2",
     "strike_peak_speed_m_s",
     "strike_trigger_distance_m"
    ],
-   "count": 5,
+   "count": 6,
    "written_as": [
     "Vollin & Higham 2021",
     "Vollin 2021"
@@ -2186,6 +2252,14 @@
    "docs/research/beyond_statistics_realism.md"
   ],
   "10.1163/156853895X00361": [
+   "capture_head_drop_m",
+   "feeding_licking_cycle_s",
+   "feeding_licking_gape_deg",
+   "feeding_reduction_cycle_s",
+   "feeding_reduction_gape_deg",
+   "feeding_transport_cycle_s",
+   "feeding_transport_gape_deg",
+   "lower_jaw_length_m",
    "strike_duration_s"
   ],
   "10.1167/9.3.27": [

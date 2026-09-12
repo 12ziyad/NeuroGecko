@@ -82,7 +82,10 @@ def _published(name):
 class Tectum:
     """Retinotopic map in; bearing and salience out."""
 
-    def __init__(self, retina, motion_floor=MOTION_FLOOR,
+    #: INVENTED. Frames the PREY map is differenced across. 1 reproduces the
+    #: shipped behaviour exactly. See Retina.motion_window for the measurement
+    #: that motivates it and the flicker-fusion bound that limits it.
+    def __init__(self, retina, motion_window=3, motion_floor=MOTION_FLOOR,
                  max_target_fraction=MAX_TARGET_FRACTION,
                  subtract_field=True, surround_cells=3,
                  velocity_band=True, elevation_switch=True):
@@ -118,6 +121,19 @@ class Tectum:
         self.v_peak = _published("prey_velocity_peak_deg_s")
         self.v_low = _published("prey_velocity_low_cut_deg_s")
         self.v_high = _published("prey_velocity_high_cut_deg_s")
+        self.motion_window = max(1, int(motion_window))
+        #: Whether the efference copy is multiplied by the window span.
+        #: REFUTED, ledger #231, and this is why it is False. In principle it
+        #: looked obligatory -- self-motion accumulates across the window
+        #: exactly as prey motion does. It is wrong because the difference
+        #: operator SATURATES: once displacement exceeds the feature size,
+        #: |L(t) - L(t-N)| stops growing, for the background and the prey
+        #: alike. Scaling the expectation linearly therefore over-subtracts.
+        #: Measured at window 3: scaled recall 3.8 %, unscaled 15.4 %, and
+        #: unscaled is better on precision too (91.9 % against 90.5 %).
+        #: Kept switchable because the refutation is worth being able to
+        #: reproduce, not because either value is open.
+        self.scale_efference_by_span = False
         self.motion_floor = float(motion_floor)
         self.max_target_fraction = float(max_target_fraction)
         #: Leave this on. Off only in the test that measures what it is worth,
@@ -223,17 +239,36 @@ class Tectum:
             return float((v - self.v_low) / max(self.v_peak - self.v_low, 1e-9))
         return float((self.v_high - v) / max(self.v_high - self.v_peak, 1e-9))
 
-    def elevation_gain(self, row, rows):
+    def elevation_gain(self, row, rows, gaze_pitch_deg=0.0):
         """Below the horizon is food; above it is not.
 
-        Returns 1.0 in the lower half of the visual field and 0.0 in the upper.
-        A hard switch rather than a soft weight, because that is what was
-        measured: the same stimulus produced escape overhead and approach to
-        the side, not a graded blend.
+        Returns 1.0 below the horizon and 0.0 above it. A hard switch rather
+        than a soft weight, because that is what was measured: the same
+        stimulus produced escape overhead and approach to the side, not a
+        graded blend.
+
+        THE HORIZON IS IN THE WORLD, NOT IN THE FRAME, and the first version of
+        this rule could not tell the difference because the head could not
+        move. It can now. Pitching the head down to keep a cricket in view
+        raises that cricket ABOVE the optical axis, and a frame-referenced test
+        then rejects the prey the animal just aimed at. Measured over 1600
+        steps with gaze on: "above the horizon" rejections persisted at every
+        range (102 / 37 / 11) while the animal was looking straight at its food.
+
+        The record already knew this was coming. Part 10, of the two published
+        elevation figures: "Both are consequences of head posture, not a
+        world-frame rule." So the gaze angle is subtracted before the test,
+        which makes the rule mean what the biology means.
+
+        `gaze_pitch_deg` is positive DOWN, and is the animal's own motor
+        command -- not a world reading. An animal knows where it is pointing
+        its own head.
         """
         if rows < 2:
             return 1.0
-        return 1.0 if row >= rows / 2.0 else 0.0
+        camera_deg = self.retina.elevation_of(int(row))
+        world_deg = camera_deg - float(gaze_pitch_deg)
+        return 1.0 if world_deg <= 0.0 else 0.0
 
     def step(self, retina_output, self_motion=None):
         """Returns salience in [0, 1] and the bearing of the best target.
@@ -258,9 +293,22 @@ class Tectum:
         Bearing is signed degrees from the optical axis, negative to the LEFT,
         which is the convention the brainstem's turn channel expects.
         """
-        motion = np.asarray(retina_output["motion"], dtype=float)
+        # The windowed map when asked for, the single-frame map otherwise.
+        # `span` is what the retina ACTUALLY differenced across, which is fewer
+        # than the window while its ring fills.
+        span = 1
+        if self.motion_window > 1 and "motion_windowed" in retina_output:
+            motion = np.asarray(retina_output["motion_windowed"], dtype=float)
+            span = max(1, int(retina_output.get("motion_window_span", 1)))
+        else:
+            motion = np.asarray(retina_output["motion"], dtype=float)
         if self_motion is not None and self.efference_copy:
-            expected = self._expected_flow(motion.shape, self_motion)
+            # SCALED BY THE SPAN. Self-motion accumulates across the window
+            # exactly as prey motion does, so an efference copy computed for
+            # one frame would under-subtract by the same factor the window
+            # buys -- and the gain would be spent on the animal's own walking.
+            expected = self._expected_flow(motion.shape, self_motion) * (
+                span if self.scale_efference_by_span else 1)
             motion = np.clip(motion - expected, 0.0, None)
         raw_peak = float(motion.max()) if motion.size else 0.0
 
@@ -306,12 +354,22 @@ class Tectum:
         local = np.clip(local, 0.0, None)
 
         peak = float(local.max()) if local.size else 0.0
+        # Exposed because the threshold that gates it was never checked against
+        # the noise it exists to reject (#254), and it cannot be checked
+        # without this number.
+        self._peak_local = peak
+        # The whole local-motion map, kept for diagnosis. This is what the
+        # argmax is taken over, and the question "is the cricket visible in it
+        # at all, or is the peak being stolen by noise?" cannot be asked
+        # without it (#255).
+        self._local_map = local
         if peak <= self.motion_floor:
             self.last = {"salience": 0.0, "bearing_deg": 0.0,
-                         "elevation_cell": None}
+                         "elevation_cell": None, "peak_local": peak}
             return 0.0, 0.0
 
         row, column = np.unravel_index(int(np.argmax(local)), local.shape)
+        _peak_local_for_report = peak
         bearing = self.retina.azimuth_of(int(column))
 
         rejected = None
@@ -374,7 +432,9 @@ class Tectum:
                 rejected = ("too slow" if speed <= self.v_low else "too fast")
 
         if self.elevation_switch:
-            g = self.elevation_gain(int(row), int(local.shape[0]))
+            gaze_deg = (float(self_motion.get("gaze_pitch_deg", 0.0))
+                        if self_motion is not None else 0.0)
+            g = self.elevation_gain(int(row), int(local.shape[0]), gaze_deg)
             gain *= g
             if g <= 0.0:
                 rejected = "above the horizon"
@@ -406,7 +466,9 @@ class Tectum:
         # empty world scores near zero and a real object has to actually stand
         # out from its surroundings to score at all.
         salience = float(min(peak / self.salience_scale, 1.0)) * gain
+        elevation_deg = self.retina.elevation_of(int(row))
         self.last = {"salience": round(salience, 6),
+                     "elevation_deg": round(float(elevation_deg), 2),
                      "bearing_deg": round(bearing, 4),
                      "elevation_cell": int(row),
                      "field_subtracted": self.subtract_field,
@@ -478,13 +540,14 @@ class Eye:
     """
 
     def __init__(self, fovy_deg=70.0, pixels=64, cells=16,
-                 render_pixels=None):
+                 render_pixels=None, motion_window=3):
         from brain.retina import Retina
         from brain.pretectum import Pretectum
         self.retina = Retina(fovy_deg=fovy_deg, pixels=pixels, cells=cells,
-                             render_pixels=render_pixels)
+                             render_pixels=render_pixels,
+                             motion_window=motion_window)
         self.pretectum = Pretectum(self.retina)
-        self.tectum = Tectum(self.retina)
+        self.tectum = Tectum(self.retina, motion_window=motion_window)
         self.last = {}
 
     def reset(self):
@@ -504,7 +567,20 @@ class Eye:
         gaze = self.pretectum.step(retina_output, dt_s)
         self.last = {
             "prey_salience": salience,
-            "prey_bearing_deg": bearing,
+            # None when nothing was reported, NOT 0.0 (#271). A bearing of 0.0
+            # is a perfectly good bearing -- it means "directly ahead" -- so
+            # returning it for "I saw nothing" made silence indistinguishable
+            # from a target dead in front. Everything downstream was already
+            # written to guard with `salience > 0`, which is why this never bit
+            # until a new consumer read the bearing without that guard and
+            # taught itself that prey was straight ahead on every silent frame.
+            # `prey_elevation_deg` below was always None-gated; this now matches.
+            "prey_bearing_deg": (bearing if salience > 0.0 else None),
+            # Where the target sits VERTICALLY in the frame. None when nothing
+            # was reported. This is what lets the head be aimed by the eye
+            # instead of by the physics engine.
+            "prey_elevation_deg": (self.tectum.last.get("elevation_deg")
+                                   if salience > 0.0 else None),
             "gaze_command_deg_s": gaze,
         }
         return dict(self.last)

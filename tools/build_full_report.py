@@ -532,7 +532,30 @@ OPEN = [
 
 
 # ==================================================================== assembly
+def handoff_sections():
+    """Parts 19-27: the animal as it stands, and the brief for the next session.
+
+    Kept in its own module because it reads the live model rather than the
+    history, and because a 1500-line generator is already at its limit. If the
+    module is missing the report still builds; it just stops at Part 18.
+    """
+    try:
+        if str(REPO) not in sys.path:
+            sys.path.insert(0, str(REPO))
+        from tools.report_handoff import sections
+    except ImportError:
+        try:
+            from report_handoff import sections           # run from tools/
+        except ImportError as exc:
+            print(f"  handoff sections unavailable: {exc}")
+            return ""
+    text = sections()
+    print(f"handoff: parts 19-27  ({len(text)/1024:.0f} KB)")
+    return text
+
+
 def build():
+    handoff_html = handoff_sections()
     led = json.load(open(OUT / "ledger.json", encoding="utf-8"))
     commits = json.load(open(OUT / "commits.json", encoding="utf-8"))
     reg = json.load(open(OUT / "registry.json", encoding="utf-8"))
@@ -964,7 +987,17 @@ ul.brief li { font-size:9.4pt; color:#454b54; margin-bottom:4px; }
     <div><b>14</b> The bibliography — {len(cites)} works, {len(bib['dois'])} DOIs</div>
     <div><b>15</b> What cannot be built honestly</div>
     <div><b>16</b> What must be checked or clarified</div>
-    <div><b>17</b> Every commit, and a glossary</div>
+    <div><b>17</b> Every commit</div>
+    <div><b>18</b> The analysis brief that goes with this document</div>
+    <div><b>19</b> The animal as it stands today — census, every gram, every joint</div>
+    <div><b>20</b> The fourteen morphology gates, and where each interval comes from</div>
+    <div><b>21</b> Every proportion measured on the body</div>
+    <div><b>22</b> The surface — skin, eye, tongue, and what it cost the physics</div>
+    <div><b>23</b> The agents, and what survived them</div>
+    <div><b>24</b> The six behaviour channels, measured</div>
+    <div><b>25</b> The walker that is accepted, and the one that is not</div>
+    <div><b>26</b> What is pending: the four behaviour items</div>
+    <div><b>27</b> The brief for the next session, and a glossary</div>
   </div>
   <div class="hair"></div>
   <h3>How to read the colour</h3>
@@ -1436,6 +1469,8 @@ ul.brief li { font-size:9.4pt; color:#454b54; margin-bottom:4px; }
   <div class="briefbox">{brief_html}</div>
 </section>
 
+{handoff_html}
+
 <section>
   <h2>Glossary — every term this document uses</h2>
   <div class="rule"></div>
@@ -1460,6 +1495,11 @@ ul.brief li { font-size:9.4pt; color:#454b54; margin-bottom:4px; }
 
 
 def to_pdf(html_path, pdf_path):
+    # Headless Chrome resolves --print-to-pdf against its OWN working
+    # directory, not the shell's, and fails with "cannot find the path" on a
+    # relative one. Resolve it here so the caller can pass either.
+    pdf_path = str(pathlib.Path(pdf_path).resolve())
+    pathlib.Path(pdf_path).parent.mkdir(parents=True, exist_ok=True)
     for exe in CHROME:
         if not pathlib.Path(exe).exists():
             continue

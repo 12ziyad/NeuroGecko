@@ -1,0 +1,182 @@
+{
+ "schema_version": 1,
+ "generated_by": "tools/oracle_free_diagnosis.py",
+ "question": "with the oracle off, WHY is the prey never on the image?",
+ "controller": "oracle",
+ "seed": 2,
+ "steps": 1200,
+ "flow_gain_yaw": 0.006,
+ "motion_floor": 0.04,
+ "camera_half_angle_deg": {
+  "horizontal": 35.0,
+  "vertical": 35.0
+ },
+ "frames": {
+  "prey_on_image": 450,
+  "behind_camera": 336,
+  "outside_azimuth_only": 103,
+  "outside_elevation_only": 93,
+  "outside_both": 217
+ },
+ "prey_geometry": {
+  "median_abs_azimuth_deg": 28.02,
+  "median_elevation_deg": 11.77,
+  "median_range_mm": 113.3,
+  "median_angular_size_deg_when_on_image": 6.171,
+  "abs_azimuth_histogram_deg": {
+   "0": 309,
+   "20": 162,
+   "40": 262,
+   "60": 83,
+   "80": 48
+  }
+ },
+ "eye_reports": {
+  "definitions": {
+   "aimed_at_prey": "report within 10.0 deg of the prey's true bearing -- the eye FOUND it",
+   "prey_merely_on_image": "the older, looser definition every previous recall number in this project used"
+  },
+  "reports_aimed_at_prey": 132,
+  "reports_while_prey_merely_on_image": 215,
+  "total": 449,
+  "true_positives": 132,
+  "false_alarms": 317,
+  "false_alarm_rate_per_frame": 0.2642,
+  "false_alarm_bearing_histogram_deg": {
+   "-40": 18,
+   "-20": 63,
+   "0": 92,
+   "20": 92,
+   "40": 52
+  }
+ },
+ "accumulator": {
+  "steps_committed": 1027,
+  "steps_committed_while_prey_actually_visible": 451
+ },
+ "by_range": {
+  "0-50mm": {
+   "frames": 239,
+   "prey_on_image": 100,
+   "true_reports": 24,
+   "false_reports": 85,
+   "on_image_fraction": 0.4184,
+   "aimed_recall_when_on_image": 0.24
+  },
+  "50-100mm": {
+   "frames": 155,
+   "prey_on_image": 77,
+   "true_reports": 31,
+   "false_reports": 50,
+   "on_image_fraction": 0.4968,
+   "aimed_recall_when_on_image": 0.4026
+  },
+  "100-150mm": {
+   "frames": 146,
+   "prey_on_image": 66,
+   "true_reports": 22,
+   "false_reports": 45,
+   "on_image_fraction": 0.4521,
+   "aimed_recall_when_on_image": 0.3333
+  },
+  "150-250mm": {
+   "frames": 228,
+   "prey_on_image": 152,
+   "true_reports": 50,
+   "false_reports": 56,
+   "on_image_fraction": 0.6667,
+   "aimed_recall_when_on_image": 0.3289
+  },
+  "250-400mm": {
+   "frames": 96,
+   "prey_on_image": 55,
+   "true_reports": 5,
+   "false_reports": 15,
+   "on_image_fraction": 0.5729,
+   "aimed_recall_when_on_image": 0.0909
+  }
+ },
+ "by_eccentricity": {
+  " 0- 5deg": {
+   "frames_prey_on_image": 198,
+   "aimed_reports": 60,
+   "aimed_recall": 0.303
+  },
+  " 5-10deg": {
+   "frames_prey_on_image": 111,
+   "aimed_reports": 40,
+   "aimed_recall": 0.3604
+  },
+  "10-15deg": {
+   "frames_prey_on_image": 57,
+   "aimed_reports": 17,
+   "aimed_recall": 0.2982
+  },
+  "15-20deg": {
+   "frames_prey_on_image": 16,
+   "aimed_reports": 2,
+   "aimed_recall": 0.125
+  },
+  "20-25deg": {
+   "frames_prey_on_image": 26,
+   "aimed_reports": 3,
+   "aimed_recall": 0.1154
+  },
+  "25-30deg": {
+   "frames_prey_on_image": 21,
+   "aimed_reports": 2,
+   "aimed_recall": 0.0952
+  },
+  "30-36deg": {
+   "frames_prey_on_image": 21,
+   "aimed_reports": 7,
+   "aimed_recall": 0.3333
+  }
+ },
+ "per_fixation": {
+  "fixations_total": 0,
+  "fixations_with_prey_on_image": 0,
+  "prey_present": {
+   "fixations": 0
+  },
+  "prey_absent": {
+   "fixations": 0
+  }
+ },
+ "fixation_evidence": {
+  "quorum_derivation": {
+   "false_alarms_per_frame": 0.19,
+   "fixate_steps": 50,
+   "agree_deg": 6.0,
+   "field_deg": 70.0,
+   "expected_noise_in_tolerance_band": 1.6286,
+   "independent_bands_searched": 5.83,
+   "p_chance_target": 0.01,
+   "quorum": 7,
+   "p_chance_achieved": 0.008577
+  },
+  "fixations": 0,
+  "commit_events": 0,
+  "commit_events_with_prey_really_visible": 0,
+  "commit_precision": null,
+  "median_bearing_error_deg_when_right": null
+ },
+ "search_state_counts": {
+  "oracle": 1200
+ },
+ "by_state": {
+  "oracle": {
+   "frames": 1200,
+   "prey_on_image": 450,
+   "true_reports": 132,
+   "false_reports": 317,
+   "false_alarms_per_frame": 0.2642,
+   "recall_when_on_image": 0.2933
+  }
+ },
+ "gaze_pitch_deg": {
+  "median": 24.36,
+  "min": 0.0,
+  "max": 64.07
+ }
+}

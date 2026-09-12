@@ -160,7 +160,7 @@ class CPGResidualController:
             # Session 3f: the axial channels are part of the fitted lab set, so
             # they come from the registry too rather than from constructor
             # defaults. Legacy still uses its constructor values untouched.
-            for name in ("spine_amp", "tail_amp", "tail_phase_lag"):
+            for name in ("spine_amp", "spine_phase", "tail_amp", "tail_phase_lag"):
                 if name in values:
                     setattr(self, name, float(values[name]))
 
@@ -279,6 +279,9 @@ class CPGResidualController:
 
         # residual scale vector: global default, then front-lift lock, then per-joint caps
         self.res_scale_vec = np.full(nu, self.residual_scale, dtype=float)
+        # Group-2 actuators (the jaw) are the brain's, not the policy's: the
+        # policy's residual never touches them (#286).
+        self.res_scale_vec[model.actuator_group == 2] = 0.0
         if self.lock_front_lift:
             for aid in self.front_lift_ids:
                 self.res_scale_vec[aid] = self.front_lift_residual_scale
@@ -425,9 +428,48 @@ class CPGResidualController:
                 ctrl[self._tail_r] = -self.tail_amp * self.half[self._tail_r] * wt
         return ctrl
 
+    def standing_ctrl(self):
+        """The mean posture over one gait cycle: what this animal looks like
+        holding still.
+
+        Computed from the gait the project already ships, by averaging the base
+        pattern over a whole cycle, so it introduces no new number and nothing
+        to publish. Cached, because it does not change.
+        """
+        if getattr(self, "_stand_ctrl", None) is None:
+            n = 64
+            acc = None
+            for k in range(n):
+                c = self.base_ctrl(k / (n * max(self.freq, 1e-9)),
+                                   front_contact=None, heading_error=0.0)
+                acc = np.asarray(c, dtype=float) if acc is None else acc + c
+            self._stand_ctrl = acc / float(n)
+        return self._stand_ctrl
+
     def compute(self, action, t, front_contact=None, heading_error=0.0):
         action = np.asarray(action, dtype=float).reshape(-1)
         base = self.base_ctrl(t, front_contact=front_contact, heading_error=heading_error)
+        # LOCOMOTOR DRIVE: the off switch this animal never had (#253).
+        #
+        # Measured: `engage` in the brain's action vector changed the walker's
+        # GOAL DISTANCE and nothing else, and the goal is re-placed a fixed
+        # span ahead of the animal every step -- a carrot on a stick. At engage
+        # +1 and engage -1 the animal travelled 222.8 mm in 300 steps, the same
+        # number to one decimal place. Pinning the goal to the animal's own
+        # position changed nothing either: the CPG is a fixed-frequency
+        # oscillator and the body walks whatever the brain asks. Every "stand
+        # still and look" behaviour in brain/search.py was walking.
+        #
+        # A gecko standing still is not walking slowly, so NOTHING the gates
+        # measure constrains it -- the lab profile's frequency, stance ratio
+        # and excursions are all measured from video of an animal in motion.
+        # The standing posture is the cycle mean of the gait already shipped,
+        # so no new number enters. At drive 1.0, the default, `base` is
+        # untouched and every gate result is bit-identical.
+        drive = float(getattr(self, "locomotor_drive", 1.0))
+        if drive < 1.0:
+            stand = self.standing_ctrl()
+            base = stand + max(drive, 0.0) * (np.asarray(base, dtype=float) - stand)
         residual = action * self.res_scale_vec * self.half
         ctrl = base + residual
         ctrl = np.where(self.lim, np.clip(ctrl, self.lo, self.hi), ctrl)

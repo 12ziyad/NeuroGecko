@@ -65,7 +65,11 @@ class WorldGeneration(unittest.TestCase):
 
     def test_prey_is_mocap_so_it_never_enters_the_state_vector(self):
         world, _ = build(self.source, prey_radius=.009)
-        path = REPO / ".test_world_mocap.xml"
+        # Written beside the real models: a model's `texturedir` is relative to
+        # the file it is loaded from, so a copy parked at the repository root
+        # cannot find the skin texture and fails on an asset rather than on
+        # anything this test is about.
+        path = BODY.parent / ".test_world_mocap.xml"
         try:
             path.write_text(world, encoding="utf-8")
             body = mujoco.MjModel.from_xml_path(str(BODY))

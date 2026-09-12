@@ -1,0 +1,512 @@
+{
+ "world_v1": {
+  "path": "morphology/gecko_world_v1.xml",
+  "total_mass_g": 38.0,
+  "bodies": 30,
+  "geoms": 139,
+  "joints": 38,
+  "hinges": 36,
+  "slides": 1,
+  "free": 1,
+  "actuators": 30,
+  "sensors": 93,
+  "sites": 23,
+  "nq": 44,
+  "nv": 43,
+  "meshes": 29,
+  "textures": 8,
+  "materials": 15,
+  "skins": 1,
+  "skin_vertices": 21663,
+  "skin_bones": 23,
+  "collision_geoms": 48,
+  "visual_geoms": 89,
+  "per_body_mass_mg": {
+   "trunk_middle": 4895.584,
+   "trunk_anterior": 5995.156,
+   "neck": 1728.126,
+   "head": 4519.956,
+   "eyelid_L": 10.854,
+   "eyelid_R": 10.854,
+   "gular": 41.182,
+   "jaw": 636.381,
+   "tongue": 10.524,
+   "humerus_L": 914.952,
+   "forearm_L": 617.686,
+   "manus_L": 165.044,
+   "humerus_R": 914.952,
+   "forearm_R": 617.686,
+   "manus_R": 165.044,
+   "trunk_posterior": 3997.685,
+   "pelvis": 2096.93,
+   "femur_L": 647.137,
+   "tibia_L": 345.774,
+   "pes_L": 157.791,
+   "femur_R": 647.137,
+   "tibia_R": 345.774,
+   "pes_R": 157.791,
+   "tail1": 4281.913,
+   "tail2": 2426.62,
+   "tail3": 1292.167,
+   "tail4": 303.568,
+   "tail5": 55.733
+  },
+  "actuator_names": [
+   "hip_sprawl_L",
+   "hip_proret_L",
+   "hip_rot_L",
+   "knee_L",
+   "ankle_L",
+   "hip_sprawl_R",
+   "hip_proret_R",
+   "hip_rot_R",
+   "knee_R",
+   "ankle_R",
+   "shoulder_sprawl_L",
+   "shoulder_proret_L",
+   "elbow_L",
+   "shoulder_sprawl_R",
+   "shoulder_proret_R",
+   "elbow_R",
+   "neck_yaw",
+   "neck_pitch",
+   "head_yaw",
+   "head_pitch",
+   "eyelid_L",
+   "eyelid_R",
+   "tongue",
+   "gular",
+   "jaw",
+   "spine_bend",
+   "spine_pitch",
+   "tail_bend_L",
+   "tail_bend_R",
+   "tail_lift"
+  ],
+  "joint_table": [
+   {
+    "name": "root",
+    "type": 0,
+    "range": null,
+    "units": "",
+    "damping": 0.0
+   },
+   {
+    "name": "spine_lat_1",
+    "type": 3,
+    "range": [
+     -25.0,
+     25.0
+    ],
+    "units": "deg",
+    "damping": 0.006
+   },
+   {
+    "name": "spine_pitch",
+    "type": 3,
+    "range": [
+     -10.0,
+     10.0
+    ],
+    "units": "deg",
+    "damping": 0.006
+   },
+   {
+    "name": "neck_yaw",
+    "type": 3,
+    "range": [
+     -40.0,
+     40.0
+    ],
+    "units": "deg",
+    "damping": 0.005
+   },
+   {
+    "name": "neck_pitch",
+    "type": 3,
+    "range": [
+     -30.0,
+     30.0
+    ],
+    "units": "deg",
+    "damping": 0.005
+   },
+   {
+    "name": "head_yaw",
+    "type": 3,
+    "range": [
+     -30.0,
+     30.0
+    ],
+    "units": "deg",
+    "damping": 0.005
+   },
+   {
+    "name": "head_pitch",
+    "type": 3,
+    "range": [
+     -20.0,
+     20.0
+    ],
+    "units": "deg",
+    "damping": 0.005
+   },
+   {
+    "name": "eyelid_L",
+    "type": 3,
+    "range": [
+     -75.0,
+     0.0
+    ],
+    "units": "deg",
+    "damping": 0.005
+   },
+   {
+    "name": "eyelid_R",
+    "type": 3,
+    "range": [
+     0.0,
+     75.0
+    ],
+    "units": "deg",
+    "damping": 0.005
+   },
+   {
+    "name": "gular",
+    "type": 3,
+    "range": [
+     -14.0,
+     6.0
+    ],
+    "units": "deg",
+    "damping": 0.005
+   },
+   {
+    "name": "jaw",
+    "type": 3,
+    "range": [
+     0.0,
+     40.0
+    ],
+    "units": "deg",
+    "damping": 0.005
+   },
+   {
+    "name": "tongue",
+    "type": 2,
+    "range": [
+     0.0,
+     0.012
+    ],
+    "units": "m",
+    "damping": 0.002
+   },
+   {
+    "name": "shoulder_sprawl_L",
+    "type": 3,
+    "range": [
+     -35.0,
+     35.0
+    ],
+    "units": "deg",
+    "damping": 0.005
+   },
+   {
+    "name": "shoulder_proret_L",
+    "type": 3,
+    "range": [
+     -40.0,
+     40.0
+    ],
+    "units": "deg",
+    "damping": 0.005
+   },
+   {
+    "name": "elbow_L",
+    "type": 3,
+    "range": [
+     -60.0,
+     60.0
+    ],
+    "units": "deg",
+    "damping": 0.005
+   },
+   {
+    "name": "wrist_L",
+    "type": 3,
+    "range": [
+     -35.0,
+     35.0
+    ],
+    "units": "deg",
+    "damping": 0.003
+   },
+   {
+    "name": "shoulder_sprawl_R",
+    "type": 3,
+    "range": [
+     -35.0,
+     35.0
+    ],
+    "units": "deg",
+    "damping": 0.005
+   },
+   {
+    "name": "shoulder_proret_R",
+    "type": 3,
+    "range": [
+     -40.0,
+     40.0
+    ],
+    "units": "deg",
+    "damping": 0.005
+   },
+   {
+    "name": "elbow_R",
+    "type": 3,
+    "range": [
+     -60.0,
+     60.0
+    ],
+    "units": "deg",
+    "damping": 0.005
+   },
+   {
+    "name": "wrist_R",
+    "type": 3,
+    "range": [
+     -35.0,
+     35.0
+    ],
+    "units": "deg",
+    "damping": 0.003
+   },
+   {
+    "name": "spine_lat_2",
+    "type": 3,
+    "range": [
+     -25.0,
+     25.0
+    ],
+    "units": "deg",
+    "damping": 0.006
+   },
+   {
+    "name": "spine_lat_3",
+    "type": 3,
+    "range": [
+     -25.0,
+     25.0
+    ],
+    "units": "deg",
+    "damping": 0.007
+   },
+   {
+    "name": "hip_sprawl_L",
+    "type": 3,
+    "range": [
+     -35.0,
+     35.0
+    ],
+    "units": "deg",
+    "damping": 0.005
+   },
+   {
+    "name": "hip_proret_L",
+    "type": 3,
+    "range": [
+     -45.0,
+     45.0
+    ],
+    "units": "deg",
+    "damping": 0.005
+   },
+   {
+    "name": "hip_rot_L",
+    "type": 3,
+    "range": [
+     -15.0,
+     15.0
+    ],
+    "units": "deg",
+    "damping": 0.005
+   },
+   {
+    "name": "knee_L",
+    "type": 3,
+    "range": [
+     -60.0,
+     60.0
+    ],
+    "units": "deg",
+    "damping": 0.005
+   },
+   {
+    "name": "ankle_L",
+    "type": 3,
+    "range": [
+     -45.0,
+     45.0
+    ],
+    "units": "deg",
+    "damping": 0.005
+   },
+   {
+    "name": "hip_sprawl_R",
+    "type": 3,
+    "range": [
+     -35.0,
+     35.0
+    ],
+    "units": "deg",
+    "damping": 0.005
+   },
+   {
+    "name": "hip_proret_R",
+    "type": 3,
+    "range": [
+     -45.0,
+     45.0
+    ],
+    "units": "deg",
+    "damping": 0.005
+   },
+   {
+    "name": "hip_rot_R",
+    "type": 3,
+    "range": [
+     -15.0,
+     15.0
+    ],
+    "units": "deg",
+    "damping": 0.005
+   },
+   {
+    "name": "knee_R",
+    "type": 3,
+    "range": [
+     -60.0,
+     60.0
+    ],
+    "units": "deg",
+    "damping": 0.005
+   },
+   {
+    "name": "ankle_R",
+    "type": 3,
+    "range": [
+     -45.0,
+     45.0
+    ],
+    "units": "deg",
+    "damping": 0.005
+   },
+   {
+    "name": "tail_yaw_1",
+    "type": 3,
+    "range": [
+     -30.0,
+     30.0
+    ],
+    "units": "deg",
+    "damping": 0.012
+   },
+   {
+    "name": "tail_lift",
+    "type": 3,
+    "range": [
+     -25.0,
+     25.0
+    ],
+    "units": "deg",
+    "damping": 0.012
+   },
+   {
+    "name": "tail_yaw_2",
+    "type": 3,
+    "range": [
+     -30.0,
+     30.0
+    ],
+    "units": "deg",
+    "damping": 0.01
+   },
+   {
+    "name": "tail_yaw_3",
+    "type": 3,
+    "range": [
+     -30.0,
+     30.0
+    ],
+    "units": "deg",
+    "damping": 0.01
+   },
+   {
+    "name": "tail_yaw_4",
+    "type": 3,
+    "range": [
+     -30.0,
+     30.0
+    ],
+    "units": "deg",
+    "damping": 0.01
+   },
+   {
+    "name": "tail_yaw_5",
+    "type": 3,
+    "range": [
+     -30.0,
+     30.0
+    ],
+    "units": "deg",
+    "damping": 0.01
+   }
+  ]
+ },
+ "lab_v2": {
+  "path": "morphology/gecko_body_lab_v2.xml",
+  "total_mass_g": 38.0,
+  "bodies": 29,
+  "geoms": 138,
+  "joints": 38,
+  "hinges": 36,
+  "slides": 1,
+  "free": 1,
+  "actuators": 30,
+  "sensors": 93,
+  "sites": 23,
+  "nq": 44,
+  "nv": 43,
+  "meshes": 29,
+  "textures": 8,
+  "materials": 14,
+  "skins": 1,
+  "skin_vertices": 21663,
+  "skin_bones": 23,
+  "collision_geoms": 48,
+  "visual_geoms": 89
+ },
+ "source_r": {
+  "path": "morphology/gecko_body_r.xml",
+  "total_mass_g": 61.2,
+  "bodies": 29,
+  "geoms": 138,
+  "joints": 38,
+  "hinges": 36,
+  "slides": 1,
+  "free": 1,
+  "actuators": 30,
+  "sensors": 93,
+  "sites": 23,
+  "nq": 44,
+  "nv": 43,
+  "meshes": 29,
+  "textures": 8,
+  "materials": 14,
+  "skins": 1,
+  "skin_vertices": 21663,
+  "skin_bones": 23,
+  "collision_geoms": 48,
+  "visual_geoms": 89
+ }
+}

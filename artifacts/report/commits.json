@@ -1186,5 +1186,16 @@
   "removed": 5,
   "data_files": 27,
   "data_added": 7584
+ },
+ {
+  "hash": "f79fca8",
+  "full": "f79fca8983f34fbc301447c205a75891436d7d57",
+  "date": "2026-09-11",
+  "subject": "Session 11b: regenerate the report after the new ledger rows landed",
+  "files": 1,
+  "added": 4,
+  "removed": 2,
+  "data_files": 7,
+  "data_added": 36
  }
 ]

@@ -212,7 +212,10 @@ class RecorderIntegrationTests(unittest.TestCase):
             b.reset(seed=7)
             recorder = TraceRecorder(a)
             recorder.record()
-            self.assertEqual(len(recorder.metadata["hinge_names"]), 32)
+            # 35 since #304: 32 walking/posture hinges + jaw, eyelids, gular.
+            # 36 since #343: the one eyelids hinge became eyelid_L and
+            # eyelid_R. (The tongue is a slide, not a hinge, so not counted.)
+            self.assertEqual(len(recorder.metadata["hinge_names"]), 36)
             self.assertGreater(recorder.metadata["svl_m"], .10)
             before = a.data.qpos.copy()
             recorder.record()

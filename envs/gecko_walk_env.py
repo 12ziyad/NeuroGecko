@@ -28,6 +28,12 @@ from gymnasium import spaces
 
 from envs.cpg_residual_controller import CPGResidualController
 from rewards.gait_prior import LateralSequenceCPG
+
+#: Hind-leg push-off amplitude during a strike, as a fraction of each joint's
+#: travel. INVENTED -- no lunge kinematics have been published for this species,
+#: and the same-family peak speed (0.57-0.85 m/s, Vollin & Higham 2021) is the
+#: thing this is measured AGAINST, never the thing it is fitted to.
+LUNGE_EXTEND = 0.55
 from common.energetics import actuator_work
 
 REPO = Path(__file__).resolve().parent.parent
@@ -189,6 +195,8 @@ class GeckoWalkEnv(gym.Env):
         sid = lambda n: mujoco.mj_name2id(M, O.mjOBJ_SENSOR, n)
         self._sid = {n: sid(n) for n in (_QP + _QV + _TENDON_P + _TENDON_V
                                          + _FEET + _BELLY + ["up_trunk", "gyro_trunk", "vel_trunk"])}
+        # The head site the camera sits on. Used for head_velocity() below.
+        self._head_site_id = mujoco.mj_name2id(M, O.mjOBJ_SITE, "head_site")
         self._foot_site_id = {
             foot: mujoco.mj_name2id(M, O.mjOBJ_SITE, site)
             for foot, site in _FOOT_SITE_BY_LABEL.items()
@@ -197,6 +205,41 @@ class GeckoWalkEnv(gym.Env):
         self.act_low = M.actuator_ctrlrange[:, 0].copy()
         self.act_high = M.actuator_ctrlrange[:, 1].copy()
         self.nu = M.nu
+        # THE POLICY'S ACTION IS NOT THE ACTUATOR COUNT (#286). Actuators in
+        # MuJoCo group 0 belong to the walker and are what every checkpoint was
+        # trained on; group 2 is the brain's -- the jaw -- and is driven by
+        # `_apply_jaw`, never by the policy. On a body with no group-2
+        # actuators `nu_policy == nu` and nothing here changes.
+        self._policy_act = np.flatnonzero(M.actuator_group == 0)
+        self.nu_policy = int(len(self._policy_act))
+        import mujoco as _mj
+        self._jaw_act = _mj.mj_name2id(M, _mj.mjtObj.mjOBJ_ACTUATOR, "jaw")
+        #: Commanded gape, radians. 0.0 = closed. Set by the brain's strike.
+        self.jaw_rad = 0.0
+        #: Commanded eyelid closure, radians. 0.0 = open. Set by the brain.
+        self.eyelid_rad = 0.0
+        #: Commanded throat (gular) angle, radians. Set by the breathing pump.
+        self.gular_rad = 0.0
+        self.tongue_m = 0.0   # tongue protrusion, metres (#343)
+        #: Hindlimb push-off, 0..1, during a strike. Set by the brain's strike.
+        self.lunge = 0.0
+        # One actuator per lid since #343: each rolls about the head's long
+        # axis, the left in the negative sense and the right in the positive,
+        # so one commanded angle is applied with opposite signs. The old single
+        # "eyelids" actuator is looked up too so an unsplit body still works.
+        self._eyelid_act = _mj.mj_name2id(M, _mj.mjtObj.mjOBJ_ACTUATOR, "eyelids")
+        self._eyelid_acts = [
+            (_mj.mj_name2id(M, _mj.mjtObj.mjOBJ_ACTUATOR, "eyelid_L"), -1.0),
+            (_mj.mj_name2id(M, _mj.mjtObj.mjOBJ_ACTUATOR, "eyelid_R"), +1.0),
+        ]
+        self._tongue_act = _mj.mj_name2id(M, _mj.mjtObj.mjOBJ_ACTUATOR, "tongue")
+        self._gular_act = _mj.mj_name2id(M, _mj.mjtObj.mjOBJ_ACTUATOR, "gular")
+        self._lunge_ids = {}
+        for _n in ("hip_proret_L", "hip_proret_R", "knee_L", "knee_R",
+                   "ankle_L", "ankle_R"):
+            _i = _mj.mj_name2id(M, _mj.mjtObj.mjOBJ_ACTUATOR, _n)
+            if _i >= 0:
+                self._lunge_ids[_n] = _i
         self.control_dt = self.dt
         self._cpg_t = 0.0
         self._last_cpg_command_time_s = 0.0
@@ -235,6 +278,14 @@ class GeckoWalkEnv(gym.Env):
         mujoco.mj_forward(M, self.data)
         self._prev_action = np.zeros(self.nu)
         self._ctrl = np.zeros(self.nu)
+        #: Commanded downward gaze, RADIANS, positive = look down. 0.0 is
+        #: exactly the shipped behaviour: the CPG leaves neck and head at
+        #: neutral and this writes nothing. Set by the brain from the EYE's
+        #: own reported elevation -- never from the prey's true position.
+        self.gaze_pitch_rad = 0.0
+        self.gaze_yaw_rad = 0.0
+        #: 1.0 walks, 0.0 stands. See CPGResidualController.compute.
+        self.locomotor_drive = 1.0
         self._step = 0
         self._cpg_t = 0.0
         self.target = np.array([1.0, 0.0])
@@ -247,7 +298,7 @@ class GeckoWalkEnv(gym.Env):
         self._work_prev_xy = self.data.xpos[self._trunk, :2].copy()
         obs = self._obs()
         self.observation_space = spaces.Box(-np.inf, np.inf, obs.shape, np.float32)
-        self.action_space = spaces.Box(-1.0, 1.0, (self.nu,), np.float32)
+        self.action_space = spaces.Box(-1.0, 1.0, (self.nu_policy,), np.float32)
 
         self.reward_fn = WalkReward(resolved_reward_cfg)
         self._renderer = None
@@ -297,6 +348,211 @@ class GeckoWalkEnv(gym.Env):
         }
 
     # ---- sensor access ----------------------------------------------------
+    #: Actuator indices for the two pitch joints, resolved once. Both are
+    #: position servos already present in the body and driven by nothing: the
+    #: CPG writes the whole control vector and leaves them at neutral.
+    def _pitch_actuators(self):
+        if getattr(self, "_pitch_idx", None) is None:
+            import mujoco
+            idx = {}
+            for name in ("neck_pitch", "head_pitch"):
+                i = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_ACTUATOR, name)
+                if i >= 0:
+                    idx[name] = i
+            self._pitch_idx = idx
+        return self._pitch_idx
+
+    def _yaw_actuators(self):
+        if getattr(self, "_yaw_idx", None) is None:
+            import mujoco
+            idx = {}
+            for name in ("neck_yaw", "head_yaw"):
+                i = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_ACTUATOR, name)
+                if i >= 0:
+                    idx[name] = i
+            self._yaw_idx = idx
+        return self._yaw_idx
+
+    def _apply_gaze_yaw(self):
+        """Turn the head left or right by the commanded angle.
+
+        Exactly the pitch routine with a different pair of joints, and for the
+        same reason: the morphology carries neck_yaw at +-40 deg and head_yaw at
+        +-30 deg, seventy degrees of look-around that nothing in this project
+        has ever commanded. tools/oracle_free_diagnosis.py measured the cost of
+        that: with the prey-position oracle off, the prey sat BEHIND the camera
+        on 581 of 600 frames. The animal had no way to look anywhere but where
+        its body pointed.
+
+        UNPUBLISHED. No head-yaw scan amplitude, rate or dwell has been measured
+        in *Eublepharis macularius*. What is published is that the head moves
+        during a capture at all -- Delheusy, Brillet & Bels 1995 measured about
+        8 mm of horizontal head translation -- and that is a capture, not a
+        search. The controller is INVENTED and says so.
+        """
+        if not self.gaze_yaw_rad:
+            return
+        idx = self._yaw_actuators()
+        if not idx:
+            return
+        spans = {n: float(self.act_high[i] - self.act_low[i]) for n, i in idx.items()}
+        total = sum(spans.values())
+        if total <= 0.0:
+            return
+        for n, i in idx.items():
+            want = float(self.gaze_yaw_rad) * (spans[n] / total)
+            self._ctrl[i] = float(np.clip(want, self.act_low[i], self.act_high[i]))
+
+    def _apply_eyelids(self):
+        """Close the eyes by the commanded angle. No-op on a lidless body.
+
+        PUBLISHED, and it is the reason this joint exists at all: Eublepharidae
+        are the EYELID geckos -- alone among Gekkota they have movable eyelids
+        instead of a fused transparent spectacle. What is NOT published, for
+        this species or for any lizard, is a blink rate, a blink duration or a
+        lid excursion, and the session-12 literature sweep closed that search
+        rather than filling it. Whoever commands this angle owns that gap.
+        """
+        if self._eyelid_act >= 0:
+            i = self._eyelid_act
+            self._ctrl[i] = float(np.clip(self.eyelid_rad, self.act_low[i], self.act_high[i]))
+        for i, sign in self._eyelid_acts:
+            if i >= 0:
+                self._ctrl[i] = float(np.clip(sign * self.eyelid_rad,
+                                              self.act_low[i], self.act_high[i]))
+
+    def _apply_tongue(self):
+        """Slide the tongue out by the commanded distance. No-op without one."""
+        if self._tongue_act < 0:
+            return
+        i = self._tongue_act
+        self._ctrl[i] = float(np.clip(self.tongue_m, self.act_low[i], self.act_high[i]))
+
+    def _apply_gular(self):
+        """Move the throat floor. No-op on a body without one."""
+        if self._gular_act < 0:
+            return
+        i = self._gular_act
+        self._ctrl[i] = float(np.clip(self.gular_rad, self.act_low[i], self.act_high[i]))
+
+    def _apply_lunge(self):
+        """Push off with the hind legs. The strike's forward motion, from muscle.
+
+        WHY THIS EXISTS, measured (#297/#301). With a physical mouth the animal
+        strikes from wherever its walk stopped -- 13-19 mm short -- and lands 1
+        catch in 60, because nothing carries the mouth the last centimetre. The
+        published capture is not a walk: *Coleonyx variegatus* (same family)
+        lunges from 1.5-2.1 cm at a peak 0.57-0.85 m/s (Vollin & Higham 2021),
+        fifteen times this animal's 0.035 m/s walk, and Delheusy et al. 1995
+        record the head of *E. macularius* translating ~8 mm forward and ~27 mm
+        DOWN through the 80 ms capture.
+
+        The push comes from the HIND LEGS through the existing joints -- hip
+        retraction plus knee and ankle extension -- and not from a force applied
+        to the trunk. A lunge that is an external impulse is a teleport with a
+        physics-shaped name; this one has to be produced by the body, and what
+        it achieves is measured rather than asserted.
+
+        `LUNGE_EXTEND` is INVENTED. It is a fraction of each joint's travel, and
+        the peak speed it actually produces is the thing to compare against the
+        published 0.57-0.85 m/s.
+        """
+        if not self.lunge or not self._lunge_ids:
+            return
+        f = float(np.clip(self.lunge, 0.0, 1.0)) * LUNGE_EXTEND
+        for n, i in self._lunge_ids.items():
+            span = float(self.act_high[i] - self.act_low[i])
+            # Retract the hip and extend knee and ankle: the direction that
+            # drives the body forward over a planted foot.
+            want = self._ctrl[i] + (-f if "proret" in n else f) * span
+            self._ctrl[i] = float(np.clip(want, self.act_low[i], self.act_high[i]))
+
+    def _apply_jaw(self):
+        """Open the mouth by the commanded gape. A no-op on a jawless body.
+
+        PUBLISHED, TARGET SPECIES, for the range: Delheusy, Brillet & Bels 1995
+        (Amphibia-Reptilia 16:185-201) -- peak gape about 37 deg at 47 ms in an
+        80 ms open-close cycle, n = 6 adult *E. macularius*, 64 fps. The jaw
+        actuator's ctrlrange admits that peak. The TIMING of a strike's gape
+        cycle is owned by brain/strike.py, which reads the same numbers.
+        """
+        if self._jaw_act < 0:
+            return
+        # ALWAYS written, even at 0.0. The residual controller fills every
+        # limited actuator with the midpoint of its ctrlrange as "neutral", and
+        # the jaw's midpoint is 20 deg -- measured: with no command the mouth
+        # hung 20.1 deg open. A closed mouth is 0, and it is commanded, not
+        # assumed (#287).
+        i = self._jaw_act
+        self._ctrl[i] = float(np.clip(self.jaw_rad, self.act_low[i], self.act_high[i]))
+
+    def _apply_gaze_pitch(self):
+        """Point the head down by the commanded angle, sharing it across the
+        two joints in proportion to the travel each one has.
+
+        A no-op at 0.0, which is the default, so a walker that never commands
+        gaze is bit-identical to the one the gates accepted. The split is
+        proportional rather than all-on-one because the neck carries 30 deg and
+        the head 20 deg, and loading either to its stop first would make the
+        command non-linear exactly where it is needed most.
+
+        PUBLISHED, TARGET SPECIES, for the behaviour but not for the value:
+        Delheusy, Brillet & Bels 1995 (Amphibia-Reptilia 16(2):185-201,
+        doi:10.1163/156853895X00361) measured the head of *Eublepharis
+        macularius* translating about 8 mm horizontally and 28 mm VERTICALLY
+        through a capture. A gecko drops its head onto its prey. How far, as a
+        function of range, is not published and the controller gain here is
+        INVENTED.
+        """
+        if not self.gaze_pitch_rad:
+            return
+        idx = self._pitch_actuators()
+        if not idx:
+            return
+        spans = {n: float(self.act_high[i] - self.act_low[i]) for n, i in idx.items()}
+        total = sum(spans.values())
+        if total <= 0.0:
+            return
+        for n, i in idx.items():
+            want = float(self.gaze_pitch_rad) * (spans[n] / total)
+            self._ctrl[i] = float(np.clip(want, self.act_low[i], self.act_high[i]))
+
+    def head_velocity(self):
+        """Angular and linear velocity of the head, in the head's own frame.
+
+        THE VESTIBULAR ORGAN IS IN THE SKULL (#247). The only inertial sensors
+        on this animal are `gyro_trunk` / `vel_trunk`, mounted above the hips,
+        and until session 12 the efference copy that removes self-motion from
+        the visual field was computed from them -- while the eye rides on a
+        head that yaws +-70 deg relative to that trunk and bobs with every step
+        of the gait. Measured walking straight, the head's own yaw rate is 3-4x
+        the trunk's: median 0.37 deg/s against 0.13, 95th percentile 2.75
+        against 0.73. The prediction was systematically too small and the
+        residual was read as the world moving.
+        
+        The semicircular canals of every vertebrate sit beside the eye. This is
+        not privileged information: knowing that your own head is turning is
+        exactly what a vestibular system is for.
+
+        NO MORPHOLOGY CHANGE. A `<gyro site="head_site">` would have been the
+        obvious way to get this and it is the wrong way -- the world XML is
+        generated and hash-checked against a manifest that asserts `nsensor`
+        unchanged (`tests/test_world.py`), so adding one alters the body hash
+        that the session 3-4 gate evidence references. `mj_objectVelocity`
+        returns the same six numbers a sensor on that site would report,
+        computed from state that already exists.
+
+        Returns (angular_rad_s, linear_m_s), each a 3-vector.
+        """
+        import mujoco
+        if getattr(self, "_head_site_id", -1) < 0:
+            return self._s("gyro_trunk"), self._s("vel_trunk")
+        res = np.zeros(6, dtype=np.float64)
+        mujoco.mj_objectVelocity(self.model, self.data,
+                                 mujoco.mjtObj.mjOBJ_SITE,
+                                 self._head_site_id, res, 1)
+        return res[:3], res[3:]
+
     def _s(self, name):
         s = self._sid[name]; a = self.model.sensor_adr[s]; d = self.model.sensor_dim[s]
         return self.data.sensordata[a:a + d]
@@ -428,6 +684,11 @@ class GeckoWalkEnv(gym.Env):
         if seed is not None:
             self._rng = np.random.default_rng(seed)
         M, d = self.model, self.data
+        self.jaw_rad = 0.0
+        self.eyelid_rad = 0.0
+        self.gular_rad = 0.0
+        self.tongue_m = 0.0   # tongue protrusion, metres (#343)
+        self.lunge = 0.0
         mujoco.mj_resetDataKeyframe(M, d, self._kf_stand)
         d.qpos[7:] += self._rng.uniform(-self.reset_noise, self.reset_noise, M.nq - 7)
         d.qvel[:] += self._rng.uniform(-self.reset_noise, self.reset_noise, M.nv)
@@ -456,6 +717,12 @@ class GeckoWalkEnv(gym.Env):
 
     def step(self, action):
         action = np.clip(np.asarray(action, np.float32), -1.0, 1.0) * self.action_scale
+        if action.shape[0] < self.nu:
+            # A policy-sized action on a body with brain-driven actuators: the
+            # extra slots are zero residual and are written by `_apply_jaw`.
+            padded = np.zeros(self.nu, dtype=np.float32)
+            padded[self._policy_act] = action
+            action = padded
         if self.action_ema > 0:
             action = self.action_ema * self._prev_action + (1 - self.action_ema) * action
         if self.control_mode == "cpg_residual":
@@ -467,14 +734,23 @@ class GeckoWalkEnv(gym.Env):
                 # as the task observation, so it goes with it.
                 _, _, heading_error = (self._target_egocentric() if self.privileged_target
                                        else (None, None, 0.))
+                self.cpg.locomotor_drive = float(self.locomotor_drive)
                 self._ctrl = self.cpg.compute(action, self._cpg_t, front_contact=front_contact,
                                               heading_error=heading_error)
             else:
+                self.cpg.locomotor_drive = float(self.locomotor_drive)
                 self._ctrl = self.cpg.compute(action, self._cpg_t, front_contact=front_contact)
             self._cpg_t += self.control_dt
         else:
             # affine map [-1,1] -> [low, high]
             self._ctrl = self.act_low + (action + 1.0) * 0.5 * (self.act_high - self.act_low)
+        self._apply_gaze_pitch()
+        self._apply_gaze_yaw()
+        self._apply_jaw()
+        self._apply_eyelids()
+        self._apply_gular()
+        self._apply_tongue()
+        self._apply_lunge()
         self.data.ctrl[:] = self._ctrl
         self._step_work[:] = 0.0
         for _ in range(self.frame_skip):

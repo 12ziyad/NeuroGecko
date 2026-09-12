@@ -1,0 +1,14 @@
+{
+ "schema_version": 1,
+ "generated_by": "tools/eye_before_after_video.py",
+ "run": "one hunt, two eyes read on the same frames; the eye steers nothing",
+ "seed": 2,
+ "steps": 900,
+ "old_motion_window": 1,
+ "new_motion_window": 8,
+ "frames_prey_on_screen": 686,
+ "old_spotted": 36,
+ "new_spotted": 129,
+ "old_recall": 0.0525,
+ "new_recall": 0.188
+}

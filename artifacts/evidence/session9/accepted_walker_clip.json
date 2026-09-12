@@ -1,13 +1,13 @@
 {
  "schema_version": 1,
  "generated_by": "tools/accepted_walker_clip.py",
- "video": "artifacts/video/accepted_walker_clip.mp4",
+ "video": "artifacts/video/_canonical.mp4",
  "controller": "zero residual with contact reflex -- the hand-written base",
  "gait_profile": "lab",
- "front_duty_left": 0.4573,
- "front_duty_right": 0.4366,
- "front_duty_asymmetry": 0.0207,
- "path_m": 0.9081,
- "speed_m_s": 0.0454,
+ "front_duty_left": 0.4468,
+ "front_duty_right": 0.4443,
+ "front_duty_asymmetry": 0.0026,
+ "path_m": 0.9164,
+ "speed_m_s": 0.0458,
  "why_no_policy": "FAILURE_MAP #11 and #71: the trained residual scored 3/6 against the base's 4/6, and the accepted walker IS the open-loop base. Every clip earlier this session loaded the trained checkpoint by mistake, and its front-foot asymmetry (0.203 vs 0.591 under lab) is the limp the user kept reporting."
 }

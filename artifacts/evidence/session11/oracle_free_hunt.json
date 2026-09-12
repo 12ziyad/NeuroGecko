@@ -1,0 +1,18 @@
+{
+ "schema_version": 1,
+ "generated_by": "tools/oracle_free_hunt_video.py",
+ "run": "prey-position oracle DISCONNECTED; the tectum's bearing steers",
+ "still_privileged": [
+  "strike trigger reads true range",
+  "walker retains its five goal slots"
+ ],
+ "seed": 2,
+ "steps": 120,
+ "motion_window": 8,
+ "gaze_pitch_gain": 2.0,
+ "eye_raw_reports": 23,
+ "steps_committed": 65,
+ "frames_prey_on_screen": 0,
+ "closest_approach_mm": 357.25,
+ "strike_trigger_mm": 20.3
+}

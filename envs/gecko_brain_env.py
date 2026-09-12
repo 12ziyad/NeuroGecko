@@ -18,6 +18,15 @@ from envs.gecko_walk_env import GeckoWalkEnv
 
 REPO = Path(__file__).resolve().parent.parent
 
+#: Breaths per second. INVENTED: no breathing frequency has been published for
+#: any gecko (#302). 0.4 Hz is one breath every 2.5 s, the order a keeper sees.
+BREATH_HZ = 0.4
+#: Throat excursion, degrees. INVENTED for the same reason.
+GULAR_AMPLITUDE_DEG = 12.0   # was 5.0: with the skin bound to the throat the 5 was invisible (#343). INVENTED
+#: Lid angle at a full blink, degrees. INVENTED; the ORGAN is published --
+#: eublepharids are the only geckos with movable eyelids.
+EYELID_CLOSED_DEG = 70.0
+
 
 def _camera_scene_options(policy_camera_mode: str):
     """Keep camera contracts independent; sealing changes policy pixels.
@@ -203,11 +212,34 @@ class GeckoBrainEnv(gym.Env):
         homeostasis: bool = False,
         homeostasis_time_compression: float = 1.0,
         action_selection: bool = False,
+        behaviour_control: bool = False,
+        meals_owed_at_start: float = 0.0,
+        mouth_goal: bool = False,
+        smell: bool = False,
+        circadian: bool = False,
+        time_of_day_h: float = 0.0,
         eye: bool = False,
         eye_render_pixels: int | None = None,
         eye_receptor_pixels: int | None = None,
+        gaze_pitch_gain: float = 0.0,
+        gaze_pitch_rate: float = 0.25,
+        gaze_pitch_max_deg: float = 45.0,
+        gaze_pitch_decay: float = 0.0,
     ):
         super().__init__()
+        #: Closed-loop gaze. 0.0 is OFF and is the default, so every existing
+        #: run and every gate result is unchanged until this is switched on.
+        self.gaze_pitch_gain = float(gaze_pitch_gain)
+        self.gaze_pitch_rate = float(np.clip(gaze_pitch_rate, 0.0, 1.0))
+        self.gaze_pitch_max_rad = math.radians(float(gaze_pitch_max_deg))
+        #: How fast the aim relaxes when the eye reports nothing. INVENTED.
+        #: 0.0 holds the aim, which is what the measurement above supports.
+        self.gaze_pitch_decay = float(np.clip(gaze_pitch_decay, 0.0, 1.0))
+        self._gaze_pitch_rad = 0.0
+        self._gaze_yaw_rad = 0.0
+        self._prev_gaze_yaw_rad = 0.0
+        self._last_head_yaw_rate = 0.0
+        self._breath_t = 0.0
         self.policy_camera_mode = str(policy_camera_mode)
         self._policy_scene_option, self._render_scene_option = _camera_scene_options(
             self.policy_camera_mode
@@ -278,9 +310,13 @@ class GeckoBrainEnv(gym.Env):
             # goal is the mouth at the published 20.3 mm strike distance, the
             # SAME frozen checkpoint arrives 75 times in 160 seconds -- one
             # every 2.1 s, mean closest 20.5 mm. It could always do this.
+            # `mouth_goal` gives the autonomous animal the same arrival test the
+            # oracle-driven one always had -- the MOUTH within strike range --
+            # without the oracle. Measuring your own arrival from your own nose
+            # is proprioception, not privileged information (#285).
             **({"approach_site": "mouth",
                 "reach_dist": float(parameter_value("strike_trigger_distance_m"))}
-               if hunt_targeting else {}),
+               if (hunt_targeting or mouth_goal) else {}),
         )
         # THE PROFILE THE BRAIN ACTUALLY WALKS ON, NOW NAMED RATHER THAN
         # INHERITED. This constructor never passed `gait_profile`, so
@@ -357,6 +393,22 @@ class GeckoBrainEnv(gym.Env):
         # strike that LANDS, and the published miss rate applies: 82.9 % on
         # evasive crickets, so roughly one in five attempts fails.
         self.strike = Strike(rng=self._rng) if strike else None
+        self._mouth_sid = mujoco.mj_name2id(self.walk_env.model, mujoco.mjtObj.mjOBJ_SITE, "mouth")
+        self._tongue_sid = mujoco.mj_name2id(self.walk_env.model, mujoco.mjtObj.mjOBJ_SITE, "tongue_tip")
+        self._jaw_ok = getattr(self.walk_env, "_jaw_act", -1) >= 0 and self._tongue_sid >= 0
+        # Lever from the neck pitch axis to the snout, for turning a published
+        # head DROP (a translation) into the pitch that delivers it. MEASURED
+        # from the body at construction (neck body origin to nose_tip site in
+        # the stand pose), not assumed: the first version hard-coded 45 mm and
+        # the body says 37 mm (#300).
+        _m, _d = self.walk_env.model, self.walk_env.data
+        _neck = mujoco.mj_name2id(_m, mujoco.mjtObj.mjOBJ_BODY, "neck")
+        _nose = mujoco.mj_name2id(_m, mujoco.mjtObj.mjOBJ_SITE, "nose_tip")
+        self._snout_lever_m = (float(np.linalg.norm(_d.site_xpos[_nose] - _d.xpos[_neck]))
+                               if _neck >= 0 and _nose >= 0 else 0.037)
+        self._strike_touched = False
+        self._strike_base_pitch = None
+        self._breath_t = 0.0
         self._prey_mocap = -1
         #: What the food actually looks like, read from the model so the
         #: detector cannot disagree with the world. None until a prey geom is
@@ -502,14 +554,126 @@ class GeckoBrainEnv(gym.Env):
             from brain.gecko_selector import GeckoSelector
             self.selector = GeckoSelector()
 
+        # THE WIRE (#265). Until session 12 the selector chose a behaviour and
+        # the env put it in the info dict beside `behaviour_controls_nothing`,
+        # because the body could only do one thing. It can now do three -- search,
+        # chase, hold still -- so selection is allowed to mean something.
+        #
+        # OFF BY DEFAULT, and `step(action)` is untouched whether it is on or
+        # off: the closed loop runs through `autonomous_step()`, which is a
+        # separate entry point. Every checkpoint, gate and policy that drives
+        # this env with its own actions behaves exactly as before.
+        self.programs = None
+        self.brainstem = None
+        self.search = None
+        self.evidence = None
+        if behaviour_control:
+            missing = [n for n, v in (("homeostasis", homeostasis),
+                                      ("action_selection", action_selection),
+                                      ("eye", eye)) if not v]
+            if missing:
+                raise ValueError(
+                    "behaviour_control needs " + ", ".join(f"{m}=True" for m in missing)
+                    + ": the loop runs hunger -> basal ganglia -> motor program "
+                      "-> body, and a missing link would be filled with a "
+                      "placeholder, which is what this flag exists to stop.")
+            from brain.programs import MotorPrograms
+            from brain.search import FixationEvidence, SearchPattern
+            self.search = SearchPattern()
+            self.evidence = FixationEvidence(
+                adaptive=True, fixate_steps=SearchPattern.FIXATE_STEPS)
+            try:
+                from brain.brainstem import Brainstem
+                from brain.spinal_cpg import SpinalCPG, FEET
+                cpg = self.walk_env.cpg
+                delays = {f: cpg.profile.touchdown_delays_cycle[i]
+                          for i, f in enumerate(FEET)}
+                # The cord is the brainstem's OUTPUT TARGET, not the walker's
+                # rhythm source: `attach_spinal_cord` is deliberately not called,
+                # so the accepted 4/6 walker keeps running on the closed form it
+                # was gated on. What the brainstem contributes here is its
+                # behaviour-to-effort map, which is the published-in-direction
+                # part; the rhythm stays where the evidence is.
+                self.brainstem = Brainstem(SpinalCPG(cpg.freq, delays))
+            except Exception:
+                self.brainstem = None       # falls back to LOCOMOTOR directly
+            self.programs = MotorPrograms(self.search, self.evidence,
+                                          brainstem=self.brainstem)
+
+        # Brain module 5: smell. Built, tested, and until now read by nothing.
+        # For THIS species chemoreception is what gates costly defence --
+        # reaction to snake scent 0.21 against 0.07 for the sight of a snake,
+        # n = 42 -- so a threat signal computed from vision alone was modelling
+        # the wrong sense. See brain/vomeronasal.py for the statistics.
+        self.nose = None
+        if smell:
+            from brain.vomeronasal import Vomeronasal
+            self.nose = Vomeronasal()
+
+        # Brain module 6: the day/night clock. CONNECTED (#352). It was built
+        # and tested in session 9w and consumed by nothing (#262); session 12
+        # added this flag, which constructed the object, reset it, and reported
+        # an `arousal` the object never produced, because `clock.step` was
+        # never called and `self._arousal` was the constant 1.0 (#347).
+        #
+        # It is stepped below in `step()` and its output is the `rest` channel's
+        # salience, through `brain/gecko_selector.py`. That is the only
+        # modulation the sources speak to: the two published numbers this
+        # species has about arousal -- activity onset after lights-out, and an
+        # evening peak window -- are measurements of WHEN IT IS ACTIVE AND WHEN
+        # IT IS NOT, which is what rest is. Anything else arousal could be made
+        # to modulate would be invention, and #347 was right to refuse it.
+        #
+        # `time_of_day_h` sets the phase the episode starts in. It is a SCENARIO
+        # setting, not biology -- the same shape as `meals_owed_at_start` -- and
+        # it exists because a day is 86400 s and an episode is tens of seconds,
+        # so the phase has to be chosen rather than waited for. The clock
+        # advances on the SAME declared `homeostasis_time_compression` as the
+        # rest of the slow physiology; at its default of 1.0 the clock barely
+        # moves inside an episode, which is correct and not a defect.
+        self._time_of_day_s = float(time_of_day_h) * 3600.0
+        self._time_compression = float(homeostasis_time_compression)
+        self._arousal = 1.0
+        #: Whether the rest channel shut the lids last step, so that opening
+        #: them again is this module's business and not a blanket write that
+        #: would fight the strike's own blink.
+        self._eyes_were_shut = False
+        self._last_eye_bearing = None
+        self.clock = None
+        if circadian:
+            from brain.arousal import Arousal
+            self.clock = Arousal()
+            self._arousal = float(self.clock.arousal_at(self._time_of_day_s))
+
         self.homeostasis = None
         if homeostasis:
             from brain.hypothalamus import Homeostasis, Physiology
             mass = float(np.sum(self.walk_env.model.body_mass[1:]))
+            physiology = Physiology.from_registry(body_mass_kg=mass)
             self.homeostasis = Homeostasis(
-                Physiology.from_registry(body_mass_kg=mass),
+                physiology,
                 time_compression=float(homeostasis_time_compression),
             )
+            # A NOCTURNAL FORAGER EMERGES HUNGRY (#268), and without this the
+            # animal is never hungry inside an episode at all. Measured: the
+            # hypothalamus reports ~3292 HOURS of reserve remaining, so over a
+            # 600-step rollout the energy deficit reaches 0.0000 and the basal
+            # ganglia releases NOTHING on every step -- which is the real reason
+            # the selector was never wired to anything.
+            #
+            # The alternative is `homeostasis_time_compression`, and it takes a
+            # value near 20000 before any behaviour is released, i.e. starving
+            # the animal over three days inside twelve seconds. Starting it with
+            # an energy debt is the same statement made honestly: this species
+            # eats every few days, so an animal emerging at dusk is some number
+            # of meals behind. That number is the parameter, it is INVENTED at
+            # its default of 0.0 meaning "starts full", and it is reported.
+            self.meals_owed_at_start = float(meals_owed_at_start)
+            if self.meals_owed_at_start:
+                self.homeostasis.energy_J = float(
+                    self.homeostasis.energy_setpoint_J
+                    - self.meals_owed_at_start * self.homeostasis.meal_scale_J)
+                self._initial_energy_J = self.homeostasis.energy_J
         self.drives = DriveState()
         self.food_xy = np.zeros(2, dtype=np.float64)
         self._prev_action = np.zeros(4, dtype=np.float32)
@@ -633,17 +797,137 @@ class GeckoBrainEnv(gym.Env):
         # with a 3-D trigger the animal stalls at 40.8 mm and never strikes.
         offset = np.asarray(self.food_xy)[:2] - self._nose_xy()
         mouth_distance = float(np.linalg.norm(offset))
-        _, finished, hit = self.strike.step(dt)
+        fraction, finished, dice_hit = self.strike.step(dt)
+
+        # THE STRIKE IS A MOVEMENT, AND THE CATCH IS GEOMETRY (#292). Until
+        # session 12 nothing moved: `fire()` rolled a die against the published
+        # 82.9 % and the cricket vanished. Now, while a strike is in flight, the
+        # mouth opens along the published gape profile, the head drops along
+        # the published ~27 mm, and the prey is caught if -- and only if -- its
+        # centre passes inside the mouth while the jaws are open. The 82.9 %
+        # stops being a number typed in and becomes a number the animal has to
+        # earn. The statistical path is kept for bodies without a jaw, so every
+        # older evidence run still reproduces.
+        # BREATHING, every step, strike or not. The visible pulsing under a
+        # gecko's chin is the gular pump, and it is what makes a still animal
+        # look alive rather than paused (#302). Geckos breathe in single breaths
+        # or short bursts separated by breath-holds (Milsom 1984, Gekkonidae,
+        # abstract only; Dial & Schwenk 1996 record "buccal pulsing" in
+        # Coleonyx brevis, SAME FAMILY, as an olfactory sniff before a defensive
+        # display). NO breathing frequency, gular excursion or throat
+        # displacement has ever been published for any gecko -- the session-12
+        # sweep closed that search -- so BREATH_HZ and the amplitude are
+        # INVENTED and say so here.
+        self._breath_t += dt
+        breath = math.sin(2.0 * math.pi * BREATH_HZ * self._breath_t)
+        self.walk_env.gular_rad = math.radians(GULAR_AMPLITUDE_DEG) * breath
+
+        # THE TONGUE (#343). Two published behaviours, both this species, and
+        # nothing else moves it:
+        #   * post-feeding labial licking at 0.165 licks/s for the minutes
+        #     after a meal (Cooper, DePerno & Steele 1996, n = 16; the registry
+        #     entry post_feeding_labial_lick_rate_per_s). The window length is
+        #     INVENTED inside their "several minutes": LICK_WINDOW_S.
+        #   * tongue-flicking at the rate the nose already computes from prey
+        #     odour (tongue_flicks_per_min), which is published for this species.
+        # Each flick is a short protrusion; its shape (a sharpened sine) and
+        # its reach are INVENTED and declared here.
+        from common.provenance import parameter_value
+        LICK_WINDOW_S = 120.0
+        LICK_REACH_M, FLICK_REACH_M = 0.010, 0.006
+        t = self._breath_t
+        ext = 0.0
+        if t < getattr(self, "_lick_until", -1.0):
+            rate = float(parameter_value("post_feeding_labial_lick_rate_per_s"))
+            ext = max(ext, LICK_REACH_M * max(0.0, math.sin(2.0 * math.pi * rate * t)) ** 3)
+        if self.nose is not None:
+            per_min = float(self.nose.last.get("tongue_flicks_per_min", 0.0))
+            if per_min > 0.0:
+                ext = max(ext, FLICK_REACH_M
+                          * max(0.0, math.sin(2.0 * math.pi * (per_min / 60.0) * t)) ** 4)
+        self.walk_env.tongue_m = float(ext)
+
+        physical = self._mouth_sid >= 0 and self._jaw_ok
         caught = False
-        if finished and hit and not proximity_capture:
-            caught = True
-            if self.prey is not None:
-                self.prey.captures += 1
-                self.food_xy = self.prey.reset(self._nose_xy(), rng=self._rng)
-                self._write_prey()
+        if physical and (self.strike.active or finished):
+            gape_deg = self.strike.gape_profile(fraction)
+            self.walk_env.jaw_rad = math.radians(gape_deg)
+            # The published drop is a head translation; the neck delivers it
+            # here as a pitch, capped at the joints' travel.
+            drop = self.strike.head_drop_profile(fraction)
+            # SET, not accumulate (#296): the profile is cumulative, so adding it
+            # every step over-integrated the drop and pinned the head at the
+            # pitch stop within a few steps of every launch.
+            # THE DROP IS THE GAZE, NOT ON TOP OF IT (#297). At launch the gaze
+            # loop has already pitched the head ~35 deg to look at a cricket
+            # 17 mm away and 13 mm below the nose, and the joints stop at 45.
+            # Adding a 27 mm drop (34 deg on this lever) to that pinned the head
+            # at the stop on every strike. The strike now COMMANDS the pitch
+            # that delivers the published drop from LEVEL, so looking at the
+            # prey and dropping onto it are the same movement -- which is what
+            # a jaws-only capture with no slow-open phase describes.
+            if self._strike_base_pitch is None:
+                self._strike_base_pitch = float(self._gaze_pitch_rad)
+            want = drop / max(self._snout_lever_m, 1e-3)
+            self._gaze_pitch_rad = float(np.clip(
+                max(want, self._strike_base_pitch * (1.0 - fraction)),
+                0.0, self.gaze_pitch_max_rad))
+            self.walk_env.gaze_pitch_rad = self._gaze_pitch_rad
+            # LUNGE. `snap` is head and neck only; `bag_jump` adds the
+            # hindlimb push. Both names and the split by distance are from the
+            # published ethogram for this species (see Strike.mode_for); which
+            # one runs is decided there, not here.
+            self.walk_env.lunge = (self.strike.velocity_profile(fraction)
+                                   if self.strike.mode == "bag_jump" else 0.0)
+            # BLINK. The eyes shut through the strike and open after it. That
+            # eublepharids CAN shut their eyes is published -- they are the only
+            # geckos with movable eyelids -- but whether a gecko closes them ON
+            # a strike is UNRECORDED in every feeding study the session-12 sweep
+            # opened, including two Coleonyx papers filmed at 500-1288 fps. This
+            # is therefore an INVENTED behaviour on a published organ, and it is
+            # the honest place to say so.
+            self.walk_env.eyelid_rad = math.radians(
+                EYELID_CLOSED_DEG * min(1.0, 2.5 * fraction))
+            if gape_deg > 10.0 and self._prey_in_mouth():
+                self._strike_touched = True
+        if finished:
+            if physical:
+                hit = bool(self._strike_touched)
+                # replace the die's tally with what actually happened
+                self.strike.hits += int(hit) - int(dice_hit)
+                self.strike.misses += int(not hit) - int(not dice_hit)
+                self.walk_env.jaw_rad = 0.0
+                self.walk_env.eyelid_rad = 0.0
+                self.walk_env.lunge = 0.0
+                self._strike_touched = False
+                self._strike_base_pitch = None
+            else:
+                hit = dice_hit
+            if hit and not proximity_capture:
+                caught = True
+                if self.prey is not None:
+                    self.prey.captures += 1
+                    self.food_xy = self.prey.reset(self._nose_xy(), rng=self._rng)
+                    self._write_prey()
         if not self.strike.active:
             self.strike.fire(mouth_distance)
         return bool(caught)
+
+    def _prey_in_mouth(self):
+        """Is the prey's centre inside the open mouth? Pure geometry.
+
+        The mouth volume is a capsule from the `mouth` site (the commissure
+        region on the mandible) to the `tongue_tip` site, with a radius of the
+        prey's own radius plus a small margin. No probability enters.
+        """
+        d = self.walk_env.data
+        a = d.site_xpos[self._mouth_sid]
+        b = d.site_xpos[self._tongue_sid]
+        p = np.array([self.food_xy[0], self.food_xy[1], float(self.prey.height_m)])
+        ab = b - a
+        t = float(np.clip(np.dot(p - a, ab) / max(float(np.dot(ab, ab)), 1e-12), 0.0, 1.0))
+        gap = float(np.linalg.norm(p - (a + t * ab)))
+        return gap <= float(self.prey.height_m) + 0.004   # height_m IS the prey radius (env sets height_m=radius_m)
 
     def _brain_action_to_target(self, action: np.ndarray) -> tuple[np.ndarray, float]:
         action = np.clip(np.asarray(action, dtype=np.float32), -1.0, 1.0)
@@ -657,7 +941,15 @@ class GeckoBrainEnv(gym.Env):
         distance = 0.05 + (float(action[2]) + 1.0) * 0.5 * (0.80 - 0.05)
         engage = (float(action[3]) + 1.0) * 0.5
         engage = float(np.clip(engage, 0.0, 1.0))
-        stop_dist = max(float(self.walk_env.reach_dist) + 0.01, 0.05)
+        # THE 5 cm FLOOR (#285). With the goal measured from the trunk, a stop
+        # distance under 5 cm put the goal inside the animal. Measured from the
+        # MOUTH that floor is wrong by the whole length of the head: the nose
+        # sits ~5 cm ahead of the trunk, so a goal that may never come closer
+        # than 5 cm to the trunk can never come closer than ~0 to the nose --
+        # and the strike needs 20.3 mm. The floor is kept for trunk goals and
+        # dropped for mouth goals.
+        _floor = 0.05 if self.walk_env.approach_site == "trunk" else 0.0
+        stop_dist = max(float(self.walk_env.reach_dist) + 0.01, _floor)
         target_dist = stop_dist + engage * (distance - stop_dist)
 
         body_vec = np.array([dir_body[0], dir_body[1], 0.0], dtype=np.float64)
@@ -679,6 +971,187 @@ class GeckoBrainEnv(gym.Env):
         self._set_walk_target(target)
         self._brain_target_xy = self.walk_env.target.copy()
         return self._brain_target_xy.copy(), engage
+
+    # ------------------------------------------------------------------
+    # THE REST OF THE WORLD (#333)
+    #
+    # Measured before this was written: over 900 autonomous steps, four of the
+    # selector's six channels had a gate of EXACTLY 0.0000 on every step. Not
+    # losing a competition -- never entered into one. `flee` and `bask` because
+    # their inputs did not exist; `rest` because a strolling gecko does not tire
+    # (#284, and that one is correct physiology); `groom` because explore's
+    # 0.35 x hunger beats its 0.05 tonic on every step the animal is hungry.
+    #
+    # Everything below is INERT WHEN THE BODY IS ABSENT. `gecko_world_v1.xml`
+    # has no shelter, warm patch or threat, so on that world every method here
+    # returns None and the animal behaves exactly as it did before -- which is
+    # what keeps the gates, the checkpoints and the accepted walker untouched.
+    # ------------------------------------------------------------------
+
+    #: Substrate temperature away from the warm patch. DERIVED: Hastings et al.
+    #: 2023 cycled the substrate 25 -> 15 -> 25 C and body temperature tracked
+    #: it at r2 = 0.97, so 25 C is that protocol's baseline ground rather than a
+    #: number chosen here. It sits 4.5 C below the preferred band's floor, which
+    #: is the whole point: a gecko emerging onto cooled ground is cold.
+    AMBIENT_SUBSTRATE_C = 25.0
+    #: How fast body temperature follows the ground it is lying on. INVENTED.
+    #: The correlation is published, the time constant is not. Compressed so a
+    #: warm-up that takes a real animal tens of minutes takes tens of seconds
+    #: here, for the same reason #268 gave the animal meals owed at the start
+    #: rather than starving it for three days inside twelve seconds.
+    THERMAL_TAU_S = 220.0
+    THERMAL_TIME_COMPRESSION = 300.0
+
+    def _world_body_xy(self, name):
+        """Ground position of a named world body, or None if it is not there."""
+        import mujoco
+        model = self.walk_env.model
+        bid = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, name)
+        if bid < 0:
+            return None
+        return np.array(self.walk_env.data.xpos[bid][:2], dtype=np.float64)
+
+    def _bearing_to_deg(self, target_xy):
+        """Body-relative bearing to a point, degrees, or None."""
+        if target_xy is None:
+            return None
+        delta = np.asarray(target_xy, float) - self._trunk_xy()
+        if float(np.linalg.norm(delta)) < 1e-9:
+            return 0.0
+        world_deg = math.degrees(math.atan2(delta[1], delta[0]))
+        return (world_deg - self._trunk_yaw_deg() + 180.0) % 360.0 - 180.0
+
+    def _predator_distance_m(self):
+        """Distance to the threat body, or None when the world has none.
+
+        Returning None rather than a large number is deliberate: the nose's
+        predator channel then reads zero because there is nothing to smell,
+        which is a different statement from the animal being safe.
+        """
+        threat = self._world_body_xy("threat")
+        if threat is None:
+            return None
+        return float(np.linalg.norm(threat - self._trunk_xy()))
+
+    def _substrate_temperature_C(self):
+        """The temperature of the ground under the animal, or None.
+
+        This species is THIGMOTHERMIC: it takes heat from the ground by lying on
+        it, not from light. Body temperature tracks substrate at r2 = 0.97
+        against 0.92 for air (Hastings et al. 2023, n = 12). So the warm patch
+        is a patch of ground, and standing on it is what warms the animal.
+        """
+        import mujoco
+        model = self.walk_env.model
+        bid = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, "warm_patch")
+        if bid < 0:
+            return None
+        centre = np.array(self.walk_env.data.xpos[bid][:2], dtype=np.float64)
+        half = 0.05
+        for g in range(model.ngeom):
+            if model.geom_bodyid[g] == bid:
+                half = float(model.geom_size[g][0])
+                break
+        from common.provenance import parameter_value
+        warm = float(parameter_value("warm_surface_temperature_C"))
+        on_patch = bool(np.all(np.abs(self._trunk_xy() - centre) <= half))
+        return warm if on_patch else self.AMBIENT_SUBSTRATE_C
+
+    def _on_warm_ground(self):
+        """Is the animal standing on ground at or above its preferred floor?"""
+        substrate = self._substrate_temperature_C()
+        if substrate is None or self.homeostasis is None:
+            return False
+        low, _ = self.homeostasis.physiology.preferred_temperature_C
+        return bool(substrate >= low)
+
+    def _step_body_temperature(self, dt_s):
+        """Relax body temperature toward the ground it is standing on."""
+        if self.homeostasis is None:
+            return
+        substrate = self._substrate_temperature_C()
+        if substrate is None:
+            return                      # no thermal field: leave it pinned
+        tau = self.THERMAL_TAU_S / max(1e-9, self.THERMAL_TIME_COMPRESSION)
+        alpha = 1.0 - math.exp(-float(dt_s) / tau)
+        body = float(self.homeostasis.body_temperature_C)
+        self.homeostasis.body_temperature_C = body + (substrate - body) * alpha
+
+    def brain_command(self):
+        """What the animal's own brain says to do this step. Reads no oracle.
+
+        hunger and fatigue (brain 1) -> basal ganglia (brain 2) -> motor program
+        -> heading, head yaw and locomotor drive. The eye's contribution enters
+        as a BEARING only, through the fixation evidence, and never as a
+        position.
+        """
+        if self.programs is None:
+            raise RuntimeError("brain_command() needs behaviour_control=True")
+        behaviour = self.selector.selected()
+        urgency = 0.0
+        if behaviour is not None:
+            gates = self.selector.gates()
+            urgency = float(gates[list(self.selector.channels).index(behaviour)])
+        # THE EYE'S LAST REPORT, AND NOTHING IF IT SAID NOTHING (#271).
+        #
+        # The first version fell back to the PREVIOUS bearing whenever the eye
+        # was silent, meaning to cover the one-step lag. What it actually did
+        # was manufacture evidence: the accumulator received the same number
+        # every step, that number agreed with itself perfectly, and the animal
+        # committed on it. Measured: the eye fired on 27.1 % of believed steps
+        # while the accumulator's own report-rate estimate read 1.0, the
+        # adaptive quorum ran to 36, and it still committed 663 times -- every
+        # one of them with the prey off screen.
+        #
+        # Silence is data. A step on which the eye reports nothing must reach
+        # the accumulator AS nothing.
+        seen = self.eye.last if isinstance(getattr(self.eye, "last", None), dict) else {}
+        bearing = (seen.get("prey_bearing_deg")
+                   if float(seen.get("prey_salience", 0.0)) > 0.0 else None)
+        # WHERE TO FLEE TO AND WHERE TO WARM UP. Both are None on a world that
+        # has neither, which is the committed one, and the programs fall back to
+        # searching exactly as before. On a furnished world they are real
+        # bearings and the flee and bask channels finally have somewhere to go
+        # (#267, #333).
+        return self.programs.step(
+            behaviour, urgency,
+            bearing_deg=bearing,
+            trunk_yaw_deg=self._trunk_yaw_deg(),
+            shelter_bearing_deg=self._bearing_to_deg(
+                self._world_body_xy("shelter")),
+            warm_bearing_deg=self._bearing_to_deg(
+                self._world_body_xy("warm_patch")),
+            on_warm_ground=self._on_warm_ground())
+
+    def _trunk_yaw_deg(self):
+        q = self.walk_env.data.qpos[3:7]
+        return math.degrees(math.atan2(
+            2.0 * (q[0] * q[3] + q[1] * q[2]),
+            1.0 - 2.0 * (q[2] ** 2 + q[3] ** 2)))
+
+    def autonomous_step(self):
+        """One step with the animal driving itself. No action is passed in.
+
+        Deliberately a SEPARATE entry point from `step(action)`. Every gate,
+        checkpoint and trained policy keeps handing this env an action and
+        keeps getting the behaviour it was validated with; nothing about that
+        path changes whether behaviour_control is on or off.
+        """
+        cmd = self.brain_command()
+        heading = math.radians(float(cmd["heading_deg"]))
+        action = np.zeros(self.action_space.shape, dtype=np.float32)
+        action[0] = math.cos(heading)
+        action[1] = math.sin(heading)
+        # The eye reports no range, so the goal is a fixed span ahead and the
+        # animal walks ALONG a bearing rather than toward a point.
+        action[2] = (0.35 - 0.05) / 0.375 - 1.0
+        action[3] = 1.0 if cmd["locomotor_drive"] > 0.0 else -1.0
+        self._gaze_yaw_rad = math.radians(float(cmd["head_yaw_deg"]))
+        self.walk_env.locomotor_drive = float(cmd["locomotor_drive"] > 0.0)
+        out = self.step(action)
+        self._last_eye_bearing = out[4].get("prey_bearing_deg")
+        out[4]["brain_command"] = cmd
+        return out
 
     def _walker_obs_raw(self) -> np.ndarray:
         return self.walk_env._obs().astype(np.float32)
@@ -768,6 +1241,13 @@ class GeckoBrainEnv(gym.Env):
         }
 
     def reset(self, *, seed: int | None = None, options=None):
+        self._gaze_pitch_rad = 0.0
+        self._gaze_yaw_rad = 0.0
+        self._prev_gaze_yaw_rad = 0.0
+        self._last_head_yaw_rate = 0.0
+        if getattr(self, "walk_env", None) is not None:
+            self.walk_env.gaze_pitch_rad = 0.0
+            self.walk_env.gaze_yaw_rad = 0.0
         super().reset(seed=seed)
         if seed is not None:
             self._rng = np.random.default_rng(seed)
@@ -777,8 +1257,21 @@ class GeckoBrainEnv(gym.Env):
             # Energy deliberately survives the episode: a gecko does not become
             # full because a rollout ended.
             self.homeostasis.reset()
+            if getattr(self, "meals_owed_at_start", 0.0):
+                self.homeostasis.energy_J = float(self._initial_energy_J)
         if self.selector is not None:
             self.selector.reset()
+        for _m in (self.programs, self.nose):
+            if _m is not None:
+                _m.reset()
+        if self.clock is not None:
+            # The clock resets to the phase the episode was CONFIGURED for, not
+            # to zero. `Arousal.reset()` defaults to time_of_day_s=0.0, and the
+            # bare `_m.reset()` in the loop above used to send it there --
+            # harmless only because nothing read the result (#347).
+            self.clock.reset(self._time_of_day_s)
+            self._arousal = float(self.clock.arousal_at(self._time_of_day_s))
+        self._eyes_were_shut = False
         if self.eye is not None:
             self.eye.reset()
         self._step = 0
@@ -859,11 +1352,23 @@ class GeckoBrainEnv(gym.Env):
         moving_speed = float(np.linalg.norm(self._trunk_xy() - trunk_before) / total_dt)
         moving_drive = float(np.clip(moving_speed / 0.25, 0.0, 1.0))
 
+        if ate:
+            self._lick_until = self._breath_t + 120.0   # LICK_WINDOW_S, see the tongue drive
         self.drives.update(total_dt, ate=ate, danger=danger, moving=moving_drive)
+        # BRAIN 6 ADVANCES HERE, before the drive vector is read, for the same
+        # reason body temperature does: a selector reading last step's arousal
+        # is a step behind the time of day it is meant to be deciding in.
+        if self.clock is not None:
+            self._arousal = float(
+                self.clock.step(total_dt * self._time_compression)["arousal"])
         if self.homeostasis is not None:
             from common.provenance import parameter_value
             # Activity cost is the published cost of transport at the speed the
             # body actually moved, not a guess about effort.
+            # The ground first, then the rest. Body temperature has to move
+            # BEFORE the drive vector is read, or the thermal error the selector
+            # sees is a step behind the ground the animal is standing on.
+            self._step_body_temperature(total_dt)
             self.homeostasis_reward = self.homeostasis.step(
                 total_dt,
                 meal_wet_mass_kg=(float(parameter_value("prey_item_wet_mass_kg")) if ate else 0.0),
@@ -903,15 +1408,93 @@ class GeckoBrainEnv(gym.Env):
             # system is doing, so it can subtract the flow its own walking
             # explains. Without it the tectum reported the same salience in a
             # world with prey and a world with none -- d = 0.036.
-            gyro = self.walk_env.data.sensor("gyro_trunk").data                 if hasattr(self.walk_env.data, "sensor") else None
-            vel = self.walk_env._s("vel_trunk")
+            # THE CAMERA IS ON THE HEAD, AND SO NOW IS THE ORGAN THAT
+            # PREDICTS WHAT THE CAMERA WILL SEE (#247).
+            #
+            # Until session 12 this read `gyro_trunk` and `vel_trunk` -- the
+            # animal predicted its own visual flow from sensors mounted above
+            # its hips, while the eye rode on a head that yaws +-70 deg
+            # relative to that trunk and bobs with every step. Measured: the
+            # head's own yaw rate is 3 to 4 times the trunk's even walking
+            # straight (median 0.37 deg/s against 0.13, 95th percentile 2.75
+            # against 0.73). The prediction was systematically too small, the
+            # residual was read as the world moving, and 30.4 % of frames
+            # produced a false alarm with the animal standing still.
+            #
+            # The fix is anatomy, not a gain. The semicircular canals of every
+            # vertebrate sit in the SKULL, beside the eye. `gyro_head` and
+            # `vel_head` are mounted on the site the camera already occupies.
+            # This is not privileged information -- a gecko has a vestibular
+            # system, and knowing that your own head is turning is what it is
+            # for.
+            #
+            # Both yaw and pitch of the head translate the whole image, so the
+            # rate fed to the uniform term is the magnitude of the two
+            # together rather than yaw alone.
+            g, v = self.walk_env.head_velocity()
+            self._last_head_yaw_rate = float(np.degrees(g[2]))
             self_motion = {
-                "yaw_rate_deg_s": float(np.degrees(self.walk_env._s("gyro_trunk")[2])),
-                "forward_m_s": float(vel[0]),
+                "yaw_rate_deg_s": float(np.degrees(
+                    math.hypot(float(g[1]), float(g[2])))),
+                "forward_m_s": float(v[0]),
+                # The animal's own gaze command. Not a world reading: a gecko
+                # knows where it is pointing its head. Lets the elevation rule
+                # test the WORLD horizon rather than the frame's.
+                "gaze_pitch_deg": float(math.degrees(self._gaze_pitch_rad)),
             }
             seen = self.eye.step(obs["image"], total_dt, self_motion=self_motion)
             food_visible_frac = float(seen["prey_salience"])
-            prey_bearing_deg = float(seen["prey_bearing_deg"])
+            # None when the eye reported nothing (#271). Kept numeric here so
+            # the info field and every existing reader keep the shape they had,
+            # and guarded everywhere the VALUE is acted on.
+            _b = seen.get("prey_bearing_deg")
+            # None when the eye reported nothing (#271), which is what the
+            # non-eye colour-match path already reports and what every existing
+            # reader already guards for with `food_visible_frac > 0`.
+            prey_bearing_deg = float(_b) if _b is not None else None
+            # GAZE. The eye aims its own head. When the tectum reports a target
+            # low in the frame, the neck and head pitch down to bring it back
+            # toward the axis -- a foveation loop that consumes ONLY the eye's
+            # own output and never the prey's true position.
+            #
+            # WHY. Measured over 2400 steps of a real hunt, the prey's
+            # elevation falls from -4 deg at 0.3-0.5 m to -35 deg inside 4 cm,
+            # and at fovy 70 the frame stops at -35: the fraction of frames
+            # with the prey on the image collapses from 100 % at 4-8 cm to
+            # 45 % inside 4 cm. The animal goes blind exactly where the strike
+            # has to fire, and it closed to 21.0 mm against a 20.3 mm trigger.
+            #
+            # The gain is INVENTED. The behaviour is not: Delheusy et al. 1995
+            # measured this species' head translating ~28 mm vertically through
+            # a capture.
+            if self.gaze_pitch_gain:
+                el = seen.get("prey_elevation_deg")
+                if el is not None and el < 0.0:
+                    want = math.radians(-float(el)) * float(self.gaze_pitch_gain)
+                    self._gaze_pitch_rad += self.gaze_pitch_rate * (
+                        want - self._gaze_pitch_rad)
+                else:
+                    # NOTHING REPORTED. The first version relaxed toward level
+                    # here, reasoning that a lost target should not leave the
+                    # animal staring at the ground. Measured: that is wrong and
+                    # it defeats the loop. Inside 4 cm the eye reports on ~1 %
+                    # of frames, so 99 % of steps were un-aiming the head, and
+                    # the gaze never exceeded 9.1 deg against a target sitting
+                    # at -35. The loop was starved by the blindness it exists
+                    # to remove.
+                    #
+                    # A target lost LOW in the frame is evidence the head is
+                    # aimed too high, not evidence there is no target. So the
+                    # aim is HELD by default (decay 0.0) and the decay is a
+                    # declared, INVENTED parameter rather than an assumption
+                    # baked into the branch.
+                    self._gaze_pitch_rad *= (1.0 - self.gaze_pitch_decay)
+                self.walk_env.gaze_pitch_rad = float(
+                    np.clip(self._gaze_pitch_rad, 0.0, self.gaze_pitch_max_rad))
+        # Head yaw is commanded straight through by the caller -- there is no
+        # closed loop on it, because the thing that would close it (a search
+        # pattern) lives in brain/search.py and not in the environment.
+        self.walk_env.gaze_yaw_rad = float(self._gaze_yaw_rad)
         # The colour matcher reports an AREA FRACTION, so it is rescaled: a
         # 3 px prey covers under 1% of the frame. The eye reports a salience
         # that is already in [0, 1], and putting it through the same divisor
@@ -922,11 +1505,100 @@ class GeckoBrainEnv(gym.Env):
         # Brain 1 -> brain 2, on live data. Threat is the same danger signal the
         # reward uses; prey_visible is what the retina-substitute actually
         # reports, so the selector sees the world the animal sees.
+        # SMELL FEEDS THREAT (#266). For this species defence is gated by
+        # chemoreception, not by sight, so `danger` -- which is a geometric
+        # proximity signal -- is combined with what the nose reports rather
+        # than used alone. With smell off this is exactly the old value.
+        if self.nose is not None:
+            self.nose.step(prey_distance_m=float(food_dist_after),
+                           predator_distance_m=self._predator_distance_m())
+            # THE VISUAL TERM IS OFF, AND IT WAS WIRED TO THE WRONG SENSE
+            # (#355). This read `predator_visible=bool(danger > 0.0)`, and
+            # `danger` is `0.65 * belly_contact + fallen` -- the animal's belly
+            # touching the ground, or it having fallen over. That is a
+            # MECHANOSENSORY and postural state, not seeing anything. So the
+            # model was adding Frydlova et al. 2026's published VISUAL reaction
+            # probability of 0.07 on a mechanosensory trigger, and the same
+            # factorial measured the mechanosensory term at chi2 < 0.01,
+            # p > 0.9, verbatim: "neither independently elicited overt
+            # defensive behaviour". The sum it produced -- 0.28 -- appears
+            # nowhere in `config/proxies.yaml` and was reported in the ledger as
+            # though the paper printed it.
+            #
+            # The honest reading of that paper is the one this map's own
+            # "currently blocked" table already had: smell 0.21, sight 0.
+            # An animal that could genuinely SEE a predator would be a
+            # different argument, but this one cannot -- prey-finding is NOT
+            # ACCEPTED and the threat body is not detected by the eye at all.
+            # So flee's ceiling is the one published number, 0.21.
+            danger = max(danger, float(self.nose.defensive_probability(
+                self.nose.last["predator_odour"],
+                predator_visible=False)))
+
+        # PREY_VISIBLE IS A DECISION, NOT A PIXEL COUNT (#265). The hunt channel
+        # is hunger x prey_visible, so feeding it a raw salience makes the animal
+        # lunge at renderer noise -- which is measurably what the eye reports on
+        # two frames in three at the shipped threshold (#254). When the full loop
+        # is running, the signal is the eye's own COMMITTED evidence: several
+        # agreeing looks taken while the head was still. Otherwise it is the old
+        # value, unchanged.
+        prey_visible_signal = float(food_visible_signal)
+        if self.programs is not None:
+            prey_visible_signal = (
+                1.0 if self.evidence.last.get("committed_bearing_deg") is not None
+                else 0.0)
+        self._prey_visible_signal = prey_visible_signal
+
         if self.selector is not None:
+            # BRAIN 6 -> BRAIN 2. With no clock this is 1.0, the rest channel's
+            # salience is 0.0, and every other channel is untouched.
             self.selector.step_from_homeostasis(
                 self.homeostasis.vector(),
                 threat=danger,
-                prey_visible=float(food_visible_signal))
+                prey_visible=prey_visible_signal,
+                arousal=self._arousal)
+
+            # A SLEEPING GECKO SHUTS ITS EYES (#356), and this is the one part
+            # of resting that is published rather than inferred. Bergel et al.
+            # 2026, Nat Neurosci 29:543-550, recorded sleep in seven lizard
+            # species with EOG electrodes placed UNDER EACH EYELID of this
+            # animal -- n = 2 E. macularius -- which is possible because
+            # eublepharids are the only geckos with movable lids and this one
+            # closes them to sleep, where a tokay cannot. The same paper is why
+            # `sleep_cycle_period_s` is null: it establishes that this animal
+            # sleeps without giving a cycle period anyone can defend (#198).
+            #
+            # IT FOLLOWS THE CLOCK, NOT THE REST GATE, and the first version of
+            # this did the second (#358). Measured over 300 light-phase steps:
+            # rest releases cleanly at gate 1.0 for about eighteen steps, then
+            # the animal lying still on cold ground drives BASK's salience up to
+            # 1.0 as well, and with two channels tied at maximum salience the
+            # published model part-releases both at 0.2210 and 0.2209. That is
+            # the authors' "dual" outcome and the network settles on 100 % of
+            # steps -- it is not an oscillation -- but `argmax` turns the tie
+            # into a coin flip, so a lid driven from the rest gate FLUTTERS at a
+            # 16.7 deg mean instead of closing. Sleep is a state of the clock,
+            # not the outcome of a competition, and no source says an animal
+            # shuts its eyes because one channel out-competed another.
+            #
+            # The ANGLE is the already-declared INVENTED `EYELID_CLOSED_DEG`,
+            # reused rather than added to -- no lid excursion has ever been
+            # published for this species or any lizard. The CONJUNCTION with
+            # locomotion is also INVENTED and is the minimum needed to stop the
+            # animal sleepwalking: a gecko whose legs are running has its eyes
+            # open, so anything that moves the body opens the lids whatever the
+            # hour. Skipped while a strike is in flight, because the strike owns
+            # the lids during its own blink and runs earlier in this same step.
+            if self.strike is None or not self.strike.active:
+                asleep = (1.0 - float(np.clip(self._arousal, 0.0, 1.0))
+                          if float(self.walk_env.locomotor_drive) <= 0.0
+                          else 0.0)
+                if asleep > 0.0:
+                    self.walk_env.eyelid_rad = math.radians(
+                        EYELID_CLOSED_DEG * asleep)
+                elif self._eyes_were_shut:
+                    self.walk_env.eyelid_rad = 0.0
+                self._eyes_were_shut = asleep > 0.0
         reward = r_progress + r_eat + r_close + r_time + r_danger
 
         info = {
@@ -948,6 +1620,10 @@ class GeckoBrainEnv(gym.Env):
             "food_visible_frac": float(food_visible_frac),
             "prey_bearing_deg": prey_bearing_deg,
             "vision_source": "eye" if self.eye is not None else "colour_match",
+            "gaze_pitch_deg": float(math.degrees(self._gaze_pitch_rad)),
+            "gaze_pitch_gain": float(self.gaze_pitch_gain),
+            "gaze_yaw_deg": float(math.degrees(self._gaze_yaw_rad)),
+            "head_yaw_rate_deg_s": float(self._last_head_yaw_rate),
             # Reported every step so no run can later be described as
             # oracle-free without the record contradicting it.
             "walker_oracle": self.walker_oracle,
@@ -975,7 +1651,24 @@ class GeckoBrainEnv(gym.Env):
             info["behaviour"] = self.selector.selected()
             info["behaviour_gates"] = self.selector.gates().copy()
             info["behaviour_committed"] = bool(self.selector.committed())
-            info["behaviour_controls_nothing"] = True
+            # True until session 12, and the field is kept rather than deleted
+            # so that any reader of an older record can see when it changed.
+            info["behaviour_controls_nothing"] = self.programs is None
+            info["prey_visible_signal"] = float(
+                getattr(self, "_prey_visible_signal", 0.0))
+        if self.programs is not None:
+            info["program"] = self.programs.last.get("program")
+            info["locomotor_drive"] = float(self.walk_env.locomotor_drive)
+            info["committed_bearing_deg"] = self.programs.last.get(
+                "committed_bearing_deg")
+        if self.nose is not None:
+            info["smell"] = self.nose.state()
+        if self.clock is not None:
+            # This now reports what the clock produced. Until #352 it reported
+            # the constant 1.0 assigned at construction, for a module whose
+            # `step` was never called.
+            info["arousal"] = float(self._arousal)
+            info["clock"] = dict(self.clock.last)
         self._last_info = dict(info)
         return obs, float(reward), terminated, truncated, info
 

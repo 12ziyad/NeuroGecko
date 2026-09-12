@@ -1,0 +1,161 @@
+{
+ "schema_version": 1,
+ "generated_by": "tools/oracle_free_diagnosis.py",
+ "question": "with the oracle off, WHY is the prey never on the image?",
+ "controller": "search",
+ "seed": 2,
+ "steps": 1500,
+ "flow_gain_yaw": 0.006,
+ "camera_half_angle_deg": {
+  "horizontal": 35.0,
+  "vertical": 35.0
+ },
+ "frames": {
+  "prey_on_image": 107,
+  "behind_camera": 850,
+  "outside_azimuth_only": 459,
+  "outside_elevation_only": 0,
+  "outside_both": 83
+ },
+ "prey_geometry": {
+  "median_abs_azimuth_deg": 58.62,
+  "median_elevation_deg": -5.08,
+  "median_range_mm": 414.5,
+  "median_angular_size_deg_when_on_image": 2.575,
+  "abs_azimuth_histogram_deg": {
+   "0": 26,
+   "20": 53,
+   "40": 180,
+   "60": 131,
+   "80": 260
+  }
+ },
+ "eye_reports": {
+  "definitions": {
+   "aimed_at_prey": "report within 10.0 deg of the prey's true bearing -- the eye FOUND it",
+   "prey_merely_on_image": "the older, looser definition every previous recall number in this project used"
+  },
+  "reports_aimed_at_prey": 8,
+  "reports_while_prey_merely_on_image": 36,
+  "total": 633,
+  "true_positives": 8,
+  "false_alarms": 625,
+  "false_alarm_rate_per_frame": 0.4167,
+  "false_alarm_bearing_histogram_deg": {
+   "-40": 45,
+   "-20": 142,
+   "0": 238,
+   "20": 147,
+   "40": 53
+  }
+ },
+ "accumulator": {
+  "steps_committed": 1497,
+  "steps_committed_while_prey_actually_visible": 108
+ },
+ "by_range": {
+  "150-250mm": {
+   "frames": 21,
+   "prey_on_image": 0,
+   "true_reports": 0,
+   "false_reports": 5,
+   "on_image_fraction": 0.0,
+   "recall_when_on_image": null
+  },
+  "250-400mm": {
+   "frames": 290,
+   "prey_on_image": 66,
+   "true_reports": 5,
+   "false_reports": 122,
+   "on_image_fraction": 0.2276,
+   "recall_when_on_image": 0.0758
+  },
+  "400-9000mm": {
+   "frames": 339,
+   "prey_on_image": 41,
+   "true_reports": 3,
+   "false_reports": 158,
+   "on_image_fraction": 0.1209,
+   "recall_when_on_image": 0.0732
+  }
+ },
+ "per_fixation": {
+  "fixations_total": 15,
+  "fixations_with_prey_on_image": 1,
+  "prey_present": {
+   "fixations": 1,
+   "median_bearing_spread_deg": 66.56,
+   "median_bearing_std_deg": 21.63,
+   "median_reports_per_fixation": 20.0
+  },
+  "prey_absent": {
+   "fixations": 14,
+   "median_bearing_spread_deg": 60.54,
+   "median_bearing_std_deg": 17.12,
+   "median_reports_per_fixation": 24.0
+  }
+ },
+ "fixation_evidence": {
+  "quorum_derivation": {
+   "false_alarms_per_frame": 0.19,
+   "fixate_steps": 50,
+   "agree_deg": 6.0,
+   "field_deg": 70.0,
+   "expected_noise_in_tolerance_band": 1.6286,
+   "independent_bands_searched": 5.83,
+   "p_chance_target": 0.01,
+   "quorum": 7,
+   "p_chance_achieved": 0.008577
+  },
+  "fixations": 15,
+  "commit_events": 237,
+  "commit_events_with_prey_really_visible": 16,
+  "commit_precision": 0.0675,
+  "median_bearing_error_deg_when_right": 46.85
+ },
+ "search_state_counts": {
+  "scan.fixate": 749,
+  "scan.saccade": 30,
+  "turn": 601,
+  "travel": 120
+ },
+ "by_state": {
+  "scan.fixate": {
+   "frames": 749,
+   "prey_on_image": 38,
+   "true_reports": 3,
+   "false_reports": 365,
+   "false_alarms_per_frame": 0.4873,
+   "recall_when_on_image": 0.0789
+  },
+  "scan.saccade": {
+   "frames": 30,
+   "prey_on_image": 0,
+   "true_reports": 0,
+   "false_reports": 19,
+   "false_alarms_per_frame": 0.6333,
+   "recall_when_on_image": null
+  },
+  "travel": {
+   "frames": 120,
+   "prey_on_image": 3,
+   "true_reports": 0,
+   "false_reports": 66,
+   "false_alarms_per_frame": 0.55,
+   "recall_when_on_image": 0.0
+  },
+  "turn": {
+   "frames": 601,
+   "prey_on_image": 66,
+   "true_reports": 5,
+   "false_reports": 175,
+   "false_alarms_per_frame": 0.2912,
+   "recall_when_on_image": 0.0758
+  }
+ },
+ "gaze_pitch_deg": {
+  "median": 2.65,
+  "min": 0.0,
+  "max": 5.36
+ }
+}

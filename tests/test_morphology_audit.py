@@ -9,6 +9,7 @@ Run these tests with:
 import copy
 import json
 from pathlib import Path
+import shutil
 import tempfile
 import unittest
 import xml.etree.ElementTree as ET
@@ -133,10 +134,38 @@ class AuditContractTests(unittest.TestCase):
                     self.assertEqual(child.get("group"), "4")
                     child.attrib.pop("group")
         self.assertEqual(found, set(MEASUREMENT_SITES))
-        previous = mujoco.MjModel.from_xml_string(ET.tostring(root, encoding="unicode"))
+        # Compiled from a STRING, so `texturedir` resolves against the working
+        # directory rather than the model file: the assets must be handed over
+        # explicitly, the same fix as build_lab_morphology._assets (#308).
+        # `meshes` joined `textures` in #313 and needs the same handover. The
+        # keys are DIR-QUALIFIED, matching build_lab_morphology._assets: bare
+        # filenames make MuJoCo reject two assets that share a basename.
+        _assets = {}
+        for _folder, _key in (("textures", False), ("meshes", True)):
+            _dir = DEFAULT_XML.parent / _folder
+            if not _dir.is_dir():
+                continue
+            for f in sorted(_dir.iterdir()):
+                if f.is_file():
+                    _assets[f"{_folder}/{f.name}" if _key else f.name] = f.read_bytes()
+        previous = mujoco.MjModel.from_xml_string(
+            ET.tostring(root, encoding="unicode"), _assets)
         current = mujoco.MjModel.from_xml_path(str(DEFAULT_XML))
         self.assertEqual((previous.nq, previous.nv, previous.nu), (current.nq, current.nv, current.nu))
-        self.assertEqual((current.nq, current.nv, current.nu), (39, 38, 25))
+        # BODY VERSION BUMP, RECORDED (#288): the template grew a lower jaw --
+        # one hinge, one group-2 actuator the walking policy never sees. The
+        # walker's own action dim stays 25 (GeckoWalkEnv.nu_policy, #286).
+        # BODY VERSION BUMP, RECORDED (#288, #304): a lower jaw, then eyelids
+        # and a throat. Three hinges, three group-2 actuators the walking
+        # policy never sees. The walker's own action dim stays 25
+        # (GeckoWalkEnv.nu_policy, #286).
+        # BODY VERSION BUMP, RECORDED (#343): the single eyelids body became
+        # one per side (two roll hinges, so each lid closes DOWN over its own
+        # eye), and the tongue got a slide. Two hinges and a slide, three
+        # group-2 actuators the walking policy never sees. Action dim still
+        # 25. The site delta stays 7: it counts the MEASUREMENT sites removed
+        # from `previous`, and the eyelid sites (now one per side) are in both.
+        self.assertEqual((current.nq, current.nv, current.nu), (44, 43, 30))
         self.assertEqual(current.nsite - previous.nsite, 7)
         for field in ("body_mass", "body_inertia", "body_pos", "jnt_range", "actuator_gainprm", "actuator_ctrlrange", "geom_pos", "geom_size"):
             np.testing.assert_array_equal(getattr(previous, field), getattr(current, field), err_msg=field)
@@ -243,6 +272,16 @@ class CrossPlatformReproducibilityTests(unittest.TestCase):
                 folder.mkdir()
                 source = folder / DEFAULT_XML.name
                 source.write_bytes(canonical.replace("\n", newline).encode("utf-8"))
+                # A model's relative assets have to travel with it (#308):
+                # `make_candidate` compiles from a string and resolves both
+                # `texturedir` and `meshdir` against `<source dir>`. The mesh
+                # folder was added in #313 and has to be copied for the same
+                # reason the texture folder is -- a missing OBJ is a hard
+                # compile error, not a missing picture.
+                for assets in ("textures", "meshes"):
+                    _dir = DEFAULT_XML.parent / assets
+                    if _dir.is_dir():
+                        shutil.copytree(_dir, folder / assets)
                 sources.append(source)
             self.assertEqual(canonical_source_sha256(sources[0]), canonical_source_sha256(sources[1]))
             first, first_evidence = make_candidate(source=sources[0])

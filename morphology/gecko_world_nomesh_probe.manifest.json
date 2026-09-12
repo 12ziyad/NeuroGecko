@@ -1,0 +1,50 @@
+{
+ "schema_version": 1,
+ "generator": "utils/build_world.py",
+ "source": "morphology/gecko_body_lab_nomesh_probe.xml",
+ "source_sha256": "6979d56727d590071c0ac4a004eaf71bed280ec7821b6c1d2c6bcbfb21d7d878",
+ "output": "morphology/gecko_world_nomesh_probe.xml",
+ "output_sha256": "bdf7b2ba497d1241c8c6e2202e96569449fa239d7bfeb1a9f7deb02726c3719e",
+ "edits": [
+  {
+   "element": "worldbody",
+   "attribute": "prey",
+   "before": "absent",
+   "after": "mocap sphere r=0.009 m",
+   "reason": "the animal must see its food rather than be told where it is; mocap keeps nq/nv unchanged and the prey collides with nothing"
+  },
+  {
+   "element": "material grid",
+   "attribute": "texrepeat",
+   "before": "6 6",
+   "after": "50 50",
+   "reason": "optic flow needs features at a scale the animal crosses"
+  },
+  {
+   "element": "camera head_cam",
+   "attribute": "fovy",
+   "before": "120",
+   "after": "70",
+   "reason": "a wider field spends the same pixels on more world"
+  },
+  {
+   "element": "global",
+   "attribute": "offwidth",
+   "before": "640",
+   "after": "1280",
+   "reason": "offscreen buffer must cover the requested render size"
+  },
+  {
+   "element": "global",
+   "attribute": "offheight",
+   "before": "480",
+   "after": "960",
+   "reason": "offscreen buffer must cover the requested render size"
+  }
+ ],
+ "note": "",
+ "world_bodies_added": [
+  "prey"
+ ],
+ "asserted": "every named body, geom, site and actuator of the animal verified identical to the source at build time, compared by name; nq/nv/nu/njnt/nsensor unchanged; any added world body verified mocap so it cannot enter qpos"
+}

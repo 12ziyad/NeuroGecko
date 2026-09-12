@@ -41,3 +41,13 @@ artifacts/evidence/**/traces/
 Thumbs.db
 .vscode/
 .idea/
+
+# Credentials and local tool state -- never commit
+.wrangler/
+
+# Throwaway capture used to smoke-test tools/telemetry_run.py
+artifacts/telemetry_smoke/
+
+# The published site keeps its own small clips, so the blanket *.mp4 rule
+# above must not swallow them.
+!site/media/*.mp4

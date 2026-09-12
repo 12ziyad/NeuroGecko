@@ -1,0 +1,38 @@
+{
+ "generated_by": "tools/four_brains_demo.py",
+ "world": "morphology/gecko_world_furnished_v1.xml",
+ "seed": 3,
+ "channels_released": [
+  "bask",
+  "explore",
+  "flee",
+  "hunt",
+  "rest"
+ ],
+ "peak_gate": {
+  "hunt": 1.0,
+  "flee": 0.9378,
+  "explore": 1.0,
+  "bask": 1.0,
+  "rest": 1.0,
+  "groom": 0.0017
+ },
+ "steps_won": {
+  "hunt": 308,
+  "flee": 148,
+  "explore": 75,
+  "bask": 1975,
+  "rest": 28,
+  "groom": 0
+ },
+ "measured_limits": {
+  "basal_ganglia_release_threshold_salience": 0.199878,
+  "basal_ganglia_release_threshold_with_old_groom_tonic": 0.201091,
+  "flee_salience_ceiling_scent_alone": 0.21,
+  "flee_margin_over_threshold": 0.01012,
+  "flee_survives_hunger_up_to": 0.24,
+  "groom_tonic_salience": 0.0,
+  "rest_salience_source": "1 - arousal, from brain/arousal.py",
+  "note": "CORRECTED (#351, #353, #349, #350). The threshold was recorded here as 0.2008 and typed rather than computed; bisected it is 0.199878 with every other channel at zero and 0.201091 with groom's old 0.05 tonic in the vector, and it is a hard step -- gate exactly 0.0 below, 0.9271 above. It carries no provenance tag because it is not a constant: it is emergent and conditional on the channel count, the dopamine level and the extended variant. The line `rest_fatigue_plateau: 0.011` that stood here was a typed literal no run computed; measured across five seeds fatigue equilibrates at 0.00203-0.00254, and it is an artefact of sampling speed over one control step rather than one stride. Nothing here was tuned."
+ }
+}

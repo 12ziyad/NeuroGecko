@@ -1217,10 +1217,10 @@
         "notes": "Do not push a hunting policy to 100% on evasive prey: the real animal misses roughly one in five. A model that never misses has been fitted to the harness rather than the animal."
       },
       "lab_base_parameters": {
-        "value": {"mirror_left_fa":true,"hind_lift_multiplier":-1.3333333333333333,"front_stance_press":0.05,"front_stance_press_fr":0.05,"front_swing_lift":-0.4,"front_stance_seek":0.0,"front_seek_relax":0.35,"shoulder_sprawl_tuck":0.0,"fore_hind_amplitude_ratio":0.54,"hind_fa_amplitude":0.98,"heading_gain":1.0,"continuous_front_lift":true,"other_amplitude":0.0,"spine_amp":0.30,"tail_amp":0.15,"tail_phase_lag":0.15,"hind_sprawl_amplitude":0.0,"fore_sprawl_amplitude":0.0,"sprawl_phase":0.0,"tail_hindlimb_coupling":0.36},
+        "value": {"mirror_left_fa":true,"hind_lift_multiplier":-1.3333333333333333,"front_stance_press":0.05,"front_stance_press_fr":0.05,"front_swing_lift":-0.4,"front_stance_seek":0.0,"front_seek_relax":0.35,"shoulder_sprawl_tuck":0.0,"fore_hind_amplitude_ratio":0.54,"hind_fa_amplitude":0.98,"heading_gain":1.0,"continuous_front_lift":true,"other_amplitude":0.0,"spine_amp":0.30,"spine_phase":0.0,"tail_amp":0.15,"tail_phase_lag":0.15,"hind_sprawl_amplitude":0.0,"fore_sprawl_amplitude":0.0,"sprawl_phase":0.0,"tail_hindlimb_coupling":0.36},
         "units": "normalized actuator half-ranges except tuck radians and heading_gain per radian", "species": "INVENTED", "sample_size": null,
         "source": "Session 2 manual trial19_front_height; experimental candidate, Gate2 FAIL", "confidence": "uncertain", "recording_temp_C": null,
-        "notes": "Engineering choices, not neural/muscle data. Selected for >.04m/s, >.8 net/path and low swing loads, not as a biological optimum. Fore/hind.54 is an angular-command proxy inspired by published44.41/82.57, not anatomical validation. Continuous front mode disables seek/relax. Heading input changes left/right amplitudes with clipped gain. Live default remains legacy. Previous lab control can be reconstructed with versioned test/evidence parameters and profile. Session 3g: spine_amp/tail_amp/tail_phase_lag moved into this set at their existing constructor defaults (0.30/0.15/0.15), so behaviour is unchanged; they are now overridable per run for fitting. Session 4: hind_sprawl_amplitude/fore_sprawl_amplitude/sprawl_phase drive femur and humerus depression, which were commanded flat (measured excursion 0.95 and 1.16 deg against published 52.42+/-3.25 and 101.38+/-15.88); tail_hindlimb_coupling makes hind fore-aft amplitude depend on realised tail motion, standing in for the caudofemoralis, whose origin on the caudal vertebrae is why blocking the tail collapses hindlimb excursions in Jagnandan & Higham 2017. The sprawl amplitudes and phase default to 0.0, exactly the pre-Session-4 behaviour. tail_hindlimb_coupling defaults to 0.36, fitted so that removing tail drive reproduces Jagnandan & Higham 2017: femur retraction -20.7% against a published -21%, ankle -16.5% against -17%, forelimb and hind duty factor unchanged. Knee moves +3.8% where the paper reports -11%, and that miss is recorded rather than tuned away. At the reference tail_amp the coupling gain is exactly 1.0, so the intact gait is bit-identical to the pre-Session-4 base and only the ablation response changes; the waveform shapes are INVENTED and only the peak-to-peak excursions they are tuned against are published."
+        "notes": "Engineering choices, not neural/muscle data. Selected for >.04m/s, >.8 net/path and low swing loads, not as a biological optimum. Fore/hind.54 is an angular-command proxy inspired by published44.41/82.57, not anatomical validation. Continuous front mode disables seek/relax. Heading input changes left/right amplitudes with clipped gain. Live default remains legacy. Previous lab control can be reconstructed with versioned test/evidence parameters and profile. Session 12 (#346): spine_phase joins the set at its constructor default 0.0, unchanged behaviour, so the timing of the axial wave against the limb cycle can be declared per run and fitted against Jagnandan & Higham 2017 (pelvic yaw peaks away from the hindlimb at 0.60-0.65 of its stride). Session 3g: spine_amp/tail_amp/tail_phase_lag moved into this set at their existing constructor defaults (0.30/0.15/0.15), so behaviour is unchanged; they are now overridable per run for fitting. Session 4: hind_sprawl_amplitude/fore_sprawl_amplitude/sprawl_phase drive femur and humerus depression, which were commanded flat (measured excursion 0.95 and 1.16 deg against published 52.42+/-3.25 and 101.38+/-15.88); tail_hindlimb_coupling makes hind fore-aft amplitude depend on realised tail motion, standing in for the caudofemoralis, whose origin on the caudal vertebrae is why blocking the tail collapses hindlimb excursions in Jagnandan & Higham 2017. The sprawl amplitudes and phase default to 0.0, exactly the pre-Session-4 behaviour. tail_hindlimb_coupling defaults to 0.36, fitted so that removing tail drive reproduces Jagnandan & Higham 2017: femur retraction -20.7% against a published -21%, ankle -16.5% against -17%, forelimb and hind duty factor unchanged. Knee moves +3.8% where the paper reports -11%, and that miss is recorded rather than tuned away. At the reference tail_amp the coupling gain is exactly 1.0, so the intact gait is bit-identical to the pre-Session-4 base and only the ablation response changes; the waveform shapes are INVENTED and only the peak-to-peak excursions they are tuned against are published."
       },
       "lab_total_power_effort_alpha": {
         "value": 0.01, "units": "reward per watt", "species": "INVENTED", "sample_size": null,
@@ -1258,6 +1258,96 @@
         "source": "Jagnandan & Higham (2018), J Exp Biol221:jeb179564, Table3, https://doi.org/10.1242/jeb.179564",
         "confidence": "verified", "recording_temp_C": 30,
         "notes": "Root visually verified supplied PDFTable3; n10cohort, per-muscle subset not assumed. SEMs in source-table percent: CF onset2.26,duration2.00,peak3.08,amp9.04; G1 onset2.30,duration4.26,peak5.49,amp5.12; G2 onset2.31,duration1.56,peak1.28,amp5.90. Smoothstep envelope SHAPE is an invented interpolation, not observed waveform or force. Table1 is stanceRIA, not timing. PDFSHA256008ee101c9a00a1a873ad83e558244489c84ef7a045622d5d5be0142921de1cc."
+      },
+      "feeding_reduction_gape_deg": {
+              "value": 47.23,
+              "units": "degrees",
+              "species": "E_macularius",
+              "sample_size": "15 cycles / 3 animals",
+              "source": "Delheusy V, Brillet C, Bels VL (1995) Etude cinematique de la prise de nourriture chez Eublepharis macularius. Amphibia-Reptilia 16(2):185-201. doi:10.1163/156853895X00361. OPENED IN FULL (Brill PDF, 17 pp) by the session-12 literature sweep and adversarially verified against the printed tables/figures.",
+              "confidence": "verified",
+              "recording_temp_C": 30.0,
+              "notes": "Table 1 REDUCTION mean +/- SD 47.23 +/- 6.19 deg (GA). 6 adult males, SVL 120 +/- 4 mm, 64 fps (15.6 ms/frame), 30 C day housing, prey adult Gryllus bimaculatus 22 +/- 3 mm. Cycle TC 0.51 +/- 0.18 s; SOI 0.07, SOII 0.30, FO 0.06, FC 0.08 s; prey moved 3.65 mm/cycle. PUBLISHED, target species."
+      },
+      "feeding_reduction_cycle_s": {
+              "value": 0.51,
+              "units": "s",
+              "species": "E_macularius",
+              "sample_size": "15 cycles / 3 animals",
+              "source": "Delheusy V, Brillet C, Bels VL (1995) Etude cinematique de la prise de nourriture chez Eublepharis macularius. Amphibia-Reptilia 16(2):185-201. doi:10.1163/156853895X00361. OPENED IN FULL (Brill PDF, 17 pp) by the session-12 literature sweep and adversarially verified against the printed tables/figures.",
+              "confidence": "verified",
+              "recording_temp_C": 30.0,
+              "notes": "Table 1 REDUCTION total cycle 0.51 +/- 0.18 s; pause between cycles 0.08 +/- 0.03 s. 6 adult males, SVL 120 +/- 4 mm, 64 fps (15.6 ms/frame), 30 C day housing, prey adult Gryllus bimaculatus 22 +/- 3 mm."
+      },
+      "feeding_transport_gape_deg": {
+              "value": 45.08,
+              "units": "degrees",
+              "species": "E_macularius",
+              "sample_size": "15 cycles / 3 animals",
+              "source": "Delheusy V, Brillet C, Bels VL (1995) Etude cinematique de la prise de nourriture chez Eublepharis macularius. Amphibia-Reptilia 16(2):185-201. doi:10.1163/156853895X00361. OPENED IN FULL (Brill PDF, 17 pp) by the session-12 literature sweep and adversarially verified against the printed tables/figures.",
+              "confidence": "verified",
+              "recording_temp_C": 30.0,
+              "notes": "Table 1 TRANSPORT 45.08 +/- 10.77 deg. Prey moved 9.48 +/- 2.48 mm backward per cycle by the tongue over 0.09 s. 6 adult males, SVL 120 +/- 4 mm, 64 fps (15.6 ms/frame), 30 C day housing, prey adult Gryllus bimaculatus 22 +/- 3 mm."
+      },
+      "feeding_transport_cycle_s": {
+              "value": 0.45,
+              "units": "s",
+              "species": "E_macularius",
+              "sample_size": "15 cycles / 3 animals",
+              "source": "Delheusy V, Brillet C, Bels VL (1995) Etude cinematique de la prise de nourriture chez Eublepharis macularius. Amphibia-Reptilia 16(2):185-201. doi:10.1163/156853895X00361. OPENED IN FULL (Brill PDF, 17 pp) by the session-12 literature sweep and adversarially verified against the printed tables/figures.",
+              "confidence": "verified",
+              "recording_temp_C": 30.0,
+              "notes": "Table 1 TRANSPORT total cycle 0.45 +/- 0.08 s; SOI 0.09, SOII 0.22, FO 0.06, FC 0.08 s; pause between cycles 0.10 +/- 0.05 s. 6 adult males, SVL 120 +/- 4 mm, 64 fps (15.6 ms/frame), 30 C day housing, prey adult Gryllus bimaculatus 22 +/- 3 mm."
+      },
+      "feeding_licking_gape_deg": {
+              "value": 8.4,
+              "units": "degrees",
+              "species": "E_macularius",
+              "sample_size": "15 cycles / 3 animals",
+              "source": "Delheusy V, Brillet C, Bels VL (1995) Etude cinematique de la prise de nourriture chez Eublepharis macularius. Amphibia-Reptilia 16(2):185-201. doi:10.1163/156853895X00361. OPENED IN FULL (Brill PDF, 17 pp) by the session-12 literature sweep and adversarially verified against the printed tables/figures.",
+              "confidence": "verified",
+              "recording_temp_C": 30.0,
+              "notes": "Table 1 LICKING 8.40 +/- 1.24 deg; tongue forward 0.52 mm, backward 3.92 mm, up 3.22 mm, down 2.65 mm; head stationary; tongue sometimes reaches the eye. Licking cycles occur only AFTER transport. 6 adult males, SVL 120 +/- 4 mm, 64 fps (15.6 ms/frame), 30 C day housing, prey adult Gryllus bimaculatus 22 +/- 3 mm."
+      },
+      "feeding_licking_cycle_s": {
+              "value": 0.41,
+              "units": "s",
+              "species": "E_macularius",
+              "sample_size": "15 cycles / 3 animals",
+              "source": "Delheusy V, Brillet C, Bels VL (1995) Etude cinematique de la prise de nourriture chez Eublepharis macularius. Amphibia-Reptilia 16(2):185-201. doi:10.1163/156853895X00361. OPENED IN FULL (Brill PDF, 17 pp) by the session-12 literature sweep and adversarially verified against the printed tables/figures.",
+              "confidence": "verified",
+              "recording_temp_C": 30.0,
+              "notes": "Table 1 LICKING total cycle 0.41 +/- 0.06 s; pause between licking cycles 0.34 +/- 0.16 s. 6 adult males, SVL 120 +/- 4 mm, 64 fps (15.6 ms/frame), 30 C day housing, prey adult Gryllus bimaculatus 22 +/- 3 mm."
+      },
+      "capture_head_drop_m": {
+              "value": 0.027,
+              "units": "m",
+              "species": "E_macularius",
+              "sample_size": "1 representative cycle (Fig. 2)",
+              "source": "Delheusy V, Brillet C, Bels VL (1995) Etude cinematique de la prise de nourriture chez Eublepharis macularius. Amphibia-Reptilia 16(2):185-201. doi:10.1163/156853895X00361. OPENED IN FULL (Brill PDF, 17 pp) by the session-12 literature sweep and adversarially verified against the printed tables/figures.",
+              "confidence": "likely",
+              "recording_temp_C": 30.0,
+              "notes": "Fig. 2C: vertical head coordinate 28.5 -> 1 mm over 78 ms (~27 mm drop); Fig. 2B horizontal ~8 mm forward then ~1.5 mm return. Capture NOT statistically quantified in the paper (5 cycles from 2 animals); representative trace only, and it is truncated at 78 ms with the mouth ~8 deg open, so the closing edge is unread. Peak gape ~37 deg at ~47 ms. Capture is JAWS ONLY, no slow-open phase. 6 adult males, SVL 120 +/- 4 mm, 64 fps (15.6 ms/frame), 30 C day housing, prey adult Gryllus bimaculatus 22 +/- 3 mm."
+      },
+      "lower_jaw_length_m": {
+              "value": 0.013,
+              "units": "m",
+              "species": "E_macularius",
+              "sample_size": "5 adult males",
+              "source": "Delheusy V, Brillet C, Bels VL (1995) Etude cinematique de la prise de nourriture chez Eublepharis macularius. Amphibia-Reptilia 16(2):185-201. doi:10.1163/156853895X00361. OPENED IN FULL (Brill PDF, 17 pp) by the session-12 literature sweep and adversarially verified against the printed tables/figures.",
+              "confidence": "verified",
+              "recording_temp_C": 30.0,
+              "notes": "Lower-jaw length, jaw tip to commissure, 13 +/- 2 mm; jaw length / SVL = 0.11 (P. madagascariensis 0.18). Morphometric subsample of the feeding study."
+      },
+      "post_feeding_labial_lick_rate_per_s": {
+              "value": 0.165,
+              "units": "licks per s",
+              "species": "E_macularius",
+              "sample_size": 16,
+              "source": "Cooper WE Jr, DePerno CS, Steele LJ (1996) — post-feeding labial licking in Eublepharis macularius; full text read by the session-12 literature sweep.",
+              "confidence": "verified",
+              "recording_temp_C": 26.5,
+              "notes": "Stationary geckos in the 5 min after swallowing a cricket lick the labial scales at ~0.165/s (SE ~0.095), against ~0.02/s while moving after eating and ~0 at baseline; licks are tongue-tip contacts of rostral/mental/anterior labial scales, not broad wipes; the rate stays elevated for several minutes. NO primary source documents EYE-licking in this species or any eublepharid."
       }
   }
 }

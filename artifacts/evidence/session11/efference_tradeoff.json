@@ -1,0 +1,309 @@
+{
+ "schema_version": 1,
+ "test": "what the efference copy costs in recall and buys in precision",
+ "run": "habitat world, accepted walker (lab, no policy), eye on, scripted creep -- the #220 configuration",
+ "seeds": 6,
+ "steps": 400,
+ "rows": [
+  {
+   "label": "SHIPPED  w=1 gain=1.00",
+   "motion_window": 1,
+   "efference": "scaled",
+   "flow_gain_scale": 1.0,
+   "recall": 0.076,
+   "precision": 0.8535,
+   "f1": 0.1396,
+   "P_prey_on_image": 0.7346,
+   "P_report": 0.0654,
+   "reports": 157,
+   "rejection_census": {
+    "below motion floor": {
+     "frames": 1489,
+     "share": 0.9141
+    },
+    "above the horizon": {
+     "frames": 129,
+     "share": 0.0792
+    },
+    "too slow": {
+     "frames": 6,
+     "share": 0.0037
+    },
+    "too fast": {
+     "frames": 5,
+     "share": 0.0031
+    }
+   }
+  },
+  {
+   "label": "w=3      gain=0.00",
+   "motion_window": 3,
+   "efference": "unscaled",
+   "flow_gain_scale": 0.0,
+   "recall": 0.7385,
+   "precision": 0.6977,
+   "f1": 0.7176,
+   "P_prey_on_image": 0.7346,
+   "P_report": 0.7775,
+   "reports": 1866,
+   "rejection_census": {
+    "above the horizon": {
+     "frames": 405,
+     "share": 0.8785
+    },
+    "too slow": {
+     "frames": 49,
+     "share": 0.1063
+    },
+    "too fast": {
+     "frames": 6,
+     "share": 0.013
+    },
+    "below motion floor": {
+     "frames": 1,
+     "share": 0.0022
+    }
+   }
+  },
+  {
+   "label": "w=3      gain=0.10",
+   "motion_window": 3,
+   "efference": "unscaled",
+   "flow_gain_scale": 0.1,
+   "recall": 0.7289,
+   "precision": 0.7022,
+   "f1": 0.7153,
+   "P_prey_on_image": 0.7346,
+   "P_report": 0.7625,
+   "reports": 1830,
+   "rejection_census": {
+    "above the horizon": {
+     "frames": 402,
+     "share": 0.841
+    },
+    "too slow": {
+     "frames": 59,
+     "share": 0.1234
+    },
+    "below motion floor": {
+     "frames": 10,
+     "share": 0.0209
+    },
+    "too fast": {
+     "frames": 7,
+     "share": 0.0146
+    }
+   }
+  },
+  {
+   "label": "w=3      gain=0.20",
+   "motion_window": 3,
+   "efference": "unscaled",
+   "flow_gain_scale": 0.2,
+   "recall": 0.5933,
+   "precision": 0.7189,
+   "f1": 0.6501,
+   "P_prey_on_image": 0.7346,
+   "P_report": 0.6062,
+   "reports": 1455,
+   "rejection_census": {
+    "above the horizon": {
+     "frames": 409,
+     "share": 0.5704
+    },
+    "below motion floor": {
+     "frames": 260,
+     "share": 0.3626
+    },
+    "too slow": {
+     "frames": 41,
+     "share": 0.0572
+    },
+    "too fast": {
+     "frames": 7,
+     "share": 0.0098
+    }
+   }
+  },
+  {
+   "label": "w=3      gain=0.30",
+   "motion_window": 3,
+   "efference": "unscaled",
+   "flow_gain_scale": 0.3,
+   "recall": 0.4657,
+   "precision": 0.7731,
+   "f1": 0.5812,
+   "P_prey_on_image": 0.7346,
+   "P_report": 0.4425,
+   "reports": 1062,
+   "rejection_census": {
+    "below motion floor": {
+     "frames": 534,
+     "share": 0.5669
+    },
+    "above the horizon": {
+     "frames": 375,
+     "share": 0.3981
+    },
+    "too slow": {
+     "frames": 27,
+     "share": 0.0287
+    },
+    "too fast": {
+     "frames": 6,
+     "share": 0.0064
+    }
+   }
+  },
+  {
+   "label": "w=3      gain=0.50",
+   "motion_window": 3,
+   "efference": "unscaled",
+   "flow_gain_scale": 0.5,
+   "recall": 0.2927,
+   "precision": 0.819,
+   "f1": 0.4313,
+   "P_prey_on_image": 0.7346,
+   "P_report": 0.2625,
+   "reports": 630,
+   "rejection_census": {
+    "below motion floor": {
+     "frames": 1011,
+     "share": 0.8107
+    },
+    "above the horizon": {
+     "frames": 206,
+     "share": 0.1652
+    },
+    "too slow": {
+     "frames": 27,
+     "share": 0.0217
+    },
+    "too fast": {
+     "frames": 3,
+     "share": 0.0024
+    }
+   }
+  },
+  {
+   "label": "w=3      gain=0.75",
+   "motion_window": 3,
+   "efference": "unscaled",
+   "flow_gain_scale": 0.75,
+   "recall": 0.2161,
+   "precision": 0.8965,
+   "f1": 0.3483,
+   "P_prey_on_image": 0.7346,
+   "P_report": 0.1771,
+   "reports": 425,
+   "rejection_census": {
+    "below motion floor": {
+     "frames": 1269,
+     "share": 0.9182
+    },
+    "above the horizon": {
+     "frames": 100,
+     "share": 0.0724
+    },
+    "too slow": {
+     "frames": 11,
+     "share": 0.008
+    },
+    "too fast": {
+     "frames": 2,
+     "share": 0.0014
+    }
+   }
+  },
+  {
+   "label": "w=3      gain=1.00",
+   "motion_window": 3,
+   "efference": "unscaled",
+   "flow_gain_scale": 1.0,
+   "recall": 0.1537,
+   "precision": 0.9186,
+   "f1": 0.2634,
+   "P_prey_on_image": 0.7346,
+   "P_report": 0.1229,
+   "reports": 295,
+   "rejection_census": {
+    "below motion floor": {
+     "frames": 1412,
+     "share": 0.9464
+    },
+    "above the horizon": {
+     "frames": 64,
+     "share": 0.0429
+    },
+    "too slow": {
+     "frames": 10,
+     "share": 0.0067
+    },
+    "too fast": {
+     "frames": 6,
+     "share": 0.004
+    }
+   }
+  },
+  {
+   "label": "w=1      gain=0.20",
+   "motion_window": 1,
+   "efference": "unscaled",
+   "flow_gain_scale": 0.2,
+   "recall": 0.4889,
+   "precision": 0.7355,
+   "f1": 0.5874,
+   "P_prey_on_image": 0.7346,
+   "P_report": 0.4883,
+   "reports": 1172,
+   "rejection_census": {
+    "above the horizon": {
+     "frames": 532,
+     "share": 0.5905
+    },
+    "below motion floor": {
+     "frames": 335,
+     "share": 0.3718
+    },
+    "too slow": {
+     "frames": 28,
+     "share": 0.0311
+    },
+    "too fast": {
+     "frames": 6,
+     "share": 0.0067
+    }
+   }
+  },
+  {
+   "label": "w=6      gain=0.20",
+   "motion_window": 6,
+   "efference": "unscaled",
+   "flow_gain_scale": 0.2,
+   "recall": 0.7431,
+   "precision": 0.7499,
+   "f1": 0.7464,
+   "P_prey_on_image": 0.7346,
+   "P_report": 0.7279,
+   "reports": 1747,
+   "rejection_census": {
+    "below motion floor": {
+     "frames": 234,
+     "share": 0.5166
+    },
+    "above the horizon": {
+     "frames": 163,
+     "share": 0.3598
+    },
+    "too slow": {
+     "frames": 52,
+     "share": 0.1148
+    },
+    "too fast": {
+     "frames": 4,
+     "share": 0.0088
+    }
+   }
+  }
+ ]
+}
