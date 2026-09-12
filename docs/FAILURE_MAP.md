@@ -1508,6 +1508,14 @@ session; measured again here at **545 tests, 8 failures, 1 skip**.
 
 ---
 
+## Ledger — legible to someone who already knew what it said (Session 13p)
+
+| # | Hypothesis | Verdict | Evidence |
+|---|---|---|---|
+| 401 | The interface was legible | **Refuted -- it was legible to someone who already knew what it said** | The user could read the headings and nothing else, and was right. Two causes, both mine. **Colour:** body text was `#9fb0c4`, a desaturated slate that sits at roughly 60 % of the contrast the headings had, so every explanation, every readout and every label read as switched-off. Lifted to `#dce5ef`, muted text to `#9db0c4`, headings to pure white. **Size:** half the interface was set in 8.5 px monospace with 0.12 em tracking, which is a caption size being used for content -- wide tracking at that size greys a line out at any normal viewing distance. Every one of those is a size up, and the measurement labels moved from tracked mono to plain sans, which is what they should always have been. Spacing went with it: block padding 14 -> 20, the about page's line height 1.72 -> 1.82 and its section gaps 44 -> 60. The four actions -- open source, contact, want one, and the nerve switch -- are now solid white buttons carrying the same weight as the active tab, because a control that matters should not be a hairline outline. Two collisions fell out of the larger type and are fixed: the captions are capped at 38 % width so they stop before the centred controls, and the guided badge moved below the caption instead of underneath it |
+
+---
+
 ## Scoreboard
 
 | | |

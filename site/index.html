@@ -7,7 +7,7 @@
 <style>
   :root{
     --bg:#0b0d11; --panel:#12161d; --sunk:#0d1116; --rule:#1e2733;
-    --ink:#e8eef6; --body:#9fb0c4; --muted:#647589;
+    --ink:#ffffff; --body:#dce5ef; --muted:#9db0c4;
     --hunt:#e08268; --flee:#e05650; --explore:#7fc4e8; --bask:#f0b552;
     --rest:#c79bc2; --groom:#7a8291; --floor:#e05650; --cyan:#39c6ff;
   }
@@ -17,7 +17,8 @@
     font-family:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;font-size:13px;line-height:1.5;
     -webkit-font-smoothing:antialiased}
   .mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
-  .lbl{font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+  .lbl{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.15em;
+    text-transform:uppercase;color:var(--muted);font-weight:500}
   :focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
 
 
@@ -263,6 +264,148 @@
     font-size:13px;line-height:1.68;color:#c3d0de}
   .about .pull b{color:var(--bask)}
 
+
+  /* ------------------------------------------------------------------
+     A readability and spacing pass. Nothing structural: the interface was
+     legible to someone who already knew what it said, which is not the same
+     as legible. Text is brighter, the small mono labels are a size up, and
+     everything has more room around it.
+     ------------------------------------------------------------------ */
+
+  body{font-size:13.5px;line-height:1.62}
+
+  /* headings never dim */
+  .hero h1,.about h2,.about h3,.modal h4{color:#fff}
+  .hero h1{font-size:17px;line-height:1.36;letter-spacing:-.005em;font-weight:600}
+  .hero{padding:22px 20px 19px}
+  .hero p{font-size:12.5px;line-height:1.72;color:var(--body)}
+  .hero .tags{gap:6px;margin-top:14px}
+  .tag{font-size:9.5px;padding:4px 8px;color:var(--body);border-color:#2a3644}
+
+  /* solid white actions, the same weight as the active tab */
+  .tbtn{background:#fff;border-color:#fff;color:#0a0d12;font-weight:600;
+    padding:8px 13px;font-size:10px;letter-spacing:.1em;border-radius:4px}
+  .tbtn:hover{background:#e6edf5;border-color:#e6edf5;color:#0a0d12}
+  .tbtn s{color:#5a6675;font-weight:600}
+  .tbtn.hot{background:var(--bask);border-color:var(--bask);color:#1b1305}
+  .tbtn.hot:hover{background:#f6c46d;border-color:#f6c46d;color:#1b1305}
+  .tbtn.hot s{color:#6b5520}
+  .topacts{gap:9px}
+  .topbar{height:58px;padding:0 20px}
+  .tabs button{padding:7px 20px;font-size:10.5px}
+
+  .isobtn{top:26px;background:#fff;border-color:#fff;color:#0a0d12;font-weight:600;
+    padding:10px 20px;font-size:10.5px;letter-spacing:.12em;
+    box-shadow:0 6px 22px rgba(0,0,0,.4)}
+  .isobtn:hover{background:#e6edf5;border-color:#e6edf5;color:#0a0d12}
+  .isobtn.on{background:var(--cyan);border-color:var(--cyan);color:#04131b;
+    box-shadow:0 6px 22px rgba(57,198,255,.3)}
+  .isobtn svg{stroke-width:1.8}
+
+  /* the render overlays: bigger type, more air */
+  .livebadge{top:15px;padding:8px 15px;font-size:10px;letter-spacing:.13em}
+  .vtag b{font-size:10.5px}
+  .vtag span{font-size:10px;color:#93a4b8;margin-top:4px}
+  .read{font-size:10px;padding:8px 12px;bottom:15px;left:15px;color:var(--body)}
+  .badge{font-size:9.5px;padding:5px 9px;top:44px;left:15px}
+  .eyebox{padding:9px;gap:7px;right:15px;bottom:15px}
+  .eyebox span{font-size:9px;color:var(--muted)}
+
+  .drawer{top:76px;left:15px;width:252px}
+  .drawer > button{padding:12px 14px;font-size:10.5px;letter-spacing:.1em}
+  .drawer .body{padding:14px 15px 13px}
+  .drawer .body dl{gap:0 12px}
+  .bio dt,.drawer .body dt{font-size:10.5px;padding:4px 0;color:var(--body);
+    font-family:"IBM Plex Sans",sans-serif;letter-spacing:0}
+  .bio dd,.drawer .body dd{font-size:10.5px;padding:4px 0;color:#fff}
+  .bio dd u,.drawer .body dd u{font-size:9px;color:var(--muted);margin-left:4px}
+  .drawer .body h6{font-size:9.5px;letter-spacing:.14em;color:var(--bask)}
+  .drawer .body h6+h6,.drawer .body dl+h6{margin-top:14px;padding-top:11px}
+  .bio .tagrow span,.drawer .body .tagrow span{font-size:9px;padding:3px 6px}
+  .bio .tagrow,.drawer .body .tagrow{margin-top:12px;padding-top:10px;gap:6px}
+
+  .legend{padding:12px 14px;max-width:224px;top:78px;left:15px}
+  .legend li{font-size:10.5px;padding:3px 0;gap:8px;color:var(--body)}
+  .legend li i{width:9px;height:9px}
+  .legend li s{font-size:10px;color:var(--muted)}
+  .legend p{font-size:9.5px;line-height:1.62;margin-top:10px;padding-top:9px;color:var(--muted)}
+  .legend p b{color:var(--body)}
+  .panegraph{padding:10px;width:200px;top:78px;right:15px}
+  .panegraph canvas{width:180px;height:62px}
+
+  /* the sidebar */
+  .block{padding:20px}
+  .bgbox{padding:20px}
+  .bgring{gap:7px;margin-top:13px}
+  .nuc{padding:9px 6px}
+  .nuc b{font-size:10px;margin-bottom:5px}
+  .nuc s{font-size:15px}
+  .nuc em{font-size:8.5px;margin-top:4px;color:var(--muted)}
+  .beh{font-size:23px;margin-top:4px}
+  .ch{grid-template-columns:56px 1fr 38px;gap:9px;margin-top:8px}
+  .ch .nm{font-size:10.5px;color:var(--muted)}
+  .ch .bar{height:8px}
+  .ch .v{font-size:10.5px}
+  .grid2{gap:1px}
+  .kv{padding:11px 12px}
+  .kv .k{font-size:9.5px;color:var(--muted)}
+  .kv .v{font-size:17px;margin-top:4px}
+  .row{gap:9px;margin-top:14px}
+  .btn{font-size:10.5px;padding:8px 13px;color:var(--body)}
+  .sw span{font-size:10.5px}
+  .sw{gap:9px}
+  .foot{padding:18px 20px;font-size:10px;line-height:1.85;color:var(--muted)}
+
+  details.why{margin-top:11px}
+  details.why summary{font-size:10px;letter-spacing:.1em}
+  details.why summary .q{width:15px;height:15px;font-size:9px}
+  details.why .body{font-size:11.5px;line-height:1.75;margin-top:10px;padding-left:12px;
+    color:var(--body)}
+  .res div{font-size:10.5px;padding:5px 0}
+  .res{gap:2px 14px;margin-top:8px}
+
+  /* the about page */
+  .wrap{max-width:790px;padding:72px 28px 120px}
+  .about h2{font-size:30px;line-height:1.22;margin-bottom:18px}
+  .about h3{font-size:14px;margin:60px 0 14px;padding-top:24px;color:#fff}
+  .about p{font-size:14.5px;line-height:1.82;margin-bottom:17px;color:var(--body)}
+  .about p.lead{font-size:16.5px;line-height:1.76;color:#eef3f9;margin-bottom:22px}
+  .about li{font-size:14px;line-height:1.8;margin-bottom:9px;color:var(--body)}
+  .about .kicker{font-size:10.5px;letter-spacing:.2em;margin-bottom:16px}
+  .about .pull{margin:24px 0;padding-left:18px;font-size:15px;line-height:1.76;color:#eef3f9}
+  .cards{gap:11px;margin:22px 0 10px}
+  .card{padding:16px 17px}
+  .card b{font-size:21px}
+  .card span{font-size:11.5px;margin-top:6px;line-height:1.6;color:var(--muted)}
+  table.bio2{font-size:13px;margin:18px 0 10px}
+  table.bio2 th{font-size:9.5px;padding:9px 10px}
+  table.bio2 td{padding:9px 10px;color:var(--body)}
+  table.bio2 td.n{color:#fff}
+  table.bio2 td.g{font-size:9.5px}
+  .about code{font-size:12.5px;padding:2px 6px}
+
+  .modal{padding:26px}
+  .modal h4{font-size:16px;margin-bottom:7px}
+  .modal p{font-size:12.5px;line-height:1.7;margin-bottom:18px;color:var(--muted)}
+  .modal label{font-size:9.5px;margin:16px 0 7px}
+  .modal input,.modal textarea{padding:11px 12px;font-size:13.5px}
+  .modal .go{padding:13px;font-size:10.5px;background:#fff;border-color:#fff;color:#0a0d12;
+    font-weight:600}
+  .modal .go:hover{background:#e6edf5;border-color:#e6edf5}
+  .modal .cancel{padding:13px 17px;font-size:10.5px}
+  .modal .row2{gap:10px;margin-top:22px}
+  .modal .note{font-size:11.5px;margin-top:15px}
+
+  /* Nothing overlaps anything. The captions are left-anchored and the two big
+     controls are centred, so the caption has to stop before it reaches them. */
+  .vtag{max-width:min(38%,380px);left:15px;top:14px}
+  .vtag span{line-height:1.5}
+  .badge{top:72px}
+  .drawer{top:108px}
+  .legend{top:104px}
+  @media (max-width:1100px){.vtag{max-width:min(30%,300px)}}
+  @media (max-width:820px){.vtag{max-width:56%}.badge{top:70px}}
+
   .foot{padding:12px 16px;color:var(--muted);font-family:"IBM Plex Mono",monospace;font-size:9px;line-height:1.7}
 
   .links{display:flex;flex-direction:column;gap:6px}
@@ -432,7 +575,7 @@
   <div class="stage">
     <div class="view">
       <canvas id="cRoom"></canvas>
-      <div class="vtag"><b>The animal</b><span>live physics &middot; 38 g &middot; skin posed by the body</span></div>
+      <div class="vtag"><b>The animal</b><span>38 g, solved live &middot; skin posed by the bones under it</span></div>
       <div class="livebadge glass"><i></i><b>Live simulation</b>
         &middot; MuJoCo physics, 500&nbsp;Hz &middot; solved in your browser</div>
       <div class="drawer" id="bioDrawer">
@@ -499,7 +642,7 @@
     <div class="view">
       <canvas id="cNerve"></canvas>
       <div class="vtag"><b>The same animal, its nervous system</b>
-        <span>48 solids the physics integrates &middot; 27 fibres, each routed along the real body tree &middot; a dot leaves the head when that joint&rsquo;s command actually moves</span></div>
+        <span>48 solids the physics integrates &middot; 27 nerve fibres, each routed along the animal&rsquo;s own body tree</span></div>
       <div class="panegraph glass">
         <div class="lbl">Channel gates &middot; last 12 s</div>
         <canvas id="gates" width="328" height="112"></canvas>
@@ -607,7 +750,7 @@
             <div class="k">web body vs full body</div><div class="v">exactly 0</div>
           </div>
           <em>Exactly 0</em> means bit-identical. The rest is floating-point dust.
-          400 hypotheses are on the record, refutations included.
+          401 hypotheses are on the record, refutations included.
         </div>
       </details>
     </div>
