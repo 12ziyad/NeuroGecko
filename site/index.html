@@ -975,10 +975,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
 <script type="module">
 import load from "./media/mujoco.js";
-import { LiveGecko, withRoom } from "./live.js?v=3c0c071a67";
-import { RoomView, NerveView } from "./views.js?v=3c0c071a67";
-import { loadSkin } from "./skin.js?v=3c0c071a67";
-import { loadEyes } from "./eyes.js?v=3c0c071a67";
+import { LiveGecko, withRoom } from "./live.js?v=c7e4924b69";
+import { RoomView, NerveView } from "./views.js?v=c7e4924b69";
+import { loadSkin } from "./skin.js?v=c7e4924b69";
+import { loadEyes } from "./eyes.js?v=c7e4924b69";
 
 const CH_CSS = {hunt:"--hunt",flee:"--flee",explore:"--explore",bask:"--bask",rest:"--rest",groom:"--groom"};
 const T = id => document.getElementById(id);
@@ -991,7 +991,7 @@ try {
   // was a page running new modules against an old brain.json -- the biology
   // panel came up empty because the file the browser had cached predated it.
   // `NG_V` is rewritten on every deploy alongside the module imports.
-  const NG_V = "3c0c071a67";
+  const NG_V = "c7e4924b69";
   const cfg = await (await fetch("media/brain.json?v=" + NG_V)).json();
 
   boot.textContent = "starting MuJoCo…";

@@ -74,13 +74,31 @@ NECK_DIP_AT = 0.40
 TRUNK_W = ((0.00, 0.86), (0.25, 0.97), (0.45, 1.00), (0.70, 0.96), (1.00, 0.80))
 TRUNK_H = ((0.00, 0.86), (0.25, 0.96), (0.45, 1.00), (0.70, 0.94), (1.00, 0.78))
 
-#: TAIL, fractions of the tail's measured maximum. Fat through the first
-#: third, then a long even taper to a ROUNDED tip. No pinch at the vent: the
-#: real animal goes smoothly from hip into tail. INVENTED.
-TAIL_W = ((0.00, 0.78), (0.10, 0.94), (0.24, 1.00), (0.42, 0.90), (0.60, 0.66),
-          (0.78, 0.42), (0.92, 0.24), (1.00, 0.16))
-TAIL_H = ((0.00, 0.76), (0.10, 0.92), (0.24, 1.00), (0.42, 0.90), (0.60, 0.66),
-          (0.78, 0.42), (0.92, 0.24), (1.00, 0.16))
+#: TAIL, fractions of the tail's measured maximum.
+#:
+#: THE COMMENT THAT USED TO BE HERE WAS WRONG, and it was wrong in a way that
+#: is worth keeping on the record: it said "no pinch at the vent: the real
+#: animal goes smoothly from hip into tail". Two keepers on r/leopardgeckos
+#: said otherwise within minutes of each other -- "you want a taper at the vent
+#: before the tail gets bulbous again" -- and a full-resolution photograph of an
+#: adult, supplied by one of them and confirmed by him as correctly
+#: proportioned, shows exactly that: a distinct WAIST where the tail leaves the
+#: body, then the fat bulb, then a long even taper to a FINE POINT.
+#:
+#: What changed, measured off that photograph:
+#:   vent   0.78 -> 0.55   the waist that was not there at all
+#:   0.42   0.90 -> 0.80   it held near-maximum for a third of its length,
+#:                         which is the "tail is too thick" the same thread got
+#:   tip    0.16 -> 0.06   it ended in a stub; the animal ends in a point
+#:
+#: STILL INVENTED, and the label does not move: this is one animal, in one
+#: hand, at one angle, and a photograph is not a measurement series. What has
+#: changed is the source of the guess -- from my eye to a keeper's adult -- and
+#: that is worth saying precisely rather than upgrading the tag it does not earn.
+TAIL_W = ((0.00, 0.55), (0.08, 0.86), (0.22, 1.00), (0.42, 0.80), (0.60, 0.58),
+          (0.78, 0.34), (0.92, 0.16), (1.00, 0.06))
+TAIL_H = ((0.00, 0.53), (0.08, 0.84), (0.22, 1.00), (0.42, 0.80), (0.60, 0.58),
+          (0.78, 0.34), (0.92, 0.16), (1.00, 0.06))
 
 #: Tail ridges: the fat tail is banded by transverse rows of tubercles that
 #: give it a visibly wavy outline. Amplitude as a fraction of radius, period
@@ -327,16 +345,31 @@ LIMB_STATIONS = 34
 #: 26 of 36 appearance claims. So this is a shape choice that says it is one.
 LIMB_FLATTEN = 0.74
 
-#: The radius profile along one limb, as multipliers on the segment radius at
-#: five stations: shoulder, mid-upper-arm, ELBOW, mid-forearm, WRIST.
-#: INVENTED, and the whole point of it is the two pinches. The old profile ran
-#: 1.08, 1.05, 0.96, 0.80, 0.62 -- monotonically down -- so nothing narrowed at
-#: an articulation and a smooth curve through it reads as a banana (#342, #341,
-#: #317). Muscle belly proximally, waist at the joint, smaller belly distally
-#: is the shape of a real limb; the NUMBERS are chosen, not measured.
-LIMB_BELLY = 1.22
-LIMB_JOINT_WAIST = 0.66
+#: The radius profile along one limb.
+#:
+#: REFUTED BY A PHOTOGRAPH. #363 and #364 reasoned that a real limb is "muscle
+#: belly proximally, waist at the joint, smaller belly distally" and built the
+#: profile around two pinches. A keeper's full-resolution photograph of an adult
+#: shows nothing of the kind: the limb is WIDEST WHERE IT LEAVES THE BODY and
+#: tapers smoothly and almost monotonically to the wrist. There is no visible
+#: mid-segment belly and there is no visible pinch at the elbow or the knee.
+#:
+#: So the reasoning in #363 was right about the OLD profile being wrong and
+#: wrong about what to replace it with. A bulge-pinch-bulge-pinch chain is a
+#: sausage, and "the legs are too stiff" plus "way too robotic" -- both from
+#: that thread -- is what a sausage looks like when it moves. The animal is a
+#: smooth cone with long thin toes on the end.
+#:
+#: `LIMB_BELLY` and `LIMB_JOINT_WAIST` are kept as names at 1.0 rather than
+#: deleted, so anyone reading #363 and #364 can find what they refer to.
+LIMB_BELLY = 1.0          # was 1.22 -- there is no mid-segment belly
+LIMB_JOINT_WAIST = 1.0    # was 0.66 -- there is no pinch at the joint
 LIMB_ROOT_SINK_M = 0.004
+
+#: The taper, as multipliers on each segment's own radius, from the body out.
+#: Smooth and monotonic, which is what the photograph shows. INVENTED, from one
+#: keeper's adult on r/leopardgeckos, and it says so.
+LIMB_TAPER = (1.16, 1.08, 0.92, 0.80, 0.70, 0.60, 0.56)
 
 _UP = np.array([0.0, 0.0, 1.0])
 
@@ -396,19 +429,23 @@ def limb_skins(model, data, ring_n, limb_scale, v_band=(0.16, 0.34)):
             mid_lower = (joints[1] + joints[2]) * 0.5
             ctrl = [joints[0] + root_dir * LIMB_ROOT_SINK_M,
                     joints[0], mid_upper, joints[1], mid_lower, joints[2], end]
-            r_ctrl = [radii[0] * 1.14,                      # where it meets the body
-                      radii[0] * 1.06,                      # shoulder / hip
-                      radii[0] * LIMB_BELLY,                # upper-arm belly
-                      radii[1] * LIMB_JOINT_WAIST,          # ELBOW / KNEE, pinched
-                      radii[1] * (LIMB_BELLY * 0.74),       # forearm / shank belly
-                      radii[2] * LIMB_JOINT_WAIST * 0.80,   # WRIST / ANKLE, pinched
-                      radii[2] * 0.78]                      # foot, a paddle not a stump
+            # SMOOTH AND MONOTONIC, out of the photograph. Widest where it
+            # meets the body, narrowest at the wrist, nothing bulging or
+            # pinching in between.
+            r_ctrl = [radii[0] * LIMB_TAPER[0],   # sunk into the trunk
+                      radii[0] * LIMB_TAPER[1],   # shoulder / hip
+                      radii[0] * LIMB_TAPER[2],   # mid upper arm / thigh
+                      radii[1] * LIMB_TAPER[3],   # elbow / knee
+                      radii[1] * LIMB_TAPER[4],   # mid forearm / shank
+                      radii[2] * LIMB_TAPER[5],   # wrist / ankle
+                      radii[2] * LIMB_TAPER[6]]   # foot
 
-            # ONE pass, not two. Chaikin cuts corners, and the elbow and the
-            # knee ARE corners -- the physics puts them there and two passes
-            # rounded them into a single arc. One pass still kills the hard
-            # kink without erasing the joint (#364).
-            pts = _chaikin(ctrl, 1)
+            # TWO passes again. #364 cut this to one because the profile had
+            # pinches at the elbow and the knee that a second pass rounded away.
+            # The profile has no pinches any more -- the photograph says there
+            # are none -- so there is nothing left for the smoothing to erase,
+            # and the limb reads less like a jointed rod for it.
+            pts = _chaikin(ctrl, 2)
             seg = np.linalg.norm(np.diff(pts, axis=0), axis=1)
             arc = np.concatenate([[0.0], np.cumsum(seg)])
             total = float(arc[-1])
