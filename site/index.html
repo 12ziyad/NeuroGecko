@@ -580,6 +580,17 @@
   .panegraph{top:76px;right:15px;width:206px}
   .panegraph canvas{width:186px;height:62px}
   @media (max-width:760px){.isobtn{width:auto;right:15px;top:20px}}
+
+  .modal .pitch{list-style:none;margin:0 0 16px;padding:0}
+  .modal .pitch li{position:relative;padding:0 0 11px 20px;font-size:12.5px;
+    line-height:1.66;color:var(--body)}
+  .modal .pitch li::before{content:"";position:absolute;left:3px;top:8px;width:6px;
+    height:6px;border-radius:50%;background:var(--bask)}
+  .modal .pitch li b{color:#fff;font-weight:600}
+  .modal .pitchnote{font-size:12px;line-height:1.68;color:var(--muted);
+    border-top:1px solid var(--rule);padding-top:14px;margin:0}
+  .modal .pitchnote b{color:var(--bask)}
+  .modal{width:min(468px,100%)}
 </style>
 
 <div class="topbar">
@@ -775,7 +786,7 @@
             <div class="k">web body vs full body</div><div class="v">exactly 0</div>
           </div>
           <em>Exactly 0</em> means bit-identical. The rest is floating-point dust.
-          402 hypotheses are on the record, refutations included.
+          403 hypotheses are on the record, refutations included.
         </div>
       </details>
     </div>
@@ -914,6 +925,31 @@
   <div class="modal">
     <h4 id="mTitle">Contact</h4>
     <p id="mSub">Send a message. It comes straight to me.</p>
+
+    <div id="mPitch" hidden>
+      <ul class="pitch">
+        <li><b>It gets hungry.</b> On the interval a real one does &mdash; 2.33 days
+          between meals, which is a measured number, not a timer I picked.</li>
+        <li><b>It gets cold and goes to warm up.</b> By lying on warm ground, because
+          that is how this species actually takes heat &mdash; not from a lamp.</li>
+        <li><b>It sleeps when it should.</b> Its own day/night clock winds it down;
+          a leopard gecko is not awake at noon and neither is this one.</li>
+        <li><b>It hunts for itself.</b> Its eye has to find the cricket in what it is
+          actually looking at. Nothing hands it a position.</li>
+        <li><b>You can feed it, warm it, and pick it up</b> &mdash; and watch which of
+          the six channels in its basal ganglia wins while you do.</li>
+      </ul>
+      <p class="pitchnote">None of that is a loop pretending to be an animal. It is the
+      same simulated biology you just watched, living on your machine instead of mine.
+      <b>It does not exist yet</b> &mdash; this page is the engine it would run on. Tell
+      me you want one and I will tell you when it is real.</p>
+      <div class="row2">
+        <button class="go" id="mNext">Continue</button>
+        <button class="cancel" id="mClose2">Not now</button>
+      </div>
+    </div>
+
+    <div id="mForm">
     <label for="mEmail">Your email</label>
     <input id="mEmail" type="email" placeholder="you@example.com" autocomplete="email">
     <label for="mBody">Message</label>
@@ -923,6 +959,7 @@
       <button class="cancel" id="mClose">Close</button>
     </div>
     <p class="note" id="mNote"></p>
+    </div>
   </div>
 </div>
 
@@ -1120,20 +1157,35 @@ try {
   // instead -- it never pretends to have sent something it did not send.
   const veil = T("veil");
   let mMode = "contact";
+  // ADOPT OPENS ON THE PITCH, CONTACT OPENS ON THE FORM. Asking for an email
+  // before saying what it is for is how you get a bounce; saying what it is for
+  // first is how you get an address from someone who meant it.
   function openModal(mode) {
     mMode = mode;
-    T("mTitle").textContent = mode === "adopt" ? "Want one?" : "Contact";
-    T("mSub").innerHTML = mode === "adopt"
-      ? "It is not ready yet. Leave your email and I will tell you when it is &mdash; and you will be counted."
+    const adopt = mode === "adopt";
+    T("mTitle").textContent = adopt ? "A gecko that is actually yours" : "Contact";
+    T("mSub").innerHTML = adopt
+      ? "Everything a real one does, on your machine. Here is what that means."
       : "Send a message. It comes straight to me.";
-    T("mBody").placeholder = mode === "adopt"
+    T("mPitch").hidden = !adopt;
+    T("mForm").hidden = adopt;              // the form waits behind Continue
+    T("mBody").placeholder = adopt
       ? "Anything you want to say (optional)\u2026" : "Say hello\u2026";
-    T("mSend").textContent = mode === "adopt" ? "Count me in" : "Send";
+    T("mSend").textContent = adopt ? "Count me in" : "Send";
     T("mNote").textContent = ""; T("mNote").className = "note";
     T("mSend").disabled = false;
     veil.classList.add("on");
-    setTimeout(() => T("mEmail").focus(), 40);
+    if (!adopt) setTimeout(() => T("mEmail").focus(), 40);
   }
+
+  T("mNext").onclick = () => {
+    T("mPitch").hidden = true;
+    T("mForm").hidden = false;
+    T("mTitle").textContent = "Tell me you want one";
+    T("mSub").innerHTML = "I will email you when it is real. Nothing else, ever.";
+    setTimeout(() => T("mEmail").focus(), 40);
+  };
+  T("mClose2").onclick = () => closeModal();
   const closeModal = () => veil.classList.remove("on");
   T("openContact").onclick = () => openModal("contact");
   T("openAdopt").onclick = () => openModal("adopt");

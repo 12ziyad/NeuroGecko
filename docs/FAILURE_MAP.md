@@ -1524,6 +1524,14 @@ session; measured again here at **545 tests, 8 failures, 1 skip**.
 
 ---
 
+## Ledger — a form that asked before it explained (Session 13r)
+
+| # | Hypothesis | Verdict | Evidence |
+|---|---|---|---|
+| 403 | Asking for an email is enough, if the button is labelled | **No -- the button said what it was FOR and never said what it WAS** | `Want one` opened straight onto an email field. A visitor who has just watched a lizard walk has no idea what they would be receiving, so the form asks them to commit to a thing that was never described. It opens on the pitch now and the address field waits behind a Continue. **What the pitch claims is only what the simulation already does**: it gets hungry on the published 2.33-day meal interval; it gets cold and warms up by lying on warm ground, because this species is thigmothermic and does not take heat from a lamp; it sleeps on its own circadian clock; and it hunts with an eye that has to find the cricket in what it is actually looking at. The one line that is not yet true -- picking it up and handling it -- is in the future tense alongside a sentence in the accent colour saying **it does not exist yet**, because a waiting list that implies a product is a different thing from a waiting list. Contact still opens straight on the form, because a message needs no pitch |
+
+---
+
 ## Scoreboard
 
 | | |
