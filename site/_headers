@@ -8,3 +8,12 @@
   Cache-Control: public, max-age=60, must-revalidate
 /media/*
   Cache-Control: public, max-age=300, must-revalidate
+
+# AND `/*` CAUGHT THE API TOO, which is the same mistake pointed the other way.
+# The contact endpoint sets its own `no-store`, and this file was overriding it:
+# the counter read 1 from the edge for as long as anyone cared to watch while KV
+# held a different number entirely. A live count served from a cache is not a
+# live count. Rules are applied in order, so this one wins.
+/api/*
+  Cache-Control: no-store, no-cache, must-revalidate
+  CDN-Cache-Control: no-store

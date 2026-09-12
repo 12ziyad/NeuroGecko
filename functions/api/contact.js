@@ -29,10 +29,31 @@ function json(obj, status = 200) {
   });
 }
 
+// RFC 2606 reserves these for documentation and testing. Deployment probes use
+// them, and a probe is not a person who wants a gecko.
+const TEST_DOMAINS = /@(example\.(com|net|org)|test|invalid|localhost)$/i;
+
+// COUNTED FROM THE KEYS, NOT FROM A COUNTER. A stored integer drifts the moment
+// anything writes to it that should not have -- two deployment probes had it
+// reading 2 with no way to correct it from outside. Deriving it from the `pet:`
+// keys means the number is always exactly the people on record, a mistaken
+// entry can be removed by removing its key, and there is no second copy of the
+// truth to disagree with the first.
+async function petCount(env) {
+  let n = 0, cursor;
+  do {
+    const page = await env.NG.list({ prefix: "pet:", cursor, limit: 1000 });
+    for (const k of page.keys) {
+      if (!TEST_DOMAINS.test(k.name.slice(4))) n += 1;
+    }
+    cursor = page.list_complete ? null : page.cursor;
+  } while (cursor);
+  return n;
+}
+
 export async function onRequestGet({ env }) {
   if (!env.NG) return json({ ok: true, count: null });
-  const count = parseInt((await env.NG.get("pet_count")) || "0", 10) || 0;
-  return json({ ok: true, count });
+  return json({ ok: true, count: await petCount(env) });
 }
 
 export async function onRequestPost({ request, env }) {
@@ -61,14 +82,10 @@ export async function onRequestPost({ request, env }) {
     await env.NG.put(`msg:${at}:${ray}`, JSON.stringify(
       { kind, email, message, at, country, page: String(body.page || "").slice(0, 300) }));
     if (kind === "adopt") {
-      // One per email, so the number means people rather than button presses.
-      const seen = await env.NG.get(`pet:${email.toLowerCase()}`);
-      count = parseInt((await env.NG.get("pet_count")) || "0", 10) || 0;
-      if (!seen) {
-        count += 1;
-        await env.NG.put(`pet:${email.toLowerCase()}`, at);
-        await env.NG.put("pet_count", String(count));
-      }
+      // One key per email, so the number means people rather than button presses.
+      const k = `pet:${email.toLowerCase()}`;
+      if (!(await env.NG.get(k))) await env.NG.put(k, at);
+      count = await petCount(env);
     }
   }
 

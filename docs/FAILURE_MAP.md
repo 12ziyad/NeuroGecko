@@ -1491,6 +1491,14 @@ session; measured again here at **545 tests, 8 failures, 1 skip**.
 
 ---
 
+## Ledger — a live count served from a cache (Session 13n cont.)
+
+| # | Hypothesis | Verdict | Evidence |
+|---|---|---|---|
+| 398 | A stored counter is the obvious way to count how many people asked | **Refuted twice in one sitting -- the cache lied about it and then the counter itself did** | Two separate failures, both mine. **One:** `site/_headers` carried a `/*` rule from #391, and `/*` includes `/api/*`. The endpoint set its own `no-store` and the file overrode it, so the live count sat at a stale number while KV held a different one -- a live count served from a cache is not a live count. Rules are applied in order, so an `/api/*` rule now follows and wins. **Two:** even uncached, an integer in a key drifts the moment anything writes to it that should not have. Two deployment probes left it reading 2 with no way to correct it from outside, and the namespace the Pages Function resolves is not the one `wrangler kv` reaches from this machine, so there was no back door either. The count is now DERIVED from the `pet:` keys themselves on every read, with RFC 2606 reserved test domains excluded -- so the number is exactly the people on record, a wrong entry is removed by removing its key, and there is no second copy of the truth left to disagree with the first. Verified live: 0 |
+
+---
+
 ## Scoreboard
 
 | | |
