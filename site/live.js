@@ -29,20 +29,7 @@ const CH_COLOUR = {
 // A room the animal can actually live in. Injected into the model XML before
 // compile: a floor is already there, so this adds four walls and a ceiling
 // light. Dimensions are a stage, not a measurement.
-function withRoom(xml) {
-  // An enclosure with real walls the animal can bump into. Kept low so the
-  // camera can look over them. Dimensions are a stage, not a measurement.
-  const W = 0.42, H = 0.10, T = 0.012;
-  const walls = `
-    <body name="room" pos="0 0 0">
-      <geom name="wall_n" type="box" size="${W} ${T} ${H}" pos="0 ${W} ${H}" group="4" rgba="0.30 0.26 0.22 1"/>
-      <geom name="wall_s" type="box" size="${W} ${T} ${H}" pos="0 ${-W} ${H}" group="4" rgba="0.30 0.26 0.22 1"/>
-      <geom name="wall_e" type="box" size="${T} ${W} ${H}" pos="${W} 0 ${H}" group="4" rgba="0.30 0.26 0.22 1"/>
-      <geom name="wall_w" type="box" size="${T} ${W} ${H}" pos="${-W} 0 ${H}" group="4" rgba="0.30 0.26 0.22 1"/>
-    </body>`;
-  const i = xml.lastIndexOf("</worldbody>");
-  return i < 0 ? xml : xml.slice(0, i) + walls + xml.slice(i);
-}
+function withRoom(xml) { return xml; }   // the enclosure is gone, see views.js
 
 export class LiveGecko {
   constructor(cfg, mj, model, data) {
@@ -66,6 +53,8 @@ export class LiveGecko {
     this.asleep = this.arousal < 0.1;
     this.eyelid = 0;
     this.pulse = 0;            // depiction: decision travelling down the body
+    this.signal = -1;          // position of that band, snout 0 -> tail 1
+    this.signalStrength = 0;
     this.speed = 0;
     this._prevXY = [0, 0];
   }
@@ -90,8 +79,14 @@ export class LiveGecko {
     this.bg.converge(this.salience);
     this.gates = this.bg.gates();
     const next = this.bg.selected();
-    if (next !== this.behaviour) this.pulse = 1;      // depiction
+    if (next !== this.behaviour) { this.signal = 0; this.signalStrength = 1; }
     this.behaviour = next;
+    // The band runs head to tail once per release, then fades. Real path,
+    // drawn timing -- see views.js.
+    if (this.signal >= 0) {
+      this.signal += dt * 1.9;
+      if (this.signal > 1.15) { this.signal = -1; this.signalStrength = 0; }
+    }
 
     // Motor program: only hunt / explore / bask move the legs. rest and groom
     // map to "still" in brain/programs.py, so the animal holds its posture.

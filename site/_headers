@@ -1,0 +1,4 @@
+/*.js
+  Cache-Control: public, max-age=60, must-revalidate
+/*.html
+  Cache-Control: public, max-age=60, must-revalidate

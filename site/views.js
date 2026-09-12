@@ -15,6 +15,11 @@
 const THREE = window.THREE;
 const SPHERE = 2, CAPSULE = 3, ELLIPSOID = 4, BOX = 6;
 
+const CH_COLOUR = {
+  hunt: 0xe08268, flee: 0xe05650, explore: 0x7fc4e8,
+  bask: 0xf0b552, rest: 0xc79bc2, groom: 0x8a93a2,
+};
+
 function geomMesh(g, material) {
   const s = g.size;
   let geo;
@@ -39,6 +44,7 @@ function poseFromMat(mesh, xpos, xmat, i, m4) {
 export class RoomView {
   constructor(canvas, cfg) {
     this.cfg = cfg;
+    this.fill = 0.95;
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
     this.renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
     this.renderer.shadowMap.enabled = true;
@@ -49,7 +55,7 @@ export class RoomView {
 
     const sc = this.scene = new THREE.Scene();
     sc.background = new THREE.Color(0x0e0c0b);
-    sc.fog = new THREE.Fog(0x0e0c0b, 0.9, 2.2);
+    sc.fog = new THREE.Fog(0x0e0c0b, 0.55, 1.5);
     this.camera = new THREE.PerspectiveCamera(38, 16 / 9, 0.01, 12);
 
     sc.add(new THREE.HemisphereLight(0xffeede, 0x241d16, 0.85));
@@ -74,23 +80,16 @@ export class RoomView {
       g.fillRect(Math.random() * size, Math.random() * size, 1.6, 1.6);
     }
     const tex = new THREE.CanvasTexture(cv);
-    tex.wrapS = tex.wrapT = THREE.RepeatWrapping; tex.repeat.set(5, 5);
+    tex.wrapS = tex.wrapT = THREE.RepeatWrapping; tex.repeat.set(18, 18);
     tex.colorSpace = THREE.SRGBColorSpace;
-    const floor = new THREE.Mesh(new THREE.PlaneGeometry(1.7, 1.7),
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(6, 6),
       new THREE.MeshStandardMaterial({ map: tex, roughness: 1.0, metalness: 0 }));
     floor.receiveShadow = true;
     sc.add(floor);
 
-    // low enclosure walls, drawn (physics has its own in group 4)
-    const wallMat = new THREE.MeshStandardMaterial({
-      color: 0x4a3f34, roughness: 0.9, transparent: true, opacity: 0.55,
-      side: THREE.DoubleSide,
-    });
-    const W = 0.42, H = 0.10, T = 0.012;
-    for (const [px, py, sx, sy] of [[0, W, W, T], [0, -W, W, T], [W, 0, T, W], [-W, 0, T, W]]) {
-      const wall = new THREE.Mesh(new THREE.BoxGeometry(2 * sx, 2 * sy, 2 * H), wallMat);
-      wall.position.set(px, py, H); sc.add(wall);
-    }
+    // NO WALLS. The enclosure was mine, not the project's, and all it did was
+    // stop the animal walking. Open ground, and the floor follows it.
+    this.floor = floor;
     this.skin = null;
     this._m4 = new THREE.Matrix4();
   }
@@ -107,12 +106,13 @@ export class RoomView {
     // the SHORTER of the two screen axes, so a wide, short pane still frames it.
     const vFov = (this.camera.fov * Math.PI) / 180;
     const hFov = 2 * Math.atan(Math.tan(vFov / 2) * this.camera.aspect);
-    this.frameRadius = Math.max(0.20, (0.10 / Math.tan(Math.min(vFov, hFov) / 2)) * 1.05);
+    this.frameRadius = Math.max(0.16, (0.095 / Math.tan(Math.min(vFov, hFov) / 2)) * this.fill);
   }
   update(sim) {
     const d = sim.d;
     if (this.skin) this.skin.update(d.xpos, d.xquat);
     const t = [d.xpos[3], d.xpos[4], d.xpos[5]];
+    if (this.floor) this.floor.position.set(t[0], t[1], 0);   // ground travels with it
     const a = sim.camAngle;
     const R = this.frameRadius;
     this.camera.position.set(t[0] + R * Math.cos(a), t[1] + R * Math.sin(a), t[2] + R * 0.42);
@@ -126,6 +126,7 @@ export class RoomView {
 export class NerveView {
   constructor(canvas, cfg) {
     this.cfg = cfg;
+    this.fill = 0.70;                 // the joints view fills the frame
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
     this.renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -133,23 +134,29 @@ export class NerveView {
     sc.background = new THREE.Color(0x0a0d12);
     this.camera = new THREE.PerspectiveCamera(38, 16 / 9, 0.01, 12);
 
-    sc.add(new THREE.HemisphereLight(0xdfe9f5, 0x131922, 1.35));
-    const k = new THREE.DirectionalLight(0xffffff, 1.1);
-    k.position.set(0.4, 0.4, 0.8); sc.add(k);
+    sc.add(new THREE.HemisphereLight(0xeaf2fb, 0x16202c, 1.15));
+    const k = new THREE.DirectionalLight(0xffffff, 1.9);
+    k.position.set(0.5, 0.45, 0.9); sc.add(k);
+    const fill = new THREE.DirectionalLight(0x9fc4e8, 0.8);
+    fill.position.set(-0.7, -0.3, 0.25); sc.add(fill);
 
     const grid = new THREE.GridHelper(1.4, 28, 0x1d2836, 0x141b25);
     grid.rotation.x = Math.PI / 2; sc.add(grid);
 
-    // the physics body: pale, translucent, like a specimen in fluid
-    const shell = new THREE.MeshStandardMaterial({
-      color: 0xd6e2ee, roughness: 0.38, metalness: 0.0,
-      transparent: true, opacity: 0.42, depthWrite: false,
-      side: THREE.DoubleSide,
-    });
+    // THE SPECIMEN, SOLID. tools/skeleton_view.py renders these 48 collision
+    // solids opaque and pale, and that is the look worth matching: you can
+    // read the shape of the animal instead of squinting through it.
+    this.baseCol = new THREE.Color(0xccd9e6);
     this.meshes = cfg.geoms.map((g) => {
-      const mesh = geomMesh(g, shell.clone());
+      const mat = new THREE.MeshStandardMaterial({
+        color: this.baseCol.clone(), roughness: 0.34, metalness: 0.02,
+        emissive: new THREE.Color(0x0a1420), emissiveIntensity: 1,
+      });
+      const mesh = geomMesh(g, mat);
       sc.add(mesh); return mesh;
     });
+    // how far down the animal each solid sits: 0 at the snout, 1 at the tail tip
+    this.along = cfg.geoms.map(() => 0.5);
 
     // one marker per joint, at its real anchor, along its real axis
     const jm = new THREE.MeshBasicMaterial({ color: 0x39c6ff, transparent: true, opacity: 0.9 });
@@ -176,13 +183,48 @@ export class NerveView {
     // the SHORTER of the two screen axes, so a wide, short pane still frames it.
     const vFov = (this.camera.fov * Math.PI) / 180;
     const hFov = 2 * Math.atan(Math.tan(vFov / 2) * this.camera.aspect);
-    this.frameRadius = Math.max(0.20, (0.10 / Math.tan(Math.min(vFov, hFov) / 2)) * 1.05);
+    this.frameRadius = Math.max(0.16, (0.095 / Math.tan(Math.min(vFov, hFov) / 2)) * this.fill);
   }
 
   update(sim) {
     const d = sim.d, cfg = this.cfg;
-    for (let i = 0; i < this.meshes.length; i++)
+
+    // Where each solid sits along the animal, recomputed in its own frame so
+    // it holds however the body is turned: project onto the trunk's forward
+    // axis, snout = 0, tail tip = 1.
+    {
+      const r = 3 * 3;                       // trunk_middle is body 1
+      const fx = d.xmat[9], fy = d.xmat[10], fz = d.xmat[11];
+      let lo = Infinity, hi = -Infinity;
+      const proj = new Array(this.meshes.length);
+      for (let i = 0; i < this.meshes.length; i++) {
+        const g = sim.geomIndex[i] * 3;
+        const p = d.geom_xpos[g] * fx + d.geom_xpos[g + 1] * fy + d.geom_xpos[g + 2] * fz;
+        proj[i] = p; if (p < lo) lo = p; if (p > hi) hi = p;
+      }
+      const span = hi - lo || 1;
+      for (let i = 0; i < proj.length; i++) this.along[i] = 1 - (proj[i] - lo) / span;
+    }
+
+    // THE DECISION, LEAVING THE BASAL GANGLIA. The path is real: the selector
+    // releases a channel, brain/brainstem.py turns it into a stride command,
+    // and brain/spinal_cpg.py drives the legs -- head end to tail end. The
+    // TIMING of the band is a drawing. No conduction velocity has ever been
+    // measured in this animal and none is claimed.
+    const front = sim.signal;                // 0 -> 1 while a decision travels
+    const chCol = new THREE.Color(CH_COLOUR[sim.behaviour] ?? 0x6f8296);
+
+    for (let i = 0; i < this.meshes.length; i++) {
       poseFromMat(this.meshes[i], d.geom_xpos, d.geom_xmat, sim.geomIndex[i], this._m4);
+      const m = this.meshes[i].material;
+      let glow = 0;
+      if (front >= 0) {
+        const dist = Math.abs(this.along[i] - front);
+        glow = Math.max(0, 1 - dist * 6) * sim.signalStrength;
+      }
+      m.color.copy(this.baseCol).lerp(chCol, 0.35 * glow);
+      m.emissive.copy(chCol).multiplyScalar(0.85 * glow);
+    }
 
     for (let i = 0; i < cfg.joints.length; i++) {
       const jj = this.joints[i]; if (!jj) continue;
