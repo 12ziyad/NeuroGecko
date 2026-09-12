@@ -591,6 +591,12 @@
     border-top:1px solid var(--rule);padding-top:14px;margin:0}
   .modal .pitchnote b{color:var(--bask)}
   .modal{width:min(468px,100%)}
+
+  .modal .lead2{font-size:16px;line-height:1.45;color:#fff;font-weight:500;
+    margin:0 0 9px;letter-spacing:-.005em;
+    font-family:"IBM Plex Mono",monospace}
+  .modal .lead3{font-size:13px;line-height:1.68;color:var(--body);margin:0 0 20px}
+  .modal .pitch li{padding-bottom:9px;font-size:12px}
 </style>
 
 <div class="topbar">
@@ -786,7 +792,7 @@
             <div class="k">web body vs full body</div><div class="v">exactly 0</div>
           </div>
           <em>Exactly 0</em> means bit-identical. The rest is floating-point dust.
-          403 hypotheses are on the record, refutations included.
+          404 hypotheses are on the record, refutations included.
         </div>
       </details>
     </div>
@@ -927,22 +933,25 @@
     <p id="mSub">Send a message. It comes straight to me.</p>
 
     <div id="mPitch" hidden>
+      <p class="lead2">A real gecko. The only difference is that it is virtual.</p>
+      <p class="lead3">Same body, same brain, same 38 grams &mdash; living on your
+      machine, on its own time, whether or not you are watching.</p>
       <ul class="pitch">
-        <li><b>It gets hungry.</b> On the interval a real one does &mdash; 2.33 days
-          between meals, which is a measured number, not a timer I picked.</li>
-        <li><b>It gets cold and goes to warm up.</b> By lying on warm ground, because
-          that is how this species actually takes heat &mdash; not from a lamp.</li>
-        <li><b>It sleeps when it should.</b> Its own day/night clock winds it down;
-          a leopard gecko is not awake at noon and neither is this one.</li>
-        <li><b>It hunts for itself.</b> Its eye has to find the cricket in what it is
-          actually looking at. Nothing hands it a position.</li>
-        <li><b>You can feed it, warm it, and pick it up</b> &mdash; and watch which of
-          the six channels in its basal ganglia wins while you do.</li>
+        <li><b>It will come to know you.</b> Not a script. The longer it lives with
+          you, the more of you it has seen.</li>
+        <li><b>It sleeps because it is tired.</b> Its own day/night clock, not a
+          timer.</li>
+        <li><b>It hunts for itself.</b> Its eye has to find the cricket. Nothing
+          tells it where one is.</li>
+        <li><b>It can die.</b> Forget to feed it for long enough and you will have
+          lost it.</li>
+        <li><b>It is the size and shape of the real animal</b> &mdash; 106.5 mm from
+          snout to vent, built from measurements of living ones.</li>
       </ul>
-      <p class="pitchnote">None of that is a loop pretending to be an animal. It is the
-      same simulated biology you just watched, living on your machine instead of mine.
-      <b>It does not exist yet</b> &mdash; this page is the engine it would run on. Tell
-      me you want one and I will tell you when it is real.</p>
+      <p class="pitchnote"><b>It does not exist yet.</b> What is real today is the
+      animal you just watched &mdash; the body, the brain and the eye. The rest is
+      what I am building toward. Tell me you want one and I will tell you when it
+      is real.</p>
       <div class="row2">
         <button class="go" id="mNext">Continue</button>
         <button class="cancel" id="mClose2">Not now</button>
@@ -1164,9 +1173,8 @@ try {
     mMode = mode;
     const adopt = mode === "adopt";
     T("mTitle").textContent = adopt ? "A gecko that is actually yours" : "Contact";
-    T("mSub").innerHTML = adopt
-      ? "Everything a real one does, on your machine. Here is what that means."
-      : "Send a message. It comes straight to me.";
+    T("mSub").innerHTML = adopt ? "" : "Send a message. It comes straight to me.";
+    T("mSub").style.display = adopt ? "none" : "";
     T("mPitch").hidden = !adopt;
     T("mForm").hidden = adopt;              // the form waits behind Continue
     T("mBody").placeholder = adopt
@@ -1182,6 +1190,7 @@ try {
     T("mPitch").hidden = true;
     T("mForm").hidden = false;
     T("mTitle").textContent = "Tell me you want one";
+    T("mSub").style.display = "";
     T("mSub").innerHTML = "I will email you when it is real. Nothing else, ever.";
     setTimeout(() => T("mEmail").focus(), 40);
   };

@@ -1532,6 +1532,14 @@ session; measured again here at **545 tests, 8 failures, 1 skip**.
 
 ---
 
+## Ledger — a datasheet is not a reason to want a pet (Session 13s)
+
+| # | Hypothesis | Verdict | Evidence |
+|---|---|---|---|
+| 404 | Five explained bullets is the way to make someone want one | **No -- a specification is not a reason to want something** | The first pitch answered *what does it do* in five sentences with a measurement in each. Correct, and nobody wants a datasheet for a pet. It leads with two lines now -- **a real gecko, the only difference is that it is virtual** / same body, same brain, same 38 grams, living on your machine on its own time whether or not you are watching -- and the points underneath are short enough to read in one pass. **THE TENSE CARRIES THE HONESTY.** Three are present tense because they are true today: it sleeps on its own circadian clock, it hunts with an eye that has to find the cricket, and it is 106.5 mm snout to vent because that is the measured animal. Two are future tense because they are NOT built: coming to know whoever it lives with, and dying if it is not fed -- starvation exists in `brain/hypothalamus.py` and is not ported, and there is no learning from a keeper anywhere in this project. The block closes on **it does not exist yet**, in the accent colour, naming what IS real: the body, the brain and the eye that were just on screen. A waiting list may describe an intention; it may not describe an intention in the present tense |
+
+---
+
 ## Scoreboard
 
 | | |
