@@ -30,13 +30,15 @@ const CH_COLOUR = {
 // compile: a floor is already there, so this adds four walls and a ceiling
 // light. Dimensions are a stage, not a measurement.
 function withRoom(xml) {
-  const W = 0.55, H = 0.26, T = 0.01;
+  // An enclosure with real walls the animal can bump into. Kept low so the
+  // camera can look over them. Dimensions are a stage, not a measurement.
+  const W = 0.42, H = 0.10, T = 0.012;
   const walls = `
     <body name="room" pos="0 0 0">
-      <geom name="wall_n" type="box" size="${W} ${T} ${H}" pos="0 ${W} ${H}" group="3" rgba="0.5 0.44 0.36 1"/>
-      <geom name="wall_s" type="box" size="${W} ${T} ${H}" pos="0 ${-W} ${H}" group="3" rgba="0.5 0.44 0.36 1"/>
-      <geom name="wall_e" type="box" size="${T} ${W} ${H}" pos="${W} 0 ${H}" group="3" rgba="0.5 0.44 0.36 1"/>
-      <geom name="wall_w" type="box" size="${T} ${W} ${H}" pos="${-W} 0 ${H}" group="3" rgba="0.5 0.44 0.36 1"/>
+      <geom name="wall_n" type="box" size="${W} ${T} ${H}" pos="0 ${W} ${H}" group="4" rgba="0.30 0.26 0.22 1"/>
+      <geom name="wall_s" type="box" size="${W} ${T} ${H}" pos="0 ${-W} ${H}" group="4" rgba="0.30 0.26 0.22 1"/>
+      <geom name="wall_e" type="box" size="${T} ${W} ${H}" pos="${W} 0 ${H}" group="4" rgba="0.30 0.26 0.22 1"/>
+      <geom name="wall_w" type="box" size="${T} ${W} ${H}" pos="${-W} 0 ${H}" group="4" rgba="0.30 0.26 0.22 1"/>
     </body>`;
   const i = xml.lastIndexOf("</worldbody>");
   return i < 0 ? xml : xml.slice(0, i) + walls + xml.slice(i);
@@ -169,14 +171,18 @@ export class View {
       grid.rotation.x = Math.PI / 2; this.scene.add(grid);
     }
 
-    for (const g of cfg.geoms) {
-      const mat = mode === "room"
-        ? new THREE.MeshStandardMaterial({ color: 0xd8a457, roughness: 0.62, metalness: 0.05 })
-        : new THREE.MeshBasicMaterial({ color: 0x2a3a4a, transparent: true, opacity: 0.92 });
-      const mesh = geomMesh(g, mat);
-      this.scene.add(mesh);
-      this.meshes.push(mesh);
+    // THE ROOM VIEW DRAWS THE SKIN. The collision solids are the body the
+    // physics uses; they are the right thing to show in the nerve view and the
+    // wrong thing to call "the animal" (see site/skin.js).
+    if (mode !== "room") {
+      for (const g of cfg.geoms) {
+        const mat = new THREE.MeshBasicMaterial({ color: 0x2a3a4a, transparent: true, opacity: 0.92 });
+        const mesh = geomMesh(g, mat);
+        this.scene.add(mesh);
+        this.meshes.push(mesh);
+      }
     }
+    this.skin = null;
     this._q = new THREE.Quaternion();
     this._mat = new THREE.Matrix4();
   }
@@ -199,8 +205,11 @@ export class View {
     mesh.quaternion.setFromRotationMatrix(this._mat);
   }
 
+  attachSkin(skin) { this.skin = skin; this.scene.add(skin.mesh); }
+
   update(sim, geomIndex) {
     const d = sim.d, cfg = this.cfg;
+    if (this.skin) this.skin.update(d.xpos, d.xquat);
     const trunk = [d.xpos[3], d.xpos[4], d.xpos[5]];
     const ang = this.mode === "room" ? 2.3 : 1.15;
     const dist = this.mode === "room" ? 0.44 : 0.34;

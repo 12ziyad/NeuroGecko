@@ -1,405 +1,248 @@
 <title>NeuroGecko</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500&display=swap">
 <style>
   :root{
-    --ground:#F6F1E8; --panel:#FFFDF9; --sunk:#EFE7DA;
-    --rule:#DFD3C0; --rule-soft:#EBE2D3;
-    --ink:#1F1811; --body:#4A3E31; --muted:#8A7A66;
-    --ochre:#B9782A; --mauve:#8E5C89; --explore:#456A7C;
-    --hunt:#A24A38; --flee:#B23A34; --groom:#7A6C5B;
-    --floor:#B23A34; --grid:#E3D9C8; --ok:#4F7A3A;
-  }
-  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-    --ground:#16120F; --panel:#211A15; --sunk:#1A1511;
-    --rule:#3A2E24; --rule-soft:#2C231C;
-    --ink:#F3E8D7; --body:#D6C7B1; --muted:#9C8C78;
-    --ochre:#E3A94A; --mauve:#C79BC2; --explore:#7FA8B8;
-    --hunt:#C9705F; --flee:#D14B45; --groom:#7A6C5B;
-    --floor:#D14B45; --grid:#302620; --ok:#86B06B;
-  }}
-  :root[data-theme="dark"]{
-    --ground:#16120F; --panel:#211A15; --sunk:#1A1511;
-    --rule:#3A2E24; --rule-soft:#2C231C;
-    --ink:#F3E8D7; --body:#D6C7B1; --muted:#9C8C78;
-    --ochre:#E3A94A; --mauve:#C79BC2; --explore:#7FA8B8;
-    --hunt:#C9705F; --flee:#D14B45; --groom:#7A6C5B;
-    --floor:#D14B45; --grid:#302620; --ok:#86B06B;
+    --bg:#0b0d11; --panel:#12161d; --sunk:#0d1116; --rule:#1e2733;
+    --ink:#e8eef6; --body:#9fb0c4; --muted:#647589;
+    --hunt:#e08268; --flee:#e05650; --explore:#7fc4e8; --bask:#f0b552;
+    --rest:#c79bc2; --groom:#7a8291; --floor:#e05650; --cyan:#39c6ff;
   }
   *{box-sizing:border-box}
-  body{background:var(--ground);color:var(--body);margin:0;
-    font-family:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;font-size:14.5px;line-height:1.6;
+  html,body{height:100%}
+  body{background:var(--bg);color:var(--body);margin:0;
+    font-family:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;font-size:13px;line-height:1.5;
     -webkit-font-smoothing:antialiased}
-  .wrap{max-width:980px;margin:0 auto;padding:0 20px}
   .mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
-  .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)}
-  h1{font-family:"Instrument Serif",Georgia,serif;font-weight:400;font-size:clamp(34px,5vw,54px);line-height:1;color:var(--ink);margin:8px 0 0}
-  h2{font-family:"Instrument Serif",Georgia,serif;font-weight:400;font-size:clamp(24px,3.2vw,34px);line-height:1.1;color:var(--ink);margin:0;text-wrap:balance}
-  :focus-visible{outline:2px solid var(--ochre);outline-offset:3px}
-  header{padding:24px 0 14px}
-  .lede{max-width:62ch;margin:12px 0 0;font-size:16px}
+  .lbl{font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+  :focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
 
-  .rig{border:1px solid var(--rule);border-radius:4px;overflow:hidden;background:var(--panel);margin:20px 0 0}
-  .pane{position:relative;background:#000;line-height:0;aspect-ratio:16/9}
-  .pane canvas{width:100%;height:100%;display:block}
-  .tag{position:absolute;left:10px;top:10px;display:flex;align-items:center;gap:7px;
-    font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;
-    color:#EFE4D3;background:rgba(8,6,5,.72);padding:4px 8px;border-radius:2px;line-height:1;z-index:2}
-  .tag.depict{right:10px;left:auto;color:#C9B9A4;text-transform:none;letter-spacing:.02em;font-size:10px}
-  .seam{display:flex;align-items:center;gap:10px;padding:7px 12px;background:var(--sunk);
-    border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);
-    font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-  .seam .line{flex:1;height:1px;background:var(--rule)}
-  .boot{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-    color:#C9B9A4;font-family:"IBM Plex Mono",monospace;font-size:12px;background:#000;z-index:3;text-align:center;padding:20px}
+  .app{display:grid;grid-template-columns:minmax(0,1fr) 300px;height:100vh;min-height:600px}
+  @media (max-width:900px){.app{grid-template-columns:1fr;height:auto}}
 
-  .transport{display:flex;align-items:center;gap:12px;padding:11px 12px;border-top:1px solid var(--rule);flex-wrap:wrap}
-  .btn{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
-    padding:7px 13px;border:1px solid var(--rule);background:var(--panel);color:var(--ink);border-radius:2px;cursor:pointer}
-  .btn:hover{border-color:var(--ochre);color:var(--ochre)}
-  .tcode{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--ink);font-variant-numeric:tabular-nums}
-  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(98px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-top:0}
-  .tile{background:var(--panel);padding:10px 12px}
-  .tile .k{font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-  .tile .v{font-family:"IBM Plex Mono",monospace;font-size:18px;color:var(--ink);font-variant-numeric:tabular-nums;margin-top:3px;line-height:1.15}
-  .tile .v.state{font-size:14px}
+  .stage{display:grid;grid-template-rows:1fr 1fr;min-height:0;border-right:1px solid var(--rule)}
+  @media (max-width:900px){.stage{border-right:0}}
+  .view{position:relative;min-height:0;background:#000}
+  .view canvas{width:100%;height:100%;display:block}
+  .view + .view{border-top:1px solid var(--rule)}
+  @media (max-width:900px){.view{aspect-ratio:16/10}}
+  .vtag{position:absolute;left:12px;top:11px;z-index:2;pointer-events:none}
+  .vtag b{display:block;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;
+    text-transform:uppercase;color:#dbe6f2;font-weight:500}
+  .vtag span{display:block;font-family:"IBM Plex Mono",monospace;font-size:9.5px;color:#7d8da1;margin-top:3px}
+  .boot{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:4;
+    background:#000;color:#8ea3ba;font-family:"IBM Plex Mono",monospace;font-size:11px;text-align:center;padding:24px}
 
-  .brain{display:grid;grid-template-columns:minmax(0,210px) minmax(0,1fr);gap:22px;margin-top:22px;align-items:start}
-  @media (max-width:760px){.brain{grid-template-columns:1fr}}
-  .ch{display:grid;grid-template-columns:50px 1fr 38px;gap:8px;align-items:center;margin-bottom:6px}
-  .ch .nm{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--muted);text-transform:uppercase}
+  .side{display:flex;flex-direction:column;min-height:0;overflow-y:auto;background:var(--panel)}
+  .block{padding:14px 16px;border-bottom:1px solid var(--rule)}
+  .clock{display:flex;align-items:baseline;gap:10px}
+  .clock b{font-family:"IBM Plex Mono",monospace;font-size:30px;color:var(--ink);font-weight:500;
+    font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+  .pill{font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;
+    padding:3px 7px;border-radius:2px;border:1px solid var(--rule);color:var(--muted)}
+  .pill.sleep{color:var(--rest);border-color:var(--rest)}
+  .pill.wake{color:var(--bask);border-color:var(--bask)}
+
+  .beh{font-family:"IBM Plex Mono",monospace;font-size:20px;color:var(--ink);margin-top:2px}
+  .ch{display:grid;grid-template-columns:46px 1fr 32px;gap:7px;align-items:center;margin-top:5px}
+  .ch .nm{font-family:"IBM Plex Mono",monospace;font-size:9.5px;color:var(--muted);text-transform:uppercase}
   .ch .nm.on{color:var(--ink)}
-  .ch .bar{height:9px;background:var(--sunk);border:1px solid var(--rule-soft);position:relative;overflow:hidden}
+  .ch .bar{height:7px;background:var(--sunk);border:1px solid var(--rule);position:relative;overflow:hidden}
   .ch .bar i{position:absolute;inset:0 auto 0 0;width:0;display:block}
-  .ch .val{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--ink);text-align:right;font-variant-numeric:tabular-nums}
-  .note{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--muted);line-height:1.6;margin-top:10px}
-  #trace{width:100%;display:block;border:1px solid var(--rule);border-radius:3px;background:var(--panel)}
+  .ch .bar u{position:absolute;top:-2px;bottom:-2px;width:1px;background:var(--floor);left:19.99%}
+  .ch .v{font-family:"IBM Plex Mono",monospace;font-size:9.5px;color:var(--ink);text-align:right}
 
-  section{padding:52px 0;border-top:1px solid var(--rule);margin-top:44px}
-  .sechead{display:flex;flex-direction:column;gap:8px;margin-bottom:26px;max-width:62ch}
-  .sechead p{margin:4px 0 0}
-  .receipt{display:grid;grid-template-columns:minmax(0,185px) minmax(0,1fr);gap:20px;align-items:start;margin-bottom:24px}
-  @media (max-width:700px){.receipt{grid-template-columns:1fr;gap:10px}}
-  .receipt .what{font-size:14px;color:var(--ink);font-weight:500}
-  .receipt .src{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--muted);margin-top:3px;line-height:1.5}
-  .plot{position:relative;height:42px;border-bottom:1px solid var(--rule)}
-  .plot .bar{position:absolute;left:0;bottom:0;height:19px;background:var(--ochre)}
-  .mark{position:absolute;top:2px;bottom:0;border-left:2px dashed var(--ink)}
-  .mark span{position:absolute;top:-2px;left:6px;white-space:nowrap;font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--ink)}
-  .barlab{position:absolute;bottom:23px;font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--ochre);font-weight:500}
-  .legend{display:flex;gap:20px;flex-wrap:wrap;margin-top:10px}
-  .legend i{display:inline-block;width:22px;height:9px;background:var(--ochre);vertical-align:-1px;margin-right:7px}
-  .legend .dash{width:0;height:14px;border-left:2px dashed var(--ink);vertical-align:-3px}
-  .census{display:grid;grid-template-columns:repeat(auto-fit,minmax(126px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule)}
-  .cell{background:var(--panel);padding:15px}
-  .cell .n{font-family:"IBM Plex Mono",monospace;font-size:24px;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1.1}
-  .cell .k{font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--muted);letter-spacing:.09em;text-transform:uppercase;margin-top:5px}
-  .limits{background:var(--sunk);border:1px solid var(--rule);border-radius:3px;padding:22px 24px}
-  .limits ul{margin:12px 0 0;padding-left:18px}
-  .limits li{margin:7px 0}
-  code{font-family:"IBM Plex Mono",monospace;font-size:.92em;color:var(--ink)}
-  footer{border-top:1px solid var(--rule);padding:24px 0 52px;margin-top:44px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--rule);border:1px solid var(--rule)}
+  .kv{background:var(--panel);padding:8px 10px}
+  .kv .k{font-family:"IBM Plex Mono",monospace;font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .kv .v{font-family:"IBM Plex Mono",monospace;font-size:15px;color:var(--ink);font-variant-numeric:tabular-nums;margin-top:2px}
+
+  canvas#trace{width:100%;display:block;background:var(--sunk);border:1px solid var(--rule)}
+  .row{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}
+  .btn{font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
+    padding:6px 10px;border:1px solid var(--rule);background:var(--sunk);color:var(--body);border-radius:2px;cursor:pointer}
+  .btn:hover{border-color:var(--cyan);color:var(--cyan)}
+  .foot{padding:12px 16px;color:var(--muted);font-family:"IBM Plex Mono",monospace;font-size:9px;line-height:1.7}
 </style>
 
-<header class="wrap">
-  <span class="eyebrow">Eublepharis macularius &middot; running live in your browser</span>
-  <h1>NeuroGecko</h1>
-  <p class="lede">
-    A leopard gecko rebuilt from real measurements of living animals. This is not a recording.
-    The physics is MuJoCo compiled to WebAssembly, running the certified body on your device;
-    the brain deciding what it does is the same brain, checked against the original to
-    <span class="mono" style="color:var(--ink)">7&times;10<sup>&minus;15</sup></span>.
-  </p>
-</header>
-
-<main class="wrap">
-  <div class="rig">
-    <div class="pane">
+<div class="app">
+  <div class="stage">
+    <div class="view">
       <canvas id="cRoom"></canvas>
-      <div class="tag"><span>The room</span></div>
+      <div class="vtag"><b>The animal</b><span>live physics &middot; 38 g &middot; skin posed by the body</span></div>
       <div class="boot" id="boot">starting the physics engine&hellip;</div>
     </div>
-
-    <div class="seam"><span>Same animal</span><span class="line"></span><span>the nervous system</span></div>
-
-    <div class="pane">
+    <div class="view">
       <canvas id="cNerve"></canvas>
-      <div class="tag"><span>48 solids &middot; 38 joints</span></div>
-      <div class="tag depict"><span>brightness = joint speed &middot; hue = released channel &middot; the travelling band is a drawing</span></div>
-    </div>
-
-    <div class="transport">
-      <button class="btn" id="play">Pause</button>
-      <span class="tcode" id="hour">09.50 h</span>
-      <button class="btn" id="dawn">Jump to day</button>
-      <button class="btn" id="dusk">Jump to night</button>
-      <span class="eyebrow" id="fps"></span>
-    </div>
-
-    <div class="tiles">
-      <div class="tile"><div class="k">Released</div><div class="v state" id="t_beh">&mdash;</div></div>
-      <div class="tile"><div class="k">Arousal</div><div class="v" id="t_ar">0.000</div></div>
-      <div class="tile"><div class="k">Eyelid</div><div class="v" id="t_lid">0&deg;</div></div>
-      <div class="tile"><div class="k">Body temp</div><div class="v" id="t_temp">30.5</div></div>
-      <div class="tile"><div class="k">Hunger</div><div class="v" id="t_hun">0.90</div></div>
-      <div class="tile"><div class="k">Speed</div><div class="v" id="t_spd">0.000</div></div>
+      <div class="vtag"><b>The same animal, its joints</b>
+        <span>marker at each joint's real anchor and axis &middot; brightness = |qvel|</span></div>
     </div>
   </div>
 
-  <div class="brain">
-    <div>
-      <div class="eyebrow" style="margin-bottom:9px">Behaviour gates</div>
-      <div id="chan"></div>
-      <div class="note">
-        Six behaviours compete; one is released. The red line is the measured release floor,
-        <span style="color:var(--ink)">0.1999</span> &mdash; nothing below it is released, however far
-        ahead of its rivals it is.
-      </div>
-    </div>
-    <div>
-      <div class="eyebrow" style="margin-bottom:9px">Arousal and rest salience, live</div>
-      <canvas id="trace" width="1360" height="300"></canvas>
-      <div class="note">
-        The clock runs <span style="color:var(--ink)">900&times;</span> so a day passes while you
-        watch. <code>rest</code>'s salience is one minus arousal &mdash; when the light phase
-        arrives it crosses the floor, the animal stops, and its eyes close.
-      </div>
-    </div>
-  </div>
-
-  <section>
-    <div class="sechead">
-      <span class="eyebrow">Why it is not a gecko-shaped robot</span>
-      <h2>It reproduces experiments on real geckos that nobody fitted it to.</h2>
-      <p>Geckos walked over force plates so their legs could be weighed. Geckos were filmed at high
-      speed eating crickets. Geckos slept with electrodes under their eyelids. Geckos were shown a
-      live snake, to find out what actually frightens them &mdash; it is smell, not sight.</p>
-    </div>
-
-    <div class="receipt">
-      <div><div class="what">Tail restrained &rarr; hind-limb force lost</div>
-        <div class="src">Living geckos, n&nbsp;=&nbsp;10<br>Jagnandan &amp; Higham 2017</div></div>
-      <div>
-        <div class="plot"><div class="barlab" style="left:0">simulated &minus;20.7%</div>
-          <div class="bar" style="width:69%"></div>
-          <div class="mark" style="left:70%"><span>measured &minus;21%</span></div></div>
-        <div class="plot" style="margin-top:14px"><div class="barlab" style="left:0">simulated &minus;16.5%</div>
-          <div class="bar" style="width:55%"></div>
-          <div class="mark" style="left:56.7%"><span>measured &minus;17%</span></div></div>
+  <aside class="side">
+    <div class="block">
+      <div class="lbl">Day / night clock</div>
+      <div class="clock"><b id="hour">09.50</b><span class="mono" style="color:var(--muted)">h</span>
+        <span class="pill sleep" id="pill">asleep</span></div>
+      <div class="row">
+        <button class="btn" id="play">Pause</button>
+        <button class="btn" id="day">Day</button>
+        <button class="btn" id="night">Night</button>
+        <button class="btn" id="spin">Orbit</button>
       </div>
     </div>
 
-    <div class="receipt">
-      <div><div class="what">How long one cricket lasts</div>
-        <div class="src">Metabolism and feeding interval measured by<br>different scientists, decades apart</div></div>
-      <div><div class="plot"><div class="barlab" style="left:0">its own metabolism says 79 h</div>
-        <div class="bar" style="width:79%"></div>
-        <div class="mark" style="left:56%"><span>keepers feed every 56 h</span></div></div>
-        <div class="src" style="margin-top:9px">Nobody arranged that agreement. It falls out of the animal&rsquo;s own physiology.</div></div>
-    </div>
-
-    <div class="receipt">
-      <div><div class="what">Foot duty factor, all four feet</div>
-        <div class="src">Fraction of a stride each foot carries load<br>Living geckos, n&nbsp;=&nbsp;10</div></div>
-      <div>
-        <div class="plot"><div class="barlab" style="left:0">hind 0.787 / 0.790</div>
-          <div class="bar" style="width:78.8%"></div>
-          <div class="mark" style="left:78%"><span>measured 0.78</span></div></div>
-        <div class="plot" style="margin-top:14px"><div class="barlab" style="left:0">fore 0.770 / 0.764</div>
-          <div class="bar" style="width:76.7%"></div>
-          <div class="mark" style="left:70%"><span>measured 0.70</span></div></div>
-        <div class="src" style="margin-top:9px">Four feet even to within 0.006 &mdash; and the fore pair overshoots. Two of six gait gates still fail.</div>
+    <div class="block">
+      <div class="lbl">Released behaviour</div>
+      <div class="beh" id="beh">&mdash;</div>
+      <div id="chan" style="margin-top:8px"></div>
+      <div class="lbl" style="margin-top:9px;letter-spacing:.06em;text-transform:none;font-size:9px;line-height:1.6">
+        The red line is the measured release floor, 0.1999. Nothing below it is released,
+        however far ahead of its rivals it is.
       </div>
     </div>
 
-    <div class="legend eyebrow">
-      <span><i></i>measured in the simulation</span>
-      <span><i class="dash"></i>measured in a living gecko</span>
+    <div class="block">
+      <div class="lbl" style="margin-bottom:8px">Arousal &amp; rest salience</div>
+      <canvas id="trace" width="560" height="150"></canvas>
     </div>
-  </section>
 
-  <section>
-    <div class="sechead">
-      <span class="eyebrow">How it was built</span>
-      <h2>Assembled, not trained.</h2>
-      <p>The virtual fly and the virtual rat are trained neural networks. This animal is arithmetic:
-      a hand-written spinal rhythm on measured gait numbers, a published basal-ganglia model that
-      reproduces its paper&rsquo;s table to four decimal places, hunger computed from its own
-      metabolism. When a network was trained for six million steps to improve the walk, it came out
-      <strong style="color:var(--ink)">worse</strong>, and was thrown away. That is why it can run
-      here at all: there are no weights to download.</p>
+    <div class="block">
+      <div class="grid2">
+        <div class="kv"><div class="k">Arousal</div><div class="v" id="ar">0.000</div></div>
+        <div class="kv"><div class="k">Eyelid</div><div class="v" id="lid">0&deg;</div></div>
+        <div class="kv"><div class="k">Body temp</div><div class="v" id="temp">30.5</div></div>
+        <div class="kv"><div class="k">Hunger</div><div class="v" id="hun">0.90</div></div>
+        <div class="kv"><div class="k">Speed m/s</div><div class="v" id="spd">0.000</div></div>
+        <div class="kv"><div class="k">Frames</div><div class="v" id="fps">&mdash;</div></div>
+      </div>
     </div>
-    <div class="census">
-      <div class="cell"><div class="n">38</div><div class="k">grams</div></div>
-      <div class="cell"><div class="n">48</div><div class="k">solids</div></div>
-      <div class="cell"><div class="n">38</div><div class="k">joints</div></div>
-      <div class="cell"><div class="n">359</div><div class="k">propositions tested</div></div>
-      <div class="cell"><div class="n">293</div><div class="k">refuted</div></div>
-      <div class="cell"><div class="n">0</div><div class="k">neural networks</div></div>
-    </div>
-    <p style="margin-top:20px;max-width:62ch">
-      The browser build is checked, not trusted. <code>tools/conformance_web.py</code> runs the
-      JavaScript and the original Python on the same inputs and compares them: the walker agrees to
-      <span class="mono" style="color:var(--ink)">7.3e&minus;15</span> across all thirty actuators,
-      and the basal ganglia and the clock agree <span class="mono" style="color:var(--ok)">exactly</span>.
-      It is the same animal, not a lookalike &mdash; and that test caught a real bug before you saw it.
-    </p>
-  </section>
 
-  <section>
-    <div class="limits">
-      <span class="eyebrow">What it cannot do</span>
-      <h2 style="font-size:24px;margin-top:6px">The rest of this page is only worth reading if this part is honest.</h2>
-      <ul>
-        <li><strong style="color:var(--ink)">About half built.</strong> Five of eight brain modules exist. Memory and learning do not.</li>
-        <li><strong style="color:var(--ink)">It mostly misses.</strong> It stalks, strikes with a real jaw, and catches on roughly 6.5% of strikes.</li>
-        <li><strong style="color:var(--ink)">The eye is the weak link</strong>, and is not running on this page &mdash; here the animal has hunger, temperature and a clock, not vision.</li>
-        <li><strong style="color:var(--ink)">The citations are not yet verified.</strong> 212 references harvested from the project&rsquo;s own text; none checked against a bibliographic database.</li>
-        <li><strong style="color:var(--ink)">Two of six gait gates fail</strong>, and the animal does not grow, age or reproduce.</li>
-      </ul>
+    <div class="foot">
+      MuJoCo WebAssembly &middot; 500 Hz physics, 50 Hz control &middot; accepted walker, zero residual<br>
+      brain checked against the original: walker 7.3e&minus;15, gates and clock exactly 0<br>
+      <span style="color:var(--muted)">joint markers are measured; their colour is a drawing</span>
     </div>
-  </section>
-</main>
-
-<footer class="wrap eyebrow">
-  accepted walker &middot; gait_profile="lab" &middot; zero residual &middot; MuJoCo WebAssembly &middot; 50 Hz control, 500 Hz physics
-</footer>
+  </aside>
+</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
 <script type="module">
 import load from "./media/mujoco.js";
-import { LiveGecko, View, withRoom } from "./live.js";
+import { LiveGecko, withRoom } from "./live.js";
+import { RoomView, NerveView } from "./views.js";
+import { loadSkin } from "./skin.js";
 
-const CH_CSS = {hunt:"--hunt",flee:"--flee",explore:"--explore",bask:"--ochre",rest:"--mauve",groom:"--groom"};
-const boot = document.getElementById("boot");
+const CH_CSS = {hunt:"--hunt",flee:"--flee",explore:"--explore",bask:"--bask",rest:"--rest",groom:"--groom"};
+const T = id => document.getElementById(id);
 const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const boot = T("boot");
 
 try {
   boot.textContent = "loading the brain…";
   const cfg = await (await fetch("media/brain.json")).json();
+
   boot.textContent = "starting MuJoCo…";
   const mj = await load();
-  const xmlText = await (await fetch("media/gecko.xml")).text();
-  mj.FS.writeFile("/g.xml", withRoom(xmlText));
+  const xml = await (await fetch("media/gecko.xml")).text();
+  mj.FS.writeFile("/g.xml", withRoom(xml));
   const model = mj.MjModel.mj_loadXML("/g.xml");
   const data = new mj.MjData(model);
   mj.mj_forward(model, data);
 
-  // map exported geom list -> live geom ids (group 3, in order)
   const geomIndex = [];
-  for (let i = 0, k = 0; i < model.ngeom; i++) {
+  for (let i = 0, k = 0; i < model.ngeom; i++)
     if (model.geom_group[i] === 3 && k < cfg.geoms.length) { geomIndex.push(i); k++; }
-  }
 
   const sim = new LiveGecko(cfg, mj, model, data);
-  // how far down the body each part sits, for the nerve view
-  sim.bodyAlong = {}; sim.jointActivity = {};
-  {
-    const xs = [];
-    for (let b = 1; b < model.nbody; b++) xs.push(data.xpos[b*3]);
-    const lo = Math.min(...xs), hi = Math.max(...xs);
-    for (let b = 1; b < model.nbody; b++)
-      sim.bodyAlong[b] = hi > lo ? 1 - (data.xpos[b*3] - lo) / (hi - lo) : 0.5;
-  }
+  sim.geomIndex = geomIndex;
+  sim.camAngle = 2.35;
+  sim.jointActivity = {}; sim.bodyAlong = {};
 
-  const room = new View(document.getElementById("cRoom"), cfg, "room");
-  const nerve = new View(document.getElementById("cNerve"), cfg, "nerve");
-  function fit(){
-    for (const [v,id] of [[room,"cRoom"],[nerve,"cNerve"]]) {
-      const c = document.getElementById(id);
-      v.resize(c.clientWidth || 800, c.clientHeight || 450);
+  boot.textContent = "loading the skin…";
+  const skin = await loadSkin("media/");
+
+  const room = new RoomView(T("cRoom"), cfg);
+  room.attachSkin(skin);
+  const nerve = new NerveView(T("cNerve"), cfg);
+  const fit = () => {
+    for (const [v, id] of [[room,"cRoom"],[nerve,"cNerve"]]) {
+      const c = T(id);
+      v.resize(Math.max(320, c.clientWidth), Math.max(200, c.clientHeight));
     }
-  }
+  };
   addEventListener("resize", fit); fit();
   boot.style.display = "none";
 
-  // channel bars
-  const chan = document.getElementById("chan"), bars = {};
+  const chan = T("chan"), bars = {};
   for (const c of cfg.bg.channels) {
-    const row = document.createElement("div"); row.className = "ch";
-    row.innerHTML = `<span class="nm">${c}</span><span class="bar"><i></i></span><span class="val">0.00</span>`;
-    chan.appendChild(row);
-    bars[c] = {f:row.querySelector("i"), v:row.querySelector(".val"), n:row.querySelector(".nm")};
+    const r = document.createElement("div"); r.className = "ch";
+    r.innerHTML = `<span class="nm">${c}</span><span class="bar"><i></i><u></u></span><span class="v">0.00</span>`;
+    chan.appendChild(r);
+    bars[c] = {f:r.querySelector("i"), v:r.querySelector(".v"), n:r.querySelector(".nm")};
     bars[c].f.style.background = css(CH_CSS[c]);
   }
-  const T = id => document.getElementById(id);
-  const tc = T("trace"), tx = tc.getContext("2d");
-  const hist = [];
 
-  let running = true, last = performance.now(), acc = 0, frames = 0, fpsT = performance.now();
-  T("play").onclick = () => { running = !running; T("play").textContent = running ? "Pause" : "Play"; };
-  T("dawn").onclick = () => { sim.clock.t = 9.5*3600; };
-  T("dusk").onclick = () => { sim.clock.t = 16*3600; };
-
-  function drawTrace(){
-    const W = tc.width, H = tc.height, P = 34;
-    tx.fillStyle = css("--panel"); tx.fillRect(0,0,W,H);
-    tx.font = '11px "IBM Plex Mono", monospace'; tx.textAlign="right"; tx.textBaseline="middle";
-    for (const v of [0,0.5,1]) {
-      const y = H-P - v*(H-P-10);
-      tx.strokeStyle = css("--grid"); tx.beginPath(); tx.moveTo(P,y+.5); tx.lineTo(W-8,y+.5); tx.stroke();
-      tx.fillStyle = css("--muted"); tx.fillText(v.toFixed(1), P-8, y);
-    }
-    const fy = H-P - 0.199878*(H-P-10);
-    tx.save(); tx.setLineDash([5,4]); tx.strokeStyle = css("--floor");
-    tx.beginPath(); tx.moveTo(P,fy+.5); tx.lineTo(W-8,fy+.5); tx.stroke(); tx.restore();
-    tx.fillStyle = css("--floor"); tx.textAlign="left"; tx.fillText("release floor 0.1999", P+6, fy-9);
-    const n = hist.length; if (!n) return;
-    const step = (W-P-8)/Math.max(1,hist.length-1);
-    for (const [key,colour] of [["a","--ochre"],["r","--mauve"]]) {
-      tx.strokeStyle = css(colour); tx.lineWidth = 2; tx.beginPath();
-      hist.forEach((h,i)=>{ const y = H-P - h[key]*(H-P-10); const x = P+i*step;
-        i ? tx.lineTo(x,y) : tx.moveTo(x,y); });
+  const tc = T("trace"), tx = tc.getContext("2d"), hist = [];
+  function trace(){
+    const W = tc.width, H = tc.height, P = 4;
+    tx.fillStyle = css("--sunk"); tx.fillRect(0,0,W,H);
+    const fy = H-P - 0.199878*(H-2*P);
+    tx.save(); tx.setLineDash([4,3]); tx.strokeStyle = css("--floor"); tx.globalAlpha=.8;
+    tx.beginPath(); tx.moveTo(0,fy); tx.lineTo(W,fy); tx.stroke(); tx.restore();
+    if (!hist.length) return;
+    const dx = W/Math.max(1,hist.length-1);
+    for (const [k,col] of [["a","--bask"],["r","--rest"]]) {
+      tx.strokeStyle = css(col); tx.lineWidth = 1.8; tx.beginPath();
+      hist.forEach((h,i)=>{ const y = H-P-h[k]*(H-2*P); i?tx.lineTo(i*dx,y):tx.moveTo(i*dx,y); });
       tx.stroke();
     }
-    tx.textAlign="left"; tx.textBaseline="middle";
-    tx.fillStyle=css("--ochre"); tx.fillRect(P,H-14,16,3);
-    tx.fillStyle=css("--muted"); tx.fillText("arousal",P+22,H-12);
-    tx.fillStyle=css("--mauve"); tx.fillRect(P+86,H-14,16,3);
-    tx.fillStyle=css("--muted"); tx.fillText("rest salience",P+108,H-12);
   }
 
+  let running = true, spin = true, last = performance.now(), acc = 0, frames = 0, fpsT = last;
+  T("play").onclick = () => { running = !running; T("play").textContent = running?"Pause":"Play"; };
+  T("day").onclick   = () => { sim.clock.t = 9.5*3600; };
+  T("night").onclick = () => { sim.clock.t = 16*3600; };
+  T("spin").onclick  = () => { spin = !spin; };
+
   function frame(now){
-    const dt = Math.min(0.1,(now-last)/1000); last = now;
+    const dt = Math.min(.1,(now-last)/1000); last = now;
+    if (spin) sim.camAngle += dt * 0.16;
     if (running) {
-      acc += dt;
-      let n = 0;
-      while (acc > 1/50 && n < 4) { sim.controlStep(); acc -= 1/50; n++; }
-      // per-joint activity for the nerve view: real |qvel|, pooled per body
-      const act = {};
-      for (const j of cfg.joints) {
-        if (j.type === 0) continue;
-        const v = Math.abs(data.qvel[j.dofadr] || 0);
-        act[j.body] = Math.max(act[j.body] || 0, Math.min(1, v / 6));
-      }
-      sim.jointActivity = act;
-      if (hist.length > 600) hist.shift();
+      acc += dt; let n = 0;
+      while (acc > 1/50 && n < 5) { sim.controlStep(); acc -= 1/50; n++; }
+      if (hist.length > 260) hist.shift();
       hist.push({a: sim.arousal, r: 1 - sim.arousal});
     }
-    room.update(sim, geomIndex);
-    nerve.update(sim, geomIndex);
+    room.update(sim);
+    nerve.update(sim);
 
-    T("hour").textContent = sim.timeOfDayH.toFixed(2) + " h";
-    T("t_beh").textContent = sim.behaviour || "none";
-    T("t_beh").style.color = sim.behaviour ? css(CH_CSS[sim.behaviour]) : css("--muted");
-    T("t_ar").textContent = sim.arousal.toFixed(3);
-    T("t_lid").textContent = Math.round(sim.eyelid) + "°";
-    T("t_temp").textContent = sim.bodyC.toFixed(1);
-    T("t_hun").textContent = sim.hunger.toFixed(2);
-    T("t_spd").textContent = sim.speed.toFixed(3);
+    T("hour").textContent = sim.timeOfDayH.toFixed(2);
+    const asleep = sim.arousal < 0.1;
+    T("pill").textContent = asleep ? "asleep" : "awake";
+    T("pill").className = "pill " + (asleep ? "sleep" : "wake");
+    T("beh").textContent = sim.behaviour || "none";
+    T("beh").style.color = sim.behaviour ? css(CH_CSS[sim.behaviour]) : css("--muted");
+    T("ar").textContent = sim.arousal.toFixed(3);
+    T("lid").textContent = Math.round(sim.eyelid)+"°";
+    T("temp").textContent = sim.bodyC.toFixed(1);
+    T("hun").textContent = sim.hunger.toFixed(2);
+    T("spd").textContent = sim.speed.toFixed(3);
     cfg.bg.channels.forEach((c,i)=>{
-      const g = sim.gates[i] || 0;
+      const g = sim.gates[i]||0;
       bars[c].f.style.width = (g*100).toFixed(1)+"%";
       bars[c].v.textContent = g.toFixed(2);
-      bars[c].n.className = "nm" + (sim.behaviour===c ? " on" : "");
+      bars[c].n.className = "nm"+(sim.behaviour===c?" on":"");
     });
-    drawTrace();
+    trace();
     frames++;
-    if (now - fpsT > 1000) { T("fps").textContent = frames + " fps"; frames = 0; fpsT = now; }
+    if (now-fpsT > 1000) { T("fps").textContent = frames; frames = 0; fpsT = now; }
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
+  // debug handle: lets a profiler time each stage without guessing
+  window.__ng = { sim, room, nerve, skin, cfg, mj, model, data };
 } catch (e) {
   boot.textContent = "could not start: " + (e && e.message ? e.message : e);
   console.error(e);
