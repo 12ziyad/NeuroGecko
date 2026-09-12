@@ -1249,6 +1249,14 @@ try {
       + "&body=" + encodeURIComponent((body || "") + "\n\nfrom: " + email);
   }
 
+  // COUNT THE VISIT. One record per person per day, no IP kept -- see
+  // functions/api/hit.js. Fired once on load and never again, and a failure
+  // here is silent because a counter must never take the page down with it.
+  fetch("/api/hit", {
+    method: "POST", headers: { "content-type": "application/json" },
+    body: JSON.stringify({ ref: document.referrer || "" }),
+  }).catch(() => {});
+
   // how many people have asked
   fetch("/api/contact").then((r) => r.json()).then((j) => {
     if (j && j.count) T("petN").textContent = j.count;

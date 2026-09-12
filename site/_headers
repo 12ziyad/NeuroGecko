@@ -17,3 +17,9 @@
 /api/*
   Cache-Control: no-store, no-cache, must-revalidate
   CDN-Cache-Control: no-store
+
+# The admin page is behind a key, but it should not be in a search index or an
+# edge cache either. Belt and braces.
+/admin.html
+  Cache-Control: no-store
+  X-Robots-Tag: noindex, nofollow

@@ -1,0 +1,204 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>NeuroGecko — admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500&display=swap">
+<style>
+  :root{--bg:#0b0d11;--panel:#12161d;--sunk:#0d1116;--rule:#1e2733;
+    --ink:#ffffff;--body:#dce5ef;--muted:#9db0c4;--bask:#f0b552;--cyan:#39c6ff;
+    --explore:#7fc4e8;--flee:#e05650}
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--body);margin:0;padding:0 0 80px;
+    font-family:"IBM Plex Sans",system-ui,sans-serif;font-size:13.5px;line-height:1.62;
+    -webkit-font-smoothing:antialiased}
+  .bar{display:flex;align-items:center;gap:12px;padding:0 22px;height:58px;
+    border-bottom:1px solid var(--rule);background:#0a0d12}
+  .bar b{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--ink);font-weight:600}
+  .bar i{width:7px;height:7px;border-radius:50%;background:var(--bask);
+    box-shadow:0 0 0 3px rgba(240,181,82,.16)}
+  .bar a{margin-left:auto;font-family:"IBM Plex Mono",monospace;font-size:10px;
+    letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-decoration:none}
+  .bar a:hover{color:var(--cyan)}
+  .wrap{max-width:960px;margin:0 auto;padding:28px 22px}
+  .lbl{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.15em;
+    text-transform:uppercase;color:var(--muted);font-weight:500}
+  .gate{max-width:400px;margin:12vh auto;padding:26px;background:var(--panel);
+    border:1px solid var(--rule);border-radius:6px}
+  .gate h1{margin:0 0 6px;font-family:"IBM Plex Mono",monospace;font-size:17px;color:var(--ink)}
+  .gate p{margin:0 0 18px;font-size:12px;color:var(--muted)}
+  input{width:100%;background:var(--sunk);border:1px solid var(--rule);border-radius:3px;
+    color:var(--ink);padding:11px 12px;font-family:"IBM Plex Mono",monospace;font-size:13px;outline:none}
+  input:focus{border-color:var(--cyan)}
+  button{margin-top:14px;width:100%;font-family:"IBM Plex Mono",monospace;font-size:10.5px;
+    letter-spacing:.12em;text-transform:uppercase;padding:12px;border-radius:3px;border:1px solid #fff;
+    background:#fff;color:#0a0d12;font-weight:600;cursor:pointer}
+  button:hover{background:#e6edf5;border-color:#e6edf5}
+  .err{color:var(--flee);font-size:12px;margin-top:12px;min-height:18px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:11px;margin:16px 0 26px}
+  .card{border:1px solid var(--rule);border-radius:5px;padding:16px 17px;background:var(--panel)}
+  .card b{display:block;font-family:"IBM Plex Mono",monospace;font-size:29px;color:var(--ink);
+    font-weight:500;letter-spacing:-.02em;line-height:1.1}
+  .card span{display:block;font-size:11px;color:var(--muted);margin-top:6px}
+  .card.hot b{color:var(--bask)}
+  h2{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--ink);font-weight:600;
+    margin:34px 0 12px;padding-top:20px;border-top:1px solid var(--rule)}
+  canvas{width:100%;height:190px;display:block;background:var(--sunk);
+    border:1px solid var(--rule);border-radius:4px}
+  table{width:100%;border-collapse:collapse;font-size:12.5px}
+  th{text-align:left;font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--muted);font-weight:400;padding:8px 10px;
+    border-bottom:1px solid var(--rule)}
+  td{padding:8px 10px;border-bottom:1px solid rgba(30,39,51,.55);color:var(--body)}
+  td.n{font-family:"IBM Plex Mono",monospace;color:var(--ink);text-align:right;white-space:nowrap}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+  @media (max-width:700px){.two{grid-template-columns:1fr}}
+  .msg{border:1px solid var(--rule);border-radius:5px;padding:13px 15px;margin-bottom:9px;
+    background:var(--panel)}
+  .msg .h{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;
+    font-family:"IBM Plex Mono",monospace;font-size:11px}
+  .msg .h b{color:var(--ink)}
+  .msg .h s{text-decoration:none;color:var(--muted);margin-left:auto;font-size:10px}
+  .msg .k{display:inline-block;font-size:9px;letter-spacing:.1em;text-transform:uppercase;
+    padding:2px 6px;border-radius:2px;border:1px solid var(--rule);color:var(--muted)}
+  .msg .k.adopt{color:var(--bask);border-color:#4a3a17}
+  .msg p{margin:9px 0 0;font-size:12.5px;line-height:1.65;white-space:pre-wrap;color:var(--body)}
+  .note{font-size:11.5px;color:var(--muted);line-height:1.6;margin-top:10px}
+</style>
+
+<div class="gate" id="gate">
+  <h1>NeuroGecko admin</h1>
+  <p>Key required. It is stored in this browser only.</p>
+  <input id="k" type="password" placeholder="admin key" autocomplete="off">
+  <button id="go">Open</button>
+  <div class="err" id="err"></div>
+</div>
+
+<div id="app" hidden>
+  <div class="bar"><i></i><b>NeuroGecko admin</b>
+    <a href="/" target="_blank">open the site &nearr;</a>
+    <a href="#" id="out" style="margin-left:16px">sign out</a></div>
+  <div class="wrap">
+    <div class="lbl">Visitors</div>
+    <div class="cards">
+      <div class="card"><b id="cTotal">—</b><span>people, all time</span></div>
+      <div class="card"><b id="cToday">—</b><span>today</span></div>
+      <div class="card"><b id="c7">—</b><span>last 7 days</span></div>
+      <div class="card hot"><b id="cWant">—</b><span>asked for one</span></div>
+    </div>
+
+    <h2>Visitors per day</h2>
+    <canvas id="chart" width="1840" height="380"></canvas>
+    <p class="note" id="note"></p>
+
+    <div class="two">
+      <div>
+        <h2>Where they came from</h2>
+        <table><thead><tr><th>Referrer</th><th style="text-align:right">People</th></tr></thead>
+          <tbody id="refs"></tbody></table>
+      </div>
+      <div>
+        <h2>Countries</h2>
+        <table><thead><tr><th>Country</th><th style="text-align:right">People</th></tr></thead>
+          <tbody id="cty"></tbody></table>
+      </div>
+    </div>
+
+    <h2>Messages</h2>
+    <div id="msgs"></div>
+  </div>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const KEYNAME = "ng_admin_key";
+
+async function load(key) {
+  const r = await fetch("/api/stats?k=" + encodeURIComponent(key));
+  const j = await r.json();
+  if (!r.ok || !j.ok) throw new Error(j.error || ("HTTP " + r.status));
+  return j;
+}
+
+function render(d) {
+  $("gate").hidden = true;
+  $("app").hidden = false;
+  $("cTotal").textContent = d.totalVisitors.toLocaleString();
+  $("cToday").textContent = d.today.toLocaleString();
+  $("c7").textContent = d.last7.toLocaleString();
+  $("cWant").textContent = d.wantOne.toLocaleString();
+  $("note").textContent = d.note;
+
+  // ---- daily bars. Last 45 days, so the chart stays readable as it grows.
+  const days = d.daily.slice(-45);
+  const cv = $("chart"), x = cv.getContext("2d");
+  const W = cv.width, H = cv.height, P = 26;
+  x.clearRect(0, 0, W, H);
+  const max = Math.max(1, ...days.map((r) => r.n));
+  // capped, so a single day's bar does not stretch across the whole chart
+  const bw = Math.min(days.length ? (W - P * 2) / days.length : 0, 70);
+  x.strokeStyle = "#1e2733"; x.lineWidth = 1;
+  for (let g = 0; g <= 4; g++) {
+    const y = P + (H - P * 2) * (g / 4);
+    x.beginPath(); x.moveTo(P, y); x.lineTo(W - P, y); x.stroke();
+  }
+  x.fillStyle = "#9db0c4"; x.font = "22px 'IBM Plex Mono', monospace";
+  x.fillText(String(max), 4, P + 8);
+  days.forEach((r, i) => {
+    const h = (H - P * 2) * (r.n / max);
+    x.fillStyle = i === days.length - 1 ? "#f0b552" : "#39c6ff";
+    x.fillRect(P + i * bw + 1.5, H - P - h, Math.max(2, bw - 3), h);
+  });
+  if (days.length) {
+    x.fillStyle = "#9db0c4"; x.font = "20px 'IBM Plex Mono', monospace";
+    x.fillText(days[0].day, P, H - 6);
+    const last = days[days.length - 1].day;
+    x.fillText(last, W - P - x.measureText(last).width, H - 6);
+  }
+
+  const rows = (el, list, blank) => {
+    el.innerHTML = list.length ? "" : `<tr><td colspan="2" style="color:var(--muted)">${blank}</td></tr>`;
+    for (const r of list) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${r.name}</td><td class="n">${r.count}</td>`;
+      el.appendChild(tr);
+    }
+  };
+  rows($("refs"), d.referrers, "nothing yet");
+  rows($("cty"), d.countries, "nothing yet");
+
+  const m = $("msgs");
+  m.innerHTML = d.messages.length ? "" :
+    `<p class="note">No messages yet.</p>`;
+  for (const v of d.messages) {
+    const el = document.createElement("div");
+    el.className = "msg";
+    const when = (v.at || "").replace("T", " ").slice(0, 16);
+    el.innerHTML = `<div class="h"><span class="k ${v.kind === "adopt" ? "adopt" : ""}">`
+      + `${v.kind === "adopt" ? "wants one" : "message"}</span>`
+      + `<b>${(v.email || "").replace(/[<>&]/g, "")}</b>`
+      + `<s>${when}${v.country ? " · " + v.country : ""}</s></div>`
+      + (v.message ? `<p></p>` : "");
+    if (v.message) el.querySelector("p").textContent = v.message;
+    m.appendChild(el);
+  }
+}
+
+async function attempt(key, fromStore) {
+  try {
+    render(await load(key));
+    localStorage.setItem(KEYNAME, key);
+  } catch (e) {
+    if (fromStore) localStorage.removeItem(KEYNAME);
+    $("err").textContent = String(e.message || e);
+  }
+}
+
+$("go").onclick = () => attempt($("k").value.trim(), false);
+$("k").onkeydown = (e) => { if (e.key === "Enter") $("go").click(); };
+$("out").onclick = (e) => { e.preventDefault(); localStorage.removeItem(KEYNAME); location.reload(); };
+
+const saved = localStorage.getItem(KEYNAME);
+if (saved) attempt(saved, true); else $("k").focus();
+</script>

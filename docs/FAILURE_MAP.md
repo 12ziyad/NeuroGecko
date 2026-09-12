@@ -1540,6 +1540,14 @@ session; measured again here at **545 tests, 8 failures, 1 skip**.
 
 ---
 
+## Ledger — counting people without keeping them (Session 13t)
+
+| # | Hypothesis | Verdict | Evidence |
+|---|---|---|---|
+| 405 | Visitor counting needs a counter | **No -- KV has no atomic increment, so a counter would drift down and never say by how much** | Two visitors landing together both read the old number and both write the same new one, and one is lost silently. The same defect that made the `pet_count` integer disagree with reality in #398, and the same fix: count distinct KEYS, because writing the same key twice is idempotent. One record per visitor per day, `v:<date>:<hash>`, counted by listing. **NO IP IS STORED ANYWHERE** -- the key is a truncated SHA-256 of address, user agent and the date, so the same person on the same day collapses to one key and tomorrow is an unrelated one. That is deliberate: it can answer *how many people came today* and cannot answer *was that the same person as yesterday*. **The write budget also drove the design**: KV's free tier caps daily writes, so one write per page VIEW would exhaust it within minutes of a front page -- exactly when the numbers matter -- and the tracking would stop without saying so. One write per visitor per day survives a spike. `functions/api/stats.js` is gated on an `ADMIN_KEY` Pages secret set through the CLI, never committed, and compared in **constant time**, because a plain `===` on a secret leaks its length to anyone willing to time the responses. Verified against the live deployment before shipping: no key and a wrong key both return 401, a recorded hit came back with its referrer and country, and the dashboard rendered |
+
+---
+
 ## Scoreboard
 
 | | |
