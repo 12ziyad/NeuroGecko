@@ -1,3 +1,5 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>NeuroGecko</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -65,6 +67,21 @@
   .btn:hover{border-color:var(--cyan);color:var(--cyan)}
   .btn.on{border-color:var(--cyan);color:var(--cyan);background:#0f1a22}
   .foot{padding:12px 16px;color:var(--muted);font-family:"IBM Plex Mono",monospace;font-size:9px;line-height:1.7}
+
+  /* Controls live ON the picture. You change the camera while watching the
+     animal, not while looking away from it at a sidebar. */
+  .hud{position:absolute;left:12px;right:12px;bottom:11px;z-index:3;
+    display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  .hud .btn{background:rgba(9,12,17,.72);border-color:rgba(120,150,180,.28);
+    backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);padding:5px 9px;font-size:9px}
+  .hud .btn:hover{border-color:var(--cyan);color:var(--cyan)}
+  .hud .btn.on{border-color:var(--cyan);color:var(--cyan);background:rgba(15,26,34,.85)}
+  .hud .sep{flex:1 1 auto}
+  .hud .read{font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:.08em;
+    color:#8ea3ba;background:rgba(9,12,17,.72);border:1px solid rgba(120,150,180,.18);
+    padding:5px 8px;border-radius:2px;white-space:nowrap}
+  .hud .read b{color:#dbe6f2;font-weight:500}
+  @media (max-width:560px){.hud .read{display:none}}
 </style>
 
 <div class="app">
@@ -72,12 +89,31 @@
     <div class="view">
       <canvas id="cRoom"></canvas>
       <div class="vtag"><b>The animal</b><span>live physics &middot; 38 g &middot; skin posed by the body</span></div>
+      <div class="hud">
+        <button class="btn" id="play">Pause</button>
+        <button class="btn" id="spin">Orbit</button>
+        <span style="width:6px"></span>
+        <span id="cams" style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn cam on" data-m="follow">Follow</button>
+          <button class="btn cam" data-m="side">Side</button>
+          <button class="btn cam" data-m="front">Front</button>
+          <button class="btn cam" data-m="top">Top</button>
+          <button class="btn cam" data-m="low">Low</button>
+        </span>
+        <span class="sep"></span>
+        <button class="btn" id="day">Day</button>
+        <button class="btn" id="night">Night</button>
+        <span class="read" id="hud1">&mdash;</span>
+      </div>
       <div class="boot" id="boot">starting the physics engine&hellip;</div>
     </div>
     <div class="view">
       <canvas id="cNerve"></canvas>
-      <div class="vtag"><b>The same animal, its skeleton</b>
-        <span>the 48 solids the physics integrates &middot; joint markers at each real anchor and axis</span></div>
+      <div class="vtag"><b>The same animal, its nervous system</b>
+        <span>48 solids the physics integrates &middot; 27 fibres, each routed along the real body tree &middot; a dot leaves the head when that joint&rsquo;s command actually moves</span></div>
+      <div class="hud">
+        <span class="read" id="hud2">&mdash;</span>
+      </div>
     </div>
   </div>
 
@@ -86,21 +122,10 @@
       <div class="lbl">Day / night clock</div>
       <div class="clock"><b id="hour">09.50</b><span class="mono" style="color:var(--muted)">h</span>
         <span class="pill sleep" id="pill">asleep</span></div>
-      <div class="row">
-        <button class="btn" id="play">Pause</button>
-        <button class="btn" id="day">Day</button>
-        <button class="btn" id="night">Night</button>
-        <button class="btn" id="spin">Orbit</button>
+      <div class="lbl" style="margin-top:11px;letter-spacing:.06em;text-transform:none;font-size:9px;line-height:1.6">
+        Playback, camera and time of day are on the picture itself, bottom left.
       </div>
-      <div class="lbl" style="margin-top:12px">Camera</div>
-      <div class="row" id="cams">
-        <button class="btn cam on" data-m="follow">Follow</button>
-        <button class="btn cam" data-m="side">Side</button>
-        <button class="btn cam" data-m="front">Front</button>
-        <button class="btn cam" data-m="top">Top</button>
-        <button class="btn cam" data-m="low">Low</button>
-      </div>
-          </div>
+    </div>
 
     <div class="block">
       <div class="lbl">Released behaviour</div>
@@ -108,7 +133,23 @@
       <div id="chan" style="margin-top:8px"></div>
       <div class="lbl" style="margin-top:9px;letter-spacing:.06em;text-transform:none;font-size:9px;line-height:1.6">
         The red line is the measured release floor, 0.1999. Nothing below it is released,
-        however far ahead of its rivals it is.
+        however far ahead of its rivals it is.<br><br>
+        <b style="color:var(--body)">Four of the six can release here.</b>
+        <span style="color:var(--rest)">rest</span> when the clock winds arousal down,
+        <span style="color:var(--bask)">bask</span> when the animal is below its preferred
+        band, <span style="color:var(--explore)">explore</span> once it is warm again,
+        <span style="color:var(--groom)">groom</span> never: its drive is a flat zero,
+        and it is zero on purpose. Grooming in this species does have a published
+        trigger &mdash; licking the lips after a meal, 0.165 licks per second &mdash;
+        and that already runs elsewhere as a reflex, not as a thing this selector
+        competes for. The channel is honestly unreachable rather than quietly
+        propped up, which is what it used to be.
+        <span style="color:var(--hunt)">hunt</span> and
+        <span style="color:var(--flee)">flee</span> stay at zero for a reason, and it is
+        not a bug: hunt needs the eye, and the retina and tectum are not ported to the
+        browser yet; flee needs something to run from and somewhere to run to, and this
+        world has neither. Handing the brain a prey position it never saw would be an
+        oracle, and this project has spent a long time taking those back out.
       </div>
     </div>
 
@@ -125,6 +166,9 @@
         <div class="kv"><div class="k">Hunger</div><div class="v" id="hun">0.90</div></div>
         <div class="kv"><div class="k">Speed m/s</div><div class="v" id="spd">0.000</div></div>
         <div class="kv"><div class="k">Walked m</div><div class="v" id="dist">0.00</div></div>
+        <div class="kv"><div class="k">Program</div><div class="v" id="sst">&mdash;</div></div>
+        <div class="kv"><div class="k">Head yaw</div><div class="v" id="hy">0&deg;</div></div>
+        <div class="kv"><div class="k">Impulses</div><div class="v" id="imp">0</div></div>
         <div class="kv"><div class="k">Frames</div><div class="v" id="fps">&mdash;</div></div>
       </div>
     </div>
@@ -132,7 +176,7 @@
     <div class="foot">
       MuJoCo WebAssembly &middot; 500 Hz physics, 50 Hz control &middot; accepted walker, zero residual<br>
       brain checked against the original: walker 7.3e&minus;15, gates and clock exactly 0<br>
-      <span style="color:var(--muted)">joint markers are measured; their colour is a drawing</span>
+      <span style="color:var(--muted)">nerve route and impulse timing are measured; conduction speed is a drawing</span>
     </div>
   </aside>
 </div>
@@ -140,9 +184,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
 <script type="module">
 import load from "./media/mujoco.js";
-import { LiveGecko, withRoom } from "./live.js?v=9d3fda40";
-import { RoomView, NerveView } from "./views.js?v=9d3fda40";
-import { loadSkin } from "./skin.js?v=9d3fda40";
+import { LiveGecko, withRoom } from "./live.js?v=38950d9089";
+import { RoomView, NerveView } from "./views.js?v=38950d9089";
+import { loadSkin } from "./skin.js?v=38950d9089";
 
 const CH_CSS = {hunt:"--hunt",flee:"--flee",explore:"--explore",bask:"--bask",rest:"--rest",groom:"--groom"};
 const T = id => document.getElementById(id);
@@ -245,6 +289,17 @@ try {
     T("hun").textContent = sim.hunger.toFixed(2);
     T("spd").textContent = sim.speed.toFixed(3);
     T("dist").textContent = sim.distance.toFixed(2);
+    T("sst").textContent = sim.program === "search" ? (sim.searchState || "-")
+                          : (sim.program || "-");
+    T("hy").textContent = Math.round(sim.headYaw) + "\u00b0";
+    T("imp").textContent = nerve.liveDots || 0;
+    T("hud1").innerHTML = `${sim.timeOfDayH.toFixed(2)} h &middot; `
+      + `<b style="color:${sim.behaviour?css(CH_CSS[sim.behaviour]):css("--muted")}">`
+      + `${sim.behaviour || "none"}</b> &middot; ${asleep?"asleep":"awake"}`
+      + ` &middot; ${sim.distance.toFixed(2)} m walked`;
+    T("hud2").innerHTML = `<b>${nerve.liveDots || 0}</b> impulses in flight &middot; `
+      + `${nerve.nerves.length} fibres &middot; head ${Math.round(sim.headYaw)}&deg;`
+      + ` &middot; ${sim.searchState || "-"}${sim.looking ? " &middot; looking" : ""}`;
     cfg.bg.channels.forEach((c,i)=>{
       const g = sim.gates[i]||0;
       bars[c].f.style.width = (g*100).toFixed(1)+"%";

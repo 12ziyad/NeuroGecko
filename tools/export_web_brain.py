@@ -161,6 +161,14 @@ def main():
 
     # Which joints move which body, so the nervous-system view can colour a
     # limb by the activity of the joint that drives it. Read from the model.
+    # Which actuator drives which joint, so the browser can start a nerve
+    # impulse at the moment the brain's command to that joint ACTUALLY changes
+    # rather than on a timer. Read from the model's transmission table.
+    jnt_act = {}
+    for a in range(model.nu):
+        if int(model.actuator_trntype[a]) == int(mujoco.mjtTrn.mjTRN_JOINT):
+            jnt_act[int(model.actuator_trnid[a, 0])] = a
+
     jnt = []
     for j in range(model.njnt):
         jnt.append({
@@ -168,10 +176,57 @@ def main():
             "body": int(model.jnt_bodyid[j]),
             "type": int(model.jnt_type[j]),
             "dofadr": int(model.jnt_dofadr[j]),
+            "act": int(jnt_act.get(j, -1)),
         })
 
+    # SEARCH. Read off the live class, never typed here: if a constant moves in
+    # brain/search.py the browser moves with it, and tools/conformance_web.py
+    # runs both step machines side by side to prove they agree.
+    from brain.search import SearchPattern
+    search = {k: _f(getattr(SearchPattern, k)) for k in (
+        "SACCADE_DEG", "SACCADE_STEPS", "FIXATE_STEPS", "SETTLE_STEPS",
+        "SCAN_HALF_WIDTH_DEG", "TURN_DEG", "TURN_COMMAND_DEG",
+        "TURN_MAX_STEPS", "TRAVEL_STEPS", "SCANS_PER_SITE")}
+
+    # MOTOR PROGRAMS and the THERMAL WORLD. Same discipline as the search
+    # constants: read off the live modules, never typed. The warm patch is
+    # lifted out of morphology/gecko_habitat_v1.xml -- the project's own
+    # furnished world -- so the browser stands on the same patch of ground the
+    # Python animal does, at the same place and the same size.
+    from brain.programs import PROGRAMS
+    from brain.brainstem import LOCOMOTOR, DRIVE_THRESHOLD
+    from envs.gecko_brain_env import GeckoBrainEnv
+    from common.provenance import parameter_value
+
+    habitat = mujoco.MjModel.from_xml_path(str(REPO / "morphology"
+                                               / "gecko_habitat_v1.xml"))
+    wb = mujoco.mj_name2id(habitat, mujoco.mjtObj.mjOBJ_BODY, "warm_patch")
+    warm_xy = [_f(x) for x in habitat.body_pos[wb][:2]]
+    warm_half = 0.05
+    for g in range(habitat.ngeom):
+        if habitat.geom_bodyid[g] == wb:
+            warm_half = _f(habitat.geom_size[g][0])
+            break
+
+    world = {
+        "programs": dict(PROGRAMS),
+        "locomotor": dict(LOCOMOTOR),
+        "drive_threshold": _f(DRIVE_THRESHOLD),
+        "ambient_substrate_C": _f(GeckoBrainEnv.AMBIENT_SUBSTRATE_C),
+        "thermal_tau_s": _f(GeckoBrainEnv.THERMAL_TAU_S),
+        "thermal_time_compression": _f(GeckoBrainEnv.THERMAL_TIME_COMPRESSION),
+        "warm_surface_C": _f(parameter_value("warm_surface_temperature_C")),
+        "warm_patch_xy": warm_xy,
+        "warm_patch_half_m": warm_half,
+    }
+
     payload = {
-        "geoms": geoms, "joints": jnt,
+        "geoms": geoms, "joints": jnt, "search": search, "world": world,
+        # The body tree itself. The nerve view routes every fibre along this
+        # chain -- head to trunk to girdle to limb -- instead of drawing a
+        # straight line from a brain to a joint through the middle of the
+        # animal, which is not where a nerve goes.
+        "body_parentid": [int(x) for x in model.body_parentid],
         "body_names": [mujoco.mj_id2name(model, mujoco.mjtObj.mjOBJ_BODY, i) or f"body{i}"
                        for i in range(model.nbody)],
         "generated_by": "tools/export_web_brain.py",
@@ -186,6 +241,10 @@ def main():
     OUT.write_text(json.dumps(payload), encoding="utf-8")
     print(f"written: {OUT}  ({OUT.stat().st_size/1024:.0f} KB)")
     print(f"  actuators {walker['n_act']}  feet {list(walker['stance'])}")
+    print(f"  search constants: {len(search)} read off SearchPattern")
+    print(f"  warm patch: {warm_half*2:.3f} m across at "
+          f"({warm_xy[0]:g}, {warm_xy[1]:g}), surface {world['warm_surface_C']} C")
+    print(f"  programs: {world['programs']}")
     print(f"  compensated feet: {sorted(comp)}")
     for f in sorted(comp):
         t = np.asarray(comp[f]["table"])

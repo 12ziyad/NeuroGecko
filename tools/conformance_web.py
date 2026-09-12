@@ -76,13 +76,33 @@ def python_side():
     hours = [h * 0.25 for h in range(96)]
     arous = [float(clock.arousal_at(h * 3600.0)) for h in hours]
 
+    # SEARCH. 4000 control steps -- long enough to cross scan -> turn -> scan
+    # -> travel several times over, so every branch of the state machine is
+    # exercised, not just the one it starts in. The trunk angle is fed a
+    # deterministic ramp that advances only while the pattern says it is
+    # turning, which is what the real body does, so the turn-exit test is
+    # driven the same way on both sides.
+    from brain.search import SearchPattern
+    sp = SearchPattern()
+    trunk = 0.0
+    head, heading, moving, states = [], [], [], []
+    for _ in range(4000):
+        h, hy, mv = sp.step(trunk)
+        head.append(float(hy)); heading.append(float(h))
+        moving.append(int(bool(mv))); states.append(sp.state)
+        if mv and h != 0.0:
+            trunk += 1.7           # deg per step while the body is turning
+    search = {"head": head, "heading": heading, "moving": moving,
+              "states": states}
+
     return {"times": times, "walk": walk, "steers": steers, "steer": steer,
-            "saliences": saliences, "gates": gates, "hours": hours, "arousal": arous}
+            "saliences": saliences, "gates": gates, "hours": hours,
+            "arousal": arous, "search": search}
 
 
 JS = r"""
 import fs from 'fs';
-import { Walker, BasalGanglia, Clock } from '../site/gecko.js';
+import { Walker, BasalGanglia, Clock, SearchPattern } from '../site/gecko.js';
 const cfg = JSON.parse(fs.readFileSync(new URL('../site/media/brain.json', import.meta.url), 'utf8'));
 const ref = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
 
@@ -100,7 +120,17 @@ const gates = ref.saliences.map(s => {
 const clock = new Clock(cfg);
 const arousal = ref.hours.map(h => clock.arousalAt(h * 3600));
 
-fs.writeFileSync(process.argv[3], JSON.stringify({ walk, steer, gates, arousal }));
+const sp = new SearchPattern(cfg);
+let trunk = 0;
+const search = { head: [], heading: [], moving: [], states: [] };
+for (let i = 0; i < ref.search.head.length; i++) {
+  const r = sp.step(trunk);
+  search.head.push(r.headYawDeg); search.heading.push(r.headingDeg);
+  search.moving.push(r.moving ? 1 : 0); search.states.push(r.state);
+  if (r.moving && r.headingDeg !== 0) trunk += 1.7;
+}
+
+fs.writeFileSync(process.argv[3], JSON.stringify({ walk, steer, gates, arousal, search }));
 """
 
 
@@ -135,6 +165,14 @@ def main():
         ("walker under steering", worst(ref["steer"], got["steer"])),
         ("basal ganglia gates", worst(ref["gates"], got["gates"])),
         ("circadian clock over a day", worst(ref["arousal"], got["arousal"])),
+        ("search: head yaw, 4000 steps", worst(ref["search"]["head"],
+                                               got["search"]["head"])),
+        ("search: heading command", worst(ref["search"]["heading"],
+                                          got["search"]["heading"])),
+        ("search: moving flag", worst(ref["search"]["moving"],
+                                      got["search"]["moving"])),
+        ("search: state, step for step",
+         0.0 if ref["search"]["states"] == got["search"]["states"] else float("inf")),
     ]
     print()
     ok = True

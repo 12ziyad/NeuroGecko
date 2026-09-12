@@ -307,3 +307,90 @@ export function salienceFromDrives(cfg, { hunger = 0, cold = 0, warm = 0, threat
     cfg.bg.groom_tonic,                         // groom -- 0.0, and it was 0.05
   ]);
 }
+
+// -------------------------------------------------- the search pattern
+// brain/search.py :: SearchPattern, transcribed.
+//
+// It reads ONLY the animal's own trunk angle -- proprioception -- and nothing
+// about prey, which is why it ports honestly with no eye attached. The cycle
+// is SCAN -> TURN -> TRAVEL -> SCAN: stand still and sweep the head in 22 deg
+// saccades out to +-65 deg, turn the body 120 deg, sweep again, and after
+// three sweeps walk to a new place and start over. Three scans separated by
+// two turns inspect the whole circle.
+//
+// Every constant here is INVENTED except SCAN_HALF_WIDTH_DEG, which comes from
+// the neck's own travel, and SACCADE_STEPS, which was derived from the servo
+// (#250, #282). That is recorded in brain/search.py and repeated here so the
+// browser does not look better sourced than the original.
+
+const wrap = (d) => { let x = (d + 180) % 360; if (x < 0) x += 360; return x - 180; };
+
+export class SearchPattern {
+  // Not one constant is typed here. They arrive in brain.json, read straight
+  // off the Python class by tools/export_web_brain.py, so the browser cannot
+  // drift from brain/search.py without the export changing too.
+  constructor(cfg) {
+    const s = (cfg && cfg.search) || {};
+    for (const k of ["SACCADE_DEG", "SACCADE_STEPS", "FIXATE_STEPS",
+                     "SETTLE_STEPS", "SCAN_HALF_WIDTH_DEG", "TURN_DEG",
+                     "TURN_COMMAND_DEG", "TURN_MAX_STEPS", "TRAVEL_STEPS",
+                     "SCANS_PER_SITE"]) {
+      if (!(k in s)) throw new Error("brain.json is missing search." + k);
+      this[k] = s[k];
+    }
+    this._lastScanN = 0;   // Python leaves this across reset(); so do we
+    this.reset();
+  }
+  reset() {
+    this.state = "scan"; this._t = 0; this._head = 0; this._sign = 1;
+    this._scans = 0; this._fixating = true; this._fixTarget = 0; this._fixIndex = 0;
+    this._turnFrom = null;
+    this.looking = false;
+    return this;
+  }
+  step(trunkYawDeg = 0) {
+    this._t += 1;
+    const trunk = trunkYawDeg;
+    let out;
+    if (this.state === "scan") {
+      if (this._fixating) {
+        if (this._t >= this.FIXATE_STEPS) {
+          const n = Math.floor(this.SCAN_HALF_WIDTH_DEG / this.SACCADE_DEG);
+          this._fixIndex += this._sign;
+          if (Math.abs(this._fixIndex) > n) {
+            this._fixIndex -= 2 * this._sign;
+            this._sign = -this._sign;
+            this._scans += 1;
+          }
+          this._fixTarget = this._fixIndex * this.SACCADE_DEG;
+          this._fixating = false; this._t = 0;
+        }
+      } else {
+        const frac = Math.min(1, this._t / Math.max(this.SACCADE_STEPS, 1));
+        this._head += (this._fixTarget - this._head) * frac;
+        if (this._t >= this.SACCADE_STEPS) {
+          this._head = this._fixTarget; this._fixating = true; this._t = 0;
+        }
+      }
+      out = [0, this._head, false];
+      if (this._scans && this._scans !== this._lastScanN) {
+        this._lastScanN = this._scans;
+        this._t = 0; this._fixIndex = 0; this._fixating = true;
+        if (this._scans % this.SCANS_PER_SITE === 0) this.state = "travel";
+        else { this.state = "turn"; this._turnFrom = trunk; }
+      }
+    } else if (this.state === "turn") {
+      out = [this.TURN_COMMAND_DEG, 0, true];
+      const turned = Math.abs(wrap(trunk - (this._turnFrom == null ? trunk : this._turnFrom)));
+      if (turned >= this.TURN_DEG || this._t >= this.TURN_MAX_STEPS) {
+        this.state = "scan"; this._t = 0; this._head = 0;
+      }
+    } else {
+      out = [0, 0, true];
+      if (this._t >= this.TRAVEL_STEPS) { this.state = "scan"; this._t = 0; this._head = 0; }
+    }
+    this.looking = this.state === "scan" && this._fixating && this._t >= this.SETTLE_STEPS;
+    return { headingDeg: out[0], headYawDeg: out[1], moving: out[2],
+             state: this.state, looking: this.looking };
+  }
+}

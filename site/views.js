@@ -89,6 +89,34 @@ export class RoomView {
     floor.receiveShadow = true;
     sc.add(floor);
 
+    // THE WARM PATCH. Not decoration and not a lamp: this species takes heat
+    // from the GROUND by lying on it -- body temperature tracked substrate at
+    // r2 = 0.97 against 0.92 for air (Hastings et al. 2023, n = 12), and
+    // melanistic pigment made no difference to heating rate, which is evidence
+    // against warming by radiation. So the heat is a patch of floor. Its
+    // position, its size and its 30 C surface all come out of the project's own
+    // furnished world, morphology/gecko_habitat_v1.xml, by way of brain.json.
+    // Standing on it is the only thing that warms this animal, and walking to
+    // it is what the `bask` channel is for.
+    const W = cfg.world;
+    if (W && W.warm_patch_xy) {
+      const h = W.warm_patch_half_m;
+      const warm = new THREE.Mesh(
+        new THREE.PlaneGeometry(2 * h, 2 * h),
+        new THREE.MeshBasicMaterial({ color: 0xff8c3a, transparent: true,
+                                      opacity: 0.16, depthWrite: false }));
+      warm.position.set(W.warm_patch_xy[0], W.warm_patch_xy[1], 0.0006);
+      sc.add(warm);
+      const ring = new THREE.LineLoop(
+        new THREE.BufferGeometry().setFromPoints([
+          new THREE.Vector3(-h, -h, 0), new THREE.Vector3(h, -h, 0),
+          new THREE.Vector3(h, h, 0), new THREE.Vector3(-h, h, 0)]),
+        new THREE.LineBasicMaterial({ color: 0xffa257, transparent: true, opacity: 0.5 }));
+      ring.position.set(W.warm_patch_xy[0], W.warm_patch_xy[1], 0.0012);
+      sc.add(ring);
+      this.warmMat = warm.material;
+    }
+
     // NO WALLS. The enclosure was mine, not the project's, and all it did was
     // stop the animal walking. Open ground, and the floor follows it.
     // Scattered stones. They are scenery, not biology -- but without a fixed
@@ -146,6 +174,10 @@ export class RoomView {
     this.frameRadius = Math.max(0.16, (0.095 / Math.tan(Math.min(vFov, hFov) / 2)) * this.fill);
   }
   update(sim) {
+    if (this.warmMat) {
+      this.warmMat.opacity = sim.onWarm
+        ? 0.22 + 0.08 * Math.sin(sim.simT * 4.0) : 0.14;
+    }
     const d = sim.d;
     if (this.skin) this.skin.update(d.xpos, d.xquat);
     const t = [d.xpos[3], d.xpos[4], d.xpos[5]];
@@ -169,7 +201,7 @@ export class RoomView {
 export class NerveView {
   constructor(canvas, cfg) {
     this.cfg = cfg;
-    this.fill = 0.70;                 // the joints view fills the frame
+    this.fill = 1.02;                 // fit the whole animal, nose to tail tip
     this.tilt = 0.38;
     this.mode = "follow";
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
@@ -203,27 +235,178 @@ export class NerveView {
       const mesh = geomMesh(g, mat);
       sc.add(mesh); return mesh;
     });
-    // how far down the animal each solid sits: 0 at the snout, 1 at the tail tip
-    this.along = cfg.geoms.map(() => 0.5);
 
     // one marker per joint, at its real anchor, along its real axis
     const jm = new THREE.MeshBasicMaterial({ color: 0x39c6ff, transparent: true, opacity: 0.9 });
-    const geo = new THREE.CylinderGeometry(0.0016, 0.0016, 1, 8);
+    const geo = new THREE.CylinderGeometry(0.00055, 0.00055, 1, 6);
     geo.translate(0, 0.5, 0);                       // grow from the anchor
     this.joints = [];
     for (const j of cfg.joints) {
       if (j.type === 0) { this.joints.push(null); continue; }   // skip the free root
       const m = new THREE.Mesh(geo, jm.clone());
       m.visible = false; sc.add(m);
-      const hub = new THREE.Mesh(new THREE.SphereGeometry(0.0026, 10, 8), jm.clone());
+      const hub = new THREE.Mesh(new THREE.SphereGeometry(0.0011, 10, 8), jm.clone());
       hub.visible = false; sc.add(hub);
       this.joints.push({ shaft: m, hub });
     }
+    this._buildNerves(cfg);
+
     this._m4 = new THREE.Matrix4();
     this._up = new THREE.Vector3(0, 1, 0);
     this._ax = new THREE.Vector3();
   }
   setMode(mode) { this.mode = mode; }
+
+  // ---------------------------------------------------------------- nerve --
+  // A motor command does not appear at a joint. It leaves the head, runs down
+  // the cord, leaves at the segment that serves that limb, and travels out to
+  // the muscle. This draws that route on the animal's OWN tree: `body_parentid`
+  // straight out of the MuJoCo model. A fibre to a hind ankle passes through
+  // the pelvis because the animal's body does, and the fibre to the jaw is
+  // short because the jaw is next to the brain. Nothing here is a straight
+  // line through the middle of the gecko.
+  //
+  // WHAT IS MEASURED AND WHAT IS DRAWN, so nobody has to guess:
+  //   route     REAL     the model's own kinematic chain, and each fibre ends
+  //                      at the joint's true anchor (`xanchor`).
+  //   when      REAL     an impulse launches when the brain's command to that
+  //                      joint actually moves. A still joint is silent.
+  //   how fast  DRAWN    no conduction velocity has ever been measured in
+  //                      *Eublepharis macularius*, and none is claimed. The
+  //                      two constants below are INVENTED and say so.
+  _buildNerves(cfg) {
+    this.NERVE_TRAVEL_S = 0.42;      // INVENTED: brain to toe, seconds
+    this.IMPULSES_PER_RAD = 10.0;    // INVENTED: impulses per radian of command
+    this.MAX_DOTS = 320;
+
+    const names = cfg.body_names || [];
+    const parent = cfg.body_parentid || [];
+    this.brainBody = Math.max(0, names.indexOf("head"));
+    const up = (b) => {
+      const c = []; let g = 0;
+      while (b > 0 && g++ < 64) { c.push(b); b = parent[b]; }
+      c.push(0); return c;
+    };
+    const headChain = up(this.brainBody);
+
+    this.nerves = [];
+    const fibreMat = new THREE.LineBasicMaterial({
+      color: 0x3c7ea3, transparent: true, opacity: 0.38,
+      depthWrite: false, depthTest: false,       // the fibre runs INSIDE the body
+    });
+    for (let i = 0; i < cfg.joints.length; i++) {
+      const j = cfg.joints[i];
+      if (j.type === 0 || (j.act ?? -1) < 0) continue;   // undriven, or the free root
+      const tc = up(j.body);
+      let lca = 0;
+      for (const b of headChain) if (tc.indexOf(b) >= 0) { lca = b; break; }
+      const chain = [];
+      for (const b of headChain) { chain.push(b); if (b === lca) break; }
+      const down = [];
+      for (const b of tc) { if (b === lca) break; down.push(b); }
+      down.reverse();
+      for (const b of down) chain.push(b);
+
+      const n = chain.length + 1;                        // + the anchor itself
+      const geo = new THREE.BufferGeometry();
+      const pos = new Float32Array(n * 3);
+      geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+      const line = new THREE.Line(geo, fibreMat);
+      line.frustumCulled = false;
+      this.scene.add(line);
+      this.nerves.push({ joint: i, act: j.act, chain, pos, geo,
+                         cum: new Float32Array(n), phase: 0, impulses: [] });
+    }
+
+    // Every impulse on every fibre in one draw call.
+    const dg = new THREE.BufferGeometry();
+    this.dotPos = new Float32Array(this.MAX_DOTS * 3);
+    this.dotCol = new Float32Array(this.MAX_DOTS * 3);
+    dg.setAttribute("position", new THREE.BufferAttribute(this.dotPos, 3));
+    dg.setAttribute("color", new THREE.BufferAttribute(this.dotCol, 3));
+    dg.setDrawRange(0, 0);
+    this.dots = new THREE.Points(dg, new THREE.PointsMaterial({
+      size: 4.2, sizeAttenuation: false, vertexColors: true,
+      transparent: true, opacity: 1.0, depthWrite: false, depthTest: false,
+    }));
+    this.dots.renderOrder = 10;
+    this.dots.frustumCulled = false;
+    this.scene.add(this.dots);
+
+    // where the impulses start: a marker sitting in the head
+    this.brainDot = new THREE.Mesh(
+      new THREE.SphereGeometry(0.0030, 12, 10),
+      new THREE.MeshBasicMaterial({ color: 0x8fd4ff, transparent: true,
+                                    opacity: 0.55, depthTest: false }));
+    this.brainDot.renderOrder = 11;
+    this.scene.add(this.brainDot);
+    this._dotCol = new THREE.Color();
+  }
+
+  _updateNerves(sim, dt) {
+    const d = sim.d;
+    const chCol = this._dotCol.set(CH_COLOUR[sim.behaviour] ?? 0x6f8296);
+    let k = 0;
+    const bp = this.brainBody * 3;
+    this.brainDot.position.set(d.xpos[bp], d.xpos[bp + 1], d.xpos[bp + 2]);
+    this.brainDot.material.opacity = 0.35 + 0.35 * Math.min(1, sim.speed * 6);
+
+    for (const nv of this.nerves) {
+      // 1. lay the fibre along the body as it is standing RIGHT NOW
+      const P = nv.pos, C = nv.cum;
+      for (let a = 0; a < nv.chain.length; a++) {
+        const b = nv.chain[a] * 3;
+        P[a * 3] = d.xpos[b]; P[a * 3 + 1] = d.xpos[b + 1]; P[a * 3 + 2] = d.xpos[b + 2];
+      }
+      const e = nv.chain.length * 3, ja = nv.joint * 3;
+      P[e] = d.xanchor[ja]; P[e + 1] = d.xanchor[ja + 1]; P[e + 2] = d.xanchor[ja + 2];
+      C[0] = 0;
+      for (let a = 1; a < C.length; a++) {
+        C[a] = C[a - 1] + Math.hypot(P[a * 3] - P[a * 3 - 3],
+                                     P[a * 3 + 1] - P[a * 3 - 2],
+                                     P[a * 3 + 2] - P[a * 3 - 1]);
+      }
+      nv.geo.attributes.position.needsUpdate = true;
+      nv.geo.computeBoundingSphere();
+
+      // 2. launch impulses from the command that actually moved
+      const drive = sim.nerveDrive ? sim.nerveDrive[nv.act] : 0;
+      nv.phase += drive * this.IMPULSES_PER_RAD;
+      while (nv.phase >= 1) {
+        nv.phase -= 1;
+        if (nv.impulses.length < 5) nv.impulses.push(0);
+      }
+      if (nv.phase > 2) nv.phase = 2;
+
+      // 3. carry them along it
+      const step = dt / this.NERVE_TRAVEL_S;
+      const total = C[C.length - 1] || 1;
+      for (let q = nv.impulses.length - 1; q >= 0; q--) {
+        const u = (nv.impulses[q] += step);
+        if (u >= 1) { nv.impulses.splice(q, 1); continue; }
+        if (k >= this.MAX_DOTS) continue;
+        const want = u * total;
+        let a = 1;
+        while (a < C.length - 1 && C[a] < want) a++;
+        const seg = C[a] - C[a - 1] || 1;
+        const f = Math.max(0, Math.min(1, (want - C[a - 1]) / seg));
+        const i0 = (a - 1) * 3, i1 = a * 3, o = k * 3;
+        this.dotPos[o] = P[i0] + (P[i1] - P[i0]) * f;
+        this.dotPos[o + 1] = P[i0 + 1] + (P[i1 + 1] - P[i0 + 1]) * f;
+        this.dotPos[o + 2] = P[i0 + 2] + (P[i1 + 2] - P[i0 + 2]) * f;
+        const fade = Math.sin(Math.PI * Math.min(1, u * 1.08));
+        this.dotCol[o] = chCol.r * fade;
+        this.dotCol[o + 1] = chCol.g * fade;
+        this.dotCol[o + 2] = chCol.b * fade;
+        k++;
+      }
+    }
+    if (sim.nerveDrive) sim.nerveDrive.fill(0);
+    this.dots.geometry.setDrawRange(0, k);
+    this.dots.geometry.attributes.position.needsUpdate = true;
+    this.dots.geometry.attributes.color.needsUpdate = true;
+    this.liveDots = k;
+  }
 
   cameraFor(t, sim) {
     const R = this.frameRadius, m = this.mode || "follow";
@@ -254,44 +437,29 @@ export class NerveView {
   update(sim) {
     const d = sim.d, cfg = this.cfg;
 
-    // Where each solid sits along the animal, recomputed in its own frame so
-    // it holds however the body is turned: project onto the trunk's forward
-    // axis, snout = 0, tail tip = 1.
-    {
-      const r = 3 * 3;                       // trunk_middle is body 1
-      const fx = d.xmat[9], fy = d.xmat[10], fz = d.xmat[11];
-      let lo = Infinity, hi = -Infinity;
-      const proj = new Array(this.meshes.length);
-      for (let i = 0; i < this.meshes.length; i++) {
-        const g = sim.geomIndex[i] * 3;
-        const p = d.geom_xpos[g] * fx + d.geom_xpos[g + 1] * fy + d.geom_xpos[g + 2] * fz;
-        proj[i] = p; if (p < lo) lo = p; if (p > hi) hi = p;
-      }
-      const span = hi - lo || 1;
-      for (let i = 0; i < proj.length; i++) this.along[i] = 1 - (proj[i] - lo) / span;
-    }
+    // (The snout-to-tail projection that used to live here fed the band, and
+    // the band is gone. It also read the trunk's forward axis out of the wrong
+    // slice of `xmat`, the same mistake that was steering the animal backwards.
+    // Deleted rather than fixed, because nothing reads it now.)
 
-    // THE DECISION, LEAVING THE BASAL GANGLIA. The path is real: the selector
-    // releases a channel, brain/brainstem.py turns it into a stride command,
-    // and brain/spinal_cpg.py drives the legs -- head end to tail end. The
-    // TIMING of the band is a drawing. No conduction velocity has ever been
-    // measured in this animal and none is claimed.
-    const front = sim.signal;                // 0 -> 1 while a decision travels
-    const chCol = new THREE.Color(CH_COLOUR[sim.behaviour] ?? 0x6f8296);
-
+    // THE BONE STAYS BONE. An earlier build tinted every solid as a decision
+    // swept past, which repainted the animal and hid the shape it was meant to
+    // annotate (#361). The signal now lives on the nerve instead -- a dot, on
+    // a fibre, going where the command goes -- so the skeleton can just be the
+    // skeleton.
     for (let i = 0; i < this.meshes.length; i++) {
       poseFromMat(this.meshes[i], d.geom_xpos, d.geom_xmat, sim.geomIndex[i], this._m4);
       const m = this.meshes[i].material;
-      let glow = 0;
-      if (front >= 0) {
-        const dist = Math.abs(this.along[i] - front);
-        glow = Math.max(0, 1 - dist * 9) * sim.signalStrength;
+      if (!m.__plain) {
+        m.color.copy(this.baseCol); m.emissive.setHex(0x12100c); m.__plain = true;
       }
-      // A BLINK, NOT A WASH. The band used to repaint the whole animal in the
-      // channel's colour, which drowned the shape it was supposed to annotate.
-      m.color.copy(this.baseCol).lerp(chCol, 0.10 * glow);
-      m.emissive.copy(chCol).multiplyScalar(0.16 * glow);
     }
+
+    // the nerve, advanced by the animal's own clock so it freezes when paused
+    const now = sim.simT || 0;
+    const dt = Math.max(0, Math.min(0.25, now - (this._lastT ?? now)));
+    this._lastT = now;
+    this._updateNerves(sim, dt);
 
     for (let i = 0; i < cfg.joints.length; i++) {
       const jj = this.joints[i]; if (!jj) continue;
@@ -304,16 +472,16 @@ export class NerveView {
 
       jj.hub.visible = true;
       jj.hub.position.set(px, py, pz);
-      jj.hub.material.opacity = 0.30 + 0.70 * lit;
+      jj.hub.material.opacity = 0.22 + 0.60 * lit;
       jj.hub.material.color.setHSL(0.55 - 0.10 * lit, 0.95, 0.45 + 0.35 * lit);
-      jj.hub.scale.setScalar(0.85 + 1.5 * lit);
+      jj.hub.scale.setScalar(0.9 + 0.8 * lit);
 
-      const len = 0.006 + 0.020 * lit;
-      jj.shaft.visible = lit > 0.02;
+      const len = 0.0035 + 0.0075 * lit;
+      jj.shaft.visible = lit > 0.10;
       jj.shaft.position.set(px, py, pz);
       jj.shaft.quaternion.setFromUnitVectors(this._up, this._ax);
       jj.shaft.scale.set(1, len, 1);
-      jj.shaft.material.opacity = 0.25 + 0.75 * lit;
+      jj.shaft.material.opacity = 0.18 + 0.45 * lit;
       jj.shaft.material.color.setHSL(0.55 - 0.10 * lit, 0.95, 0.45 + 0.35 * lit);
     }
 

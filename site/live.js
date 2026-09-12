@@ -13,7 +13,7 @@
 // the spine when the released behaviour changes, are a drawing. No conduction
 // velocity has ever been measured in this animal, and none is claimed here.
 
-import { Walker, BasalGanglia, Clock, salienceFromDrives, FEET } from "./gecko.js";
+import { Walker, BasalGanglia, Clock, salienceFromDrives, SearchPattern, FEET } from "./gecko.js";
 
 const THREE = window.THREE;
 const CTRL_HZ = 50, PHYS_PER_CTRL = 10;
@@ -37,6 +37,7 @@ export class LiveGecko {
     this.walker = new Walker(cfg);
     this.bg = new BasalGanglia(cfg);
     this.clock = new Clock(cfg);
+    this.search = new SearchPattern(cfg);
     this.nAct = cfg.walker.n_act;
 
     this.gaitT = 0;            // the walker's own clock, advanced only when walking
@@ -57,8 +58,23 @@ export class LiveGecko {
     this.signalStrength = 0;
     this.speed = 0;
     this.heading = 0;          // trunk yaw, so the side/front cameras track it
+    this.headYaw = 0;          // where the head is pointed, relative to the trunk
+    this.searchState = "scan";
+    this.looking = false;
+    this.program = "still";
+    this.drive = 0;
+    this.onWarm = false;
     this.distance = 0;         // ground actually covered, metres
     this._prevXY = [0, 0];
+
+    // NERVE TRAFFIC. Not a timer: how far the brain's command to each joint
+    // has actually moved since the renderer last looked. A joint held still
+    // produces exactly zero, a joint being driven hard produces a lot, and
+    // the view turns that into impulses. Accumulated at control rate so it
+    // stays exact however many control steps a rendered frame contains.
+    this.simT = 0;
+    this.nerveDrive = new Float64Array(this.nAct);
+    this._prevCtrl = new Float64Array(this.nAct);
   }
 
   // One 50 Hz control step: clock -> drives -> selector -> motor program -> body.
@@ -67,11 +83,21 @@ export class LiveGecko {
     const c = this.clock.step(dt * this.compression);
     this.arousal = c.arousal; this.asleep = c.asleep; this.timeOfDayH = c.timeOfDayH;
 
-    // A thermostat with somewhere warm: the floor is cool, the animal cools
-    // toward it. Same shape as the Python env's relaxation.
+    // THE THERMOSTAT, and it is the whole reason this animal has more than one
+    // thing to do. This species is THIGMOTHERMIC -- it takes heat from the
+    // GROUND by lying on it, not from light (Hastings et al. 2023, body temp
+    // tracked substrate at r2 = 0.97 against 0.92 for air). So the world has a
+    // warm patch of ground, and standing on it is what warms the animal.
+    // Every constant here is read from brain.json, straight off
+    // GeckoBrainEnv, and the patch is lifted out of the project's own
+    // furnished world: 0.14 m across at (0.28, -0.2), surface 30 C.
+    const W = this.cfg.world;
     const prefLow = this.cfg.drives.preferred_temperature_C[0];
-    const substrate = 25.0;
-    this.bodyC += (substrate - this.bodyC) * (1 - Math.exp(-dt * this.compression / 900));
+    this.onWarm = Math.abs(this.d.xpos[3] - W.warm_patch_xy[0]) <= W.warm_patch_half_m
+               && Math.abs(this.d.xpos[4] - W.warm_patch_xy[1]) <= W.warm_patch_half_m;
+    const substrate = this.onWarm ? W.warm_surface_C : W.ambient_substrate_C;
+    const tau = W.thermal_tau_s / W.thermal_time_compression;
+    this.bodyC += (substrate - this.bodyC) * (1 - Math.exp(-dt / tau));
     const cold = Math.max(0, Math.min(1, (prefLow - this.bodyC) / 6));
 
     this.salience = salienceFromDrives(this.cfg, {
@@ -90,13 +116,61 @@ export class LiveGecko {
       if (this.signal > 1.15) { this.signal = -1; this.signalStrength = 0; }
     }
 
-    // Motor program: only hunt / explore / bask move the legs. rest and groom
-    // map to "still" in brain/programs.py, so the animal holds its posture.
-    const moving = next === "hunt" || next === "explore" || next === "bask";
+    // MOTOR PROGRAM -- brain/programs.py, ported rather than improvised.
+    // A released behaviour is not a gait. The selector says `explore` and the
+    // program that runs is SEARCH, which is not walking in a straight line: the
+    // animal stops, sweeps its head in saccades, turns its body, walks a
+    // little, and scans again. It says `bask` and the program is WARM, which
+    // walks toward warm ground and then LIES DOWN on it, because walking once
+    // you are on it walks you off the other side. It says `rest` or `groom` and
+    // the program is STILL.
+    //
+    // Two of the six programs cannot run in this browser and are not faked:
+    //   chase    needs the eye. The retina and tectum are not ported, so the
+    //            animal here has no prey to see and `hunt` never releases.
+    //   shelter  needs a threat to flee and a refuge to flee to. This world
+    //            has neither, so `flee` never releases.
+    // Handing the brain a prey position it did not see would be an oracle, and
+    // this project spent #270 through #282 taking oracles back out.
+    const P = this.cfg.world.programs, L = this.cfg.world.locomotor;
+    let program = P[next] || "still";
+    let drive = (L[next] || 0) * 1.0;                       // urgency is 1 here
+    if (drive <= this.cfg.world.drive_threshold) drive = 0;
+
+    let steer = 0;
+    this.program = program;
+    if (program === "warm") {
+      // Where the warm ground is. In Python this arrives from the environment
+      // as a stand-in for a spatial memory the project has not built -- brain 7
+      // is absent -- and it is marked as such there. Same here: this is
+      // REMEMBERED, not seen.
+      const dx = this.cfg.world.warm_patch_xy[0] - this.d.xpos[3];
+      const dy = this.cfg.world.warm_patch_xy[1] - this.d.xpos[4];
+      steer = Math.atan2(dy, dx) - this.heading;
+      steer = ((steer + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI;
+      if (this.onWarm) drive = 0;                           // a basking animal lies down
+      this.headYaw += (0 - this.headYaw) * 0.06;
+      this.looking = false;
+      this.searchState = this.onWarm ? "settled" : "approach";
+    } else if (program === "search") {
+      const sp = this.search.step((this.heading * 180) / Math.PI);
+      this.searchState = sp.state;
+      this.looking = sp.looking;
+      this.headYaw = sp.headYawDeg;
+      if (!sp.moving) drive = 0;
+      steer = (sp.headingDeg * Math.PI) / 180;
+    } else {
+      drive = 0;
+      this.headYaw += (0 - this.headYaw) * 0.06;
+      this.looking = false;
+      this.searchState = "still";
+    }
+    this.drive = drive;
+
     let ctrl;
-    if (moving) {
+    if (drive > 0) {
       this.gaitT += dt;
-      ctrl = this.walker.baseCtrl(this.gaitT, 0);
+      ctrl = this.walker.baseCtrl(this.gaitT, steer);
     } else {
       ctrl = Float64Array.from(this.cfg.walker.standing_ctrl);
     }
@@ -104,7 +178,9 @@ export class LiveGecko {
     // A sleeping gecko shuts its eyes (#356): published for this species --
     // Bergel et al. 2026 recorded sleep with electrodes UNDER EACH EYELID.
     // The angle reuses the declared-invented EYELID_CLOSED_DEG.
-    const shut = moving ? 0 : (1 - Math.min(1, Math.max(0, this.arousal)));
+    // Gated on the locomotor drive, the same quantity envs/gecko_brain_env.py
+    // gates it on: an animal that is walking is not asleep.
+    const shut = drive > 0 ? 0 : (1 - Math.min(1, Math.max(0, this.arousal)));
     this.eyelid = shut * this.cfg.eyelid_closed_deg;
 
     const dd = this.d;
@@ -118,6 +194,31 @@ export class LiveGecko {
     if (this._lidIds[0] >= 0) dd.ctrl[this._lidIds[0]] = -rad;
     if (this._lidIds[1] >= 0) dd.ctrl[this._lidIds[1]] = +rad;
 
+    // THE HEAD ACTUALLY TURNS. envs/gecko_walk_env.py spreads a gaze command
+    // across neck_yaw and head_yaw in proportion to their ranges; same here.
+    if (this._neckIds === undefined) {
+      const nm = this.cfg.walker.actuator_names;
+      this._neckIds = [nm.indexOf("neck_yaw"), nm.indexOf("head_yaw")];
+      const hi = this.cfg.walker.ctrl_high, lo = this.cfg.walker.ctrl_low;
+      this._neckSpan = this._neckIds.map((i) => (i >= 0 ? hi[i] - lo[i] : 0));
+    }
+    const total = this._neckSpan[0] + this._neckSpan[1];
+    if (total > 1e-9) {
+      const want = (this.headYaw * Math.PI) / 180;
+      const hi = this.cfg.walker.ctrl_high, lo = this.cfg.walker.ctrl_low;
+      for (let k = 0; k < 2; k++) {
+        const i = this._neckIds[k];
+        if (i < 0) continue;
+        dd.ctrl[i] = Math.min(hi[i], Math.max(lo[i], want * (this._neckSpan[k] / total)));
+      }
+    }
+
+    for (let i = 0; i < this.nAct; i++) {
+      this.nerveDrive[i] += Math.abs(dd.ctrl[i] - this._prevCtrl[i]);
+      this._prevCtrl[i] = dd.ctrl[i];
+    }
+    this.simT += dt;
+
     for (let k = 0; k < PHYS_PER_CTRL; k++) this.mj.mj_step(this.m, this.d);
 
     const x = this.d.xpos[3], y = this.d.xpos[4];
@@ -126,7 +227,16 @@ export class LiveGecko {
     this.distance += step;
     this._prevXY = [x, y];
     // trunk forward axis, from its rotation matrix
-    this.heading = Math.atan2(this.d.xmat[10], this.d.xmat[9]);
+    // WHICH WAY THE ANIMAL IS POINTING. `xmat` is ROW-major, so the body's own
+    // forward axis expressed in world coordinates is the first COLUMN --
+    // (xmat[9], xmat[12], xmat[15]) for the trunk -- not the first row. Reading
+    // the row instead returns the world x-axis in body coordinates, which for a
+    // yaw is the NEGATIVE of the heading, and a negated heading steers the
+    // animal away from whatever it is walking toward. That is exactly what it
+    // did: released `bask`, turned its back on the warm ground and walked 7 m
+    // in the wrong direction, and the thermostat never closed. Checked against
+    // the Python definition, which takes yaw from the quaternion.
+    this.heading = Math.atan2(this.d.xmat[12], this.d.xmat[9]);
     this.pulse *= 0.94;                                // depiction decay
   }
 }
