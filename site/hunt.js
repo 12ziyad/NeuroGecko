@@ -370,7 +370,9 @@ export class Prey {
       return { captured: true };
     }
 
-    if (distance <= this.fleeRadiusFor(this.approachSpeed)) {
+    // GUIDED MODE HOLDS IT STILL. `calm` is set only by the page's declared
+    // oracle; with it off the cricket flees exactly as envs/prey.py says.
+    if (!this.calm && distance <= this.fleeRadiusFor(this.approachSpeed)) {
       // Latency: a startled animal does not accelerate instantaneously, and a
       // zero-latency prey is uncatchable for reasons that are an artefact of
       // the simulation rather than of the animal.

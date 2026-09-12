@@ -192,7 +192,10 @@ export class LiveGecko {
   // animal's own field of view and range. Returns null otherwise, which is most
   // of the time -- measured, the cricket is in frame on about 11 % of steps.
   // Used only by guided mode, which the page labels.
-  _trueBearingIfVisible() {
+  // The true bearing to the cricket whenever it is inside the arena -- NOT
+  // gated on the field of view, which is what makes this the strong version.
+  // The animal knows where its food is the way a viewer does. Guided mode only.
+  _trueBearing() {
     const d = this.d, hb = this.headBodyId ?? 4, p = hb * 3, m = hb * 9;
     const fx = d.xmat[m], fy = d.xmat[m + 3], fz = d.xmat[m + 6];
     const ux = d.xmat[m + 2], uy = d.xmat[m + 5], uz = d.xmat[m + 8];
@@ -201,13 +204,19 @@ export class LiveGecko {
     const ez = d.xpos[p + 2] + fz * 0.02958 + uz * 0.00682;
     const dx = this.prey.x - ex, dy = this.prey.y - ey, dz = 0.007 - ez;
     const L = Math.hypot(dx, dy, dz);
-    if (L > this.prey.arenaRadius) return null;                 // out of the arena
-    const off = Math.acos(Math.max(-1, Math.min(1, (dx * fx + dy * fy + dz * fz) / L)));
-    if (off > (this.cfg.eye.fovy_deg / 2) * Math.PI / 180) return null;   // off screen
-    // signed bearing about the head's own up axis, the convention the tectum uses
+    if (L > this.prey.arenaRadius * 1.2) return null;      // not in this world
     const lx = d.xmat[m + 1], ly = d.xmat[m + 4], lz = d.xmat[m + 7];
     const fwd = dx * fx + dy * fy + dz * fz;
     const lat = dx * lx + dy * ly + dz * lz;
+    this.preyRange = L;
+    // ALSO the TRUNK-relative bearing, which is what the walker steers by.
+    // Measured: steering by `orient.headDeg + headRelativeBearing` cannot work
+    // for a target behind the animal, because the orienting reflex saturates at
+    // +-65 deg -- the head slams to its stop, the residual stays near 180, and
+    // the sum flips sign every time the head changes side. The animal circled
+    // at 30 cm forever. The trunk-relative angle has no such stop.
+    let t = Math.atan2(this.prey.y - d.xpos[4], this.prey.x - d.xpos[3]) - this.heading;
+    this.preyBearingTrunk = (((t * 180) / Math.PI + 540) % 360) - 180;
     return (Math.atan2(-lat, fwd) * 180) / Math.PI;
   }
 
@@ -266,6 +275,7 @@ export class LiveGecko {
     // what lets it tell a cricket from its own walking.
     if (this.renderRetina) {
       const px = this.renderRetina();
+      this.lastEyeFrame = px;      // kept so the page can show the raw frame
       if (px) {
         const out = this.eye.step(px, dt, {
           yaw_rate_deg_s: ((this.heading - this._prevHeading) / dt) * 180 / Math.PI,
@@ -305,15 +315,32 @@ export class LiveGecko {
     // and nothing measured anywhere in this project was measured with it on.
     // It is a rendering aid for a web page and it says so everywhere it shows.
     this.guided = false;
-    if (this.assist && this.renderRetina) {
-      const g = this._trueBearingIfVisible();
-      if (g !== null) { this.preyBearing = g; this.guided = true; }
+    if (this.assist) {
+      // STRONG. Inside the arena the animal simply knows where the cricket is,
+      // the commitment is handed to it rather than accumulated, and the cricket
+      // does not bolt. That is three oracles stacked and the page says so.
+      const g = this._trueBearing();
+      if (g !== null) {
+        this.preyBearing = g;
+        this.guided = true;
+        // hand it the commitment directly, so `chase` runs from the first step
+        this.evidence.committed = g;
+        this.evidence.sinceCommit = 0;
+      }
     }
+    this.prey.calm = this.guided;     // a guided cricket does not run away
 
     this.salience = salienceFromDrives(this.cfg, {
       hunger: this.hunger, cold, warm: 0, threat: 0,
       preyVisible: this.committed !== null ? 1 : 0, arousal: this.arousal,
     });
+    // STRONG ORACLE, FOURTH PART. Measured without it: the animal closed to
+    // 6.7 cm and then released `bask` instead, walked to the warm patch, and
+    // left the cricket behind -- which is honest behaviour and is not what a
+    // visitor came to watch. While guided, wanting the cricket outranks
+    // everything else. The selector still runs: the salience goes in at 1.0 and
+    // the basal ganglia still have to release it against its five rivals.
+    if (this.guided) this.salience[0] = 1.0;          // channel 0 is hunt
     this.bg.converge(this.salience);
     this.gates = this.bg.gates();
     const next = this.bg.selected();
@@ -349,6 +376,19 @@ export class LiveGecko {
       shelterBearingDeg: null,          // no refuge in this world, and none faked
       onWarmGround: this.onWarm,
     });
+    if (this.guided) {
+      // re-assert after the accumulator has had its turn, so a guided animal
+      // never loses the target mid-stride
+      this.evidence.committed = this.preyBearing;
+      this.evidence.sinceCommit = 0;
+      if (cmd.program === "chase") {
+        cmd.heading_deg = this.preyBearingTrunk;
+        cmd.committed_bearing_deg = this.preyBearing;
+        // no stalk pause while guided: it walks the whole way in
+        cmd.locomotor_drive = Math.max(cmd.locomotor_drive,
+                                       this.cfg.world.locomotor.hunt || 1);
+      }
+    }
     this.program = cmd.program;
     this.searchState = cmd.search_state;
     this.looking = cmd.believed_eye;
@@ -392,7 +432,7 @@ export class LiveGecko {
     const neckShare = this.neckLag / NECK_LAG_STEPS;
 
     // Creep while closing on something it has committed to.
-    this.creeping = this.program === "chase" && this.committed !== null;
+    this.creeping = this.program === "chase" && this.committed !== null && !this.guided;
     let ctrl;
     if (drive > 0) {
       this.gaitT += dt * (this.creeping ? CREEP_GAIT_SCALE : 1);

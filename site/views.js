@@ -455,6 +455,15 @@ export class NerveView {
   }
   setMode(mode) { this.mode = mode; }
 
+  // Hide the bone so only the nervous system is left. The solids are still
+  // there and still being posed by the physics; they are simply not drawn.
+  setIsolate(on) {
+    this.isolate = !!on;
+    for (const m of this.meshes) m.visible = !this.isolate;
+    if (this.cricket) this.cricket.visible = !this.isolate;
+    return this;
+  }
+
   // ---------------------------------------------------------------- nerve --
   // A motor command does not appear at a joint. It leaves the head, runs down
   // the cord, leaves at the segment that serves that limb, and travels out to
