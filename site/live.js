@@ -56,6 +56,8 @@ export class LiveGecko {
     this.signal = -1;          // position of that band, snout 0 -> tail 1
     this.signalStrength = 0;
     this.speed = 0;
+    this.heading = 0;          // trunk yaw, so the side/front cameras track it
+    this.distance = 0;         // ground actually covered, metres
     this._prevXY = [0, 0];
   }
 
@@ -119,8 +121,12 @@ export class LiveGecko {
     for (let k = 0; k < PHYS_PER_CTRL; k++) this.mj.mj_step(this.m, this.d);
 
     const x = this.d.xpos[3], y = this.d.xpos[4];
-    this.speed = Math.hypot(x - this._prevXY[0], y - this._prevXY[1]) / dt;
+    const step = Math.hypot(x - this._prevXY[0], y - this._prevXY[1]);
+    this.speed = step / dt;
+    this.distance += step;
     this._prevXY = [x, y];
+    // trunk forward axis, from its rotation matrix
+    this.heading = Math.atan2(this.d.xmat[10], this.d.xmat[9]);
     this.pulse *= 0.94;                                // depiction decay
   }
 }

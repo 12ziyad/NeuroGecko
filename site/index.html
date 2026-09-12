@@ -63,6 +63,7 @@
   .btn{font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
     padding:6px 10px;border:1px solid var(--rule);background:var(--sunk);color:var(--body);border-radius:2px;cursor:pointer}
   .btn:hover{border-color:var(--cyan);color:var(--cyan)}
+  .btn.on{border-color:var(--cyan);color:var(--cyan);background:#0f1a22}
   .foot{padding:12px 16px;color:var(--muted);font-family:"IBM Plex Mono",monospace;font-size:9px;line-height:1.7}
 </style>
 
@@ -75,8 +76,8 @@
     </div>
     <div class="view">
       <canvas id="cNerve"></canvas>
-      <div class="vtag"><b>The same animal, its joints</b>
-        <span>marker at each joint's real anchor and axis &middot; brightness = |qvel|</span></div>
+      <div class="vtag"><b>The same animal, its skeleton</b>
+        <span>bone lengths fitted to the body &middot; shapes and vertebral counts invented &middot; joint markers are measured</span></div>
     </div>
   </div>
 
@@ -91,6 +92,15 @@
         <button class="btn" id="night">Night</button>
         <button class="btn" id="spin">Orbit</button>
       </div>
+      <div class="lbl" style="margin-top:12px">Camera</div>
+      <div class="row" id="cams">
+        <button class="btn cam on" data-m="follow">Follow</button>
+        <button class="btn cam" data-m="side">Side</button>
+        <button class="btn cam" data-m="front">Front</button>
+        <button class="btn cam" data-m="top">Top</button>
+        <button class="btn cam" data-m="low">Low</button>
+      </div>
+      <div class="row"><button class="btn" id="shell">Hide body</button></div>
     </div>
 
     <div class="block">
@@ -115,6 +125,7 @@
         <div class="kv"><div class="k">Body temp</div><div class="v" id="temp">30.5</div></div>
         <div class="kv"><div class="k">Hunger</div><div class="v" id="hun">0.90</div></div>
         <div class="kv"><div class="k">Speed m/s</div><div class="v" id="spd">0.000</div></div>
+        <div class="kv"><div class="k">Walked m</div><div class="v" id="dist">0.00</div></div>
         <div class="kv"><div class="k">Frames</div><div class="v" id="fps">&mdash;</div></div>
       </div>
     </div>
@@ -130,9 +141,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
 <script type="module">
 import load from "./media/mujoco.js";
-import { LiveGecko, withRoom } from "./live.js?v=f738b490";
-import { RoomView, NerveView } from "./views.js?v=f738b490";
-import { loadSkin } from "./skin.js?v=f738b490";
+import { LiveGecko, withRoom } from "./live.js?v=f78676d0";
+import { RoomView, NerveView } from "./views.js?v=f78676d0";
+import { loadSkin } from "./skin.js?v=f78676d0";
+import { loadSkeleton } from "./skeleton.js?v=f78676d0";
 
 const CH_CSS = {hunt:"--hunt",flee:"--flee",explore:"--explore",bask:"--bask",rest:"--rest",groom:"--groom"};
 const T = id => document.getElementById(id);
@@ -166,6 +178,9 @@ try {
   const room = new RoomView(T("cRoom"), cfg);
   room.attachSkin(skin);
   const nerve = new NerveView(T("cNerve"), cfg);
+  boot.textContent = "loading the skeleton…";
+  const skel = await loadSkeleton("media/");
+  nerve.attachSkeleton(skel);
   const fit = () => {
     for (const [v, id] of [[room,"cRoom"],[nerve,"cNerve"]]) {
       const c = T(id);
@@ -205,6 +220,14 @@ try {
   T("day").onclick   = () => { sim.clock.t = 9.5*3600; };
   T("night").onclick = () => { sim.clock.t = 16*3600; };
   T("spin").onclick  = () => { spin = !spin; };
+  let shellOn = true;
+  T("shell").onclick = () => { shellOn = !shellOn; nerve.setShell(shellOn);
+    T("shell").textContent = shellOn ? "Hide body" : "Show body"; };
+  for (const b of document.querySelectorAll(".cam")) b.onclick = () => {
+    for (const o of document.querySelectorAll(".cam")) o.classList.remove("on");
+    b.classList.add("on");
+    room.setMode(b.dataset.m); nerve.setMode(b.dataset.m);
+  };
 
   function frame(now){
     const dt = Math.min(.1,(now-last)/1000); last = now;
@@ -229,6 +252,7 @@ try {
     T("temp").textContent = sim.bodyC.toFixed(1);
     T("hun").textContent = sim.hunger.toFixed(2);
     T("spd").textContent = sim.speed.toFixed(3);
+    T("dist").textContent = sim.distance.toFixed(2);
     cfg.bg.channels.forEach((c,i)=>{
       const g = sim.gates[i]||0;
       bars[c].f.style.width = (g*100).toFixed(1)+"%";

@@ -45,6 +45,8 @@ export class RoomView {
   constructor(canvas, cfg) {
     this.cfg = cfg;
     this.fill = 0.95;
+    this.tilt = 0.42;
+    this.mode = "follow";
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
     this.renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
     this.renderer.shadowMap.enabled = true;
@@ -89,6 +91,24 @@ export class RoomView {
 
     // NO WALLS. The enclosure was mine, not the project's, and all it did was
     // stop the animal walking. Open ground, and the floor follows it.
+    // Scattered stones. They are scenery, not biology -- but without a fixed
+    // landmark the eye has nothing to measure movement against.
+    const stoneMat = new THREE.MeshStandardMaterial({ color: 0x6f6152, roughness: 1 });
+    const stones = new THREE.Group();
+    let seed = 7;
+    const rnd = () => (seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
+    for (let i = 0; i < 90; i++) {
+      const r = 0.004 + rnd() * 0.012;
+      const g2 = new THREE.SphereGeometry(r, 7, 5);
+      g2.scale(1, 0.7 + rnd() * 0.5, 0.45 + rnd() * 0.3);
+      const st = new THREE.Mesh(g2, stoneMat);
+      st.position.set((rnd() - 0.5) * 3.0, (rnd() - 0.5) * 3.0, r * 0.35);
+      st.rotation.z = rnd() * 6.28;
+      st.castShadow = true; st.receiveShadow = true;
+      stones.add(st);
+    }
+    sc.add(stones);
+
     this.floor = floor;
     this.skin = null;
     this._m4 = new THREE.Matrix4();
@@ -98,6 +118,23 @@ export class RoomView {
     skin.mesh.castShadow = true;
     this.scene.add(skin.mesh);
   }
+  setMode(mode) { this.mode = mode; }
+
+  cameraFor(t, sim) {
+    const R = this.frameRadius, m = this.mode || "follow";
+    const heading = sim.heading;
+    if (m === "side")  return [t[0] + R * Math.cos(heading + Math.PI / 2),
+                               t[1] + R * Math.sin(heading + Math.PI / 2), t[2] + R * 0.12];
+    if (m === "front") return [t[0] + R * Math.cos(heading),
+                               t[1] + R * Math.sin(heading), t[2] + R * 0.18];
+    if (m === "top")   return [t[0] + 0.001, t[1] + 0.001, t[2] + R * 1.25];
+    if (m === "low")   return [t[0] + R * Math.cos(sim.camAngle),
+                               t[1] + R * Math.sin(sim.camAngle), t[2] + R * 0.06];
+    return [t[0] + R * Math.cos(sim.camAngle), t[1] + R * Math.sin(sim.camAngle),
+            t[2] + R * this.tilt];
+  }
+
+
   resize(w, h) {
     this.renderer.setSize(w, h, false);
     this.camera.aspect = w / h;
@@ -112,10 +149,16 @@ export class RoomView {
     const d = sim.d;
     if (this.skin) this.skin.update(d.xpos, d.xquat);
     const t = [d.xpos[3], d.xpos[4], d.xpos[5]];
-    if (this.floor) this.floor.position.set(t[0], t[1], 0);   // ground travels with it
-    const a = sim.camAngle;
-    const R = this.frameRadius;
-    this.camera.position.set(t[0] + R * Math.cos(a), t[1] + R * Math.sin(a), t[2] + R * 0.42);
+    // THE GROUND DOES NOT FOLLOW. It used to be pinned to the animal, which
+    // is exactly why the walk read as a treadmill: nothing ever passed it.
+    // It re-centres only in whole texture tiles, so the pattern never slides.
+    if (this.floor) {
+      const TILE = 6 / 18;
+      this.floor.position.set(Math.round(t[0] / TILE) * TILE,
+                              Math.round(t[1] / TILE) * TILE, 0);
+    }
+    const c = this.cameraFor(t, sim);
+    this.camera.position.set(c[0], c[1], c[2]);
     this.camera.up.set(0, 0, 1);
     this.camera.lookAt(t[0], t[1], t[2] + 0.006);
     this.renderer.render(this.scene, this.camera);
@@ -127,6 +170,8 @@ export class NerveView {
   constructor(canvas, cfg) {
     this.cfg = cfg;
     this.fill = 0.70;                 // the joints view fills the frame
+    this.tilt = 0.38;
+    this.mode = "follow";
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
     this.renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -151,6 +196,7 @@ export class NerveView {
       const mat = new THREE.MeshStandardMaterial({
         color: this.baseCol.clone(), roughness: 0.34, metalness: 0.02,
         emissive: new THREE.Color(0x0a1420), emissiveIntensity: 1,
+        transparent: true, opacity: 0.17, depthWrite: false,
       });
       const mesh = geomMesh(g, mat);
       sc.add(mesh); return mesh;
@@ -171,10 +217,31 @@ export class NerveView {
       hub.visible = false; sc.add(hub);
       this.joints.push({ shaft: m, hub });
     }
+    this.skeleton = null;
+    this.showShell = true;
     this._m4 = new THREE.Matrix4();
     this._up = new THREE.Vector3(0, 1, 0);
     this._ax = new THREE.Vector3();
   }
+  setMode(mode) { this.mode = mode; }
+
+  cameraFor(t, sim) {
+    const R = this.frameRadius, m = this.mode || "follow";
+    const heading = sim.heading;
+    if (m === "side")  return [t[0] + R * Math.cos(heading + Math.PI / 2),
+                               t[1] + R * Math.sin(heading + Math.PI / 2), t[2] + R * 0.12];
+    if (m === "front") return [t[0] + R * Math.cos(heading),
+                               t[1] + R * Math.sin(heading), t[2] + R * 0.18];
+    if (m === "top")   return [t[0] + 0.001, t[1] + 0.001, t[2] + R * 1.25];
+    if (m === "low")   return [t[0] + R * Math.cos(sim.camAngle),
+                               t[1] + R * Math.sin(sim.camAngle), t[2] + R * 0.06];
+    return [t[0] + R * Math.cos(sim.camAngle), t[1] + R * Math.sin(sim.camAngle),
+            t[2] + R * this.tilt];
+  }
+
+  attachSkeleton(sk) { this.skeleton = sk; this.scene.add(sk.mesh); }
+  setShell(on) { this.showShell = on; for (const m of this.meshes) m.visible = on; }
+
   resize(w, h) {
     this.renderer.setSize(w, h, false);
     this.camera.aspect = w / h;
@@ -188,6 +255,7 @@ export class NerveView {
 
   update(sim) {
     const d = sim.d, cfg = this.cfg;
+    if (this.skeleton) this.skeleton.update(d.xpos, d.xmat);
 
     // Where each solid sits along the animal, recomputed in its own frame so
     // it holds however the body is turned: project onto the trunk's forward
@@ -251,9 +319,8 @@ export class NerveView {
     }
 
     const t = [d.xpos[3], d.xpos[4], d.xpos[5]];
-    const a = sim.camAngle;
-    const R = this.frameRadius;
-    this.camera.position.set(t[0] + R * Math.cos(a), t[1] + R * Math.sin(a), t[2] + R * 0.38);
+    const c = this.cameraFor(t, sim);
+    this.camera.position.set(c[0], c[1], c[2]);
     this.camera.up.set(0, 0, 1);
     this.camera.lookAt(t[0], t[1], t[2] + 0.006);
     this.renderer.render(this.scene, this.camera);
