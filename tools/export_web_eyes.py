@@ -9,8 +9,20 @@ to the head body. Nothing in the browser knew about them, so the animal had
 blank sockets -- and eyelid geckos are named for the one feature the render was
 missing.
 
-WHAT IS PUBLISHED AND WHAT IS NOT. The mesh geometry, its placement on the head
-and the texture are the project's own assets and are exported verbatim -- not
+READ THE COMPILED MESH, NOT THE OBJ. This is the whole correctness point of the
+file and the first version got it wrong. MuJoCo's compiler RE-CENTRES a mesh
+asset: it subtracts the mesh's own centroid from every vertex and records that
+shift in `mesh_pos`, and `geom_pos` is then expressed relative to the re-centred
+frame. For this eye the two are the same number -- centroid (16.94, 10.40, 6.85)
+mm, geom_pos (16.89, 10.41, 6.85) mm -- because the OBJ was authored in head
+coordinates. So taking raw OBJ vertices AND adding geom_pos applies the offset
+TWICE, and the eyes float about 17 mm in front of the face and 10 mm out to the
+side. Reading `model.mesh_vert` gives the vertices MuJoCo itself draws, already
+re-centred, and then `geom_pos`/`geom_quat` put them exactly where the physics
+engine puts them.
+
+WHAT IS PUBLISHED AND WHAT IS NOT. The geometry, its placement on the head and
+the texture are the project's own assets and are exported verbatim -- not
 redrawn here. Eublepharidae are the EYELID geckos: alone among Gekkota they have
 movable eyelids instead of a fused spectacle, and that is why the eyelid joints
 exist at all. What has never been published for this species is a blink rate, a
@@ -25,48 +37,55 @@ import shutil
 import struct
 import sys
 
+import numpy as np
+
 REPO = pathlib.Path(__file__).resolve().parents[1]
 OUT = REPO / "site" / "media"
 XML = REPO / "morphology" / "gecko_body_lab_v2.xml"
 
 
-def read_obj(path):
-    """Positions, normals, texcoords and triangles from a Wavefront OBJ."""
-    vs, vts, vns, faces = [], [], [], []
-    for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
-        if line.startswith("v "):
-            vs.append([float(x) for x in line.split()[1:4]])
-        elif line.startswith("vt "):
-            vts.append([float(x) for x in line.split()[1:3]])
-        elif line.startswith("vn "):
-            vns.append([float(x) for x in line.split()[1:4]])
-        elif line.startswith("f "):
-            idx = []
-            for tok in line.split()[1:]:
-                parts = (tok.split("/") + ["", ""])[:3]
-                v = int(parts[0]) - 1
-                t = int(parts[1]) - 1 if parts[1] else -1
-                n = int(parts[2]) - 1 if parts[2] else -1
-                idx.append((v, t, n))
-            for k in range(1, len(idx) - 1):       # fan-triangulate
-                faces.append((idx[0], idx[k], idx[k + 1]))
-    return vs, vts, vns, faces
+def compiled_mesh(model, mid):
+    """Per-corner position / uv / normal buffers from the COMPILED mesh.
 
+    MuJoCo keeps positions, normals and texture coordinates in three separate
+    arrays with their own per-face index triples, which is the OBJ convention.
+    A GPU wants one vertex per corner, so the three are flattened together.
+    """
+    va, vn = int(model.mesh_vertadr[mid]), int(model.mesh_vertnum[mid])
+    fa, fn = int(model.mesh_faceadr[mid]), int(model.mesh_facenum[mid])
+    vert = np.asarray(model.mesh_vert[va:va + vn]).reshape(-1, 3)
+    face = np.asarray(model.mesh_face[fa:fa + fn]).reshape(-1, 3)
 
-def flatten(vs, vts, vns, faces):
-    """One vertex per (v, t, n) corner, which is what a GPU buffer wants."""
-    order, seen = [], {}
+    na = int(model.mesh_normaladr[mid])
+    nn = int(model.mesh_normalnum[mid])
+    normal = (np.asarray(model.mesh_normal[na:na + nn]).reshape(-1, 3)
+              if nn > 0 else None)
+    fnorm = (np.asarray(model.mesh_facenormal[fa:fa + fn]).reshape(-1, 3)
+             if nn > 0 else None)
+
+    ta = int(model.mesh_texcoordadr[mid])
+    tn = int(model.mesh_texcoordnum[mid]) if ta >= 0 else 0
+    texc = (np.asarray(model.mesh_texcoord[ta:ta + tn]).reshape(-1, 2)
+            if tn > 0 else None)
+    ftex = (np.asarray(model.mesh_facetexcoord[fa:fa + fn]).reshape(-1, 3)
+            if tn > 0 else None)
+
     pos, uv, nrm, tri = [], [], [], []
-    for f in faces:
-        for corner in f:
-            if corner not in seen:
-                seen[corner] = len(order)
-                order.append(corner)
-                v, t, n = corner
-                pos.extend(vs[v])
-                uv.extend(vts[t] if 0 <= t < len(vts) else (0.0, 0.0))
-                nrm.extend(vns[n] if 0 <= n < len(vns) else (0.0, 0.0, 1.0))
-            tri.append(seen[corner])
+    for f in range(face.shape[0]):
+        for k in range(3):
+            pos.extend(float(x) for x in vert[face[f, k]])
+            if texc is not None:
+                t = texc[ftex[f, k]]
+                # MuJoCo stores v with the image's own row order; the loader is
+                # told not to flip, so this passes straight through.
+                uv.extend((float(t[0]), float(t[1])))
+            else:
+                uv.extend((0.0, 0.0))
+            if normal is not None:
+                nrm.extend(float(x) for x in normal[fnorm[f, k]])
+            else:
+                nrm.extend((0.0, 0.0, 1.0))
+            tri.append(len(tri))
     return pos, uv, nrm, tri
 
 
@@ -78,12 +97,8 @@ def main():
     if head < 0:
         raise SystemExit("no head body in the morphology")
 
-    # Every eye mesh geom on the head, with its own local placement. Read off
-    # the compiled model rather than the XML text, so what ships is what the
-    # physics engine itself resolved.
     eyes = []
     for g in range(model.ngeom):
-        name = mujoco.mj_id2name(model, mujoco.mjtObj.mjOBJ_GEOM, g) or ""
         if int(model.geom_bodyid[g]) != head:
             continue
         if int(model.geom_type[g]) != int(mujoco.mjtGeom.mjGEOM_MESH):
@@ -92,27 +107,24 @@ def main():
         mesh_name = mujoco.mj_id2name(model, mujoco.mjtObj.mjOBJ_MESH, mid) or ""
         if "eye" not in mesh_name.lower():
             continue
-        obj = REPO / "morphology" / "meshes" / f"{mesh_name.replace('skin_', '')}.obj"
-        if not obj.exists():
-            print(f"  ! {mesh_name}: {obj.name} not found, skipped")
-            continue
-        vs, vts, vns, faces = read_obj(obj)
-        pos, uv, nrm, tri = flatten(vs, vts, vns, faces)
+        pos, uv, nrm, tri = compiled_mesh(model, mid)
+        r = float(np.abs(np.asarray(pos).reshape(-1, 3)).max())
         eyes.append({
             "name": mesh_name,
-            "geom": name,
+            "geom": mujoco.mj_id2name(model, mujoco.mjtObj.mjOBJ_GEOM, g) or f"geom{g}",
             "pos": [float(x) for x in model.geom_pos[g]],
             "quat": [float(x) for x in model.geom_quat[g]],
+            "radius": r,
             "counts": {"verts": len(pos) // 3, "tris": len(tri) // 3},
             "_buf": (pos, uv, nrm, tri),
         })
-        print(f"  {mesh_name}: {len(pos)//3} verts, {len(tri)//3} tris, "
-              f"local pos {tuple(round(float(x), 5) for x in model.geom_pos[g])}")
+        print(f"  {mesh_name}: {len(pos)//3} corners, {len(tri)//3} tris, "
+              f"radius {r*1000:.2f} mm, at "
+              f"({', '.join(f'{x*1000:.2f}' for x in model.geom_pos[g])}) mm on the head")
 
     if not eyes:
         raise SystemExit("no eye meshes found on the head")
 
-    # One binary, laid out mesh after mesh.
     blob, header = bytearray(), []
     for e in eyes:
         pos, uv, nrm, tri = e.pop("_buf")
@@ -129,6 +141,9 @@ def main():
     (OUT / "eyes.json").write_text(json.dumps({
         "generated_by": "tools/export_web_eyes.py",
         "source": "morphology/gecko_body_lab_v2.xml",
+        "note": "vertices are model.mesh_vert -- the COMPILED, re-centred mesh. "
+                "Using the raw OBJ here double-counts mesh_pos and floats the "
+                "eyes off the face.",
         "head_body": "head",
         "texture": "eye.png",
         "meshes": header,

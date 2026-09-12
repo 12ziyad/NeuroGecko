@@ -325,7 +325,7 @@ def main():
     # number this project does not hold, and each carries the provenance tag the
     # registry gives it -- published, derived or invented. A value and its label
     # travel together or neither travels.
-    def _bio(key, label, unit, scale=1.0, fmt="%.3g"):
+    def _bio(key, label, unit, scale=1.0, fmt="%.3g", group=None):
         entry = REGISTRY[key]
         val = entry["value"]
         note = (entry.get("notes") or "")
@@ -333,7 +333,7 @@ def main():
                else "INVENTED" if str(entry.get("species", "")).upper() == "INVENTED"
                else "DERIVED" if str(entry.get("species", "")).lower() == "derived"
                else "PUBLISHED")
-        return {"key": key, "label": label, "unit": unit, "tag": tag,
+        return {"key": key, "label": label, "unit": unit, "tag": tag, "group": group,
                 "value": fmt % (float(val) * scale),
                 "species": entry.get("species"),
                 "n": entry.get("sample_size"),
@@ -345,7 +345,7 @@ def main():
 
     biology = []
     for args in (
-        ("body_mass_kg", "Body mass", "g", 1000.0, "%.0f"),
+        ("body_mass_kg", "Body mass", "g", 1000.0, "%.0f", "The body"),
         ("fuller_svl_m", "Snout-vent length", "mm", 1000.0, "%.1f"),
         ("tail_mass_fraction", "Tail, share of mass", "%", 100.0, "%.0f"),
         ("tail_length_svl", "Tail length", "x SVL", 1.0, "%.2f"),
@@ -353,13 +353,13 @@ def main():
         ("head_width_svl", "Head width", "x SVL", 1.0, "%.3f"),
         ("hip_height_svl", "Hip height", "x SVL", 1.0, "%.2f"),
         ("com_intact_svl", "Centre of mass", "x SVL from snout", 1.0, "%.3f"),
-        ("lab_gait_frequency_hz", "Leg rhythm", "Hz", 1.0, "%.3f"),
+        ("lab_gait_frequency_hz", "Leg rhythm", "Hz", 1.0, "%.3f", "The walk"),
         ("hind_duty_factor", "Hind foot on ground", "of each stride", 1.0, "%.2f"),
         ("fore_duty_factor", "Fore foot on ground", "of each stride", 1.0, "%.2f"),
-        ("warm_surface_temperature_C", "Preferred warm ground", "C", 1.0, "%.0f"),
+        ("warm_surface_temperature_C", "Preferred warm ground", "C", 1.0, "%.0f", "Living"),
         ("inter_meal_interval_days", "Between meals", "days", 1.0, "%.2f"),
         ("prey_item_wet_mass_kg", "One cricket", "g", 1000.0, "%.2f"),
-        ("prey_escape_speed_m_s", "Cricket escape speed", "m/s", 1.0, "%.3f"),
+        ("prey_escape_speed_m_s", "Cricket escape speed", "m/s", 1.0, "%.3f", "The hunt"),
         ("strike_peak_speed_m_s", "Strike peak speed", "m/s", 1.0, "%.3f"),
         ("capture_head_drop_m", "Head drop at capture", "mm", 1000.0, "%.0f"),
         ("lower_jaw_length_m", "Lower jaw", "mm", 1000.0, "%.0f"),

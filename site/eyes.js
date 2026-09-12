@@ -32,7 +32,10 @@ export async function loadEyes(base = "media/", v = "") {
     // is the one part of this animal that should catch a highlight, and at
     // MuJoCo's default specular a small dark sphere is almost all highlight,
     // which is what used to make them read as cream-coloured blobs.
-    roughness: 0.18, metalness: 0.0,
+    roughness: 0.14, metalness: 0.0,
+    // A living eye is not a matte ball. This lifts the iris out of the shadow
+    // the brow casts over it without washing the texture out.
+    emissive: 0x14100a, emissiveIntensity: 1.0,
     envMapIntensity: 1.0,
   });
 
@@ -54,6 +57,34 @@ export async function loadEyes(base = "media/", v = "") {
     mesh.castShadow = true;
     mesh.name = m.name;
     group.add(mesh);
+
+    // THE EYELID RIM. A dark sphere on a dark head reads as a hole, or as one
+    // of the stones on the floor -- which is exactly what a viewer said it
+    // looked like. This is the pale margin of the lid itself, which is a real
+    // feature of this animal and the reason the family has its name: alone
+    // among Gekkota, eublepharids have movable eyelids with a scaled margin
+    // rather than a fused transparent spectacle.
+    //
+    // ITS APPEARANCE IS A DRAWING and says so: no lid-margin width, colour or
+    // contrast has been published for this species. What it is doing here is
+    // separating the eye from the head so the eye can be seen at all.
+    const R = m.radius || 0.0036;
+    const rim = new THREE.Mesh(
+      new THREE.TorusGeometry(R * 0.97, R * 0.14, 8, 32),
+      new THREE.MeshStandardMaterial({
+        color: 0xdcc9a4, roughness: 0.70, metalness: 0.0,
+        emissive: 0x2a2418, emissiveIntensity: 0.42,
+      }));
+    rim.position.copy(mesh.position);
+    rim.quaternion.copy(mesh.quaternion);
+    // The torus lies in its own xy plane; the eye looks along the head's +x,
+    // so turn the ring to face the same way.
+    rim.rotateY(Math.PI / 2);
+    // ...and push it very slightly outboard so it rings the eye rather than
+    // cutting through the middle of it.
+    rim.translateZ(R * 0.30);
+    rim.name = m.name + "_rim";
+    group.add(rim);
   }
 
   group.matrixAutoUpdate = false;

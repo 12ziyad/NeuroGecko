@@ -1499,6 +1499,15 @@ session; measured again here at **545 tests, 8 failures, 1 skip**.
 
 ---
 
+## Ledger — the eyes were in the wrong place, then invisible (Session 13o)
+
+| # | Hypothesis | Verdict | Evidence |
+|---|---|---|---|
+| 399 | The eye meshes could be exported by reading eye_L.obj and applying the geom's offset | **Refuted -- MuJoCo re-centres a mesh asset at compile time, so the offset got applied twice** | The user's screenshots showed the eyes hanging in the air beside the animal's face. Measured: the raw OBJ's vertices have centroid **(16.94, 10.40, 6.85) mm** -- the file was authored in head coordinates -- and MuJoCo's compiler subtracts exactly that, recording it in `mesh_pos` **(16.89, 10.41, 6.85) mm**, which is also what `geom_pos` then carries. So raw vertices PLUS geom_pos put each eye about 17 mm in front of the face and 10 mm out to the side, which is precisely what was on screen. The exporter now reads `model.mesh_vert`, `mesh_face`, `mesh_normal`/`mesh_facenormal` and `mesh_texcoord`/`mesh_facetexcoord` -- the compiled, re-centred mesh MuJoCo itself draws, a 3.60 mm sphere about the origin -- and `geom_pos`/`geom_quat` then place it exactly where the physics engine places it. Verified: the eye group's world transform now equals the head body's to the last digit, and the mesh sits at the model's own 21 mm offset from the head origin |
+| 400 | Exporting the eyes is enough to make the animal look like it has eyes | **No -- a dark sphere on a dark head reads as a hole, and a viewer said so** | With the eyes correctly placed they were still being mistaken for the stones on the floor: the texture is dark, the brow shades it, and at render scale there is nothing separating eye from head. Added the **eyelid rim** -- a thin pale ring at 0.97 of the eye radius, sitting just outboard of it. That is a real feature of this animal and the reason the family has its name: alone among Gekkota, eublepharids have movable eyelids with a scaled margin instead of a fused transparent spectacle, which is also why the eyelid joints exist in the morphology at all. **Its appearance is a drawing and says so** -- no lid-margin width, colour or contrast has been published for this species. What it does is let the eye be seen |
+
+---
+
 ## Scoreboard
 
 | | |
