@@ -38,6 +38,13 @@ import sys
 REPO = pathlib.Path(__file__).resolve().parents[1]
 SOURCE = REPO / "morphology" / "gecko_body_lab_v2.xml"
 OUTPUT = REPO / "morphology" / "gecko_body_web.xml"
+#: The page fetches this copy, and it had drifted for exactly the same reason
+#: the web body did: it was copied by hand and nothing could rebuild it.
+#: `site/media/gecko.xml` carried the physics of the PREVIOUS web body
+#: (e49f837f...) while the repository had moved on, so a visitor was running an
+#: older animal than the one the ledger describes. Written here so the copy
+#: cannot be forgotten again.
+SITE_COPY = REPO / "site" / "media" / "gecko.xml"
 
 #: A line is dropped whole if it opens one of these. The source writes each on
 #: its own line, which is checked below rather than assumed.
@@ -127,8 +134,12 @@ def main(argv=None) -> int:
     raw = SOURCE.read_bytes().decode("utf-8")
     newline = "\r\n" if "\r\n" in raw else "\n"
     stripped = strip(raw.replace("\r\n", "\n"))
-    OUTPUT.write_bytes(stripped.replace("\n", newline).encode("utf-8"))
+    payload = stripped.replace("\n", newline).encode("utf-8")
+    OUTPUT.write_bytes(payload)
+    SITE_COPY.parent.mkdir(parents=True, exist_ok=True)
+    SITE_COPY.write_bytes(payload)
     print(f"wrote {OUTPUT.relative_to(REPO)} from {SOURCE.relative_to(REPO)}")
+    print(f"wrote {SITE_COPY.relative_to(REPO)} (the copy the page fetches)")
     if args.verify:
         verify()
     return 0
