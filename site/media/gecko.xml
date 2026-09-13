@@ -5,7 +5,7 @@
  Exact paired CoM means are geometrically incompatible with the selected tail-density guard.
  Geometry and landmarks are identical to candidate v1; see generated evidence for feasibility/sensitivity. -->
   <!-- LAB COHORT CANDIDATE v2, opt-in only. Legacy GeckoBody-R physics remains unchanged.
- Source body: gecko_body_r.xml canonical-LF SHA256 639e202c7467865246d46e5ed22c37cf75451340c0b3f52c22db034ae23e1bda.
+ Source body: gecko_body_r.xml canonical-LF SHA256 9fd73bad8c50ec563db27b734bf5358d9447bdfa29616264f6589f69791893e2.
  38 g / ~106 mm SVL population choice; segment masses, neutral inclinations and gains are proxies.
  Femur depression target convention: Jagnandan & Higham 2017 (doi:10.1038/s41598-017-11484-7).
  Raw hip_sprawl is a local hinge angle, NOT the paper's reconstructed 3-D anatomical angle.
@@ -67,7 +67,7 @@
            mid_back follows the existing dorsal visual surface (not skin data). -->
       <site name="mid_back" pos="0 0 0.01196" size="0.0005" group="4" />
       <camera name="tracking" mode="trackcom" pos="0 -0.18 0.10" xyaxes="1 0 0 0 0.5 0.87" />
-      <geom class="collision" type="capsule" fromto="-0.0095 0 0 0.0095 0 0" size="0.013" mass="0.004892639219689833" />
+      <geom class="collision" type="capsule" fromto="-0.0095 0 0 0.0095 0 0" size="0.013" mass="0.0048955842084023281" />
       <!-- trunk_mid R-redist (root, ~CoM) -->
       <geom rgba="0 0 0 0" class="visual" type="ellipsoid" pos="0 0 0" size="0.0147 0.01365 0.01196" />
       <site name="belly_mid" type="box" pos="0.0 0 -0.0104" size="0.0114 0.0078 0.003" rgba="0.9 0.2 0.2 0.25" group="4" />
@@ -78,21 +78,21 @@
         <!-- lateral bend 1 [R] -->
         <joint name="spine_pitch" axis="0 1 0" range="-10 10" stiffness="0.03" damping="0.006" />
         <!-- weakly actuated pitch [R] -->
-        <geom class="collision" type="capsule" fromto="0 0 0 0.018 0 0" size="0.012" mass="0.0059840241548102611" />
+        <geom class="collision" type="capsule" fromto="0 0 0 0.018 0 0" size="0.012" mass="0.0059951559717732411" />
         <!-- R-redist -->
         <geom rgba="0 0 0 0" class="visual" type="ellipsoid" pos="0.009 0 0" size="0.0126 0.0126 0.0114" />
         <body name="neck" pos="0.018 0 0">
           <!-- generated skin, tools/make_gecko_mesh.py -->
           <joint name="neck_yaw" axis="0 0 1" range="-40 40" />
           <joint name="neck_pitch" axis="0 1 0" range="-30 30" />
-          <geom class="collision" type="capsule" fromto="0 0 0 0.008 0 0" size="0.008" mass="0.0017233948874003616" />
+          <geom class="collision" type="capsule" fromto="0 0 0 0.008 0 0" size="0.008" mass="0.0017281263596576038" />
           <!-- R -->
           <geom rgba="0 0 0 0" class="visual" type="capsule" fromto="0 0 0 0.008 0 0" size="0.00816" />
           <body name="head" pos="0.008 0 0">
             <!-- generated skin, tools/make_gecko_mesh.py -->
             <joint name="head_yaw" axis="0 0 1" range="-30 30" />
             <joint name="head_pitch" axis="0 1 0" range="-20 20" />
-            <geom class="collision" type="ellipsoid" size="0.015949999999999999 0.0098049999999999995 0.0055649999999999996" mass="0.0045023627128094991" pos="0.01305 0 0" />
+            <geom class="collision" type="ellipsoid" size="0.015949999999999999 0.0098049999999999995 0.0055649999999999996" mass="0.0045199560181738499" pos="0.01305 0 0" />
             <!-- R; 0.0006 moved to the jaw, head+jaw = 0.005 as before -->
             <geom rgba="0 0 0 0" class="visual" type="ellipsoid" pos="0.01305 0 0" size="0.015949999999999999 0.0098049999999999995 0.0055649999999999996" />
             <geom rgba="0 0 0 0" class="visual" type="ellipsoid" pos="0.02552 0 -0.0011" size="0.0052199999999999998 0.0066 0.0033275000000000002" />
@@ -122,7 +122,7 @@
                  the two lids need two joints. Mass 2e-5 split in half; the
                  generator rescales it into the budget as before. -->
             <body name="eyelid_L" pos="0.01682 0.01012 0.0072">
-              <geom type="sphere" pos="0 0 0" size="0.0012" mass="1.0808655404347834e-05" contype="0" conaffinity="0" group="3" rgba="0 0 0 0" />
+              <geom type="sphere" pos="0 0 0" size="0.0012" mass="1.0853670408245173e-05" contype="0" conaffinity="0" group="3" rgba="0 0 0 0" />
               <joint name="eyelid_L" axis="1 0 0" range="-75 0" />
               <geom class="visual" type="ellipsoid" pos="0 0 0.0026" size="0.0042 0.0042 0.0014" rgba="0 0 0 0" />
               <!-- L upper lid -->
@@ -130,7 +130,7 @@
             </body>
             <!-- eyelid_L -->
             <body name="eyelid_R" pos="0.01682 -0.01012 0.0072">
-              <geom type="sphere" pos="0 0 0" size="0.0012" mass="1.0808655404347834e-05" contype="0" conaffinity="0" group="3" rgba="0 0 0 0" />
+              <geom type="sphere" pos="0 0 0" size="0.0012" mass="1.0853670408245173e-05" contype="0" conaffinity="0" group="3" rgba="0 0 0 0" />
               <joint name="eyelid_R" axis="1 0 0" range="0 75" />
               <geom class="visual" type="ellipsoid" pos="0 0 0.0026" size="0.0042 0.0042 0.0014" rgba="0 0 0 0" />
               <!-- R upper lid -->
@@ -147,7 +147,7 @@
                    abstract only). NO breathing frequency or throat displacement
                    has been published for any gecko, so the rate is INVENTED and
                    declared at the place it is commanded. -->
-              <geom type="sphere" pos="0 0 0" size="0.0016" mass="4.1024883292748228e-05" contype="0" conaffinity="0" group="3" rgba="0 0 0 0" />
+              <geom type="sphere" pos="0 0 0" size="0.0016" mass="4.1182253286301627e-05" contype="0" conaffinity="0" group="3" rgba="0 0 0 0" />
               <joint name="gular" axis="0 1 0" range="-14 6" />
               <geom class="visual" type="ellipsoid" pos="0.0020 0 0.0006" size="0.0092 0.0050 0.0017" rgba="0 0 0 0" />
               <site name="throat" pos="0.0022 0 -0.0050" size="0.0008" group="4" />
@@ -160,7 +160,7 @@
                    a share of the head; the generator rescales all masses into
                    the 38 g budget so total mass is unchanged. -->
               <joint name="jaw" axis="0 1 0" range="0 40" />
-              <geom class="collision" type="capsule" fromto="0 0 0 0.0245 0 0" size="0.0032" mass="0.00063376649066762601" />
+              <geom class="collision" type="capsule" fromto="0 0 0 0.0245 0 0" size="0.0032" mass="0.00063638130668083057" />
               <!-- 0.0006 less the 1e-5 now carried by the tongue body: the TEMPLATE mass stays 0.0612 (#343, same move as #306) -->
               <!-- generated mandible, swept at the head's own width -->
               <!-- Mouth corner (commissure) sits 13 +/- 2 mm behind the jaw tip:
@@ -173,7 +173,7 @@
                    licks/s (Cooper, DePerno &amp; Steele 1996, n = 16), and the
                    tongue-flick rate the nose already computes. Range 0-12 mm. -->
               <body name="tongue" pos="0 0 0">
-                <geom type="sphere" pos="0.010 0 0.0012" size="0.0008" mass="1.0481934287108031e-05" contype="0" conaffinity="0" group="3" rgba="0 0 0 0" />
+                <geom type="sphere" pos="0.010 0 0.0012" size="0.0008" mass="1.0523572342627257e-05" contype="0" conaffinity="0" group="3" rgba="0 0 0 0" />
                 <joint name="tongue" type="slide" axis="1 0 0" range="0 0.012" damping="0.002" />
                 <geom class="visual" type="capsule" fromto="0.0045 0 0.0012 0.0155 0 0.0012" size="0.0016" rgba="0.85 0.45 0.50 1" />
                 <site name="tongue_tip" pos="0.0165 0 0.0018" size="0.001" rgba="0.9 0.3 0.4 0.6" group="4" />
@@ -191,18 +191,18 @@
           <site name="shoulder_L" pos="0 0 0" size="0.0005" group="4" />
           <joint name="shoulder_sprawl_L" axis="1 0 0" range="-35 35" />
           <joint name="shoulder_proret_L" axis="0 0 1" range="-40 40" />
-          <geom class="collision" type="capsule" fromto="0 0 0 -0.0038435905793392272 0.010890157112177317 -0.0027000000000000001" size="0.0025" mass="0.00091315568179642999" />
+          <geom class="collision" type="capsule" fromto="0 0 0 -0.0038435905793392272 0.010890157112177317 -0.0027000000000000001" size="0.0025" mass="0.00091495247598478351" />
           <geom rgba="0 0 0 0" class="visual" type="capsule" fromto="0 0 0 -0.0038435905793392272 0.010890157112177317 -0.0027000000000000001" size="0.002625" />
           <body name="forearm_L" pos="-0.0038435905793392272 0.010890157112177317 -0.0027000000000000001">
             <!-- generated skin, tools/make_gecko_mesh.py -->
             <joint name="elbow_L" axis="0 1 0" range="-60 60" />
-            <geom class="collision" type="capsule" fromto="0 0 0 0.0061395372186465519 0.012279038184394018 -0.0061000000000000004" size="0.002" mass="0.00061642476261613373" />
+            <geom class="collision" type="capsule" fromto="0 0 0 0.0061395372186465519 0.012279038184394018 -0.0061000000000000004" size="0.002" mass="0.00061768585612739725" />
             <geom rgba="0 0 0 0" class="visual" type="capsule" fromto="0 0 0 0.0061395372186465519 0.012279038184394018 -0.0061000000000000004" size="0.0021" />
             <body name="manus_L" pos="0.0061395372186465519 0.012279038184394018 -0.0061000000000000004">
               <!-- generated skin, tools/make_gecko_mesh.py -->
               <joint name="wrist_L" axis="0 1 0" range="-35 35" stiffness="0.02" damping="0.003" />
               <!-- PASSIVE [R] -->
-              <geom class="collision" type="box" pos="0.0030045264886472095 0 -0.0020557286501270379" size="0.0030045264886472095 0.0022138616232137334 0.0011069308116068667" mass="0.00016463929213058142" />
+              <geom class="collision" type="box" pos="0.0030045264886472095 0 -0.0020557286501270379" size="0.0030045264886472095 0.0022138616232137334 0.0011069308116068667" mass="0.00016504420637639811" />
               <!-- forefoot pad (mass) -->
               <geom rgba="0 0 0 0" class="visual" type="box" pos="0.0030045264886472095 0 -0.0020557286501270379" size="0.0030045264886472095 0.0022138616232137334 0.0011069308116068667" />
               <site name="footzone_fore_L" type="box" pos="0.0057323202743927021 0 -0.0019608488662750207" size="0.0066811181129128724 0.0049653753549222298 0.0029096467047951924" rgba="0.2 0.8 0.3 0.16" group="4" />
@@ -237,18 +237,18 @@
           <site name="shoulder_R" pos="0 0 0" size="0.0005" group="4" />
           <joint name="shoulder_sprawl_R" axis="1 0 0" range="-35 35" />
           <joint name="shoulder_proret_R" axis="0 0 1" range="-40 40" />
-          <geom class="collision" type="capsule" fromto="0 0 0 -0.0038435905793392272 -0.010890157112177317 -0.0027000000000000001" size="0.0025" mass="0.00091315568179642999" />
+          <geom class="collision" type="capsule" fromto="0 0 0 -0.0038435905793392272 -0.010890157112177317 -0.0027000000000000001" size="0.0025" mass="0.00091495247598478351" />
           <geom rgba="0 0 0 0" class="visual" type="capsule" fromto="0 0 0 -0.0038435905793392272 -0.010890157112177317 -0.0027000000000000001" size="0.002625" />
           <body name="forearm_R" pos="-0.0038435905793392272 -0.010890157112177317 -0.0027000000000000001">
             <!-- generated skin, tools/make_gecko_mesh.py -->
             <joint name="elbow_R" axis="0 1 0" range="-60 60" />
-            <geom class="collision" type="capsule" fromto="0 0 0 0.0061395372186465519 -0.012279038184394018 -0.0061000000000000004" size="0.002" mass="0.00061642476261613373" />
+            <geom class="collision" type="capsule" fromto="0 0 0 0.0061395372186465519 -0.012279038184394018 -0.0061000000000000004" size="0.002" mass="0.00061768585612739725" />
             <geom rgba="0 0 0 0" class="visual" type="capsule" fromto="0 0 0 0.0061395372186465519 -0.012279038184394018 -0.0061000000000000004" size="0.0021" />
             <body name="manus_R" pos="0.0061395372186465519 -0.012279038184394018 -0.0061000000000000004">
               <!-- generated skin, tools/make_gecko_mesh.py -->
               <joint name="wrist_R" axis="0 1 0" range="-35 35" stiffness="0.02" damping="0.003" />
               <!-- PASSIVE [R] -->
-              <geom class="collision" type="box" pos="0.0030045264886472095 0 -0.0020557286501270379" size="0.0030045264886472095 0.0022138616232137334 0.0011069308116068667" mass="0.00016463929213058142" />
+              <geom class="collision" type="box" pos="0.0030045264886472095 0 -0.0020557286501270379" size="0.0030045264886472095 0.0022138616232137334 0.0011069308116068667" mass="0.00016504420637639811" />
               <!-- forefoot pad (mass) -->
               <geom rgba="0 0 0 0" class="visual" type="box" pos="0.0030045264886472095 0 -0.0020557286501270379" size="0.0030045264886472095 0.0022138616232137334 0.0011069308116068667" />
               <site name="footzone_fore_R" type="box" pos="0.0057323202743927021 0 -0.0019608488662750207" size="0.0066811181129128724 0.0049653753549222298 0.0029096467047951924" rgba="0.2 0.8 0.3 0.16" group="4" />
@@ -283,7 +283,7 @@
       <body name="trunk_posterior" pos="-0.0095 0 0">
         <joint name="spine_lat_2" axis="0 0 1" range="-25 25" stiffness="0.02" damping="0.006" />
         <!-- lateral bend 2 [R] -->
-        <geom class="collision" type="capsule" fromto="0 0 0 -0.018 0 0" size="0.013" mass="0.0040003044631436889" />
+        <geom class="collision" type="capsule" fromto="0 0 0 -0.018 0 0" size="0.013" mass="0.0039976849400415824" />
         <!-- R-redist -->
         <geom rgba="0 0 0 0" class="visual" type="ellipsoid" pos="-0.009 0 0" size="0.0129 0.01365 0.01235" />
         <site name="belly_post" type="box" pos="-0.009 0 -0.0104" size="0.0108 0.0078 0.003" rgba="0.9 0.2 0.2 0.25" group="4" />
@@ -291,7 +291,7 @@
           <site name="pelvis_center" pos="-0.007 0 -0.002" size="0.0005" group="4" />
           <joint name="spine_lat_3" axis="0 0 1" range="-25 25" stiffness="0.03" damping="0.007" />
           <!-- lateral bend 3 (lumbo-sacral) [R] -->
-          <geom class="collision" type="capsule" fromto="0 0 0 -0.014 0 0" size="0.013" mass="0.0021005861889451497" />
+          <geom class="collision" type="capsule" fromto="0 0 0 -0.014 0 0" size="0.013" mass="0.0020969301614167778" />
           <!-- R -->
           <geom rgba="0 0 0 0" class="visual" type="ellipsoid" pos="-0.007 0 0" size="0.01155 0.01456 0.013" />
           <site name="vent" pos="-0.014 0 0" size="0.001" rgba="1 0 0 0.6" group="4" />
@@ -302,17 +302,17 @@
             <joint name="hip_proret_L" axis="0 0 1" range="-45 45" />
             <joint name="hip_rot_L" axis="0 1 0" range="-15 15" />
             <!-- long-axis -->
-            <geom class="collision" type="capsule" fromto="0 0 0 -0.0033994199528688102 0.014400774870882158 -0.0040000000000000001" size="0.003" mass="0.00065986621884127686" />
-            <geom rgba="0 0 0 0" class="visual" type="capsule" fromto="0 0 0 -0.0033994199528688102 0.014400774870882158 -0.0040000000000000001" size="0.00324" />
-            <body name="tibia_L" pos="-0.0033994199528688102 0.014400774870882158 -0.0040000000000000001">
+            <geom class="collision" type="capsule" fromto="0 0 0 -0.0066172123605431716 0.013234457808058039 -0.0040000000000000001" size="0.003" mass="0.00064713729955139529" />
+            <geom rgba="0 0 0 0" class="visual" type="capsule" fromto="0 0 0 -0.0066172123605431716 0.013234457808058039 -0.0040000000000000001" size="0.00324" />
+            <body name="tibia_L" pos="-0.0066172123605431716 0.013234457808058039 -0.0040000000000000001">
               <!-- generated skin, tools/make_gecko_mesh.py -->
               <joint name="knee_L" axis="0 1 0" range="-60 60" />
-              <geom class="collision" type="capsule" fromto="0 0 0 -0.0059885620195373086 0.011500052680285673 -0.0076" size="0.0025" mass="0.00035268725284275999" />
-              <geom rgba="0 0 0 0" class="visual" type="capsule" fromto="0 0 0 -0.0059885620195373086 0.011500052680285673 -0.0076" size="0.002625" />
-              <body name="pes_L" pos="-0.0059885620195373086 0.011500052680285673 -0.0076">
+              <geom class="collision" type="capsule" fromto="0 0 0 -0.0027707696118629476 0.012666369743109798 -0.0076" size="0.0025" mass="0.00034577358324357514" />
+              <geom rgba="0 0 0 0" class="visual" type="capsule" fromto="0 0 0 -0.0027707696118629476 0.012666369743109798 -0.0076" size="0.002625" />
+              <body name="pes_L" pos="-0.0027707696118629476 0.012666369743109798 -0.0076">
                 <!-- generated skin, tools/make_gecko_mesh.py -->
                 <joint name="ankle_L" axis="0 1 0" range="-45 45" />
-                <geom class="collision" type="box" pos="0.0037971374395781507 0 -0.0025314249597187676" size="0.0037971374395781507 0.002700186623700019 0.0013500933118500095" mass="0.0001581256688453343" />
+                <geom class="collision" type="box" pos="0.0037971374395781507 0 -0.0025314249597187676" size="0.0037971374395781507 0.002700186623700019 0.0013500933118500095" mass="0.00015779051242063584" />
                 <!-- hindfoot pad (mass) -->
                 <geom rgba="0 0 0 0" class="visual" type="box" pos="0.0037971374395781507 0 -0.0025314249597187676" size="0.0037971374395781507 0.002700186623700019 0.0013500933118500095" />
                 <site name="footzone_hind_L" type="box" pos="0.0073791037575802066 0 -0.0024386060445290795" size="0.0083916737414677142 0.0064551336472828567 0.0034511760284165862" rgba="0.2 0.8 0.3 0.16" group="4" />
@@ -349,17 +349,17 @@
             <joint name="hip_proret_R" axis="0 0 1" range="-45 45" />
             <joint name="hip_rot_R" axis="0 1 0" range="-15 15" />
             <!-- long-axis -->
-            <geom class="collision" type="capsule" fromto="0 0 0 -0.0033994199528688102 -0.014400774870882158 -0.0040000000000000001" size="0.003" mass="0.00065986621884127686" />
-            <geom rgba="0 0 0 0" class="visual" type="capsule" fromto="0 0 0 -0.0033994199528688102 -0.014400774870882158 -0.0040000000000000001" size="0.00324" />
-            <body name="tibia_R" pos="-0.0033994199528688102 -0.014400774870882158 -0.0040000000000000001">
+            <geom class="collision" type="capsule" fromto="0 0 0 -0.0066172123605431716 -0.013234457808058039 -0.0040000000000000001" size="0.003" mass="0.00064713729955139529" />
+            <geom rgba="0 0 0 0" class="visual" type="capsule" fromto="0 0 0 -0.0066172123605431716 -0.013234457808058039 -0.0040000000000000001" size="0.00324" />
+            <body name="tibia_R" pos="-0.0066172123605431716 -0.013234457808058039 -0.0040000000000000001">
               <!-- generated skin, tools/make_gecko_mesh.py -->
               <joint name="knee_R" axis="0 1 0" range="-60 60" />
-              <geom class="collision" type="capsule" fromto="0 0 0 -0.0059885620195373086 -0.011500052680285673 -0.0076" size="0.0025" mass="0.00035268725284275999" />
-              <geom rgba="0 0 0 0" class="visual" type="capsule" fromto="0 0 0 -0.0059885620195373086 -0.011500052680285673 -0.0076" size="0.002625" />
-              <body name="pes_R" pos="-0.0059885620195373086 -0.011500052680285673 -0.0076">
+              <geom class="collision" type="capsule" fromto="0 0 0 -0.0027707696118629476 -0.012666369743109798 -0.0076" size="0.0025" mass="0.00034577358324357514" />
+              <geom rgba="0 0 0 0" class="visual" type="capsule" fromto="0 0 0 -0.0027707696118629476 -0.012666369743109798 -0.0076" size="0.002625" />
+              <body name="pes_R" pos="-0.0027707696118629476 -0.012666369743109798 -0.0076">
                 <!-- generated skin, tools/make_gecko_mesh.py -->
                 <joint name="ankle_R" axis="0 1 0" range="-45 45" />
-                <geom class="collision" type="box" pos="0.0037971374395781507 0 -0.0025314249597187676" size="0.0037971374395781507 0.002700186623700019 0.0013500933118500095" mass="0.0001581256688453343" />
+                <geom class="collision" type="box" pos="0.0037971374395781507 0 -0.0025314249597187676" size="0.0037971374395781507 0.002700186623700019 0.0013500933118500095" mass="0.00015779051242063584" />
                 <!-- hindfoot pad (mass) -->
                 <geom rgba="0 0 0 0" class="visual" type="box" pos="0.0037971374395781507 0 -0.0025314249597187676" size="0.0037971374395781507 0.002700186623700019 0.0013500933118500095" />
                 <site name="footzone_hind_R" type="box" pos="0.0073791037575802066 0 -0.0024386060445290795" size="0.0083916737414677142 0.0064551336472828567 0.0034511760284165862" rgba="0.2 0.8 0.3 0.16" group="4" />
@@ -619,6 +619,6 @@
   </sensor>
   <keyframe>
     <key name="neutral" qpos="0 0 0.028000000000000001 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0" />
-    <key name="stand" qpos="-0.0011155270043863655 -8.14687166848453e-19 0.019753263299942474 0.99958858343471746 1.0535371780923658e-18 -0.028682117546894152 -1.0296831565003151e-19 9.4920822078292232e-20 0.0032530254780663973 -9.3528831869242368e-21 0.019112643269171295 -5.212102062507778e-21 0.015343142821984145 -4.0264887096016597e-24 8.9751333226201957e-24 -1.0571640630104439e-13 7.0652645504252386e-05 -7.3355575237373802e-08 0.0056709529685304615 -1.9583849802369389e-05 -0.0019594531198546187 -5.9014784925995235e-05 -0.0056709529685304624 1.9583849802369291e-05 -0.0019594531198546183 -5.9014784925995302e-05 -7.4174565059163641e-20 -4.3047441009018288e-20 0.0041360305676558439 -0.00023680406010135696 0.0019618197083145611 0.00093450794722240739 -4.2179704821050953e-05 -0.0041360305676558457 0.00023680406010135702 0.0019618197083145611 0.00093450794722240761 -4.2179704821051075e-05 -2.2542276160788409e-21 -0.013821371455464379 -9.1798913197260866e-22 5.8410952500944414e-22 1.3060370515094903e-21 1.3986444657571294e-21" />
+    <key name="stand" qpos="-0.0011197584243318466 6.8404457640904525e-19 0.019752999456017169 0.99958991530617858 1.5769755585769568e-18 -0.028635663397003075 3.9690689651361922e-19 -2.081077716845622e-20 0.0031363281253725221 1.1466599347272641e-21 0.019200473543748243 1.736502894068352e-22 0.015426748694518195 -1.2697087046582429e-23 9.2112275513116517e-24 -1.0570671682665172e-13 7.0959454668897376e-05 -7.3092092634916753e-08 0.0056681411397225242 -2.4970097703089766e-05 -0.001976107677412135 -5.938709124678732e-05 -0.0056681411397225242 2.4970097703089735e-05 -0.001976107677412135 -5.9387091246787347e-05 3.8232344873484842e-21 6.2225116422610907e-21 0.0041495601541853555 -0.00022378476277805042 0.0019312693572574112 0.00021800665012212559 -4.1596145084497963e-05 -0.0041495601541853581 0.00022378476277805031 0.0019312693572574109 0.00021800665012212551 -4.1596145084497929e-05 1.9673518207855202e-21 -0.013821330956451995 6.802411907107443e-22 -4.1280959403157931e-22 -8.9550988932323576e-22 -9.5165626700860216e-22" />
   </keyframe>
 </mujoco>
