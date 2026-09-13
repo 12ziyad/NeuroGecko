@@ -2,9 +2,9 @@
  "schema_version": 1,
  "generator": "utils/build_world.py",
  "source": "morphology/gecko_body_lab_v2.xml",
- "source_sha256": "db650f6bf55852cb3d1f24a642091024abef2cb55b1bf00380da4e33446049f3",
+ "source_sha256": "9f1caaf71c1e03efe36b64fe661af6eec829427a54461e7726bddece513e71c8",
  "output": "morphology/gecko_habitat_v1.xml",
- "output_sha256": "a8d40a2f0d160018fa43e7c4bd34f3af34fdc76c6f811cb62bbd00e133bf54b3",
+ "output_sha256": "1050991dc3711f7d76e45c1cff92460568577f2809d965ec8ddd14b9c905f517",
  "edits": [
   {
    "element": "worldbody",

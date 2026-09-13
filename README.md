@@ -13,7 +13,7 @@ published measurements, with neural control and a ledger of every hypothesis tes
 | | |
 |---|---|
 | **Live** | https://neurogecko.pages.dev |
-| **Browser port vs the Python model** | walker `7.3e-15`, eye `8.9e-16`, gates / clock / search **exactly 0** |
+| **Browser port vs the Python model** | walker `5.6e-16`, eye `8.9e-16`, gates / clock / search **exactly 0** |
 | **Anatomy** | 14 / 14 gates against the literature |
 | **Ledger** | [`docs/FAILURE_MAP.md`](docs/FAILURE_MAP.md) — every hypothesis, refutations kept |
 

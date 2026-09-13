@@ -23,6 +23,7 @@ Usage:  python tools/rebuild_body.py [--skip-skin]
 from __future__ import annotations
 
 import argparse
+import os
 import pathlib
 import subprocess
 import sys
@@ -38,7 +39,14 @@ WORLD_ARGS = [
 
 def run(label, args, grep=None):
     print(f"\n=== {label} ===", flush=True)
-    result = subprocess.run([PY] + args, cwd=REPO, capture_output=True, text=True)
+    # Running a script BY PATH puts that script's own directory on sys.path, not
+    # the repository root -- so `utils/build_lab_morphology.py` died on
+    # `from common.morphology_audit import ...` and the pipeline never reached
+    # the steps after it. The one place this script is supposed to be
+    # authoritative is order, and it could not get there. PYTHONPATH fixes every
+    # step at once rather than rewriting each invocation.
+    env = {**os.environ, "PYTHONPATH": str(REPO) + os.pathsep + os.environ.get("PYTHONPATH", "")}
+    result = subprocess.run([PY] + args, cwd=REPO, capture_output=True, text=True, env=env)
     out = (result.stdout or "") + (result.stderr or "")
     if result.returncode != 0:
         print(out[-2500:])
@@ -85,6 +93,26 @@ def main():
              "--threat", "0.45", "-0.30", "0.05"] + WORLD_ARGS,
             grep=["__never__"])
         print("  furnished world written")
+
+    # The habitat was NOT in this list and it drifted for it: the committed copy
+    # was generated from source db650f6b while the committed body records
+    # 9fd73bad, i.e. a body two generations back, before the animal had textures
+    # at all. It is not decorative -- `tools/export_web_brain.py` lifts the
+    # shelter and warm-patch geometry out of it for the public page, and
+    # `tools/everything_video.py` films in it. Its flags differ from the others
+    # (its own manifest records no offwidth/offheight), so they are spelled out.
+    habitat = REPO / "morphology" / "gecko_habitat_v1.xml"
+    if habitat.exists():
+        run("habitat (the world the page and the films use)",
+            ["utils/build_world.py",
+             "--source", "morphology/gecko_body_lab_v2.xml",
+             "--output", str(habitat.relative_to(REPO)),
+             "--shelter", "0.055", "-0.3", "0.16",
+             "--warm-patch", "0.070", "0.28", "-0.2",
+             "--threat", "0", "0.45", "0.3",
+             "--prey-radius", "0.009", "--texrepeat", "50", "--fovy", "70"],
+            grep=["__never__"])
+        print("  habitat written")
 
     import mujoco
     for name in ("gecko_world_v1.xml", "gecko_world_furnished_v1.xml"):

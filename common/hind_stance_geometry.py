@@ -193,13 +193,34 @@ class StanceCompensator:
                     low = max(low, -self.sprawl_limit_rad)
                     high = min(high, self.sprawl_limit_rad)
                 sprawl_grid = np.linspace(low, high, sprawl_nodes)
+            # CONTINUATION, and the reason is measured. Two free joints against
+            # one height constraint is underdetermined: the solutions form a
+            # CURVE, and every point on it is equally "solved". Started from
+            # zero at every node independently, the solver used to land on
+            # different parts of that curve at neighbouring nodes -- the Newton
+            # path on one branch, the bisection fallback (which searches along
+            # ones/sqrt(n) and so always returns knee == ankle) on another --
+            # and the table sawtoothed between them. Runtime then interpolated
+            # between two different branches, which is a pose on neither.
+            #
+            # Seeding each node with the previous node's answer makes the table
+            # trace ONE branch by construction. Nothing biological changes: the
+            # target, the band and the reachable set are untouched. What changes
+            # is which of many equally-valid poses gets reported, and the class
+            # has always said that choice is not unique.
             solutions, errors = [], []
+            column_seed = None
             for sprawl in sprawl_grid:
                 column = []
+                seed = column_seed
                 for hip in hip_grid:
-                    offsets, error = self._solve(foot, float(hip), float(sprawl))
+                    offsets, error = self._solve(foot, float(hip), float(sprawl), seed=seed)
+                    seed = offsets
                     column.append(offsets)
                     errors.append(error)
+                # The next sprawl row starts at the same hip node this one did,
+                # so seed it from there and the second axis stays continuous too.
+                column_seed = column[0]
                 solutions.append(np.asarray(column))
             # (n_drive, n_sprawl, n_free); the one-node case is the original table.
             table = np.stack(solutions, axis=1)
@@ -277,7 +298,7 @@ class StanceCompensator:
             result = min(result, height)
         return result
 
-    def _solve(self, foot, hip, sprawl=0.):
+    def _solve(self, foot, hip, sprawl=0., seed=None):
         # Numerical controls: 100 microradian differences, 2 um target residual,
         # bounded 0.05-rad updates, at most 60 iterations and 12 backtrack trials.
         # These are deterministic solver tolerances, not biological parameters.
@@ -291,8 +312,16 @@ class StanceCompensator:
         # either edge of the declared [-1.2 mm, 0] stance band, and is far below
         # anything the contact solver resolves. The post-build dense-interpolation
         # check against that band is unchanged and remains the real guard.
-        x = np.zeros(self._info[foot]["free_count"])
         bounds = self._info[foot]["offset_bounds"]
+        # `seed` is the previous node's pose. Starting there keeps this node on
+        # the same branch, and it starts ON the solution curve rather than at
+        # the origin, so Newton has less distance to cover before the min() kink
+        # can stall it.
+        if seed is None:
+            x = np.zeros(self._info[foot]["free_count"])
+        else:
+            x = np.clip(np.asarray(seed, dtype=float).copy(), bounds[:, 0], bounds[:, 1])
+        origin = x.copy()
         for _ in range(60):
             error = self.clearance(foot, hip, *x, sprawl_ctrl_rad=sprawl) - self.target_for(foot)
             if abs(error) <= 2e-6:
@@ -328,9 +357,13 @@ class StanceCompensator:
             # Bisection needs no derivative and is unaffected by the kink.
             bounds = self._info[foot]["offset_bounds"]
             direction = np.ones(x.size) / math.sqrt(float(x.size))
-            lo_scale = float(np.min(bounds[:, 0] / direction))
-            hi_scale = float(np.min(bounds[:, 1] / direction))
-            at = lambda s: self.clearance(foot, hip, *np.clip(s * direction, bounds[:, 0], bounds[:, 1]), sprawl_ctrl_rad=sprawl) - self.target_for(foot)
+            # THROUGH THE SEED, not through the origin. Bisecting from zero
+            # always returns knee == ankle, which is a different branch from
+            # wherever Newton was working, and alternating the two across
+            # neighbouring nodes is what used to break the table.
+            lo_scale = float(np.max((bounds[:, 0] - origin) / direction))
+            hi_scale = float(np.min((bounds[:, 1] - origin) / direction))
+            at = lambda s: self.clearance(foot, hip, *np.clip(origin + s * direction, bounds[:, 0], bounds[:, 1]), sprawl_ctrl_rad=sprawl) - self.target_for(foot)
             lo_error, hi_error = at(lo_scale), at(hi_scale)
             if lo_error * hi_error <= 0.:
                 for _ in range(200):
@@ -342,7 +375,7 @@ class StanceCompensator:
                         lo_scale, lo_error = mid_scale, mid_error
                     else:
                         hi_scale, hi_error = mid_scale, mid_error
-                candidate = np.clip(mid_scale * direction, bounds[:, 0], bounds[:, 1])
+                candidate = np.clip(origin + mid_scale * direction, bounds[:, 0], bounds[:, 1])
                 if abs(mid_error) < abs(error):
                     x, error = candidate, mid_error
         if abs(error) > 1e-5:
@@ -354,11 +387,9 @@ class StanceCompensator:
             # the foot simply presses deeper into the floor, which is what a
             # loaded foot does. Take the closest reachable pose and record the
             # residual; the dense band check below is still the real guard.
-            x = np.clip(np.full(x.size, min(hi_scale, max(lo_scale, 0.)) / math.sqrt(float(x.size))
-                                if False else 0.), bounds[:, 0], bounds[:, 1])
-            best, best_error = None, math.inf
+            best, best_error = x, error
             for scale in np.linspace(lo_scale, hi_scale, 65):
-                candidate = np.clip(scale * direction, bounds[:, 0], bounds[:, 1])
+                candidate = np.clip(origin + scale * direction, bounds[:, 0], bounds[:, 1])
                 candidate_error = self.clearance(foot, hip, *candidate, sprawl_ctrl_rad=sprawl) - self.target_for(foot)
                 if abs(candidate_error) < abs(best_error):
                     best, best_error = candidate, candidate_error

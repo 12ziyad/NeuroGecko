@@ -27,7 +27,7 @@ later turned out to be right gets a second row, not an edit.
 | Stage | State |
 |---|---|
 | **Research** — 167 agents, 276 published measurements, fact-checked | ✅ done |
-| **Body** — 38 g lab morphology, 14/14 static checks | ✅ done |
+| **Body** — 38 g lab morphology, 14/14 static checks | ✅ done. **The knee bowed the wrong way from the first build until #413** |
 | **Walking** — base controller, 4/6 gates, accepted | ✅ done |
 | **World** — no cheat, textured floor, fleeing prey, **shelter + warm surface + threat** | ✅ done |
 | **Brain 1/8 — hypothalamus** (hunger, energy, fatigue, thermostat) | ✅ done |
@@ -41,7 +41,7 @@ later turned out to be right gets a second row, not an edit.
 | **Behaviour channels reachable** | 🟡 **5 of 6** — hunt, explore, flee, bask, rest. `groom` unreachable and honestly zero (#353), blocked on #354 |
 | Brains 7–8 — memory, learning | ❌ barely measured in this animal |
 | **Proof** — 15-test battery | 🟡 1 run (A3, failed then fixed) |
-| **Gate contracts** | ✅ 16/16. One check compared bytes instead of physics and masked seven others — #167, #168 |
+| **Gate contracts** | 🟡 **8 failing since #291** — the accepted base evidence was measured on a body the repository no longer contains, and that decision is still the user's. Not caused by, and not worsened by, #413 |
 
 **Roughly 50 % done.** The irreversible parts — the research and the body — are
 behind us.
@@ -261,6 +261,23 @@ sees, and that stationary prey is invisible to a visual predator. Ledger
   failures (545 tests, 8 failures, 1 skip), the front-foot duty disagreement,
   and the body-hash question — whose failing test reports that the PHYSICS
   digest differs too, not only the file bytes, which #167 claimed was closed.
+- **CLOSED — the knee.** #408 left it reverted and blocked. The blocker was
+  never the knee: the stance compensator's table had been sawtoothing between
+  two branches of an underdetermined solve since it was written (#409), and the
+  new limb only pushed a guard that was already two-thirds spent. Continuation
+  fixed the table without touching the target or the band (#411), the knee was
+  turned cranial by taking the other branch of the two-link chain so the foot
+  never moved (#413), and it is shipped.
+- **OPEN, and it is the price of #413**: the forefeet make **1.101 and 1.104**
+  contacts per commanded stride against a 10 % entrainment tolerance, so
+  `observed_contacts_entrained` is false and Gate 2's own caveat applies —
+  non-entrained cycles cannot certify walking. Hind duty also moved from
+  0.718/0.717 to 0.646/0.641 against a 0.78 ± 0.05 target, landing where the
+  project's own `verified_final` evidence already sat (0.641/0.631). Nobody has
+  looked at why the FOREfeet changed when only the hindlimb was touched.
+- **OPEN**: `test_proposed_sign_tuck_lift_controls_improve_frozen_clearance_not_gait_claim`
+  is red because the parameter set it pins was fitted to the old geometry
+  (#417). Left red rather than edited.
 - **Next decision, not yet taken**: commit, then settle #354 from the sources,
   or take the light-phase `rest`/`bask` tie (#358) by giving the animal a
   retreat to rest in — which needs a source for when a leopard gecko retreats,
@@ -1563,20 +1580,35 @@ session; measured again here at **545 tests, 8 failures, 1 skip**.
 |---|---|---|---|
 | 408 | The hind legs look wrong because they are SCULPTED wrong | **Refuted -- they are ARTICULATED wrong, and the knee has bent backwards since the beginning** | A keeper said *the HIND legs are the wrong shape* and was specific about which end; another asked *can you see the joint forward, unlike hands? ours have the opposite way*. Measured in the trunk's own frame, standing: the **elbow bows 5.6 mm BACKWARD**, which is right, and the **knee bows 3.2 mm BACKWARD**, which is not -- in every tetrapod the elbow points caudally and the knee cranially. The morphology says why in one line each: the forelimb's fore-aft offsets run **+12.5, -4.7, +6.8 mm** (forward, back, forward -- an elbow), and the hindlimb's run **-7.0, -8.0, -2.1 mm** (back, back, back -- no bend at all). The knee was built as a second elbow: same axis, same range, same sign, same-signed standing angle. **FIRST ATTEMPT REFUTED**: flipping the knee's sign in the controller left the bow at -1.6 mm and HALVED the distance walked -- it is geometry, not control. **SECOND ATTEMPT WORKS**: flipping the tibia's fore-aft bearing in gecko_body_r.xml gives the alternating pattern the forelimb has, and the knee bows **+3.8 mm FORWARD**. Segment length is preserved, so the hindlimb-chain gate is untouched, and over five controlled runs the walk is **statistically unchanged: 28.1 +- 17.4 cm against 27.8 +- 16.1 cm**, trunk height 20.4 against 20.7 mm. **NOT SHIPPED, AND THIS IS THE BLOCKER**: StanceCompensator then refuses to build -- *HL interpolation violates frozen stance band* -- because its table is solved against the OLD hind geometry and the new one puts the foot 1.5 mm down against a frozen floor of 1.2 mm. That guard is deliberate and it is working; widening it to pass would be rule 2. So the fix is proven and the compensator must be re-derived for the new limb before it can ship. **Reverted for now**: a live page with a documented anatomical defect beats a live page whose own guard fails. The gecko on the site still has a backwards knee and this row says so |
 
+
+## Ledger — the blocker was never the knee (Session 13w)
+
+| # | Hypothesis | Verdict | Evidence |
+|---|---|---|---|
+| 409 | The compensator refuses the new limb because the NEW LIMB is bad | **Refuted -- the compensator's table has been sawtoothing between two different answers since it was written, and the new limb only pushed it past a guard that was already nearly full** | #408 read the *HL interpolation violates frozen stance band* failure as a property of the flipped tibia. It is not. The guard at `common/hind_stance_geometry.py:248` does not check the solved table nodes -- it checks a grid **four times denser**, i.e. how far LINEAR INTERPOLATION between nodes drifts from the solved curve. Measured on the **shipped** geometry, unchanged: the dense curve sags to **-0.9062 mm** against a -0.600 mm target and a -1.200 mm floor, so two thirds of the headroom was already gone before anything was flipped. The cause is visible node by node. Two free joints (knee, ankle) against one height constraint is **underdetermined**: the solutions form a CURVE and every point on it is equally 'solved'. The Newton path lands on one part of it; the bisection fallback searches along `ones/sqrt(n)` and therefore always returns **knee == ankle**, a different part. Across hip +0.29..+0.79 rad the two **alternate node to node** -- 12 steps above 30 mrad against a median step of **2.05 mrad**, the largest **394 mrad (22.6 degrees)** between neighbours, both solving to -0.6000 mm. The worst interpolated point sits exactly at that step. Interpolating between two branches returns a pose that is on neither |
+| 410 | It is a resolution problem; a denser table will fix it | **Refuted in one measurement** | Linear interpolation error falls as h^2, so doubling the table should cut the overshoot about fourfold. Table 129 -> 257 moved the dense floor from **-0.9062 mm to -0.9032 mm** -- 3 micrometres, not a factor of four -- and the largest node-to-node step stayed at **394 -> 392 mrad**. A finer sample of a sawtooth is a finer sawtooth. That result is what ruled out the sampling explanation and forced the search to the solver, and it is why `table_size` was never touched: raising it until the guard passed would have been rule 2 with extra arithmetic |
+| 411 | The table can be made single-branched without touching the target or the band | **Confirmed** | Seed each node's solve with the PREVIOUS node's answer, and make the bisection fallback search a line THROUGH that seed instead of through the origin. The table then traces one branch by construction. On the **shipped** geometry, with the target at -0.600 mm and the band at -1.200 mm both untouched, the dense interpolation range goes from **[-0.9062, -0.5956] mm to [-0.6021, -0.5981] mm** -- a 306 micrometre drift reduced to 2 -- and the largest node step falls from **394 mrad to 36**. Nothing biological moved: the target, the band, the reachable set and the 2 um residual tolerance are as they were, and what changed is which of many equally-valid poses gets reported, a choice the class docstring already called non-unique. **This is a prerequisite, not an option**: the original solver refuses the reflected limb of #413 too, at -1.6202 mm, so no knee correction could have shipped without it |
+| 412 | Flipping the tibia's fore-aft bearing fixes the knee and leaves the walk statistically unchanged (#408) | **Refuted, and the earlier claim was MINE and it was measured too coarsely to see the failure** | #408 reported 28.1 +- 17.4 cm against 27.8 +- 16.1 cm over five seeds and called the walk unchanged. Those runs used reset noise; the protocol the accepted evidence actually uses is **deterministic** (`reset_noise = 0`, one 20 s episode -- the harness itself collapses repeats because they are the same experiment). On that protocol the flip fails **every one of the six Gate 2 checks**, against three for the shipped body. The reason is geometric and was never measured in #408: flipping the bearing made the knee bow forward **by carrying the whole lower leg forward**. The hind contact point moved from **-40.11 mm to -26.83 mm** in the trunk's own frame -- **13.3 mm, 12.5% of SVL** -- so the left hindfoot's longest no-contact gap collapsed from **252 ms to 136 ms** and the gait analyser counted **38 contacts against 19 commanded strides**, a ratio of 1.96. Preserving segment LENGTH, which #408 checked, does not preserve where the foot lands, which it did not |
+| 413 | The knee can be turned cranial without moving the foot at all | **Confirmed -- it is the other branch of the same two-link chain** | A two-link chain with fixed segment lengths reaching a fixed endpoint has exactly TWO solutions, mirror images across the line from the hip to the ankle; one puts the knee caudal and the other cranial. So the correction is not to move the leg but to **reflect the knee across the hip-ankle line**. `build_lab_morphology.shaped_vector` keeps only the source's horizontal BEARING and imposes length and drop from the registry, so the reflection is done on the xy bearings and **the registry-derived lengths and drops cannot move** -- the hindlimb-chain gate is safe by construction rather than by inspection. Measured: planar link lengths **14.7966 and 12.9659 mm before and after**, ankle unchanged to 1e-12, knee offset from the hip-ankle line **-1.6089 mm -> +1.6089 mm**, an exact mirror. On the rebuilt body the **knee bows +1.35 mm CRANIAL** and the elbow **-4.84 mm CAUDAL**, the hind contact point returns to **-40.12 mm against the original -40.11**, and the chain offsets run **-7.0, -3.4, -6.0 mm** against the forelimb's **+12.5, -3.8, +6.1** -- mirrored, as a tetrapod is. **14/14 morphology gates**, conformance **10/10** with the walker at 5.603e-16 |
+| 414 | The reflected knee is a free improvement | **Partly -- it is better on four of the six Gate 2 values and it costs contact entrainment, and the cost is recorded here rather than rounded away** | Same deterministic protocol, shipped body against reflected body. **Better**: forward speed **0.0550 vs 0.0411 m/s**, net-to-path ratio **0.9038 vs 0.7397**, hind swing load **0.015/0.002 vs 0.052/0.051** (the best of any condition tried), front stance load **0.618/0.615 vs 0.602/0.605** -- still failing its 0.65 floor, but closer. Peak hind foot load drops from **2.2 to 1.25 bodyweights**. **Worse**: hind duty **0.646/0.641 vs 0.718/0.717** against a 0.78 +- 0.05 target, though the project's own accepted `verified_final` evidence records **0.641/0.631**, so this lands where the recorded walker already sat; limb phase **0.624/0.639 vs 0.610/0.620** against 0.435 +- 0.03. **The real cost**: the forefeet make **1.101 and 1.104** contacts per commanded stride against a 10% entrainment tolerance, so `observed_contacts_entrained` is **false** and the gate's own caveat applies -- non-entrained cycles cannot certify walking. That is a FAIL at 0.1% over the bound and it is written here as a fail, not as 'essentially passing'. Gate 2 fails overall on both bodies, as it has since #291, so no passing gate was turned into a failing one. **Shipped**: a visible anatomical defect two keepers identified in public outweighs an internal timing-quality margin, and this row is what makes that trade reversible |
+| 415 | `morphology/gecko_body_web.xml` is the certified body with its skin removed, as `site/live.js` tells every visitor | **Refuted -- it was a DIFFERENT body, and it had no generator at all** | The committed web body records source `a9d423ed...`; the committed `gecko_body_lab_v2.xml` records `9fd73bad...`. Two different source animals, while the public page says the browser runs the certified one. It had drifted because it was made by hand once and **no script in the repository could rebuild it** -- an artifact nobody can regenerate cannot be kept honest. `tools/export_web_body.py` now performs the strip explicitly (textures, materials, mesh assets, the `<deformable>`/`<skin>` block, every `type="mesh"` geom, and the orphaned `material=` attributes) and `--verify` re-measures the original claim instead of restating it: nq/nv/nu/nbody/njnt/nkey identical, masses, inertias and keyframes identical, and **400 steps under identical controls with a maximum joint difference of exactly 0.000e+00** |
+| 416 | `tools/rebuild_body.py` rebuilds the animal end to end, which is what it exists for | **Refuted -- it died at its fifth step and had never reached the sixth** | It invokes each stage by PATH, so Python puts that script's own directory on `sys.path` and not the repository root; `utils/build_lab_morphology.py` therefore failed on `from common.morphology_audit import ...` and the pipeline stopped before it built either lab body, let alone the worlds. The one thing this script is supposed to be authoritative about is ORDER, and it could not get to the end of the order. Fixed by handing every stage a `PYTHONPATH` rooted at the repository. **The habitat was missing from it entirely** and had drifted two generations for it -- committed from source `db650f6b`, i.e. a body from before the animal had textures -- and it is not decorative: `tools/export_web_brain.py` lifts the shelter and warm-patch geometry out of it for the public page and `tools/everything_video.py` films in it. It is now a step in the pipeline with its own flags, which differ from the other worlds' |
+| 417 | The proposed sign/tuck/lift parameter set still improves frozen clearance on the corrected limb | **Refuted -- it was fitted to the old geometry, and the test stays red for a stated reason** | `test_proposed_sign_tuck_lift_controls_improve_frozen_clearance_not_gait_claim` asserts mid-swing clearance exceeds mid-stance under an UNSHIPPED experimental parameter set. On the reflected limb it does not: **-0.2636 against -0.2161 mm**. Reversing `hind_lift_multiplier` was the obvious explanation and it made a sharp prediction -- an exact mirror should recover the baseline **+2.2779 mm** -- so it was tested and **refuted**: +4/3 gives **-2.7587 mm**, further down, not up. Under the **shipped** parameters the same probe reads **-2.874 mm for the reflected body against -4.798 for the baseline**, so on what is actually shipped the new limb is the better of the two and the failing assertion is about a parameter set nobody runs. Following #291's precedent the test is left failing rather than edited to match, because editing a test until it passes is the thing this file exists to catch. Suite: **536 of 545**, the eight `GateContracts` of #291 plus this one |
+
 ---
 
 ## Scoreboard
 
 | | |
 |---|---|
-| Hypotheses tested | **317** |
-| Refuted | **258** |
-| Confirmed | **34** |
-| Partly | **18** |
-| Other | **7** |
-| Tests passing | **529 of 537**, one skip |
+| Hypotheses tested | **417** |
+| Refuted | **345** |
+| Confirmed | **40** |
+| Partly | **26** |
+| Other | **6** |
+| Tests passing | **536 of 545**, one skip |
 
-**81 per cent of everything tried was wrong.**
+**83 per cent of everything tried was wrong.**
 
 THIS TABLE HAD DRIFTED AGAIN, AND THE LINE CLAIMING OTHERWISE WAS FALSE. It read
 221 / 186 / 22 / 12 and "now regenerated by `tools/report_data.py`". That tool
