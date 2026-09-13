@@ -391,8 +391,8 @@
          future muscle-level upgrade. [R] -->
     <fixed name="spine_bend" stiffness="0.01" damping="0.004">
       <joint joint="spine_lat_1" coef="1.0"/>
-      <joint joint="spine_lat_2" coef="1.0"/>
-      <joint joint="spine_lat_3" coef="0.8"/>
+      <joint joint="spine_lat_2" coef="-1.0"/>
+      <joint joint="spine_lat_3" coef="-0.8"/>
     </fixed>
     <!-- tail: LEFT/RIGHT antagonist pair over the 5 yaw joints
          (muscle-like push-pull). Opposite-sign coefs; co-activation
