@@ -1557,6 +1557,14 @@ session; measured again here at **545 tests, 8 failures, 1 skip**.
 
 ---
 
+## Ledger — the knee has been bending backwards since the beginning (Session 13v)
+
+| # | Hypothesis | Verdict | Evidence |
+|---|---|---|---|
+| 408 | The hind legs look wrong because they are SCULPTED wrong | **Refuted -- they are ARTICULATED wrong, and the knee has bent backwards since the beginning** | A keeper said *the HIND legs are the wrong shape* and was specific about which end; another asked *can you see the joint forward, unlike hands? ours have the opposite way*. Measured in the trunk's own frame, standing: the **elbow bows 5.6 mm BACKWARD**, which is right, and the **knee bows 3.2 mm BACKWARD**, which is not -- in every tetrapod the elbow points caudally and the knee cranially. The morphology says why in one line each: the forelimb's fore-aft offsets run **+12.5, -4.7, +6.8 mm** (forward, back, forward -- an elbow), and the hindlimb's run **-7.0, -8.0, -2.1 mm** (back, back, back -- no bend at all). The knee was built as a second elbow: same axis, same range, same sign, same-signed standing angle. **FIRST ATTEMPT REFUTED**: flipping the knee's sign in the controller left the bow at -1.6 mm and HALVED the distance walked -- it is geometry, not control. **SECOND ATTEMPT WORKS**: flipping the tibia's fore-aft bearing in gecko_body_r.xml gives the alternating pattern the forelimb has, and the knee bows **+3.8 mm FORWARD**. Segment length is preserved, so the hindlimb-chain gate is untouched, and over five controlled runs the walk is **statistically unchanged: 28.1 +- 17.4 cm against 27.8 +- 16.1 cm**, trunk height 20.4 against 20.7 mm. **NOT SHIPPED, AND THIS IS THE BLOCKER**: StanceCompensator then refuses to build -- *HL interpolation violates frozen stance band* -- because its table is solved against the OLD hind geometry and the new one puts the foot 1.5 mm down against a frozen floor of 1.2 mm. That guard is deliberate and it is working; widening it to pass would be rule 2. So the fix is proven and the compensator must be re-derived for the new limb before it can ship. **Reverted for now**: a live page with a documented anatomical defect beats a live page whose own guard fails. The gecko on the site still has a backwards knee and this row says so |
+
+---
+
 ## Scoreboard
 
 | | |
