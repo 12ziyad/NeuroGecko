@@ -56,8 +56,20 @@ def find(root: ET.Element, tag: str, name: str) -> ET.Element:
 
 
 def shaped_vector(original: np.ndarray, length: float, drop: float) -> np.ndarray:
-    """Change inclination while preserving length and original horizontal bearing."""
-    if length <= 0 or not 0 <= drop < length:
+    """Change inclination while preserving length and original horizontal bearing.
+
+    A NEGATIVE drop raises the far end above the near one, and forbidding it is
+    what kept the hind limb straight for the whole life of this project. With
+    every segment obliged to descend, femur and tibia both went out AND down,
+    which is one straight diagonal: the knee measured 159.9 deg, 98.5% of full
+    extension, against a published stance range of 69-96 (Reilly & Delancey
+    1997, Sceloporus, cross-species). A sprawling lizard is not a diagonal, it
+    is a Z -- thigh out and roughly level, knee the high outer corner, shin down
+    to a foot that still lands wide. That shape cannot be expressed while
+    drop >= 0 is a hard constraint, so the constraint is now |drop| < length,
+    which is the real geometric limit and nothing more.
+    """
+    if length <= 0 or not -length < drop < length:
         raise ValueError("Invalid segment length/drop")
     horizontal = original[:2] / np.linalg.norm(original[:2])
     return np.r_[horizontal * math.sqrt(length * length - drop * drop), -drop]

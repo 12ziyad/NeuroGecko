@@ -592,24 +592,24 @@
         "notes": "Deterministic calibration protocol."
       },
       "lab_neutral_femur_drop_m": {
-        "value": 0.004,
+        "value": -0.002,
         "units": "m",
         "species": "INVENTED",
         "sample_size": null,
         "source": "NeuroGecko lab candidate v1 engineering design, 2026-09-05",
         "confidence": "uncertain",
         "recording_temp_C": null,
-        "notes": "Engineered hip-to-knee downward component. Preserves source-scaled femur length by adjusting horizontal projection; not measured gecko neutral geometry."
+        "notes": "Engineered hip-to-knee vertical component. NEGATIVE: the knee sits ABOVE the hip, which is what makes the limb a sprawled Z instead of a straight diagonal. The previous +0.004 put femur and tibia both going out and down and the knee measured 159.9 deg -- 98.5% extended, a stick -- against Reilly and Delancey's 69-96 deg stance range. Two keepers on r/leopardgeckos called the legs stiff and wrongly curved before any of this was measured. STILL INVENTED: no standing knee angle has been published for this species, so this is a chosen posture, not a measured one. Chosen to give a 107 deg knee at unchanged trunk height, with the foot still landing 32 mm out so the hind feet keep tracking wide."
       },
       "lab_neutral_tibia_drop_m": {
-        "value": 0.0076,
+        "value": 0.0136,
         "units": "m",
         "species": "INVENTED",
         "sample_size": null,
         "source": "NeuroGecko lab candidate v1 engineering design, 2026-09-05",
         "confidence": "uncertain",
         "recording_temp_C": null,
-        "notes": "Engineered knee-to-ankle downward component. Other components adjusted to preserve source-scaled tibia length."
+        "notes": "Engineered knee-to-ankle vertical component. Raised from 0.0076 so the shin carries the whole descent and the foot lands under a raised knee. Paired with the negative femur drop the TOTAL hip-to-foot drop is unchanged at 11.6 mm, so the animal does not stand taller -- only the path from hip to foot changes. INVENTED, same as before, for the same reason."
       },
       "lab_forelimb_fraction_hind": {
         "value": 0.85,

@@ -991,7 +991,7 @@ try {
   // was a page running new modules against an old brain.json -- the biology
   // panel came up empty because the file the browser had cached predated it.
   // `NG_V` is rewritten on every deploy alongside the module imports.
-  const NG_V = "f7a6407f2e";
+  const NG_V = "f311f7fab1";
   const cfg = await (await fetch("media/brain.json?v=" + NG_V)).json();
 
   boot.textContent = "starting MuJoCo…";
